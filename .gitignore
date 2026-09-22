@@ -19,5 +19,3 @@ desktop.ini
 
 # Logs
 *.log
-# ===== Build output (không push) =====
-dist/
