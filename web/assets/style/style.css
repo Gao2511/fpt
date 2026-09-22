@@ -1,0 +1,579 @@
+/* =========================================================
+   FPT SALE - THEME BẢNG GIÁ FPT
+   ========================================================= */
+
+:root {
+    --fpt-orange:       #f37021;
+    --fpt-orange-dark:  #e65100;
+    --fpt-orange-light: #fff3e0;
+    --fpt-blue:         #1a4b8c;
+    --fpt-blue-dark:    #0f3266;
+    --fpt-green:        #28a745;
+    --fpt-green-light:  #e8f5e9;
+    --fpt-yellow:       #ffc107;
+    --fpt-red:          #e53935;
+    --fpt-red-light:    #ffebee;
+    --fpt-gray:         #f5f7fa;
+    --fpt-gray-dark:    #666;
+    --fpt-text:         #333;
+    --fpt-border:       #e5e5e5;
+    --fpt-white:        #ffffff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--fpt-gray);
+    color: var(--fpt-text);
+    line-height: 1.5;
+}
+
+a { text-decoration: none; color: inherit; }
+img { max-width: 100%; display: block; }
+
+/* =========================================================
+   TOP BAR (dòng cam trên cùng)
+   ========================================================= */
+.top-strip {
+    background: var(--fpt-orange);
+    color: white;
+    font-size: 13px;
+    padding: 8px 0;
+}
+
+.top-strip .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.top-strip .left { display: flex; align-items: center; gap: 15px; }
+.top-strip .right { display: flex; align-items: center; gap: 20px; font-weight: 600; }
+
+/* =========================================================
+   MAIN HEADER (logo + menu)
+   ========================================================= */
+.main-header {
+    background: var(--fpt-white);
+    padding: 12px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.main-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.main-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.main-header .logo img { height: 40px; }
+.main-header .logo span {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--fpt-orange);
+}
+
+.main-header nav {
+    display: flex;
+    gap: 25px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+}
+
+.main-header nav a:hover { color: var(--fpt-orange); }
+
+.main-header .actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-outline {
+    padding: 8px 16px;
+    border: 1.5px solid var(--fpt-orange);
+    color: var(--fpt-orange);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btn-outline:hover {
+    background: var(--fpt-orange);
+    color: white;
+}
+
+.btn-solid {
+    padding: 8px 20px;
+    background: var(--fpt-orange);
+    color: white;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    transition: 0.2s;
+}
+
+.btn-solid:hover {
+    background: var(--fpt-orange-dark);
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   HERO (banner bảng giá)
+   ========================================================= */
+.hero {
+    background: linear-gradient(180deg, #e8f0fb 0%, #f5f7fa 100%);
+    text-align: center;
+    padding: 45px 20px 35px;
+    position: relative;
+}
+
+.hero .slogan {
+    display: inline-block;
+    background: white;
+    border: 1px solid #d0dcef;
+    color: var(--fpt-blue);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+
+.hero h1 {
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--fpt-blue);
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+.hero .subtitle {
+    display: inline-block;
+    background: var(--fpt-blue);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 8px 24px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+
+.hero .desc {
+    max-width: 700px;
+    margin: 0 auto 25px;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.hero .badges {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: #444;
+}
+
+.hero .badges span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hero .badges span::before {
+    content: "✓";
+    color: var(--fpt-green);
+    font-weight: 700;
+    font-size: 15px;
+}
+
+/* =========================================================
+   SECTION TITLE
+   ========================================================= */
+.section-title {
+    text-align: center;
+    padding: 30px 20px 10px;
+}
+
+.section-title .small {
+    color: var(--fpt-orange);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.section-title h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--fpt-blue);
+    position: relative;
+    display: inline-block;
+    padding-bottom: 12px;
+}
+
+.section-title h2::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: var(--fpt-orange);
+    border-radius: 2px;
+}
+
+/* =========================================================
+   PACKAGE CARDS
+   ========================================================= */
+.packages-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    max-width: 1300px;
+    margin: 25px auto 40px;
+    padding: 0 20px;
+}
+
+.pkg-card {
+    background: white;
+    border-radius: 14px;
+    padding: 0 0 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+.pkg-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.pkg-card .pkg-header {
+    padding: 15px 20px;
+    color: white;
+    text-align: center;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    position: relative;
+}
+
+.pkg-card .hot-tag {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--fpt-red);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 10px;
+}
+
+.pkg-card .pkg-sub {
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+    padding: 12px 15px 8px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.pkg-card .pkg-icon {
+    text-align: center;
+    font-size: 42px;
+    padding: 5px 0 15px;
+    color: var(--fpt-orange);
+}
+
+.pkg-card .pkg-price {
+    text-align: center;
+    padding: 8px 20px;
+    background: var(--fpt-orange-light);
+    margin: 0 20px;
+    border-radius: 8px;
+}
+
+.pkg-card .pkg-price .num {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--fpt-orange);
+    line-height: 1;
+}
+
+.pkg-card .pkg-price .unit {
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+}
+
+.pkg-card ul {
+    list-style: none;
+    padding: 15px 20px;
+    flex: 1;
+}
+
+.pkg-card ul li {
+    font-size: 13px;
+    color: #444;
+    padding: 6px 0 6px 22px;
+    position: relative;
+    line-height: 1.5;
+}
+
+.pkg-card ul li::before {
+    content: "✓";
+    color: var(--fpt-green);
+    font-weight: 700;
+    position: absolute;
+    left: 0;
+    font-size: 14px;
+}
+
+.pkg-card .btn-register {
+    display: block;
+    margin: 10px 20px 0;
+    text-align: center;
+    padding: 12px;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 14px;
+    transition: 0.3s;
+    border: 2px solid;
+    background: white;
+}
+
+/* Màu header theo từng gói */
+/* =========================================================
+   PACKAGE CARDS - TẤT CẢ ĐỀU MÀU CAM (ĐỒNG BỘ 100%)
+   ========================================================= */
+
+/* ===== HEADER GÓI - TẤT CẢ CÙNG 1 MÀU CAM ===== */
+.pkg-card .pkg-header {
+    background: linear-gradient(135deg, #FF9800 0%, #F37021 100%) !important;
+    color: white;
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1);
+}
+
+/* ===== NÚT ĐĂNG KÝ - TẤT CẢ CÙNG 1 MÀU CAM ===== */
+.pkg-card .btn-register {
+    border: 2px solid #F37021 !important;
+    background: linear-gradient(135deg, #FF9800, #F37021) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(243, 112, 33, 0.3);
+}
+
+.pkg-card .btn-register:hover {
+    background: linear-gradient(135deg, #F37021, #E65100) !important;
+    border-color: #E65100 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(243, 112, 33, 0.5);
+}
+
+/* ===== TAG "HOT" - MÀU CAM ĐẬM ===== */
+.pkg-card .hot-tag {
+    background: linear-gradient(135deg, #E65100, #D95810) !important;
+    color: white;
+}
+
+/* =========================================================
+   FEATURES (4 ô ưu điểm)
+   ========================================================= */
+.features {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    max-width: 1300px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.feature-item {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+
+.feature-item .icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--fpt-orange-light);
+    color: var(--fpt-orange);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.feature-item .text h4 {
+    color: var(--fpt-blue);
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 3px;
+}
+
+.feature-item .text p {
+    color: #777;
+    font-size: 12px;
+}
+
+/* =========================================================
+   DEVICES (3 ô thiết bị)
+   ========================================================= */
+.devices-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    max-width: 1000px;
+    margin: 20px auto 50px;
+    padding: 0 20px;
+}
+
+.device-card {
+    background: white;
+    border-radius: 14px;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s;
+}
+
+.device-card:hover { transform: translateY(-5px); }
+
+.device-card .device-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+
+.device-card h3 {
+    font-size: 16px;
+    color: var(--fpt-blue);
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.device-card .device-btn {
+    display: inline-block;
+    padding: 10px 25px;
+    border-radius: 25px;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    transition: 0.3s;
+}
+
+.device-card .device-btn:hover { transform: translateY(-2px); }
+
+.device-1 .device-btn { background: #1a4b8c; }
+.device-2 .device-btn { background: #28a745; }
+.device-3 .device-btn { background: var(--fpt-orange); }
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+.footer {
+    background: #0a1f44;
+    color: #cfd6e0;
+    padding: 40px 0 20px;
+    font-size: 13px;
+}
+
+.footer .container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.2fr;
+    gap: 30px;
+}
+
+.footer h4 {
+    color: white;
+    font-size: 14px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.footer ul {
+    list-style: none;
+}
+
+.footer ul li {
+    padding: 5px 0;
+    color: #a8b3c4;
+}
+
+.footer .logo-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.footer .logo-footer img { height: 35px; }
+
+.footer .hotline-footer {
+    color: var(--fpt-orange);
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.footer .bottom {
+    border-top: 1px solid #1e3a63;
+    margin-top: 30px;
+    padding-top: 15px;
+    text-align: center;
+    font-size: 12px;
+    color: #7a8ba5;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 1024px) {
+    .packages-grid { grid-template-columns: repeat(2, 1fr); }
+    .features { grid-template-columns: repeat(2, 1fr); }
+    .footer .container { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 640px) {
+    .hero h1 { font-size: 28px; }
+    .hero .desc { font-size: 13px; }
+    .packages-grid { grid-template-columns: 1fr; }
+    .features { grid-template-columns: 1fr; }
+    .devices-grid { grid-template-columns: 1fr; }
+    .footer .container { grid-template-columns: 1fr; }
+    .main-header nav { display: none; }
+}

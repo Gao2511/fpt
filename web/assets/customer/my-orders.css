@@ -1,0 +1,450 @@
+/* =========================================================
+   MY ORDERS - TRANG XEM ĐƠN ĐĂNG KÝ
+   ========================================================= */
+
+.orders-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 120px 20px 100px;
+    background: transparent;
+    min-height: 80vh;
+}
+
+.orders-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.orders-header h1 {
+    font-size: 32px;
+    font-weight: 900;
+    color: #d95810;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 8px rgba(243, 112, 33, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.orders-header h1 svg {
+    width: 30px;
+    height: 30px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+}
+
+.orders-header p {
+    color: #64748b;
+    font-size: 14.5px;
+}
+
+.orders-count {
+    display: inline-block;
+    background: linear-gradient(135deg, #f37021, #ff8c42);
+    color: white;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(243, 112, 33, 0.3);
+}
+
+/* =========================================================
+   ORDER CARD
+   ========================================================= */
+
+.order-card {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 24px 28px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border: 2px solid #f37021;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+}
+
+.order-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 5px;
+    height: 100%;
+    background: linear-gradient(180deg, #f37021, #ff8c42);
+    z-index: 3;
+}
+
+.order-card:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 12px 35px rgba(243, 112, 33, 0.2),
+        0 0 0 1px rgba(243, 112, 33, 0.15);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed #f1f5f9;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.order-id {
+    font-size: 15px;
+    font-weight: 800;
+    color: #d95810;
+}
+
+.order-status {
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.status-Mới           { background: #dbeafe; color: #1d4ed8; }
+.status-Đã-liên-hệ    { background: #fef3c7; color: #d97706; }
+.status-Đã-ký-HĐ      { background: #dcfce7; color: #15803d; }
+.status-Hủy           { background: #fee2e2; color: #dc2626; }
+
+.order-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 30px;
+}
+
+.order-row {
+    display: flex;
+    gap: 10px;
+    font-size: 14px;
+    padding: 6px 0;
+}
+
+.order-label {
+    color: #64748b;
+    font-weight: 600;
+    min-width: 100px;
+}
+
+.order-value {
+    color: #1e293b;
+    font-weight: 600;
+    flex: 1;
+    word-break: break-word;
+}
+
+.order-row-full {
+    grid-column: 1 / -1;
+}
+
+.order-footer {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed #f1f5f9;
+    font-size: 13px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.order-footer svg {
+    width: 14px;
+    height: 14px;
+    stroke: #94a3b8;
+    fill: none;
+    stroke-width: 2;
+    flex-shrink: 0;
+}
+
+/* =========================================================
+   PHÂN TRANG ĐƠN ĐĂNG KÝ
+   ========================================================= */
+
+.orders-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.orders-pagination a,
+.orders-pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    height: 42px;
+    padding: 0 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.25s;
+    border: 1.5px solid #e5e7eb;
+    background: white;
+    color: #475569;
+    font-family: 'Be Vietnam Pro', sans-serif;
+}
+
+.orders-pagination a:hover {
+    border-color: #f37021;
+    color: #f37021;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(243, 112, 33, 0.15);
+}
+
+.orders-pagination .page-active {
+    background: linear-gradient(135deg, #f37021, #ff8c42);
+    color: white;
+    border-color: #f37021;
+    box-shadow: 0 4px 12px rgba(243, 112, 33, 0.3);
+    cursor: default;
+    transform: none !important;
+}
+
+.orders-pagination .page-dots {
+    border: none;
+    background: transparent;
+    cursor: default;
+    color: #94a3b8;
+    letter-spacing: 2px;
+    font-weight: 900;
+}
+
+.orders-pagination .page-dots:hover {
+    background: transparent;
+    color: #94a3b8;
+    transform: none;
+    box-shadow: none;
+}
+
+.orders-pagination .page-nav {
+    padding: 0 18px;
+    font-size: 13.5px;
+    gap: 4px;
+}
+
+.orders-pagination .page-nav.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* Info dưới phân trang */
+.orders-page-info {
+    text-align: center;
+    color: #64748b;
+    font-size: 13.5px;
+    margin-top: 16px;
+    font-weight: 500;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    border: 1px solid #eef2f7;
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.orders-page-info-wrap {
+    text-align: center;
+    margin-top: 8px;
+}
+
+.orders-page-info strong {
+    color: #f37021;
+    font-weight: 800;
+}
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.empty-orders {
+    text-align: center;
+    padding: 70px 20px 80px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border: 2px solid #f37021;
+    position: relative;
+    overflow: hidden;
+}
+
+.empty-orders::before {
+    content: "";
+    position: absolute;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 340px;
+    height: 340px;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+        rgba(243, 112, 33, 0.15) 0%,
+        rgba(243, 112, 33, 0.05) 45%,
+        transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.empty-illustration {
+    width: 220px;
+    height: 220px;
+    margin: 0 auto 26px;
+    display: block;
+    position: relative;
+    z-index: 1;
+    animation: floatEmpty 3.5s ease-in-out infinite;
+    filter: drop-shadow(0 14px 30px rgba(243, 112, 33, 0.18));
+}
+
+@keyframes floatEmpty {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
+}
+
+.empty-orders h3 {
+    font-size: 22px;
+    color: #1e293b;
+    margin-bottom: 10px;
+    font-weight: 800;
+    position: relative;
+    z-index: 1;
+}
+
+.empty-orders p {
+    color: #64748b;
+    font-size: 14.5px;
+    margin-bottom: 26px;
+    position: relative;
+    z-index: 1;
+}
+
+.btn-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 30px;
+    background: linear-gradient(135deg, #f37021, #ff8c42);
+    color: white;
+    font-weight: 800;
+    font-size: 14px;
+    border-radius: 30px;
+    text-decoration: none;
+    box-shadow: 0 8px 20px rgba(243, 112, 33, 0.3);
+    transition: all 0.3s;
+    position: relative;
+    z-index: 1;
+}
+
+.btn-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(243, 112, 33, 0.45);
+}
+
+.btn-cta svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* =========================================================
+   FIX DẢI TRẮNG DƯỚI FOOTER
+   ========================================================= */
+
+body {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.footer {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.footer .container {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.footer .footer-bottom {
+    padding-bottom: 30px !important;
+    margin-bottom: 0 !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 640px) {
+    .orders-container {
+        padding: 100px 14px 40px;
+    }
+    .order-body {
+        grid-template-columns: 1fr;
+    }
+    .orders-header h1 {
+        font-size: 24px;
+    }
+    .order-card {
+        padding: 18px 20px;
+    }
+    .order-label {
+        min-width: 80px;
+        font-size: 13px;
+    }
+    .order-value {
+        font-size: 13px;
+    }
+    .empty-illustration {
+        width: 170px;
+        height: 170px;
+    }
+    .empty-orders h3 {
+        font-size: 18px;
+    }
+    .empty-orders p {
+        font-size: 13.5px;
+    }
+
+    /* Phân trang mobile */
+    .orders-pagination a,
+    .orders-pagination span {
+        min-width: 38px;
+        height: 38px;
+        font-size: 13px;
+        padding: 0 10px;
+    }
+    .orders-pagination .page-nav {
+        padding: 0 12px;
+        font-size: 12.5px;
+    }
+    .orders-page-info {
+        font-size: 12.5px;
+        padding: 10px 16px;
+    }
+}

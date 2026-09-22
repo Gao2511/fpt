@@ -1,0 +1,28 @@
+/* =========================================================
+   FPT SALE - WEB FONTS
+   Load Inter + Be Vietnam Pro từ Google Fonts
+   ========================================================= */
+
+/* Inter - font chính, hiện đại, đọc tốt */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+/* Be Vietnam Pro - font phụ trợ cho tiếng Việt (dấu đẹp) */
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap');
+
+/* =========================================================
+   KHAI BÁO BIẾN FONT DÙNG CHUNG
+   ========================================================= */
+:root {
+    --font-primary: 'Be Vietnam Pro', 'Inter', -apple-system, BlinkMacSystemFont,
+                    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-heading: 'Be Vietnam Pro', 'Inter', sans-serif;
+    --font-mono:    'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+}
+
+/* Áp dụng cho toàn bộ trang */
+html, body, input, button, select, textarea {
+    font-family: var(--font-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}

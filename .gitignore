@@ -1,0 +1,23 @@
+# Build
+build/
+# dist/        
+target/
+# *.war        
+
+# NetBeans
+nbproject/private/
+nbproject/build-impl.xml
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+*.log
+# ===== Build output (không push) =====
+dist/

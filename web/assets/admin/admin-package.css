@@ -1,0 +1,850 @@
+/* =========================================================
+   ADMIN PACKAGE - QUẢN LÝ GÓI CƯỚC
+   ========================================================= */
+
+/* ===== MÃ GÓI ===== */
+.pkg-code {
+    display: inline-block;
+    background: #1a4b8c;
+    color: white;
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* ===== GIÁ ===== */
+.pkg-price-tag {
+    display: inline-block;
+    background: #fff3e0;
+    color: #f37021;
+    font-size: 13.5px;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+/* ===== TỐC ĐỘ ===== */
+.pkg-speed {
+    display: inline-block;
+    background: #dcfce7;
+    color: #16a34a;
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+/* ===== MÔ TẢ ===== */
+.col-desc {
+    color: #64748b;
+    font-size: 12.5px;
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.5;
+}
+
+/* ===== BADGE HOT (cũ) ===== */
+.hot-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #f37021, #ff8c42);
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 8px rgba(243, 112, 33, 0.3);
+    white-space: nowrap;
+}
+
+/* ===== FIELD HINT ===== */
+.field-hint {
+    display: block;
+    color: #94a3b8;
+    font-size: 11.5px;
+    font-style: italic;
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+/* =========================================================
+   TOGGLE SWITCH
+   ========================================================= */
+.toggle-switch {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+    padding: 12px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fafbfc;
+    transition: all 0.2s;
+}
+
+.toggle-switch:hover {
+    border-color: #f37021;
+    background: #fff9f5;
+}
+
+.toggle-switch input[type="checkbox"] {
+    display: none;
+}
+
+.toggle-switch .slider {
+    position: relative;
+    width: 42px;
+    height: 24px;
+    background: #cbd5e1;
+    border-radius: 24px;
+    transition: all 0.3s;
+    flex-shrink: 0;
+}
+
+.toggle-switch .slider::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.toggle-switch input[type="checkbox"]:checked + .slider {
+    background: linear-gradient(135deg, #f37021, #ff8c42);
+    box-shadow: 0 0 0 3px rgba(243, 112, 33, 0.15);
+}
+
+.toggle-switch input[type="checkbox"]:checked + .slider::after {
+    left: 21px;
+}
+
+.toggle-switch .toggle-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    line-height: 1.4;
+}
+
+.toggle-switch input[type="checkbox"]:checked ~ .toggle-label {
+    color: #f37021;
+    font-weight: 700;
+}
+
+/* =========================================================
+   BADGE SELECTOR - CHỌN PHÂN LOẠI TRONG FORM EDIT
+   ========================================================= */
+.badge-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.badge-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s;
+    background: #fafbfc;
+    position: relative;
+    user-select: none;
+}
+
+.badge-card:hover {
+    border-color: #cbd5e1;
+    background: white;
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.badge-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.badge-card .badge-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.badge-card .badge-info {
+    flex: 1;
+}
+
+.badge-card .badge-info strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 2px;
+}
+
+.badge-card .badge-info small {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* ===== TRẠNG THÁI ACTIVE ===== */
+
+.badge-card.active {
+    border-color: #94a3b8;
+    background: #f1f5f9;
+    box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.15);
+}
+.badge-card.active .badge-info strong {
+    color: #475569;
+}
+
+.badge-card-hot.active {
+    border-color: #dc2626;
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+.badge-card-hot.active .badge-info strong {
+    color: #dc2626;
+}
+.badge-card-hot.active .badge-icon {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: white;
+}
+
+.badge-card-featured.active {
+    border-color: #d97706;
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+}
+.badge-card-featured.active .badge-info strong {
+    color: #d97706;
+}
+.badge-card-featured.active .badge-icon {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: white;
+}
+
+/* =========================================================
+   BADGE OPTIONS - NÚT CHỌN NHANH TRONG DANH SÁCH GÓI CƯỚC
+   ========================================================= */
+.badge-form {
+    margin: 0;
+}
+
+.badge-options {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.badge-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.25s;
+    background: #fafbfc;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.badge-option input[type="radio"] {
+    display: none;
+}
+
+.badge-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.badge-option-hot:hover {
+    border-color: #dc2626;
+    color: #dc2626;
+    background: #fef2f2;
+}
+
+.badge-option-hot.active {
+    border-color: #dc2626;
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: white;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+}
+
+.badge-option-featured:hover {
+    border-color: #d97706;
+    color: #d97706;
+    background: #fffbeb;
+}
+
+.badge-option-featured.active {
+    border-color: #d97706;
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: white;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+}
+
+.badge-clear {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #94a3b8;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    margin-left: 2px;
+}
+
+.badge-clear:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    transform: rotate(90deg);
+}
+
+/* =========================================================
+   BADGE DISPLAY - HIỂN THỊ TRONG DANH SÁCH
+   ========================================================= */
+.badge-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.badge-display-hot {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: white;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+.badge-display-featured {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: white;
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+}
+
+/* =========================================================
+   ⭐ PACKAGE LIST — NEON SÁNG LUÔN (MÃ GÓI / GIÁ / TỐC ĐỘ)
+   CHỈ ÁP DỤNG CHO TRANG DANH SÁCH (.page-package-list)
+   ========================================================= */
+
+.page-package-list .pkg-code {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.35), rgba(2, 132, 199, 0.25)) !important;
+    color: #bae6fd !important;
+    border: 1px solid rgba(56, 189, 248, 0.5) !important;
+    box-shadow:
+        0 0 12px rgba(56, 189, 248, 0.5),
+        0 0 24px rgba(56, 189, 248, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    text-shadow: 0 0 10px rgba(186, 230, 253, 0.7);
+    font-weight: 800 !important;
+}
+
+.page-package-list .pkg-price-tag {
+    background: linear-gradient(135deg, rgba(243, 112, 33, 0.35), rgba(255, 140, 66, 0.25)) !important;
+    color: #fdba74 !important;
+    border: 1px solid rgba(255, 178, 107, 0.5) !important;
+    box-shadow:
+        0 0 12px rgba(243, 112, 33, 0.5),
+        0 0 24px rgba(243, 112, 33, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    text-shadow: 0 0 10px rgba(253, 186, 116, 0.7);
+    font-weight: 800 !important;
+}
+
+.page-package-list .pkg-speed {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.35), rgba(74, 222, 128, 0.25)) !important;
+    color: #86efac !important;
+    border: 1px solid rgba(74, 222, 128, 0.5) !important;
+    box-shadow:
+        0 0 12px rgba(34, 197, 94, 0.5),
+        0 0 24px rgba(34, 197, 94, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    text-shadow: 0 0 10px rgba(134, 239, 172, 0.7);
+    font-weight: 800 !important;
+}
+
+/* =========================================================
+   ⭐ PHÂN LOẠI BADGE — TRONG SUỐT MẶC ĐỊNH
+   Chỉ sáng khi .active hoặc hover
+   ========================================================= */
+
+.page-package-list .badge-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 6px 12px !important;
+    border-radius: 20px !important;
+    font-size: 11.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.3px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    white-space: nowrap !important;
+}
+
+.page-package-list .badge-pill svg {
+    width: 12px !important;
+    height: 12px !important;
+    stroke: currentColor !important;
+    fill: none !important;
+    stroke-width: 2.5 !important;
+    flex-shrink: 0 !important;
+    display: inline-block !important;
+}
+
+/* 🔥 HOT — TRẠNG THÁI CHƯA CHỌN (xám nhạt) */
+.page-package-list .badge-pill.pill-hot {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #94a3b8 !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+/* 🔥 HOT — HOVER */
+.page-package-list .badge-pill.pill-hot:hover {
+    background: rgba(243, 112, 33, 0.15) !important;
+    color: #fb923c !important;
+    border-color: rgba(243, 112, 33, 0.4) !important;
+    box-shadow: 0 0 12px rgba(243, 112, 33, 0.3) !important;
+    transform: translateY(-2px);
+}
+
+/* 🔥 HOT — ĐÃ CHỌN */
+.page-package-list .badge-pill.pill-hot.active {
+    background: linear-gradient(135deg, rgba(243, 112, 33, 0.4), rgba(255, 140, 66, 0.25)) !important;
+    color: #ffb26b !important;
+    border: 1px solid rgba(255, 178, 107, 0.6) !important;
+    box-shadow:
+        0 0 15px rgba(243, 112, 33, 0.6),
+        0 0 30px rgba(243, 112, 33, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    text-shadow: 0 0 12px rgba(255, 178, 107, 0.9);
+}
+
+/* ⭐ NỔI BẬT — CHƯA CHỌN */
+.page-package-list .badge-pill.pill-featured {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #94a3b8 !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+/* ⭐ NỔI BẬT — HOVER */
+.page-package-list .badge-pill.pill-featured:hover {
+    background: rgba(251, 191, 36, 0.15) !important;
+    color: #fcd34d !important;
+    border-color: rgba(251, 191, 36, 0.4) !important;
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.3) !important;
+    transform: translateY(-2px);
+}
+
+/* ⭐ NỔI BẬT — ĐÃ CHỌN */
+.page-package-list .badge-pill.pill-featured.active {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.4), rgba(245, 158, 11, 0.25)) !important;
+    color: #fcd34d !important;
+    border: 1px solid rgba(251, 191, 36, 0.6) !important;
+    box-shadow:
+        0 0 15px rgba(251, 191, 36, 0.6),
+        0 0 30px rgba(251, 191, 36, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    text-shadow: 0 0 12px rgba(252, 211, 77, 0.9);
+}
+
+/* =========================================================
+   ⭐ PACKAGE FORM — DARK THEME (FIX NỀN TRẮNG)
+   CHỈ ÁP DỤNG CHO TRANG FORM (.page-package-form)
+   ========================================================= */
+
+/* ===== EDIT CARD HEADER ===== */
+.page-package-form .edit-card-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.page-package-form .edit-card-header h3 {
+    color: #f8fafc !important;
+}
+
+/* ===== LABEL ===== */
+.page-package-form .edit-card .form-group label {
+    color: #cbd5e1 !important;
+}
+
+.page-package-form .edit-card .form-group label .req {
+    color: #f37021 !important;
+}
+
+/* ===== INPUT / TEXTAREA / SELECT — NỀN TỐI ===== */
+.page-package-form .edit-card .form-group input[type="text"],
+.page-package-form .edit-card .form-group input[type="number"],
+.page-package-form .edit-card .form-group input[type="tel"],
+.page-package-form .edit-card .form-group textarea,
+.page-package-form .edit-card .form-group select {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+    color: #f8fafc !important;
+    border-radius: 10px !important;
+    padding: 12px 14px !important;
+    font-size: 14px !important;
+    transition: all 0.25s !important;
+}
+
+.page-package-form .edit-card .form-group input:focus,
+.page-package-form .edit-card .form-group textarea:focus,
+.page-package-form .edit-card .form-group select:focus {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: #f37021 !important;
+    box-shadow: 0 0 0 4px rgba(243, 112, 33, 0.15) !important;
+    outline: none !important;
+}
+
+.page-package-form .edit-card .form-group input::placeholder,
+.page-package-form .edit-card .form-group textarea::placeholder {
+    color: #64748b !important;
+}
+
+/* ===== TEXTAREA "MÔ TẢ DÀI" — MONO + NỀN TỐI ===== */
+.page-package-form .edit-card .form-group textarea#longDescription,
+.page-package-form #longDescription {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+    color: #f8fafc !important;
+    font-family: 'Courier New', monospace !important;
+    font-size: 13px !important;
+    line-height: 1.7 !important;
+    min-height: 160px !important;
+    padding: 12px 14px !important;
+    border-radius: 10px !important;
+    white-space: pre-wrap !important;
+    width: 100% !important;
+    resize: vertical !important;
+    box-sizing: border-box !important;
+}
+
+.page-package-form #longDescription:focus {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: #f37021 !important;
+    box-shadow: 0 0 0 4px rgba(243, 112, 33, 0.15) !important;
+    outline: none !important;
+}
+
+/* ===== FIELD HINT ===== */
+.page-package-form .field-hint {
+    color: #94a3b8 !important;
+}
+
+/* ===== BADGE CARD — NỀN TỐI ===== */
+.page-package-form .badge-card {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 2px solid rgba(255, 255, 255, 0.12) !important;
+    transition: all 0.3s ease !important;
+}
+
+.page-package-form .badge-card:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    transform: translateX(4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+}
+
+.page-package-form .badge-card .badge-icon {
+    background: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.page-package-form .badge-card .badge-info strong {
+    color: #f8fafc !important;
+}
+
+.page-package-form .badge-card .badge-info small {
+    color: #94a3b8 !important;
+}
+
+/* ===== BADGE CARD — ACTIVE (SÁNG NEON) ===== */
+
+.page-package-form .badge-card.active {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: #94a3b8 !important;
+    box-shadow:
+        0 0 15px rgba(148, 163, 184, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+.page-package-form .badge-card.active .badge-info strong {
+    color: #f8fafc !important;
+}
+
+.page-package-form .badge-card-hot.active {
+    background: linear-gradient(135deg, rgba(243, 112, 33, 0.25), rgba(255, 140, 66, 0.15)) !important;
+    border-color: rgba(255, 178, 107, 0.7) !important;
+    box-shadow:
+        0 0 20px rgba(243, 112, 33, 0.5),
+        0 0 40px rgba(243, 112, 33, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+.page-package-form .badge-card-hot.active .badge-info strong {
+    color: #ffb26b !important;
+    text-shadow: 0 0 12px rgba(255, 178, 107, 0.9);
+}
+.page-package-form .badge-card-hot.active .badge-icon {
+    background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+    color: white !important;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.6) !important;
+}
+
+.page-package-form .badge-card-featured.active {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.25), rgba(245, 158, 11, 0.15)) !important;
+    border-color: rgba(251, 191, 36, 0.7) !important;
+    box-shadow:
+        0 0 20px rgba(251, 191, 36, 0.5),
+        0 0 40px rgba(251, 191, 36, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+.page-package-form .badge-card-featured.active .badge-info strong {
+    color: #fcd34d !important;
+    text-shadow: 0 0 12px rgba(252, 211, 77, 0.9);
+}
+.page-package-form .badge-card-featured.active .badge-icon {
+    background: linear-gradient(135deg, #d97706, #f59e0b) !important;
+    color: white !important;
+    box-shadow: 0 0 15px rgba(217, 119, 6, 0.6) !important;
+}
+
+/* ===== INFO READONLY — NỀN TỐI ===== */
+.page-package-form .info-readonly {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 12px !important;
+}
+
+.page-package-form .info-row {
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.08) !important;
+}
+
+.page-package-form .info-label {
+    color: #94a3b8 !important;
+}
+
+.page-package-form .info-value {
+    color: #f8fafc !important;
+    font-weight: 700 !important;
+}
+
+/* ===== WARNING BOX — NỀN TỐI + GLOW ===== */
+.page-package-form .warning-box {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.08)) !important;
+    border: 1px solid rgba(245, 158, 11, 0.35) !important;
+    color: #fbbf24 !important;
+    border-radius: 12px !important;
+}
+
+.page-package-form .warning-box svg {
+    stroke: #fbbf24 !important;
+    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.6));
+}
+
+.page-package-form .warning-box strong {
+    color: #fcd34d !important;
+    text-shadow: 0 0 10px rgba(252, 211, 77, 0.6);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 768px) {
+    .badge-option {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+    .badge-clear {
+        width: 22px;
+        height: 22px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 640px) {
+    .col-desc {
+        max-width: 120px;
+    }
+    .pkg-code,
+    .pkg-price-tag,
+    .pkg-speed {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+}
+/* =========================================================
+   BADGE ICON — SVG ICON TRONG FORM
+   ========================================================= */
+
+.badge-card .badge-icon {
+    font-size: 24px;      /* giữ cho các case dùng emoji cũ nếu còn */
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* SVG bên trong badge-icon */
+.badge-card .badge-icon svg {
+    width: 22px;
+    height: 22px;
+    max-width: 22px;
+    max-height: 22px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    display: block;
+}
+
+/* Màu SVG cho từng loại badge */
+.badge-card .badge-icon svg {
+    color: #64748b;
+}
+
+.badge-card-hot .badge-icon svg {
+    color: #dc2626;
+}
+
+.badge-card-featured .badge-icon svg {
+    color: #d97706;
+}
+
+/* Khi active — icon trắng để nổi bật */
+.badge-card.active .badge-icon svg {
+    color: #ffffff;
+}
+
+.badge-card-hot.active .badge-icon svg {
+    color: #ffffff;
+    fill: none;
+    filter: drop-shadow(0 0 4px rgba(255,255,255,0.6));
+}
+
+.badge-card-featured.active .badge-icon svg {
+    color: #ffffff;
+    fill: #ffffff;
+    filter: drop-shadow(0 0 4px rgba(255,255,255,0.6));
+}
+
+/* Dark theme override cho badge-icon trong form */
+.page-package-form .badge-card .badge-icon {
+    background: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.page-package-form .badge-card .badge-icon svg {
+    color: #94a3b8;
+}
+
+.page-package-form .badge-card-hot .badge-icon svg {
+    color: #fb923c;
+}
+
+.page-package-form .badge-card-featured .badge-icon svg {
+    color: #fbbf24;
+}
+
+.page-package-form .badge-card.active .badge-icon svg {
+    color: #f8fafc;
+}
+
+.page-package-form .badge-card-hot.active .badge-icon svg {
+    color: #ffffff;
+    stroke: #ffffff;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.7));
+}
+
+.page-package-form .badge-card-featured.active .badge-icon svg {
+    color: #ffffff;
+    stroke: #ffffff;
+    fill: #ffffff;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.7));
+}
+/* =========================================================
+   NÚT RESET — ĐỒNG BỘ VỚI TRANG EMAIL LOG
+   ========================================================= */
+
+.btn-reset {
+    width: 42px !important;
+    height: 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(56, 189, 248, 0.15) !important;
+    color: #7dd3fc !important;
+    border: 1.5px solid rgba(56, 189, 248, 0.35) !important;
+    border-radius: 10px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    text-decoration: none !important;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.2) !important;
+}
+
+.btn-reset:hover {
+    background: rgba(56, 189, 248, 0.35) !important;
+    color: #ffffff !important;
+    border-color: #38bdf8 !important;
+    transform: translateY(-2px) rotate(180deg) !important;
+    box-shadow:
+        0 0 15px rgba(56, 189, 248, 0.7),
+        0 0 30px rgba(56, 189, 248, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.btn-reset svg {
+    width: 16px !important;
+    height: 16px !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 2 !important;
+}

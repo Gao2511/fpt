@@ -1,0 +1,278 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký FPT ID</title>
+    <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
+    <link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/fpt-id.css">
+</head>
+<body>
+    <div class="fptid-box">
+
+        <!-- NÚT QUAY LẠI TRANG CHỦ -->
+        <div class="back-home-wrapper">
+            <a href="${pageContext.request.contextPath}/home" class="btn-back-home">
+                <svg viewBox="0 0 24 24">
+                    <line x1="19" y1="12" x2="5" y2="12"/>
+                    <polyline points="12 19 5 12 12 5"/>
+                </svg>
+                Quay lại trang chủ
+            </a>
+        </div>
+
+        <!-- LOGO -->
+        <div class="fptid-logo">
+            <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
+                 alt="FPT Telecom"
+                 class="fptid-logo-img">
+            <div class="tagline">Hệ sinh thái số FPT</div>
+        </div>
+
+        <!-- TABS -->
+        <div class="fptid-tabs">
+            <a href="${pageContext.request.contextPath}/login">Đăng Nhập</a>
+            <a href="${pageContext.request.contextPath}/register" class="active">Đăng Ký Mới</a>
+        </div>
+
+        <!-- TIÊU ĐỀ -->
+        <div class="fptid-title">
+            <h1>Tạo tài khoản <span>FPT ID mới</span></h1>
+            <p>Đăng ký nhanh chóng chỉ trong 1 phút để quản lý toàn diện đường truyền &amp; ưu đãi dịch vụ số.</p>
+        </div>
+
+        <!-- ALERT -->
+        <% if (request.getAttribute("error") != null) { %>
+            <div class="alert-error">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                ${error}
+            </div>
+        <% } %>
+
+        <!-- FORM -->
+        <form action="${pageContext.request.contextPath}/register" method="POST" onsubmit="return validateRegister()">
+
+            <!-- ROW 1 -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Họ và tên khách hàng <span class="req">*</span></label>
+                    <div class="input-wrap">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </span>
+                        <input type="text" name="fullName" id="fullName"
+                               placeholder="VD: Nguyễn Văn An" value="${fullName}" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Số điện thoại di động <span class="req">*</span></label>
+                    <div class="input-wrap">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                            </svg>
+                        </span>
+                        <input type="tel" name="phone" id="phone"
+                               placeholder="0912 345 678" value="${phone}" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label>Email liên hệ</label>
+                <div class="input-wrap">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                    </span>
+                    <input type="email" name="email" id="email"
+                           placeholder="nguyenvanan@example.com" value="${email}">
+                </div>
+            </div>
+
+            <!-- ROW 2 -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Mật khẩu khởi tạo <span class="req">*</span></label>
+                    <div class="input-wrap">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                        </span>
+                        <input type="password" name="password" id="password"
+                               placeholder="Ít nhất 8 ký tự" required
+                               oninput="checkPwdStrength(this.value)">
+                        <button type="button" class="toggle-eye" onclick="togglePwd('password', this)">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Xác nhận lại mật khẩu <span class="req">*</span></label>
+                    <div class="input-wrap">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                        </span>
+                        <input type="password" name="confirmPassword" id="confirmPassword"
+                               placeholder="Nhập lại mật khẩu" required>
+                        <button type="button" class="toggle-eye" onclick="togglePwd('confirmPassword', this)">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thanh độ mạnh -->
+            <div class="pwd-strength">
+                <div class="top">
+                    <div class="label">Độ bảo mật mật khẩu:</div>
+                    <div class="status" id="pwdStatus">Chưa nhập</div>
+                </div>
+                <div class="pwd-bars">
+                    <div class="bar" id="bar1"></div>
+                    <div class="bar" id="bar2"></div>
+                    <div class="bar" id="bar3"></div>
+                    <div class="bar" id="bar4"></div>
+                </div>
+                <div class="pwd-rules">
+                    <span id="rule1">Tối thiểu 8 ký tự</span>
+                    <span id="rule2">Có chữ hoa (A-Z)</span>
+                    <span id="rule3">Có chữ số (0-9)</span>
+                </div>
+            </div>
+
+            <!-- Điều khoản -->
+            <div class="checkbox-wrap">
+                <input type="checkbox" id="agree" name="agree" value="true" required>
+                <label for="agree">
+                    Tôi đã đọc và đồng ý với
+                    <a href="#">Điều khoản dịch vụ</a> &amp;
+                    <a href="#">Chính sách bảo mật</a> của FPT Telecom. <span style="color:#f37021;">*</span>
+                </label>
+            </div>
+
+            <!-- Nút submit -->
+            <button type="submit" class="btn-fptid">
+                ĐĂNG KÝ TÀI KHOẢN FPT ID
+                <svg viewBox="0 0 24 24">
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                    <polyline points="12 5 19 12 12 19"/>
+                </svg>
+            </button>
+        </form>
+
+        <!-- Switch -->
+        <div class="switch-auth">
+            Đã có tài khoản FPT ID?
+            <a href="${pageContext.request.contextPath}/login">Đăng nhập ngay</a>
+        </div>
+
+    </div>
+
+    <script>
+        function togglePwd(id, btn) {
+            const inp = document.getElementById(id);
+            const svg = btn.querySelector("svg");
+            if (inp.type === "password") {
+                inp.type = "text";
+                svg.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+            } else {
+                inp.type = "password";
+                svg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+            }
+        }
+
+        function checkPwdStrength(pwd) {
+            const status = document.getElementById("pwdStatus");
+            const bars = [document.getElementById("bar1"), document.getElementById("bar2"),
+                          document.getElementById("bar3"), document.getElementById("bar4")];
+            const rule1 = document.getElementById("rule1");
+            const rule2 = document.getElementById("rule2");
+            const rule3 = document.getElementById("rule3");
+
+            bars.forEach(b => b.className = "bar");
+            rule1.classList.remove("ok");
+            rule2.classList.remove("ok");
+            rule3.classList.remove("ok");
+
+            let score = 0;
+
+            if (pwd.length >= 8) {
+                rule1.classList.add("ok");
+                score++;
+            }
+            if (/[A-Z]/.test(pwd)) {
+                rule2.classList.add("ok");
+                score++;
+            }
+            if (/[0-9]/.test(pwd)) {
+                rule3.classList.add("ok");
+                score++;
+            }
+            if (/[^A-Za-z0-9]/.test(pwd)) {
+                score++;
+            }
+
+            if (pwd.length === 0) {
+                status.textContent = "Chưa nhập";
+                status.className = "status";
+            } else if (score <= 2) {
+                status.textContent = "Yếu";
+                status.className = "status weak";
+                bars[0].classList.add("active-weak");
+            } else if (score === 3) {
+                status.textContent = "Trung bình";
+                status.className = "status medium";
+                bars[0].classList.add("active-medium");
+                bars[1].classList.add("active-medium");
+                bars[2].classList.add("active-medium");
+            } else {
+                status.textContent = "Mạnh";
+                status.className = "status strong";
+                bars.forEach(b => b.classList.add("active-strong"));
+            }
+        }
+
+        function validateRegister() {
+            const pwd = document.getElementById("password").value;
+            const confirm = document.getElementById("confirmPassword").value;
+            if (pwd.length < 8) {
+                alert("Mật khẩu phải có ít nhất 8 ký tự!");
+                return false;
+            }
+            if (pwd !== confirm) {
+                alert("Mật khẩu xác nhận không khớp!");
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>

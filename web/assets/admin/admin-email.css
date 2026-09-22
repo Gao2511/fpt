@@ -1,0 +1,551 @@
+/* =========================================================
+   ADMIN EMAIL LOG - THÔNG BÁO & LỊCH SỬ EMAIL
+   ========================================================= */
+
+/* ===== 4 STAT CARDS ===== */
+.email-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.email-stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    border: 1px solid #eef2f7;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+}
+
+.email-stat-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+    background: #f37021;
+    transform: scaleY(0);
+    transition: transform 0.3s;
+    transform-origin: bottom;
+}
+
+.email-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.email-stat-card:hover::before {
+    transform: scaleY(1);
+}
+
+.esc-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.esc-icon svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+}
+
+.esc-blue   { background: #e0f2fe; color: #0284c7; }
+.esc-green  { background: #dcfce7; color: #16a34a; }
+.esc-red    { background: #fee2e2; color: #dc2626; }
+.esc-orange { background: #fff3e0; color: #f37021; }
+
+.esc-info { flex: 1; }
+
+.esc-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.esc-value {
+    font-size: 26px;
+    font-weight: 900;
+    color: #1e293b;
+    line-height: 1;
+    letter-spacing: -0.5px;
+}
+
+/* ===== BẢNG EMAIL ===== */
+.email-table .col-id {
+    font-weight: 700;
+    color: #64748b;
+    font-size: 12.5px;
+}
+
+.email-recipient {
+    display: inline-block;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.email-subject {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 4px;
+    max-width: 320px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.email-error {
+    font-size: 11.5px;
+    color: #dc2626;
+    background: #fee2e2;
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-top: 4px;
+    font-weight: 500;
+    max-width: 320px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.email-error strong {
+    color: #991b1b;
+}
+
+/* ===== STATUS PILL ===== */
+.status-pill {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+}
+
+.status-pill.status-success {
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.status-pill.status-failed {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+/* ===== NÚT XÓA TOÀN BỘ ===== */
+.btn-clear-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1.5px solid #fecaca;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn-clear-all:hover {
+    background: #dc2626;
+    color: white;
+    border-color: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(220, 38, 38, 0.3);
+}
+
+.btn-clear-all svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1100px) {
+    .email-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .email-stats {
+        grid-template-columns: 1fr;
+    }
+    .email-subject,
+    .email-error {
+        max-width: 180px;
+    }
+    .esc-value {
+        font-size: 22px;
+    }
+}
+/* =========================================================
+   DARK THEME OVERRIDE — ADMIN EMAIL LOG
+   ========================================================= */
+
+.email-stat-card {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+}
+
+.esc-label { color: #94a3b8 !important; }
+.esc-value { color: #f8fafc !important; }
+
+/* Icon background — giữ màu nhưng đậm hơn */
+.esc-blue {
+    background: rgba(2, 132, 199, 0.25) !important;
+    color: #38bdf8 !important;
+    border: 1px solid rgba(2, 132, 199, 0.3) !important;
+}
+.esc-green {
+    background: rgba(34, 197, 94, 0.25) !important;
+    color: #4ade80 !important;
+    border: 1px solid rgba(34, 197, 94, 0.3) !important;
+}
+.esc-red {
+    background: rgba(239, 68, 68, 0.25) !important;
+    color: #f87171 !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+.esc-orange {
+    background: rgba(243, 112, 33, 0.25) !important;
+    color: #fb923c !important;
+    border: 1px solid rgba(243, 112, 33, 0.3) !important;
+}
+
+/* Email table */
+.email-recipient {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #cbd5e1 !important;
+}
+
+.email-subject {
+    color: #f8fafc !important;
+}
+
+.email-error {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #f87171 !important;
+}
+
+.email-error strong { color: #fca5a5 !important; }
+
+/* Status pills */
+.status-pill.status-success {
+    background: rgba(34, 197, 94, 0.2) !important;
+    color: #4ade80 !important;
+    border: 1px solid rgba(34, 197, 94, 0.3) !important;
+}
+
+.status-pill.status-failed {
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #f87171 !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+
+/* Clear all button */
+.btn-clear-all {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #f87171 !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+.btn-clear-all:hover {
+    background: rgba(239, 68, 68, 0.3) !important;
+    color: white !important;
+    border-color: #ef4444 !important;
+}
+/* =========================================================
+   EMAIL STAT CARDS — CLICKABLE NHƯ DASHBOARD
+   ========================================================= */
+
+.email-stat-card {
+    text-decoration: none !important;
+    color: inherit !important;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.email-stat-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.email-stat-card:hover::before {
+    opacity: 0.15;
+}
+
+.email-stat-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Màu hover cho từng card */
+.stat-link-blue::before {
+    background: linear-gradient(135deg, #0284c7, #38bdf8);
+}
+
+.stat-link-blue:hover {
+    border-color: rgba(2, 132, 199, 0.6) !important;
+    box-shadow:
+        0 20px 50px rgba(2, 132, 199, 0.35),
+        0 0 30px rgba(2, 132, 199, 0.2) !important;
+    transform: translateY(-6px) scale(1.02);
+}
+
+.stat-link-green::before {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+}
+
+.stat-link-green:hover {
+    border-color: rgba(22, 163, 74, 0.6) !important;
+    box-shadow:
+        0 20px 50px rgba(22, 163, 74, 0.35),
+        0 0 30px rgba(22, 163, 74, 0.2) !important;
+    transform: translateY(-6px) scale(1.02);
+}
+
+.stat-link-red::before {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+.stat-link-red:hover {
+    border-color: rgba(220, 38, 38, 0.6) !important;
+    box-shadow:
+        0 20px 50px rgba(220, 38, 38, 0.35),
+        0 0 30px rgba(220, 38, 38, 0.2) !important;
+    transform: translateY(-6px) scale(1.02);
+}
+
+.stat-link-orange::before {
+    background: linear-gradient(135deg, #f37021, #ff8c42);
+}
+
+.stat-link-orange:hover {
+    border-color: rgba(243, 112, 33, 0.6) !important;
+    box-shadow:
+        0 20px 50px rgba(243, 112, 33, 0.35),
+        0 0 30px rgba(243, 112, 33, 0.2) !important;
+    transform: translateY(-6px) scale(1.02);
+}
+
+/* =========================================================
+   EMAIL RECIPIENT LINE — Icon SVG + Phát sáng
+   ========================================================= */
+
+.email-recipient-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.email-icon-svg {
+    width: 15px;
+    height: 15px;
+    max-width: 15px;
+    max-height: 15px;
+    flex-shrink: 0;
+    display: inline-block;
+    vertical-align: middle;
+
+    stroke: #7dd3fc;
+    fill: none;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    filter: drop-shadow(0 0 4px rgba(125, 211, 252, 0.7));
+}
+
+/* =========================================================
+   EMAIL SUBJECT LINE — Icon SVG cảnh báo + Chữ
+   ========================================================= */
+
+.email-subject-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.email-subject-icon {
+    width: 14px;
+    height: 14px;
+    max-width: 14px;
+    max-height: 14px;
+    flex-shrink: 0;
+    display: inline-block;
+    margin-top: 2px;
+
+    stroke: #fbbf24;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.7));
+}
+
+/* =========================================================
+   STATUS PILL — NEON GLOW
+   ========================================================= */
+
+.status-pill {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 11.5px !important;
+    font-weight: 800 !important;
+    padding: 6px 14px !important;
+    border-radius: 20px !important;
+    white-space: nowrap !important;
+    letter-spacing: 0.3px !important;
+}
+
+.pill-icon {
+    width: 12px;
+    height: 12px;
+    max-width: 12px;
+    max-height: 12px;
+    flex-shrink: 0;
+    display: inline-block;
+    stroke: currentColor;
+    fill: none;
+}
+
+.status-pill.status-success {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.35), rgba(74, 222, 128, 0.2)) !important;
+    color: #86efac !important;
+    border: 1px solid rgba(74, 222, 128, 0.5) !important;
+    box-shadow:
+        0 0 12px rgba(34, 197, 94, 0.5),
+        0 0 24px rgba(34, 197, 94, 0.25) !important;
+    text-shadow: 0 0 10px rgba(134, 239, 172, 0.8) !important;
+}
+
+.status-pill.status-failed {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.35), rgba(248, 113, 113, 0.2)) !important;
+    color: #fca5a5 !important;
+    border: 1px solid rgba(248, 113, 113, 0.5) !important;
+    box-shadow:
+        0 0 12px rgba(239, 68, 68, 0.5),
+        0 0 24px rgba(239, 68, 68, 0.25) !important;
+    text-shadow: 0 0 10px rgba(252, 165, 165, 0.8) !important;
+}
+
+/* =========================================================
+   NÚT XÓA TOÀN BỘ — Icon SVG + Đồng bộ dark
+   ========================================================= */
+
+.btn-clear-all {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 8px 16px !important;
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #f87171 !important;
+    border: 1.5px solid rgba(239, 68, 68, 0.3) !important;
+    border-radius: 8px !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    transition: all 0.25s !important;
+    cursor: pointer !important;
+}
+
+.btn-clear-all:hover {
+    background: rgba(239, 68, 68, 0.3) !important;
+    color: white !important;
+    border-color: #ef4444 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4) !important;
+}
+
+.btn-clear-all svg {
+    width: 14px !important;
+    height: 14px !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 2 !important;
+}
+
+/* =========================================================
+   NÚT RESET — ĐỒNG BỘ MÀU
+   ========================================================= */
+
+.btn-reset {
+    width: 42px !important;
+    height: 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(56, 189, 248, 0.15) !important;
+    color: #7dd3fc !important;
+    border: 1.5px solid rgba(56, 189, 248, 0.35) !important;
+    border-radius: 10px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    text-decoration: none !important;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.2) !important;
+}
+
+.btn-reset:hover {
+    background: rgba(56, 189, 248, 0.35) !important;
+    color: #ffffff !important;
+    border-color: #38bdf8 !important;
+    transform: translateY(-2px) rotate(180deg) !important;
+    box-shadow:
+        0 0 15px rgba(56, 189, 248, 0.7),
+        0 0 30px rgba(56, 189, 248, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.btn-reset svg {
+    width: 16px !important;
+    height: 16px !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 2 !important;
+}

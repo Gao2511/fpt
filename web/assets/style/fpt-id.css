@@ -1,0 +1,806 @@
+/* =========================================================
+   FPT ID - LOGIN & REGISTER (PREMIUM + SẢNH CHỜ)
+   ========================================================= */
+
+/* Import font trước tiên */
+@import url('./fonts.css');
+
+:root {
+    --fpt-orange:        #f37021;
+    --fpt-orange-dark:   #d95810;
+    --fpt-orange-light:  #fff3e0;
+    --fpt-orange-glow:   rgba(243, 112, 33, 0.25);
+    --fpt-blue:          #003087;
+    --fpt-blue-dark:     #0a1f44;
+    --fpt-text:          #1a1a1a;
+    --fpt-text-muted:    #6b7280;
+    --fpt-border:        #e5e7eb;
+    --fpt-bg-soft:       #f8fafc;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* =========================================================
+   BODY - NỀN SẢNH CHỜ SANG TRỌNG
+   ========================================================= */
+body {
+    font-family: 'Be Vietnam Pro', 'Inter', -apple-system, BlinkMacSystemFont,
+                 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--fpt-text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 15px;
+    background: linear-gradient(135deg, #0a1f44 0%, #1e3a5f 50%, #0a1f44 100%);
+    background-size: 200% 200%;
+    animation: fptIdBgMove 15s ease infinite;
+    position: relative;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes fptIdBgMove {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+}
+
+/* Vòng sáng cam — góc trên trái */
+body::before {
+    content: "";
+    position: fixed;
+    top: -200px;
+    left: -200px;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle,
+        rgba(243, 112, 33, 0.3) 0%,
+        rgba(255, 178, 107, 0.15) 40%,
+        transparent 70%);
+    border-radius: 50%;
+    animation: fptIdFloat1 4s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(40px);
+}
+
+/* Vòng sáng xanh navy — góc dưới phải */
+body::after {
+    content: "";
+    position: fixed;
+    bottom: -200px;
+    right: -200px;
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle,
+        rgba(66, 153, 225, 0.25) 0%,
+        rgba(26, 75, 140, 0.12) 40%,
+        transparent 70%);
+    border-radius: 50%;
+    animation: fptIdFloat2 5s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(50px);
+}
+
+@keyframes fptIdFloat1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(100px, 120px) scale(1.15); }
+}
+
+@keyframes fptIdFloat2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(-120px, -100px) scale(1.2); }
+}
+
+/* =========================================================
+   KHUNG CHÍNH
+   ========================================================= */
+.fptid-box {
+    width: 100%;
+    max-width: 640px;
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 45px 50px 40px;
+    position: relative;
+    z-index: 10;
+    box-shadow:
+        0 1px 2px rgba(0,0,0,0.03),
+        0 4px 12px rgba(0,0,0,0.04),
+        0 24px 60px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.8);
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================================
+   LOGO
+   ========================================================= */
+.fptid-logo {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 22px;
+    border-bottom: 1px dashed #eef2f7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.fptid-logo-img {
+    height: 70px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 10px;
+    border-radius: 12px;
+    filter: drop-shadow(0 4px 12px rgba(243, 112, 33, 0.25));
+    transition: transform 0.3s ease;
+}
+
+.fptid-logo-img:hover {
+    transform: scale(1.05);
+}
+
+.fptid-logo img {
+    height: 48px;
+    margin: 0 auto 10px;
+    filter: drop-shadow(0 4px 8px rgba(243, 112, 33, 0.15));
+}
+
+.fptid-logo .tagline {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 11.5px;
+    color: var(--fpt-orange);
+    font-weight: 700;
+    letter-spacing: 2.2px;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
+
+/* =========================================================
+   TABS
+   ========================================================= */
+.fptid-tabs {
+    display: flex;
+    background: #f4f6fa;
+    border-radius: 14px;
+    padding: 5px;
+    margin-bottom: 32px;
+    position: relative;
+}
+
+.fptid-tabs a {
+    flex: 1;
+    text-align: center;
+    padding: 13px 10px;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 10px;
+    color: var(--fpt-text-muted);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 1;
+    letter-spacing: 0.3px;
+    text-decoration: none;
+}
+
+.fptid-tabs a.active {
+    background: white;
+    color: var(--fpt-orange);
+    box-shadow: 0 2px 8px rgba(243, 112, 33, 0.12),
+                0 0 0 1px rgba(243, 112, 33, 0.1);
+}
+
+.fptid-tabs a:not(.active):hover {
+    color: var(--fpt-orange);
+}
+
+/* =========================================================
+   TIÊU ĐỀ
+   ========================================================= */
+.fptid-title {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.fptid-title h1 {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--fpt-text);
+    margin-bottom: 12px;
+    letter-spacing: -0.6px;
+    line-height: 1.25;
+}
+
+.fptid-title h1 span {
+    background: linear-gradient(135deg, var(--fpt-orange), #ff8c42);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.fptid-title p {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--fpt-text-muted);
+    line-height: 1.65;
+    max-width: 490px;
+    margin: 0 auto;
+}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.form-group {
+    margin-bottom: 18px;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    letter-spacing: 0.1px;
+    line-height: 1.4;
+}
+
+.form-group label .req {
+    color: var(--fpt-orange);
+    margin-left: 2px;
+    font-weight: 700;
+}
+
+.form-group label .optional {
+    color: #9ca3af;
+    font-weight: 500;
+    font-size: 11.5px;
+    float: right;
+    font-style: italic;
+    text-transform: none;
+}
+
+.form-group label .forgot {
+    float: right;
+    color: var(--fpt-orange);
+    font-weight: 700;
+    font-size: 12px;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.form-group label .forgot:hover {
+    text-decoration: underline;
+    color: var(--fpt-orange-dark);
+}
+
+/* Input wrapper */
+.input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrap .icon {
+    position: absolute;
+    left: 16px;
+    color: #9ca3af;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    transition: color 0.25s;
+}
+
+.input-wrap .icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.input-wrap .toggle-eye {
+    position: absolute;
+    right: 12px;
+    color: #9ca3af;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    transition: 0.25s;
+}
+
+.input-wrap .toggle-eye:hover {
+    color: var(--fpt-orange);
+    background: var(--fpt-orange-light);
+}
+
+.input-wrap .toggle-eye svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Input */
+.input-wrap input {
+    width: 100%;
+    padding: 14px 46px 14px 46px;
+    border: 1.5px solid var(--fpt-border);
+    border-radius: 12px;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fpt-text);
+    transition: all 0.25s;
+    background: #fafbfc;
+    line-height: 1.4;
+}
+
+.input-wrap input:hover {
+    border-color: #cbd5e1;
+    background: white;
+}
+
+.input-wrap input:focus {
+    border-color: var(--fpt-orange);
+    background: white;
+    outline: none;
+    box-shadow: 0 0 0 4px var(--fpt-orange-glow);
+}
+
+.input-wrap input:focus ~ .icon svg {
+    stroke: var(--fpt-orange);
+}
+
+.input-wrap input::placeholder {
+    color: #b8bcc5;
+    font-weight: 400;
+    font-size: 13.5px;
+}
+
+/* Hint */
+.field-hint {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    color: #9ca3af;
+    margin-top: 6px;
+    padding-left: 4px;
+    font-style: italic;
+    line-height: 1.4;
+}
+
+/* =========================================================
+   THANH ĐỘ MẠNH MẬT KHẨU
+   ========================================================= */
+.pwd-strength {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: -6px;
+    margin-bottom: 18px;
+}
+
+.pwd-strength .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.pwd-strength .label {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.pwd-strength .status {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #9ca3af;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.04);
+    transition: 0.3s;
+    letter-spacing: 0.2px;
+}
+
+.pwd-strength .status.weak    { color: #dc2626; background: #fee2e2; }
+.pwd-strength .status.medium  { color: #d97706; background: #fef3c7; }
+.pwd-strength .status.strong  { color: #059669; background: #d1fae5; }
+
+.pwd-bars {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 12px;
+}
+
+.pwd-bars .bar {
+    flex: 1;
+    height: 5px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    transition: 0.35s;
+}
+
+.pwd-bars .bar.active-weak    { background: #ef4444; }
+.pwd-bars .bar.active-medium  { background: #f59e0b; }
+.pwd-bars .bar.active-strong  { background: #10b981; }
+
+.pwd-rules {
+    display: flex;
+    gap: 14px;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #9ca3af;
+    flex-wrap: wrap;
+}
+
+.pwd-rules span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.25s;
+}
+
+.pwd-rules span::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #d1d5db;
+    transition: 0.25s;
+}
+
+.pwd-rules span.ok {
+    color: #059669;
+    font-weight: 700;
+}
+
+.pwd-rules span.ok::before {
+    background: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/* =========================================================
+   CHECKBOX
+   ========================================================= */
+.checkbox-wrap {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 14px;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #4b5563;
+    line-height: 1.6;
+    cursor: pointer;
+}
+
+.checkbox-wrap input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 1px;
+    flex-shrink: 0;
+    transition: 0.25s;
+    position: relative;
+    background: white;
+}
+
+.checkbox-wrap input[type="checkbox"]:hover {
+    border-color: var(--fpt-orange);
+}
+
+.checkbox-wrap input[type="checkbox"]:checked {
+    background: linear-gradient(135deg, var(--fpt-orange), #ff8c42);
+    border-color: var(--fpt-orange);
+}
+
+.checkbox-wrap input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 6px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-wrap label { cursor: pointer; }
+
+.checkbox-wrap a {
+    color: var(--fpt-orange);
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.checkbox-wrap a:hover { text-decoration: underline; }
+
+/* =========================================================
+   NÚT SUBMIT CAM
+   ========================================================= */
+.btn-fptid {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #f37021 0%, #ff8c42 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 14.5px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 1.2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 12px;
+    box-shadow:
+        0 4px 12px rgba(243, 112, 33, 0.3),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+}
+
+.btn-fptid::before {
+    content: "";
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    transition: left 0.6s;
+}
+
+.btn-fptid:hover::before { left: 100%; }
+
+.btn-fptid:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 8px 20px rgba(243, 112, 33, 0.4),
+        inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.btn-fptid:active { transform: translateY(0); }
+
+.btn-fptid svg {
+    width: 18px;
+    height: 18px;
+    stroke: white;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* =========================================================
+   HỘP THÔNG BÁO
+   ========================================================= */
+.info-box {
+    background: linear-gradient(135deg, #eff6ff, #e0f2fe);
+    border: 1px solid #bae6fd;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1e40af;
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+    line-height: 1.6;
+}
+
+.info-box .info-icon {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    background: #4299e1;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    font-style: italic;
+    font-family: Georgia, serif;
+}
+
+.info-box a {
+    color: #1e40af;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+/* =========================================================
+   DÒNG "ĐÃ CÓ TÀI KHOẢN?"
+   ========================================================= */
+.switch-auth {
+    text-align: center;
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 1px dashed #eef2f7;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fpt-text-muted);
+}
+
+.switch-auth a {
+    color: var(--fpt-orange);
+    font-weight: 700;
+    margin-left: 4px;
+    text-decoration: none;
+}
+
+.switch-auth a:hover { text-decoration: underline; }
+
+/* =========================================================
+   ALERT
+   ========================================================= */
+.alert-error {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    color: #b91c1c;
+    padding: 13px 16px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border-left: 4px solid #dc2626;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: shake 0.4s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    color: #15803d;
+    padding: 13px 16px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    border-left: 4px solid #16a34a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* =========================================================
+   NÚT QUAY LẠI TRANG CHỦ
+   ========================================================= */
+.btn-back-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: #f4f6fa;
+    color: var(--fpt-text-muted);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1.5px solid transparent;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-back-home::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(243, 112, 33, 0.15), transparent);
+    transition: left 0.5s;
+}
+
+.btn-back-home:hover::before {
+    left: 100%;
+}
+
+.btn-back-home:hover {
+    background: var(--fpt-orange-light);
+    color: var(--fpt-orange);
+    border-color: var(--fpt-orange);
+    transform: translateX(-4px);
+    box-shadow: 0 6px 18px rgba(243, 112, 33, 0.2);
+}
+
+.btn-back-home:active {
+    transform: translateX(-2px) scale(0.97);
+}
+
+.btn-back-home svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.3s;
+}
+
+.btn-back-home:hover svg {
+    transform: translateX(-3px);
+}
+
+.back-home-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 5px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 640px) {
+    .fptid-box {
+        padding: 32px 26px 28px;
+        border-radius: 18px;
+    }
+    .fptid-title h1 { font-size: 24px; letter-spacing: -0.3px; }
+    .fptid-title p { font-size: 13px; }
+    .form-row { grid-template-columns: 1fr; gap: 0; }
+    .input-wrap input { padding: 13px 42px; font-size: 13.5px; }
+    .btn-fptid { font-size: 13px; padding: 14px; letter-spacing: 0.8px; }
+}

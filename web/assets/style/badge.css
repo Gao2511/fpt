@@ -1,0 +1,381 @@
+/* =========================================================
+   BADGE SYSTEM - DÙNG CHUNG TOÀN HỆ THỐNG
+   Thay thế icon emoji 🔥 ⭐ bằng badge chuyên nghiệp
+   ========================================================= */
+
+/* ===== BADGE CƠ BẢN ===== */
+.pkg-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    line-height: 1;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hiệu ứng shine lướt qua */
+.pkg-badge::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: left 0.6s;
+}
+
+.pkg-badge:hover::before {
+    left: 100%;
+}
+
+/* Icon SVG bên trong badge */
+.pkg-badge svg {
+    width: 12px;
+    height: 12px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+}
+
+/* ===== BADGE HOT - ĐỎ CAM ===== */
+.pkg-badge-hot {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f97316 100%);
+    color: white;
+    box-shadow:
+        0 4px 12px rgba(220, 38, 38, 0.35),
+        inset 0 1px 0 rgba(255,255,255,0.25);
+    animation: badgeHotPulse 2s infinite;
+}
+
+@keyframes badgeHotPulse {
+    0%, 100% {
+        box-shadow:
+            0 4px 12px rgba(220, 38, 38, 0.35),
+            0 0 0 0 rgba(220, 38, 38, 0.5),
+            inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+    50% {
+        box-shadow:
+            0 4px 12px rgba(220, 38, 38, 0.5),
+            0 0 0 8px rgba(220, 38, 38, 0),
+            inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+}
+
+/* ===== BADGE NỔI BẬT - VÀNG CAM ===== */
+.pkg-badge-featured {
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 50%, #fbbf24 100%);
+    color: white;
+    box-shadow:
+        0 4px 12px rgba(217, 119, 6, 0.4),
+        inset 0 1px 0 rgba(255,255,255,0.3);
+    animation: badgeFeaturedPulse 2.5s infinite;
+}
+
+@keyframes badgeFeaturedPulse {
+    0%, 100% {
+        box-shadow:
+            0 4px 12px rgba(217, 119, 6, 0.4),
+            0 0 0 0 rgba(217, 119, 6, 0.5),
+            inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+    50% {
+        box-shadow:
+            0 4px 12px rgba(217, 119, 6, 0.6),
+            0 0 0 10px rgba(217, 119, 6, 0),
+            inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+}
+
+/* ===== BADGE BÌNH THƯỜNG - XÁM ===== */
+.pkg-badge-normal {
+    background: linear-gradient(135deg, #64748b, #94a3b8);
+    color: white;
+    box-shadow: 0 2px 8px rgba(100, 116, 139, 0.25);
+}
+
+/* =========================================================
+   RIBBON HOT + NỔI BẬT — PHIÊN BẢN TINH TẾ
+   ========================================================= */
+
+.pkg-ribbon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 16px 8px 14px;
+    border-bottom-left-radius: 12px;
+    font-size: 10.5px;
+    font-weight: 900;
+    letter-spacing: 0.9px;
+    text-transform: uppercase;
+    color: white;
+    z-index: 3;
+    line-height: 1;
+    transition: all 0.3s ease;
+}
+
+.pkg-ribbon svg {
+    width: 12px;
+    height: 12px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
+}
+
+/* ===== HOT ===== */
+.pkg-ribbon-hot {
+    background: linear-gradient(135deg,
+        #dc2626 0%,
+        #ef4444 40%,
+        #f97316 100%);
+    box-shadow:
+        -4px 4px 14px rgba(220, 38, 38, 0.35),
+        -1px 1px 3px rgba(220, 38, 38, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== NỔI BẬT ===== */
+.pkg-ribbon-featured {
+    background: linear-gradient(135deg,
+        #d97706 0%,
+        #f59e0b 40%,
+        #fbbf24 100%);
+    box-shadow:
+        -4px 4px 14px rgba(217, 119, 6, 0.4),
+        -1px 1px 3px rgba(217, 119, 6, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Hover card → ribbon sáng + nâng nhẹ */
+.pkg:hover .pkg-ribbon-hot {
+    transform: translateY(-1px) scale(1.03);
+    box-shadow:
+        -4px 6px 18px rgba(220, 38, 38, 0.45),
+        -1px 1px 3px rgba(220, 38, 38, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.pkg:hover .pkg-ribbon-featured {
+    transform: translateY(-1px) scale(1.03);
+    box-shadow:
+        -4px 6px 18px rgba(217, 119, 6, 0.5),
+        -1px 1px 3px rgba(217, 119, 6, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+/* =========================================================
+   RIBBON HOT + NỔI BẬT — PHÁT SÁNG NEON
+   ========================================================= */
+
+/* ===== HOT — PHÁT SÁNG ĐỎ CAM ===== */
+.pkg-ribbon-hot {
+    background: linear-gradient(135deg,
+        #dc2626 0%,
+        #ef4444 40%,
+        #f97316 100%);
+    box-shadow:
+        -4px 4px 14px rgba(220, 38, 38, 0.35),
+        -1px 1px 3px rgba(220, 38, 38, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        0 0 12px rgba(239, 68, 68, 0.9),        /* ← GLOW 1 */
+        0 0 24px rgba(239, 68, 68, 0.6),        /* ← GLOW 2 */
+        0 0 36px rgba(249, 115, 22, 0.4);       /* ← GLOW 3 */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    animation: glowHot 2s ease-in-out infinite;
+}
+
+@keyframes glowHot {
+    0%, 100% {
+        box-shadow:
+            -4px 4px 14px rgba(220, 38, 38, 0.35),
+            -1px 1px 3px rgba(220, 38, 38, 0.5),
+            inset 0 1px 0 rgba(255, 255, 255, 0.25),
+            0 0 12px rgba(239, 68, 68, 0.9),
+            0 0 24px rgba(239, 68, 68, 0.6),
+            0 0 36px rgba(249, 115, 22, 0.4);
+    }
+    50% {
+        box-shadow:
+            -4px 4px 14px rgba(220, 38, 38, 0.5),
+            -1px 1px 3px rgba(220, 38, 38, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3),
+            0 0 18px rgba(239, 68, 68, 1),
+            0 0 36px rgba(239, 68, 68, 0.8),
+            0 0 54px rgba(249, 115, 22, 0.6);
+    }
+}
+
+/* ===== NỔI BẬT — PHÁT SÁNG VÀNG CAM ===== */
+.pkg-ribbon-featured {
+    background: linear-gradient(135deg,
+        #d97706 0%,
+        #f59e0b 40%,
+        #fbbf24 100%);
+    box-shadow:
+        -4px 4px 14px rgba(217, 119, 6, 0.4),
+        -1px 1px 3px rgba(217, 119, 6, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        0 0 12px rgba(251, 191, 36, 0.9),       /* ← GLOW 1 */
+        0 0 24px rgba(251, 191, 36, 0.6),       /* ← GLOW 2 */
+        0 0 36px rgba(245, 158, 11, 0.4);       /* ← GLOW 3 */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    animation: glowFeatured 2.5s ease-in-out infinite;
+}
+
+@keyframes glowFeatured {
+    0%, 100% {
+        box-shadow:
+            -4px 4px 14px rgba(217, 119, 6, 0.4),
+            -1px 1px 3px rgba(217, 119, 6, 0.5),
+            inset 0 1px 0 rgba(255, 255, 255, 0.35),
+            0 0 12px rgba(251, 191, 36, 0.9),
+            0 0 24px rgba(251, 191, 36, 0.6),
+            0 0 36px rgba(245, 158, 11, 0.4);
+    }
+    50% {
+        box-shadow:
+            -4px 4px 14px rgba(217, 119, 6, 0.55),
+            -1px 1px 3px rgba(217, 119, 6, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4),
+            0 0 18px rgba(251, 191, 36, 1),
+            0 0 36px rgba(251, 191, 36, 0.8),
+            0 0 54px rgba(245, 158, 11, 0.6);
+    }
+}
+
+/* ===== BADGE NHỎ (dùng trong bảng admin) ===== */
+.pkg-badge-sm {
+    padding: 3px 9px;
+    font-size: 10px;
+    gap: 4px;
+}
+
+.pkg-badge-sm svg {
+    width: 10px;
+    height: 10px;
+}
+
+/* ===== BADGE TRONG BẢNG ADMIN (thay radio) ===== */
+.badge-pill-group {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.25s;
+    border: 1.5px solid transparent;
+    background: #f1f5f9;
+    color: #64748b;
+    user-select: none;
+    letter-spacing: 0.3px;
+}
+
+.badge-pill svg {
+    width: 12px;
+    height: 12px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.badge-pill input[type="radio"] {
+    display: none;
+}
+
+.badge-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.badge-pill.active.pill-hot {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: white;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+}
+
+.badge-pill.active.pill-featured {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: white;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
+}
+
+/* ===== NÚT XÓA BADGE ===== */
+.badge-remove-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s;
+    flex-shrink: 0;
+}
+
+.badge-remove-btn:hover {
+    background: #dc2626;
+    color: white;
+    transform: rotate(90deg) scale(1.1);
+}
+
+.badge-remove-btn svg {
+    width: 12px;
+    height: 12px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 640px) {
+    .pkg-badge {
+        padding: 4px 10px;
+        font-size: 10px;
+    }
+    .pkg-ribbon {
+        padding: 5px 12px 6px 10px;
+        font-size: 9.5px;
+    }
+    .badge-pill {
+        padding: 5px 10px;
+        font-size: 10.5px;
+    }
+}

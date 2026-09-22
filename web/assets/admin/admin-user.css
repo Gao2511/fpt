@@ -1,0 +1,599 @@
+/* =========================================================
+   ADMIN USER - QUẢN LÝ TÀI KHOẢN (DARK NEON)
+   ========================================================= */
+
+/* =========================================================
+   USER CELL
+   ========================================================= */
+
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-avatar-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f37021, #ff8c42);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 16px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 12px rgba(243, 112, 33, 0.3);
+}
+
+.user-avatar-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.user-cell-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.user-cell-info strong {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #f8fafc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-cell-info small {
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* =========================================================
+   ROLE TAG — NEON GLOW
+   ========================================================= */
+
+.role-tag {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 3px 10px !important;
+    border-radius: 8px !important;
+    font-size: 10px !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+    transition: all 0.3s ease !important;
+    line-height: 1.4 !important;
+}
+
+.role-tag.role-admin {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(245, 158, 11, 0.2)) !important;
+    color: #fcd34d !important;
+    border: 1px solid rgba(251, 191, 36, 0.5) !important;
+    box-shadow:
+        0 0 10px rgba(251, 191, 36, 0.5),
+        0 0 20px rgba(251, 191, 36, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    text-shadow: 0 0 10px rgba(252, 211, 77, 0.8) !important;
+}
+
+.role-tag.role-customer {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(2, 132, 199, 0.2)) !important;
+    color: #7dd3fc !important;
+    border: 1px solid rgba(56, 189, 248, 0.5) !important;
+    box-shadow:
+        0 0 10px rgba(56, 189, 248, 0.5),
+        0 0 20px rgba(56, 189, 248, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    text-shadow: 0 0 10px rgba(125, 211, 252, 0.8) !important;
+}
+
+.role-icon {
+    width: 10px !important;
+    height: 10px !important;
+    max-width: 10px !important;
+    max-height: 10px !important;
+    flex-shrink: 0 !important;
+    display: inline-block !important;
+    stroke: currentColor !important;
+    fill: none !important;
+    stroke-width: 2.5 !important;
+}
+
+/* =========================================================
+   ⭐ CONTACT MINI — FIX TRIỆT ĐỂ
+   Chỉ ICON phát sáng nhẹ, KHÔNG nền, KHÔNG khung, KHÔNG vuông
+   ========================================================= */
+
+/* Reset sạch mọi element */
+td.col-email,
+.col-email,
+.contact-mini,
+.contact-mini div,
+.contact-line {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+td.col-email {
+    vertical-align: middle !important;
+}
+
+.contact-mini {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    font-size: 12.5px !important;
+    color: #e2e8f0 !important;
+    line-height: 1.5 !important;
+}
+
+.contact-line {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 12.5px !important;
+    color: #e2e8f0 !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 200px !important;
+    min-height: 18px !important;
+}
+
+/* ⭐ SVG ICON — CHỈ 1 LỚP GLOW NHẸ, KHÔNG LAN THÀNH VUÔNG */
+.contact-icon-svg {
+    width: 15px !important;
+    height: 15px !important;
+    max-width: 15px !important;
+    max-height: 15px !important;
+    min-width: 15px !important;
+    min-height: 15px !important;
+
+    flex-shrink: 0 !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+
+    stroke: #7dd3fc !important;
+    fill: none !important;
+    stroke-width: 2.2 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+
+    /* ⭐ CHỈ 1 LỚP GLOW — KHÔNG LAN RỘNG */
+    filter: drop-shadow(0 0 4px rgba(125, 211, 252, 0.7)) !important;
+
+    /* Đảm bảo KHÔNG có nền */
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+}
+
+/* =========================================================
+   STATUS BADGE — NEON GLOW
+   ========================================================= */
+
+.status-badge.status-active {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.35), rgba(74, 222, 128, 0.2)) !important;
+    color: #86efac !important;
+    border: 1px solid rgba(74, 222, 128, 0.5) !important;
+    padding: 6px 14px !important;
+    border-radius: 20px !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.3px !important;
+    box-shadow:
+        0 0 12px rgba(34, 197, 94, 0.5),
+        0 0 24px rgba(34, 197, 94, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    text-shadow: 0 0 10px rgba(134, 239, 172, 0.8) !important;
+    white-space: nowrap !important;
+}
+
+.status-badge.status-locked {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.35), rgba(248, 113, 113, 0.2)) !important;
+    color: #fca5a5 !important;
+    border: 1px solid rgba(248, 113, 113, 0.5) !important;
+    padding: 6px 14px !important;
+    border-radius: 20px !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.3px !important;
+    box-shadow:
+        0 0 12px rgba(239, 68, 68, 0.5),
+        0 0 24px rgba(239, 68, 68, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    text-shadow: 0 0 10px rgba(252, 165, 165, 0.8) !important;
+    white-space: nowrap !important;
+}
+
+.status-icon {
+    width: 12px !important;
+    height: 12px !important;
+    max-width: 12px !important;
+    max-height: 12px !important;
+    flex-shrink: 0 !important;
+    display: inline-block !important;
+    stroke: currentColor !important;
+    fill: none !important;
+    stroke-width: 2.5 !important;
+}
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.action-btn svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+}
+
+.action-btn.btn-lock {
+    background: rgba(245, 158, 11, 0.2) !important;
+    color: #fbbf24 !important;
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+}
+
+.action-btn.btn-lock:hover {
+    background: #f59e0b !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(245, 158, 11, 0.4);
+}
+
+.action-btn.btn-unlock {
+    background: rgba(34, 197, 94, 0.2) !important;
+    color: #4ade80 !important;
+    border: 1px solid rgba(34, 197, 94, 0.3) !important;
+}
+
+.action-btn.btn-unlock:hover {
+    background: #22c55e !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(34, 197, 94, 0.4);
+}
+
+.action-btn.btn-password {
+    background: rgba(59, 130, 246, 0.2) !important;
+    color: #60a5fa !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+}
+
+.action-btn.btn-password:hover {
+    background: #3b82f6 !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+}
+
+.action-btn.btn-delete {
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #f87171 !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+
+.action-btn.btn-delete:hover {
+    background: #ef4444 !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4);
+}
+
+/* =========================================================
+   USER PROFILE BOX (trang đổi mật khẩu)
+   ========================================================= */
+
+.user-profile-box {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(243, 112, 33, 0.15), rgba(255, 140, 66, 0.08)) !important;
+    border-radius: 14px;
+    border: 1px solid rgba(243, 112, 33, 0.3) !important;
+    margin-bottom: 20px;
+}
+
+.user-avatar-big {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f37021, #ff8c42);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 30px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 3px solid white;
+    box-shadow: 0 6px 18px rgba(243, 112, 33, 0.35);
+}
+
+.user-avatar-big img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.user-profile-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-profile-info h3 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #f8fafc !important;
+    margin-bottom: 4px;
+}
+
+.user-profile-info p {
+    font-size: 13.5px;
+    color: #94a3b8 !important;
+    margin-bottom: 8px;
+}
+
+/* =========================================================
+   INPUT WRAP
+   ========================================================= */
+
+.input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrap .icon {
+    position: absolute;
+    left: 14px;
+    color: #94a3b8 !important;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.input-wrap .icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.input-wrap input {
+    width: 100%;
+    padding: 13px 16px 13px 46px;
+    border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.05) !important;
+    transition: all 0.25s;
+    color: #f8fafc !important;
+    box-sizing: border-box;
+}
+
+.input-wrap input:focus {
+    outline: none;
+    border-color: #f37021 !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 0 0 4px rgba(243, 112, 33, 0.1);
+}
+
+.input-wrap input::placeholder {
+    color: #64748b !important;
+}
+
+/* =========================================================
+   PASSWORD STRENGTH
+   ========================================================= */
+
+.pwd-strength {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: 6px;
+}
+
+.pwd-strength .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.pwd-strength .label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #cbd5e1 !important;
+}
+
+.pwd-strength .status {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #9ca3af;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.04);
+    transition: 0.3s;
+}
+
+.pwd-strength .status.weak { color: #dc2626; background: rgba(220,38,38,0.2); }
+.pwd-strength .status.medium { color: #fbbf24; background: rgba(245,158,11,0.2); }
+.pwd-strength .status.strong { color: #4ade80; background: rgba(34,197,94,0.2); }
+
+.pwd-bars {
+    display: flex;
+    gap: 5px;
+}
+
+.pwd-bars .bar {
+    flex: 1;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 3px;
+    transition: 0.35s;
+}
+
+.pwd-bars .bar.active-weak { background: #ef4444 !important; }
+.pwd-bars .bar.active-medium { background: #f59e0b !important; }
+.pwd-bars .bar.active-strong { background: #10b981 !important; }
+
+/* =========================================================
+   BACK LINK — NÚT CAM
+   ========================================================= */
+
+.back-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 10px 20px !important;
+
+    background: linear-gradient(135deg, #f37021, #ff8c42) !important;
+    color: white !important;
+
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.3px !important;
+
+    border: none !important;
+    border-radius: 10px !important;
+    text-decoration: none !important;
+
+    box-shadow:
+        0 6px 18px rgba(243, 112, 33, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+
+    margin-bottom: 16px !important;
+}
+
+.back-link::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) !important;
+    transition: left 0.6s ease !important;
+}
+
+.back-link:hover::before {
+    left: 100% !important;
+}
+
+.back-link:hover {
+    background: linear-gradient(135deg, #ff8c42, #f37021) !important;
+    transform: translateY(-3px) !important;
+    box-shadow:
+        0 12px 28px rgba(243, 112, 33, 0.6),
+        0 0 30px rgba(243, 112, 33, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+}
+
+/* =========================================================
+   NÚT RESET — ĐỒNG BỘ MÀU + SÁNG KHI HOVER
+   ========================================================= */
+
+.btn-reset {
+    width: 42px !important;
+    height: 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: rgba(56, 189, 248, 0.15) !important;
+    color: #7dd3fc !important;
+    border: 1.5px solid rgba(56, 189, 248, 0.35) !important;
+    border-radius: 10px !important;
+
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    text-decoration: none !important;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.2) !important;
+}
+
+.btn-reset:hover {
+    background: rgba(56, 189, 248, 0.35) !important;
+    color: #ffffff !important;
+    border-color: #38bdf8 !important;
+    transform: translateY(-2px) rotate(180deg) !important;
+    box-shadow:
+        0 0 15px rgba(56, 189, 248, 0.7),
+        0 0 30px rgba(56, 189, 248, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.btn-reset svg {
+    width: 16px !important;
+    height: 16px !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 2 !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+    .user-profile-box {
+        flex-direction: column;
+        text-align: center;
+    }
+    .contact-line {
+        max-width: 120px !important;
+    }
+    .user-cell-info strong {
+        max-width: 100px;
+    }
+}
