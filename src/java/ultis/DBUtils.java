@@ -9,7 +9,7 @@ public class DBUtils {
     // Đọc từ Environment Variables
     // - Local (NetBeans): ENV không có → dùng fallback localhost\SQLEXPRESS
     // - Render: ENV có giá trị → dùng Azure
-    private static final String DB_HOST = getEnv("DB_HOST", "localhost\\SQLEXPRESS");
+    private static final String DB_HOST = getEnv("DB_HOST", "localhost");
     private static final String DB_PORT = getEnv("DB_PORT", "1433");
     private static final String DB_NAME = getEnv("DB_NAME", "fpt_sale_db");
     private static final String DB_USER = getEnv("DB_USER", "sa");
