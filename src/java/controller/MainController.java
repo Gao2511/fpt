@@ -9,7 +9,7 @@ import dto.EmailLogDTO;
 import dto.PackageDTO;
 import dto.UserDTO;
 import utils.DBUtils;
-import utils.EmailUtility;
+import ultis.EmailUtility;
 
 import java.sql.Connection;
 import java.util.List;

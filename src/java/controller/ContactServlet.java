@@ -4,7 +4,7 @@ import dao.CustomerDAO;
 import dao.EmailLogDAO;
 import dto.CustomerDTO;
 import dto.UserDTO;
-import utils.EmailUtility;
+import ultis.EmailUtility;
 
 import java.io.IOException;
 import javax.servlet.ServletException;

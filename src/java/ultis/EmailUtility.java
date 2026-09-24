@@ -1,85 +1,80 @@
-package utils;
+package ultis;
 
-import java.util.Properties;
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeUtility;
+import com.google.gson.JsonObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
+/**
+ * EmailUtility - Gửi mail qua Resend API
+ * Không dùng SMTP (vì Render chặn port 25/465/587)
+ */
 public class EmailUtility {
 
-    // ====================================================
-    // MAIL HỆ THỐNG - Gmail dùng để GỬI thông báo
-    // ====================================================
-    private static final String FROM_EMAIL   = "mrnguyenben@gmail.com";
-    
-   
-    // Cách lấy: https://myaccount.google.com/apppasswords
-    private static final String APP_PASSWORD = "wsbb keov gmmq gtgo";
+    private static final String RESEND_API_URL = "https://api.resend.com/emails";
+    private static final String FROM_EMAIL = "FPT Sale <onboarding@resend.dev>";
 
-    public static boolean sendEmail(String toEmail, String subject, String bodyText) {
-        System.out.println("==================================================");
-        System.out.println("📧 [EmailUtility] Bắt đầu gửi email:");
-        System.out.println("   FROM_EMAIL = " + FROM_EMAIL);
-        System.out.println("   TO_EMAIL   = " + toEmail);
-        System.out.println("   Subject    = " + subject);
+    public static boolean sendEmail(String toEmail, String subject, String body) {
+        String apiKey = System.getenv("RESEND_API_KEY");
 
-        Properties props = new Properties();
-        props.put("mail.smtp.host", "smtp.gmail.com");
-        props.put("mail.smtp.port", "587");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
-        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
-        props.put("mail.smtp.connectiontimeout", "10000");
-        props.put("mail.smtp.timeout", "10000");
-        props.put("mail.smtp.writetimeout", "10000");
-        
-        // BỔ SUNG: Ép buộc mã hóa UTF-8 ngay từ cấu hình
-        props.put("mail.mime.charset", "UTF-8");
-
-        Session session = Session.getInstance(props, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(FROM_EMAIL, APP_PASSWORD);
-            }
-        });
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            System.err.println("❌ [EmailUtility] RESEND_API_KEY chưa được cấu hình!");
+            return false;
+        }
 
         try {
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(FROM_EMAIL, "FPT Telecom", "UTF-8"));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
-            
-            // ===== SỬA LỖI CHÍNH Ở ĐÂY =====
-            // Thêm "UTF-8" vào cả subject và body để hiển thị đúng tiếng Việt
-          message.setSubject(MimeUtility.encodeText(subject, "UTF-8", "B"));
-          message.setContent(bodyText, "text/plain; charset=UTF-8");
-            // ================================
+            JsonObject requestBody = new JsonObject();
+            requestBody.addProperty("from", FROM_EMAIL);
+            requestBody.addProperty("to", toEmail);
+            requestBody.addProperty("subject", subject);
+            requestBody.addProperty("text", body);
 
-            Transport.send(message);
-            System.out.println("✅ [EmailUtility] Gửi email THÀNH CÔNG tới: " + toEmail);
-            System.out.println("==================================================");
-            return true;
+            URL url = new URL(RESEND_API_URL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Authorization", "Bearer " + apiKey);
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            conn.setDoOutput(true);
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(30000);
 
-        } catch (MessagingException e) {
-            System.err.println("❌ [EmailUtility] LỖI MessagingException:");
-            System.err.println("   Class:   " + e.getClass().getName());
-            System.err.println("   Message: " + e.getMessage());
+            try (OutputStream os = conn.getOutputStream()) {
+                byte[] input = requestBody.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int statusCode = conn.getResponseCode();
+
+            InputStreamReader streamReader = (statusCode >= 200 && statusCode < 300)
+                ? new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8)
+                : new InputStreamReader(conn.getErrorStream(), StandardCharsets.UTF_8);
+
+            StringBuilder responseStr = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(streamReader)) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    responseStr.append(line);
+                }
+            }
+
+            if (statusCode >= 200 && statusCode < 300) {
+                System.out.println("✅ [EmailUtility] Gửi mail thành công đến: " + toEmail);
+                System.out.println("   Response: " + responseStr.toString());
+                return true;
+            } else {
+                System.err.println("❌ [EmailUtility] Gửi mail thất bại (HTTP " + statusCode + ")");
+                System.err.println("   Response: " + responseStr.toString());
+                return false;
+            }
+
+        } catch (IOException e) {
+            System.err.println("❌ [EmailUtility] Lỗi kết nối: " + e.getMessage());
             e.printStackTrace();
-            System.out.println("==================================================");
-            return false;
-
-        } catch (Exception e) {
-            System.err.println("❌ [EmailUtility] LỖI Exception:");
-            System.err.println("   Class:   " + e.getClass().getName());
-            System.err.println("   Message: " + e.getMessage());
-            e.printStackTrace();
-            System.out.println("==================================================");
             return false;
         }
     }
