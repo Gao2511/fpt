@@ -24,7 +24,7 @@ public class ContactServlet extends HttpServlet {
     // ====================================================
     // MAIL ADMIN - Gmail dùng để NHẬN thông báo
     // ====================================================
-    private static final String ADMIN_EMAIL = "nguyenhacaoky@gmail.com";
+    private static final String ADMIN_EMAIL = "nguyenphuc6403@gmail.com";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
