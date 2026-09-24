@@ -356,6 +356,7 @@
 
                 <div class="footer-top">
 
+                    <!-- Cột 1: Logo + Mô tả -->
                     <div>
                         <div class="brand-footer">
                             <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
@@ -371,55 +372,9 @@
                             Truyền hình tương tác FPT Play và giải pháp Camera AI thông minh hàng đầu Việt Nam.
                             Đồng hành cùng hàng triệu hộ gia đình và doanh nghiệp trên toàn quốc.
                         </p>
-
-
-                        <div class="socials">
-                            <a href="#" title="Facebook">
-                                <svg viewBox="0 0 24 24">
-                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
-                                </svg>
-                            </a>
-                            <a href="#" title="YouTube">
-                                <svg viewBox="0 0 24 24">
-                                <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/>
-                                <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>
-                                </svg>
-                            </a>
-                            <a href="#" title="Zalo">
-                                <svg viewBox="0 0 24 24">
-                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-                                </svg>
-                            </a>
-                            <a href="#" title="TikTok">
-                                <svg viewBox="0 0 24 24">
-                                <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>
-                                </svg>
-                            </a>
-                        </div>
                     </div>
 
-                    <div>
-                        <h4>Dịch vụ</h4>
-                        <ul>
-                            <li><a href="${pageContext.request.contextPath}/home#packages">Internet Cáp Quang</a></li>
-                            <li><a href="${pageContext.request.contextPath}/home#packages">Combo Internet + FPT Play</a></li>
-                            <li><a href="${pageContext.request.contextPath}/home#packages">FPT Play Box 4K</a></li>
-                            <li><a href="${pageContext.request.contextPath}/home#packages">Camera AI Thông Minh</a></li>
-                            <li><a href="${pageContext.request.contextPath}/home#packages">Gói Doanh Nghiệp</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4>Hỗ trợ khách hàng</h4>
-                        <ul>
-                            <li><a href="#">Hướng dẫn thanh toán</a></li>
-                            <li><a href="#">Tra cứu hóa đơn</a></li>
-                            <li><a href="#">Báo sự cố kỹ thuật</a></li>
-                            <li><a href="#">Câu hỏi thường gặp</a></li>
-                            <li><a href="#">Chính sách bảo mật</a></li>
-                        </ul>
-                    </div>
-
+                    <!-- Cột 2: Liên hệ -->
                     <div>
                         <h4>Liên hệ với chúng tôi</h4>
                         <ul class="contact-list">
@@ -432,7 +387,7 @@
                                 </span>
                                 <div>
                                     <strong>Trụ sở chính</strong>
-                                    94 Phạm Hùng, TP Quy Nhơn, Bình Định
+                                    94 Phạm Hùng, Quy Nhơn, Gia Lai.
                                 </div>
                             </li>
                             <li>

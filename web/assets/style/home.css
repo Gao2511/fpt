@@ -1582,10 +1582,11 @@ ul { list-style: none; }
 
 .footer-top {
     display: grid;
-    grid-template-columns: 2.2fr 1fr 1fr 1.4fr;
-    gap: 50px;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 60px;
     padding: 60px 0 45px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    align-items: start;
 }
 
 .footer .brand-footer {
@@ -2827,4 +2828,249 @@ footer {
         flex-direction: column !important;
         align-items: stretch !important;
     }
+}
+/* =========================================================
+   MOBILE OPTIMIZATION — GHI ĐÈ TOÀN BỘ RESPONSIVE CŨ
+   Paste vào CUỐI file home.css
+   ========================================================= */
+
+/* ===== TABLET (≤1024px) ===== */
+@media (max-width: 1024px) {
+    .footer .container { padding: 0 25px; }
+    .footer-top { grid-template-columns: 1fr 1fr; gap: 40px; }
+    .footer-bottom { flex-direction: column; text-align: center; }
+    .footer .copyright { text-align: center; max-width: 100%; }
+
+    .hero-image { margin-right: -80px; }
+    .hero-slideshow { max-width: 550px; height: 380px; }
+}
+
+/* ===== TABLET NHỎ (≤900px) ===== */
+@media (max-width: 900px) {
+    .hero .container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .hero-image {
+        margin-right: 0;
+        order: -1;             /* Hình ảnh lên trước text */
+    }
+
+    .hero-slideshow {
+        max-width: 100%;
+        height: 340px;
+    }
+
+    .hero h1 { font-size: 32px; }
+
+    .features { grid-template-columns: repeat(2, 1fr); }
+    .devices { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== MOBILE (≤640px) ===== */
+@media (max-width: 640px) {
+    /* ---- NAV ---- */
+    .top-nav { padding: 8px 0; }
+    .top-nav .menu { display: none; }
+    .top-nav .hotline-box { padding: 4px 8px; margin-right: 0; }
+    .top-nav .hotline-box .text small { display: none; }
+    .top-nav .hotline-box .text strong { font-size: 12px; }
+    .top-nav .logo img { height: 42px !important; }
+    .top-nav .right { gap: 6px; }
+
+    .btn-login-small,
+    .btn-register-small {
+        padding: 6px 10px;
+        font-size: 11.5px;
+    }
+
+    /* ---- HERO ---- */
+    .hero { padding: 110px 0 40px 0; }
+    .hero .container { gap: 24px; }
+    .hero h1 { font-size: 26px; line-height: 1.25; }
+    .hero .desc { font-size: 13px; margin-bottom: 20px; }
+    .hero .badges { gap: 8px; margin-bottom: 20px; }
+    .hero .badges span { padding: 5px 10px; font-size: 11.5px; }
+    .hero .cta-buttons { flex-direction: column; gap: 10px; }
+    .btn-hero-primary,
+    .btn-hero-secondary {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 20px;
+        font-size: 13px;
+    }
+
+    .hero-image { margin-right: 0; }
+    .hero-slideshow {
+        max-width: 100%;
+        height: 240px;
+        border-radius: 12px;
+    }
+    .hero-slide { border-radius: 12px; }
+    .hero-slideshow::after { border-radius: 12px; }
+    .hero-image .floating-tag {
+        bottom: 12px;
+        left: 12px;
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+
+    /* ---- SECTION TITLE ---- */
+    .section-title { padding: 40px 0 20px; }
+    .section-title h2 { font-size: 20px; padding-bottom: 10px; }
+    .section-title h2::after { width: 45px; height: 3px; }
+    .section-title p { font-size: 13px; }
+    .section-title .small-label { font-size: 10.5px; padding: 4px 10px; }
+
+    /* ---- PACKAGES (fix: chuyển flex → block) ---- */
+    .packages {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+        padding-bottom: 30px;
+    }
+
+    .pkg {
+        flex: 1 1 100% !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    .pkg .price { font-size: 26px; }
+    .pkg .pkg-header { font-size: 15px; padding: 14px 12px; }
+    .pkg ul li { font-size: 12.5px; }
+
+    /* ---- FEATURES ---- */
+    .features {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .feature { padding: 20px 16px; }
+    .feature .icon { width: 48px; height: 48px; margin-bottom: 10px; }
+    .feature .icon svg { width: 22px; height: 22px; }
+    .feature h4 { font-size: 13px; }
+    .feature p { font-size: 12px; }
+
+    /* ---- DEVICES ---- */
+    .devices {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .device .img-wrap { height: 200px; }
+
+    /* ---- CONTACT FORM ---- */
+    .contact-section { padding: 40px 0 60px 0; }
+    .contact-wrapper {
+        padding: 28px 20px;
+        border-radius: 16px;
+    }
+    .contact-wrapper h2 { font-size: 20px; }
+    .contact-wrapper > p { font-size: 13px; }
+
+    .contact-form {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .contact-form input,
+    .contact-form select,
+    .contact-form textarea {
+        font-size: 13.5px;
+        padding: 11px 13px;
+    }
+    .contact-form button {
+        padding: 13px;
+        font-size: 13.5px;
+    }
+
+    /* ---- ADDRESS PICKER ---- */
+    .addr-mode-bar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+    }
+    .addr-mode-btn,
+    .addr-toggle-btn {
+        width: 100% !important;
+        max-width: 100% !important;
+        justify-content: center !important;
+        padding: 10px 14px !important;
+        font-size: 12px !important;
+    }
+
+    .addr-row-2,
+    .addr-row-3 {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    /* ---- FOOTER ---- */
+    .footer .container { padding: 0 20px; }
+    .footer-top {
+        grid-template-columns: 1fr !important;
+        gap: 30px;
+        padding: 40px 0 30px;
+    }
+
+    .footer .brand-footer img { height: 45px !important; }
+    .footer .brand-footer strong { font-size: 18px; }
+    .footer .company-desc { font-size: 12.5px; }
+
+    .footer h4 { font-size: 13px; margin-bottom: 16px; }
+    .footer ul li { font-size: 12.5px; padding: 6px 0; }
+
+    .footer .contact-list li {
+        gap: 10px;
+        padding: 8px 0;
+    }
+    .footer .contact-list li .contact-icon {
+        width: 40px !important;
+        height: 40px !important;
+    }
+    .footer .contact-list li .contact-icon svg {
+        width: 18px !important;
+        height: 18px !important;
+    }
+    .footer .contact-list li strong { font-size: 12.5px; }
+    .footer .contact-list li .value { font-size: 13px; }
+
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+        padding: 24px 0;
+    }
+    .footer .hotline-box-footer {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 18px;
+    }
+    .footer .copyright { font-size: 11.5px; text-align: center; }
+
+    /* ---- AI CHAT (đã có sẵn, ghi đè lại cho chắc) ---- */
+    .ai-chat-button {
+        width: 52px;
+        height: 52px;
+        bottom: 16px;
+        right: 16px;
+    }
+    .ai-chat-button svg { width: 22px; height: 22px; }
+    .ai-chat-window {
+        width: calc(100vw - 20px);
+        right: 10px;
+        bottom: 80px;
+        height: 70vh;
+    }
+}
+
+/* ===== MOBILE NHỎ (≤400px) ===== */
+@media (max-width: 400px) {
+    .hero h1 { font-size: 22px; }
+    .hero-slideshow { height: 200px; }
+    .section-title h2 { font-size: 18px; }
+    .contact-wrapper { padding: 24px 16px; }
+    .contact-wrapper h2 { font-size: 18px; }
+    .pkg .price { font-size: 24px; }
 }

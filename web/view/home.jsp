@@ -25,7 +25,7 @@
                     <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
                          alt="FPT Telecom"
                          style="height: 50px; width: auto; object-fit: contain; display: block;">
-                </a>                
+                </a>
                 <nav class="menu">
                     <a href="${pageContext.request.contextPath}/home">Trang chủ</a>
                     <a href="#packages">Bảng giá</a>
@@ -187,11 +187,11 @@
                 </div>
                 <div class="hero-image">
                     <div class="hero-slideshow">
-                        <img src="${pageContext.request.contextPath}/assets/images/Hero1.png" 
+                        <img src="${pageContext.request.contextPath}/assets/images/Hero1.png"
                              alt="FPT Internet" class="hero-slide active">
-                        <img src="${pageContext.request.contextPath}/assets/images/Hero2.png" 
+                        <img src="${pageContext.request.contextPath}/assets/images/Hero2.png"
                              alt="FPT WiFi 6" class="hero-slide">
-                        <img src="${pageContext.request.contextPath}/assets/images/Hero3.png" 
+                        <img src="${pageContext.request.contextPath}/assets/images/Hero3.png"
                              alt="FPT Camera" class="hero-slide">
                     </div>
                     <div class="floating-tag">
@@ -337,7 +337,7 @@
 
                 <div class="device">
                     <div class="img-wrap">
-                        <img src="${pageContext.request.contextPath}/assets/images/Wifi_6.png" 
+                        <img src="${pageContext.request.contextPath}/assets/images/Wifi_6.png"
                              alt="Modem WiFi 6">
                     </div>
                     <div class="info">
@@ -348,7 +348,7 @@
 
                 <div class="device">
                     <div class="img-wrap">
-                        <img src="${pageContext.request.contextPath}/assets/images/FPT-Play-Box.png" 
+                        <img src="${pageContext.request.contextPath}/assets/images/FPT-Play-Box.png"
                              alt="FPT Play Box">
                     </div>
                     <div class="info">
@@ -359,7 +359,7 @@
 
                 <div class="device">
                     <div class="img-wrap">
-                        <img src="${pageContext.request.contextPath}/assets/images/Camera-FPT-Play.png" 
+                        <img src="${pageContext.request.contextPath}/assets/images/Camera-FPT-Play.png"
                              alt="Camera AI">
                     </div>
                     <div class="info">
@@ -370,7 +370,7 @@
 
                 <div class="device">
                     <div class="img-wrap">
-                        <img src="${pageContext.request.contextPath}/assets/images/Ngoai_Hang_Anh.png" 
+                        <img src="${pageContext.request.contextPath}/assets/images/Ngoai_Hang_Anh.png"
                              alt="Box Ngoại Hạng Anh">
                     </div>
                     <div class="info">
@@ -459,124 +459,78 @@
 
                 <div class="footer-top">
 
-                    <div>
-                        <div class="brand-footer">
-                            <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
-                                 alt="FPT Telecom"
-                                 style="height: 55px; width: auto; object-fit: contain; margin-right: 12px;">
-                            <div class="brand-text">
-                                <strong>FPT Telecom</strong>
-                                <small>Hệ sinh thái số FPT</small>
-                            </div>
-                        </div>
-                        <p class="company-desc">
-                            Công ty Cổ phần Viễn thông FPT — Nhà cung cấp dịch vụ Internet tốc độ cao,
-                            Truyền hình tương tác FPT Play và giải pháp Camera AI thông minh hàng đầu Việt Nam.
-                            Đồng hành cùng hàng triệu hộ gia đình và doanh nghiệp trên toàn quốc.
-                        </p>
+    <!-- Cột 1: Logo + Mô tả -->
+    <div>
+        <div class="brand-footer">
+            <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
+                 alt="FPT Telecom"
+                 style="height: 55px; width: auto; object-fit: contain; margin-right: 12px;">
+            <div class="brand-text">
+                <strong>FPT Telecom</strong>
+                <small>Hệ sinh thái số FPT</small>
+            </div>
+        </div>
+        <p class="company-desc">
+            Công ty Cổ phần Viễn thông FPT — Nhà cung cấp dịch vụ Internet tốc độ cao,
+            Truyền hình tương tác FPT Play và giải pháp Camera AI thông minh hàng đầu Việt Nam.
+            Đồng hành cùng hàng triệu hộ gia đình và doanh nghiệp trên toàn quốc.
+        </p>
+    </div>
 
-
-
-                        <div class="socials">
-                            <a href="#" title="Facebook">
-                                <svg viewBox="0 0 24 24">
-                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
-                                </svg>
-                            </a>
-                            <a href="#" title="YouTube">
-                                <svg viewBox="0 0 24 24">
-                                <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/>
-                                <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>
-                                </svg>
-                            </a>
-                            <a href="#" title="Zalo">
-                                <svg viewBox="0 0 24 24">
-                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-                                </svg>
-                            </a>
-                            <a href="#" title="TikTok">
-                                <svg viewBox="0 0 24 24">
-                                <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h4>Dịch vụ</h4>
-                        <ul>
-                            <li><a href="${pageContext.request.contextPath}/home#packages">Internet Cáp Quang</a></li>
-                            <li><a href="${pageContext.request.contextPath}/home#packages">Combo Internet + FPT Play</a></li>
-                            <li><a href="${pageContext.request.contextPath}/home#packages">FPT Play Box 4K</a></li>
-                            <li><a href="${pageContext.request.contextPath}/home#packages">Camera AI Thông Minh</a></li>
-                            <li><a href="${pageContext.request.contextPath}/home#packages">Gói Doanh Nghiệp</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4>Hỗ trợ khách hàng</h4>
-                        <ul>
-                            <li><a href="#">Hướng dẫn thanh toán</a></li>
-                            <li><a href="#">Tra cứu hóa đơn</a></li>
-                            <li><a href="#">Báo sự cố kỹ thuật</a></li>
-                            <li><a href="#">Câu hỏi thường gặp</a></li>
-                            <li><a href="#">Chính sách bảo mật</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4>Liên hệ với chúng tôi</h4>
-                        <ul class="contact-list">
-                            <li>
-                                <span class="contact-icon">
-                                    <svg viewBox="0 0 24 24">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                    <circle cx="12" cy="10" r="3"/>
-                                    </svg>
-                                </span>
-                                <div>
-                                    <strong>Trụ sở chính</strong>
-                                    94 Phạm Hùng, Quy Nhơn, Gia Lai.
-                                </div>
-                            </li>
-                            <li>
-                                <span class="contact-icon">
-                                    <svg viewBox="0 0 24 24">
-                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                                    </svg>
-                                </span>
-                                <div>
-                                    <strong>Hotline đăng ký</strong>
-                                    <span class="value">0932 079 469</span>
-                                </div>
-                            </li>
-                            <li>
-                                <span class="contact-icon">
-                                    <svg viewBox="0 0 24 24">
-                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                                    </svg>
-                                </span>
-                                <div>
-                                    <strong>Chăm sóc khách hàng</strong>
-                                    <span class="value">1900 6600</span>
-                                </div>
-                            </li>
-                            <li>
-                                <span class="contact-icon">
-                                    <svg viewBox="0 0 24 24">
-                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                                    <polyline points="22,6 12,13 2,6"/>
-                                    </svg>
-                                </span>
-                                <div>
-                                    <strong>Email</strong>
-                                    <a href="mailto:hieulv20@fpt.com">PhucBN2@fpt.com</a>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-
+    <!-- Cột 2: Liên hệ -->
+    <div>
+        <h4>Liên hệ với chúng tôi</h4>
+        <ul class="contact-list">
+            <li>
+                <span class="contact-icon">
+                    <svg viewBox="0 0 24 24">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                </span>
+                <div>
+                    <strong>Trụ sở chính</strong>
+                    94 Phạm Hùng, Quy Nhơn, Gia Lai.
                 </div>
+            </li>
+            <li>
+                <span class="contact-icon">
+                    <svg viewBox="0 0 24 24">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                </span>
+                <div>
+                    <strong>Hotline đăng ký</strong>
+                    <span class="value">0932 079 469</span>
+                </div>
+            </li>
+            <li>
+                <span class="contact-icon">
+                    <svg viewBox="0 0 24 24">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                </span>
+                <div>
+                    <strong>Chăm sóc khách hàng</strong>
+                    <span class="value">1900 6600</span>
+                </div>
+            </li>
+            <li>
+                <span class="contact-icon">
+                    <svg viewBox="0 0 24 24">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                </span>
+                <div>
+                    <strong>Email</strong>
+                    <a href="mailto:hieulv20@fpt.com">PhucBN2@fpt.com</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+</div>
 
                 <div class="footer-bottom">
 
@@ -602,215 +556,215 @@
             </div>
         </footer>
 
-                            <!-- ============ SCRIPT CHUNG ============ -->
-                            <script>
-                                // ===== SCROLL REVEAL =====
-                                const revealElements = document.querySelectorAll(
-                                        '.section-title, .pkg, .feature, .device, .contact-wrapper'
-                                        );
-                                revealElements.forEach(el => el.classList.add('reveal'));
+        <!-- ============ SCRIPT CHUNG ============ -->
+        <script>
+            // ===== SCROLL REVEAL =====
+            const revealElements = document.querySelectorAll(
+                    '.section-title, .pkg, .feature, .device, .contact-wrapper'
+                    );
+            revealElements.forEach(el => el.classList.add('reveal'));
 
-                                const observer = new IntersectionObserver((entries) => {
-                                    entries.forEach((entry, index) => {
-                                        if (entry.isIntersecting) {
-                                            setTimeout(() => {
-                                                entry.target.classList.add('active');
-                                            }, index * 80);
-                                            observer.unobserve(entry.target);
-                                        }
-                                    });
-                                }, {
-                                    threshold: 0.1,
-                                    rootMargin: '0px 0px -50px 0px'
-                                });
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('active');
+                        }, index * 80);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
 
-                                revealElements.forEach(el => observer.observe(el));
+            revealElements.forEach(el => observer.observe(el));
 
-                                // ===== NAVBAR SCROLL EFFECT =====
-                                const topNav = document.querySelector('.top-nav');
-                                window.addEventListener('scroll', () => {
-                                    if (window.scrollY > 50) {
-                                        topNav.style.boxShadow = '0 4px 30px rgba(0,0,0,0.1)';
-                                        topNav.style.padding = '8px 0';
-                                    } else {
-                                        topNav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.06)';
-                                        topNav.style.padding = '12px 0';
-                                    }
-                                });
+            // ===== NAVBAR SCROLL EFFECT =====
+            const topNav = document.querySelector('.top-nav');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    topNav.style.boxShadow = '0 4px 30px rgba(0,0,0,0.1)';
+                    topNav.style.padding = '8px 0';
+                } else {
+                    topNav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.06)';
+                    topNav.style.padding = '12px 0';
+                }
+            });
 
-                                // ===== CLICK RIPPLE EFFECT CHO NÚT =====
-                                document.querySelectorAll('.btn-pkg, .btn-device, .btn-hero-primary, .contact-form button').forEach(btn => {
-                                    btn.addEventListener('click', function (e) {
-                                        const rect = this.getBoundingClientRect();
-                                        const x = e.clientX - rect.left;
-                                        const y = e.clientY - rect.top;
+            // ===== CLICK RIPPLE EFFECT CHO NÚT =====
+            document.querySelectorAll('.btn-pkg, .btn-device, .btn-hero-primary, .contact-form button').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
 
-                                        const ripple = document.createElement('span');
-                                        ripple.style.cssText = `
-                                            position: absolute;
-                                            width: 0;
-                                            height: 0;
-                                            border-radius: 50%;
-                                            background: rgba(255,255,255,0.5);
-                                            transform: translate(-50%, -50%);
-                                            left: ${x}px;
-                                            top: ${y}px;
-                                            pointer-events: none;
-                                            animation: rippleAnim 0.6s ease-out;
-                                        `;
-                                        this.style.position = 'relative';
-                                        this.style.overflow = 'hidden';
-                                        this.appendChild(ripple);
+                    const ripple = document.createElement('span');
+                    ripple.style.cssText = `
+                        position: absolute;
+                        width: 0;
+                        height: 0;
+                        border-radius: 50%;
+                        background: rgba(255,255,255,0.5);
+                        transform: translate(-50%, -50%);
+                        left: ${x}px;
+                        top: ${y}px;
+                        pointer-events: none;
+                        animation: rippleAnim 0.6s ease-out;
+                    `;
+                    this.style.position = 'relative';
+                    this.style.overflow = 'hidden';
+                    this.appendChild(ripple);
 
-                                        setTimeout(() => ripple.remove(), 600);
-                                    });
-                                });
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
 
-                                const style = document.createElement('style');
-                                style.textContent = `
-                                    @keyframes rippleAnim {
-                                        to { width: 300px; height: 300px; opacity: 0; }
-                                    }
-                                `;
-                                document.head.appendChild(style);
-                            </script>
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes rippleAnim {
+                    to { width: 300px; height: 300px; opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        </script>
 
-                            <!-- ============ SCRIPT: LƯU FORM TƯ VẤN + CHUYỂN LOGIN ============ -->
-                            <script>
-                                (function () {
-                                    var contactForm = document.getElementById('contactForm');
-                                    if (!contactForm) return;
+        <!-- ============ SCRIPT: LƯU FORM TƯ VẤN + CHUYỂN LOGIN ============ -->
+        <script>
+            (function () {
+                var contactForm = document.getElementById('contactForm');
+                if (!contactForm) return;
 
-                                    var isLoggedIn = '${not empty sessionScope.user}' === 'true';
-                                    var STORAGE_KEY = 'contactFormBackup';
+                var isLoggedIn = '${not empty sessionScope.user}' === 'true';
+                var STORAGE_KEY = 'contactFormBackup';
 
-                                    // ===== BƯỚC 1: Chặn submit khi CHƯA đăng nhập =====
-                                    if (!isLoggedIn) {
-                                        contactForm.addEventListener('submit', function (e) {
-                                            e.preventDefault();
+                // ===== BƯỚC 1: Chặn submit khi CHƯA đăng nhập =====
+                if (!isLoggedIn) {
+                    contactForm.addEventListener('submit', function (e) {
+                        e.preventDefault();
 
-                                            // Lấy địa chỉ từ hidden input (đã được address-picker ghép sẵn)
-                                            var finalAddr = document.querySelector('.addr-final[data-prefix="home"]');
-                                            var formData = {
-                                                user_name: document.getElementById('user_name').value,
-                                                user_phone: document.getElementById('user_phone').value,
-                                                user_email: document.getElementById('user_email').value,
-                                                user_address: finalAddr ? finalAddr.value : '',
-                                                user_note: document.getElementById('user_note').value
-                                            };
+                        // Lấy địa chỉ từ hidden input (đã được address-picker ghép sẵn)
+                        var finalAddr = document.querySelector('.addr-final[data-prefix="home"]');
+                        var formData = {
+                            user_name: document.getElementById('user_name').value,
+                            user_phone: document.getElementById('user_phone').value,
+                            user_email: document.getElementById('user_email').value,
+                            user_address: finalAddr ? finalAddr.value : '',
+                            user_note: document.getElementById('user_note').value
+                        };
 
-                                            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+                        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
 
-                                            var returnUrl = window.location.origin
-                                                    + window.location.pathname
-                                                    + '#contact';
+                        var returnUrl = window.location.origin
+                                + window.location.pathname
+                                + '#contact';
 
-                                            var loginUrl = '${pageContext.request.contextPath}/login'
-                                                    + '?returnUrl=' + encodeURIComponent(returnUrl);
+                        var loginUrl = '${pageContext.request.contextPath}/login'
+                                + '?returnUrl=' + encodeURIComponent(returnUrl);
 
-                                            window.location.href = loginUrl;
-                                        });
-                                    }
+                        window.location.href = loginUrl;
+                    });
+                }
 
-                                    // ===== BƯỚC 2: Khôi phục dữ liệu form khi quay lại =====
-                                    var saved = sessionStorage.getItem(STORAGE_KEY);
-                                    if (saved) {
-                                        try {
-                                            var data = JSON.parse(saved);
+                // ===== BƯỚC 2: Khôi phục dữ liệu form khi quay lại =====
+                var saved = sessionStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    try {
+                        var data = JSON.parse(saved);
 
-                                            if (data.user_note)
-                                                document.getElementById('user_note').value = data.user_note;
+                        if (data.user_note)
+                            document.getElementById('user_note').value = data.user_note;
 
-                                            if (isLoggedIn) {
-                                                setTimeout(function () {
-                                                    var contactSection = document.getElementById('contact');
-                                                    if (contactSection) {
-                                                        contactSection.scrollIntoView({behavior: 'smooth', block: 'start'});
-                                                    }
-                                                }, 500);
-                                            }
-                                            sessionStorage.removeItem(STORAGE_KEY);
-                                        } catch (e) {
-                                            sessionStorage.removeItem(STORAGE_KEY);
-                                        }
-                                    }
-                                })();
+                        if (isLoggedIn) {
+                            setTimeout(function () {
+                                var contactSection = document.getElementById('contact');
+                                if (contactSection) {
+                                    contactSection.scrollIntoView({behavior: 'smooth', block: 'start'});
+                                }
+                            }, 500);
+                        }
+                        sessionStorage.removeItem(STORAGE_KEY);
+                    } catch (e) {
+                        sessionStorage.removeItem(STORAGE_KEY);
+                    }
+                }
+            })();
 
-                                // ============ VALIDATE FORM CONTACT ============
-                                document.getElementById('contactForm')?.addEventListener('submit', function (e) {
-                                    var prefix = 'home';
-                                    var mode = window['getAddressMode_' + prefix] ? window['getAddressMode_' + prefix]() : 'new';
+            // ============ VALIDATE FORM CONTACT ============
+            document.getElementById('contactForm')?.addEventListener('submit', function (e) {
+                var prefix = 'home';
+                var mode = window['getAddressMode_' + prefix] ? window['getAddressMode_' + prefix]() : 'new';
 
-                                    // ===== CHẾ ĐỘ TỰ NHẬP TAY =====
-                                    if (mode === 'manual') {
-                                        var manualInput = document.querySelector('.addr-manual-input[data-prefix="' + prefix + '"]');
-                                        if (!manualInput || manualInput.value.trim() === '') {
-                                            e.preventDefault();
-                                            alert('Vui lòng nhập địa chỉ lắp đặt đầy đủ!');
-                                            if (manualInput) manualInput.focus();
-                                            return false;
-                                        }
-                                        return true;
-                                    }
+                // ===== CHẾ ĐỘ TỰ NHẬP TAY =====
+                if (mode === 'manual') {
+                    var manualInput = document.querySelector('.addr-manual-input[data-prefix="' + prefix + '"]');
+                    if (!manualInput || manualInput.value.trim() === '') {
+                        e.preventDefault();
+                        alert('Vui lòng nhập địa chỉ lắp đặt đầy đủ!');
+                        if (manualInput) manualInput.focus();
+                        return false;
+                    }
+                    return true;
+                }
 
-                                    // ===== CHẾ ĐỘ CŨ (3 cấp) =====
-                                    if (mode === 'old') {
-                                        var provOld = document.querySelector('.addr-province-old[data-prefix="' + prefix + '"]');
-                                        var distOld = document.querySelector('.addr-district-old[data-prefix="' + prefix + '"]');
-                                        var wardOld = document.querySelector('.addr-ward-old[data-prefix="' + prefix + '"]');
-                                        var detailOld = document.querySelector('.addr-detail-old[data-prefix="' + prefix + '"]');
+                // ===== CHẾ ĐỘ CŨ (3 cấp) =====
+                if (mode === 'old') {
+                    var provOld = document.querySelector('.addr-province-old[data-prefix="' + prefix + '"]');
+                    var distOld = document.querySelector('.addr-district-old[data-prefix="' + prefix + '"]');
+                    var wardOld = document.querySelector('.addr-ward-old[data-prefix="' + prefix + '"]');
+                    var detailOld = document.querySelector('.addr-detail-old[data-prefix="' + prefix + '"]');
 
-                                        if (!provOld || !provOld.value) {
-                                            e.preventDefault(); alert('Vui lòng chọn Tỉnh/Thành phố!'); if (provOld) provOld.focus(); return false;
-                                        }
-                                        if (!distOld || !distOld.value) {
-                                            e.preventDefault(); alert('Vui lòng chọn Quận/Huyện!'); if (distOld) distOld.focus(); return false;
-                                        }
-                                        if (!wardOld || !wardOld.value) {
-                                            e.preventDefault(); alert('Vui lòng chọn Phường/Xã!'); if (wardOld) wardOld.focus(); return false;
-                                        }
-                                        if (!detailOld || detailOld.value.trim() === '') {
-                                            e.preventDefault(); alert('Vui lòng nhập địa chỉ chi tiết (số nhà, tên đường...)!'); if (detailOld) detailOld.focus(); return false;
-                                        }
-                                        return true;
-                                    }
+                    if (!provOld || !provOld.value) {
+                        e.preventDefault(); alert('Vui lòng chọn Tỉnh/Thành phố!'); if (provOld) provOld.focus(); return false;
+                    }
+                    if (!distOld || !distOld.value) {
+                        e.preventDefault(); alert('Vui lòng chọn Quận/Huyện!'); if (distOld) distOld.focus(); return false;
+                    }
+                    if (!wardOld || !wardOld.value) {
+                        e.preventDefault(); alert('Vui lòng chọn Phường/Xã!'); if (wardOld) wardOld.focus(); return false;
+                    }
+                    if (!detailOld || detailOld.value.trim() === '') {
+                        e.preventDefault(); alert('Vui lòng nhập địa chỉ chi tiết (số nhà, tên đường...)!'); if (detailOld) detailOld.focus(); return false;
+                    }
+                    return true;
+                }
 
-                                    // ===== CHẾ ĐỘ MỚI (2 cấp) - mặc định =====
-                                    var provNew = document.querySelector('.addr-province-new[data-prefix="' + prefix + '"]');
-                                    var wardNew = document.querySelector('.addr-ward-new[data-prefix="' + prefix + '"]');
-                                    var detailNew = document.querySelector('.addr-detail[data-prefix="' + prefix + '"]');
-                                    var customProvNew = document.querySelector('.addr-custom-prov-new[data-prefix="' + prefix + '"]');
-                                    var customWardNew = document.querySelector('.addr-custom-ward-new[data-prefix="' + prefix + '"]');
+                // ===== CHẾ ĐỘ MỚI (2 cấp) - mặc định =====
+                var provNew = document.querySelector('.addr-province-new[data-prefix="' + prefix + '"]');
+                var wardNew = document.querySelector('.addr-ward-new[data-prefix="' + prefix + '"]');
+                var detailNew = document.querySelector('.addr-detail[data-prefix="' + prefix + '"]');
+                var customProvNew = document.querySelector('.addr-custom-prov-new[data-prefix="' + prefix + '"]');
+                var customWardNew = document.querySelector('.addr-custom-ward-new[data-prefix="' + prefix + '"]');
 
-                                    var provVal = (provNew && provNew.value === 'custom')
-                                        ? (customProvNew ? customProvNew.value.trim() : '')
-                                        : (provNew ? provNew.value : '');
-                                    var wardVal = (wardNew && wardNew.value === 'custom')
-                                        ? (customWardNew ? customWardNew.value.trim() : '')
-                                        : (wardNew ? wardNew.value : '');
+                var provVal = (provNew && provNew.value === 'custom')
+                    ? (customProvNew ? customProvNew.value.trim() : '')
+                    : (provNew ? provNew.value : '');
+                var wardVal = (wardNew && wardNew.value === 'custom')
+                    ? (customWardNew ? customWardNew.value.trim() : '')
+                    : (wardNew ? wardNew.value : '');
 
-                                    if (!provVal) {
-                                        e.preventDefault();
-                                        alert('Vui lòng chọn Tỉnh/Thành phố!');
-                                        if (provNew && provNew.value === 'custom' && customProvNew) customProvNew.focus();
-                                        else if (provNew) provNew.focus();
-                                        return false;
-                                    }
-                                    if (!wardVal) {
-                                        e.preventDefault();
-                                        alert('Vui lòng chọn Phường/Xã!');
-                                        if (wardNew && wardNew.value === 'custom' && customWardNew) customWardNew.focus();
-                                        else if (wardNew) wardNew.focus();
-                                        return false;
-                                    }
-                                    if (!detailNew || detailNew.value.trim() === '') {
-                                        e.preventDefault();
-                                        alert('Vui lòng nhập địa chỉ chi tiết (số nhà, tên đường...)!');
-                                        if (detailNew) detailNew.focus();
-                                        return false;
-                                    }
-                                });
-                            </script>
+                if (!provVal) {
+                    e.preventDefault();
+                    alert('Vui lòng chọn Tỉnh/Thành phố!');
+                    if (provNew && provNew.value === 'custom' && customProvNew) customProvNew.focus();
+                    else if (provNew) provNew.focus();
+                    return false;
+                }
+                if (!wardVal) {
+                    e.preventDefault();
+                    alert('Vui lòng chọn Phường/Xã!');
+                    if (wardNew && wardNew.value === 'custom' && customWardNew) customWardNew.focus();
+                    else if (wardNew) wardNew.focus();
+                    return false;
+                }
+                if (!detailNew || detailNew.value.trim() === '') {
+                    e.preventDefault();
+                    alert('Vui lòng nhập địa chỉ chi tiết (số nhà, tên đường...)!');
+                    if (detailNew) detailNew.focus();
+                    return false;
+                }
+            });
+        </script>
 
         <!-- ============ AI CHAT WIDGET ============ -->
         <div class="ai-chat-button" id="aiChatBtn" onclick="toggleAIChat()">
@@ -850,245 +804,6 @@
                 </button>
             </div>
         </div>
-
-        <style>
-            .ai-chat-button {
-                position: fixed;
-                bottom: 25px;
-                right: 25px;
-                width: 60px;
-                height: 60px;
-                background: linear-gradient(135deg, #f37021, #ff8c42);
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                box-shadow: 0 8px 25px rgba(243, 112, 33, 0.4);
-                z-index: 9999;
-                transition: all 0.3s;
-                animation: chatPulse 2s infinite;
-            }
-            .ai-chat-button:hover {
-                transform: scale(1.1);
-                box-shadow: 0 12px 35px rgba(243, 112, 33, 0.6);
-            }
-            .ai-chat-button svg {
-                width: 26px;
-                height: 26px;
-                stroke: white;
-            }
-            @keyframes chatPulse {
-                0%, 100% {
-                    box-shadow: 0 8px 25px rgba(243, 112, 33, 0.4), 0 0 0 0 rgba(243, 112, 33, 0.7);
-                }
-                50%      {
-                    box-shadow: 0 8px 25px rgba(243, 112, 33, 0.4), 0 0 0 15px rgba(243, 112, 33, 0);
-                }
-            }
-
-            .ai-chat-window {
-                position: fixed;
-                bottom: 100px;
-                right: 25px;
-                width: 380px;
-                height: 550px;
-                background: white;
-                border-radius: 20px;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-                display: none;
-                flex-direction: column;
-                z-index: 9998;
-                overflow: hidden;
-                animation: chatSlideIn 0.3s ease-out;
-            }
-            .ai-chat-window.active {
-                display: flex;
-            }
-            @keyframes chatSlideIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(30px);
-                }
-                to   {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-
-            .ai-chat-header {
-                background: linear-gradient(135deg, #f37021, #ff8c42);
-                color: white;
-                padding: 16px 20px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            .ai-chat-header-info {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-            }
-            .ai-chat-avatar {
-                width: 42px;
-                height: 42px;
-                background: rgba(255,255,255,0.2);
-                border: 2px solid rgba(255,255,255,0.4);
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: 800;
-                font-size: 14px;
-            }
-            .ai-chat-title {
-                font-weight: 800;
-                font-size: 15px;
-            }
-            .ai-chat-status {
-                font-size: 11.5px;
-                opacity: 0.9;
-                display: flex;
-                align-items: center;
-                gap: 5px;
-            }
-            .ai-chat-status::before {
-                content: "";
-                width: 7px;
-                height: 7px;
-                background: #4ade80;
-                border-radius: 50%;
-                box-shadow: 0 0 8px #4ade80;
-            }
-            .ai-chat-close {
-                background: rgba(255,255,255,0.2);
-                border: none;
-                color: white;
-                width: 30px;
-                height: 30px;
-                border-radius: 50%;
-                font-size: 20px;
-                cursor: pointer;
-                transition: 0.2s;
-            }
-            .ai-chat-close:hover {
-                background: rgba(255,255,255,0.35);
-            }
-
-            .ai-chat-body {
-                flex: 1;
-                padding: 18px;
-                overflow-y: auto;
-                background: #f8fafc;
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-            }
-            .ai-msg {
-                max-width: 80%;
-                padding: 11px 15px;
-                border-radius: 16px;
-                font-size: 13.5px;
-                line-height: 1.55;
-                word-wrap: break-word;
-            }
-            .ai-msg-bot {
-                background: white;
-                color: #1a1a1a;
-                border-bottom-left-radius: 4px;
-                align-self: flex-start;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            }
-            .ai-msg-user {
-                background: linear-gradient(135deg, #f37021, #ff8c42);
-                color: white;
-                border-bottom-right-radius: 4px;
-                align-self: flex-end;
-            }
-            .ai-msg-loading {
-                align-self: flex-start;
-                background: white;
-                padding: 14px 18px;
-                border-radius: 16px;
-                border-bottom-left-radius: 4px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-                display: flex;
-                gap: 5px;
-            }
-            .ai-msg-loading span {
-                width: 7px;
-                height: 7px;
-                background: #f37021;
-                border-radius: 50%;
-                animation: typing 1.4s infinite;
-            }
-            .ai-msg-loading span:nth-child(2) {
-                animation-delay: 0.2s;
-            }
-            .ai-msg-loading span:nth-child(3) {
-                animation-delay: 0.4s;
-            }
-            @keyframes typing {
-                0%, 60%, 100% {
-                    transform: translateY(0);
-                    opacity: 0.5;
-                }
-                30%           {
-                    transform: translateY(-6px);
-                    opacity: 1;
-                }
-            }
-
-            .ai-chat-footer {
-                padding: 12px 15px;
-                background: white;
-                border-top: 1px solid #e5e7eb;
-                display: flex;
-                gap: 8px;
-            }
-            .ai-chat-footer input {
-                flex: 1;
-                padding: 11px 15px;
-                border: 1.5px solid #e5e7eb;
-                border-radius: 25px;
-                font-family: inherit;
-                font-size: 13.5px;
-                outline: none;
-                transition: 0.2s;
-            }
-            .ai-chat-footer input:focus {
-                border-color: #f37021;
-                box-shadow: 0 0 0 3px rgba(243, 112, 33, 0.1);
-            }
-            .ai-chat-footer button {
-                width: 42px;
-                height: 42px;
-                background: linear-gradient(135deg, #f37021, #ff8c42);
-                border: none;
-                border-radius: 50%;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: 0.2s;
-            }
-            .ai-chat-footer button:hover {
-                transform: scale(1.08);
-            }
-            .ai-chat-footer button svg {
-                width: 18px;
-                height: 18px;
-                stroke: white;
-            }
-
-            @media (max-width: 480px) {
-                .ai-chat-window {
-                    width: calc(100vw - 20px);
-                    right: 10px;
-                    height: 70vh;
-                }
-            }
-        </style>
 
         <script>
             function toggleAIChat() {
@@ -1221,6 +936,6 @@
                 window.goToSlide = goToSlide;
             })();
         </script>
-      
+
     </body>
 </html>
