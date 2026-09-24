@@ -749,7 +749,7 @@ ul { list-style: none; }
     line-height: 1.7;
     opacity: 0.92;
     margin-bottom: 26px;
-    max-width: 520px;
+    max-width: 100%;
 }
 
 .hero .badges {
@@ -834,7 +834,7 @@ ul { list-style: none; }
 .hero-image {
     position: relative;
     text-align: center;
-    margin-right: -200px;
+   margin-left: -10px;
 }
 
 /* HERO SLIDESHOW */
