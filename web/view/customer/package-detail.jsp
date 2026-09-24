@@ -13,7 +13,7 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/customer/package-detail.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/badge.css">
         <script src="${pageContext.request.contextPath}/js/address-data.js"></script>
-        <script src="${pageContext.request.contextPath}/js/address-picker.js" defer></script>    
+        <script src="${pageContext.request.contextPath}/js/address-picker.js" defer></script>
     </head>
     <body>
 
@@ -130,8 +130,24 @@
                         </c:otherwise>
                     </c:choose>
                 </div>
+
+                <!-- ⭐ NÚT HAMBURGER MENU -->
+                <button class="hamburger-btn" onclick="toggleMobileMenu(event)" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
         </header>
+
+        <!-- ⭐ MOBILE MENU -->
+        <div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="${pageContext.request.contextPath}/home">Trang chủ</a>
+            <a href="${pageContext.request.contextPath}/home#packages">Bảng giá</a>
+            <a href="${pageContext.request.contextPath}/my-orders">Xem đơn</a>
+            <a href="${pageContext.request.contextPath}/contact">Liên hệ</a>
+        </div>
 
         <!-- BREADCRUMB -->
         <div class="breadcrumb-wrap">
@@ -446,8 +462,6 @@
 
                     <div class="copyright">
                         <strong>Copyright © 2024 Cơ quan chủ quản: Công Ty Cổ Phần Viễn Thông FPT</strong>
-
-
                     </div>
 
                 </div>
@@ -455,8 +469,46 @@
             </div>
         </footer>
 
-        <!-- ============ SCRIPT: TOGGLE USER MENU ============ -->
+        <!-- ============ SCRIPT: MOBILE MENU + TOGGLE USER MENU ============ -->
         <script>
+            // ===== MOBILE MENU =====
+            function toggleMobileMenu(event) {
+                event.stopPropagation();
+                const menu = document.getElementById('mobileMenu');
+                const overlay = document.querySelector('.mobile-menu-overlay');
+                const btn = document.querySelector('.hamburger-btn');
+
+                menu.classList.toggle('active');
+                overlay.classList.toggle('active');
+                btn.classList.toggle('active');
+
+                if (menu.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
+
+            function closeMobileMenu() {
+                const menu = document.getElementById('mobileMenu');
+                const overlay = document.querySelector('.mobile-menu-overlay');
+                const btn = document.querySelector('.hamburger-btn');
+
+                menu.classList.remove('active');
+                overlay.classList.remove('active');
+                btn.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 900) closeMobileMenu();
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeMobileMenu();
+            });
+
+            // ===== TOGGLE USER MENU =====
             function toggleUserMenu(event) {
                 event.stopPropagation();
                 const dropdown = document.getElementById('userDropdown');
@@ -497,7 +549,6 @@
                 if (!quickForm) return;
 
                 quickForm.addEventListener('submit', function (e) {
-                    // ===== 1. VALIDATE HỌ TÊN =====
                     var nameInput = document.getElementById('user_name');
                     if (nameInput.value.trim() === '') {
                         e.preventDefault();
@@ -505,7 +556,6 @@
                         return false;
                     }
 
-                    // ===== 2. VALIDATE SĐT =====
                     var phoneInput = document.getElementById('user_phone');
                     var phone = phoneInput.value.trim().replace(/[\s.\-]/g, '');
                     if (!/^[0-9]{10,11}$/.test(phone)) {
@@ -514,11 +564,9 @@
                         return false;
                     }
 
-                    // ===== 3. VALIDATE ĐỊA CHỈ =====
                     var prefix = 'detail';
                     var mode = window['getAddressMode_' + prefix] ? window['getAddressMode_' + prefix]() : 'new';
 
-                    // --- Chế độ tự nhập tay ---
                     if (mode === 'manual') {
                         var manualInput = document.querySelector('.addr-manual-input[data-prefix="' + prefix + '"]');
                         if (!manualInput || manualInput.value.trim() === '') {
@@ -526,9 +574,7 @@
                             showError(manualInput, 'Vui lòng nhập địa chỉ lắp đặt đầy đủ!');
                             return false;
                         }
-                    }
-                    // --- Chế độ cũ (3 cấp) ---
-                    else if (mode === 'old') {
+                    } else if (mode === 'old') {
                         var provOld = document.querySelector('.addr-province-old[data-prefix="' + prefix + '"]');
                         var distOld = document.querySelector('.addr-district-old[data-prefix="' + prefix + '"]');
                         var wardOld = document.querySelector('.addr-ward-old[data-prefix="' + prefix + '"]');
@@ -554,9 +600,7 @@
                             showError(detailOld, 'Vui lòng nhập địa chỉ chi tiết (số nhà, tên đường...)!');
                             return false;
                         }
-                    }
-                    // --- Chế độ mới (2 cấp) - mặc định ---
-                    else {
+                    } else {
                         var provNew = document.querySelector('.addr-province-new[data-prefix="' + prefix + '"]');
                         var wardNew = document.querySelector('.addr-ward-new[data-prefix="' + prefix + '"]');
                         var detailNew = document.querySelector('.addr-detail[data-prefix="' + prefix + '"]');
@@ -587,7 +631,6 @@
                         }
                     }
 
-                    // ===== 4. VALIDATE EMAIL (nếu có nhập) =====
                     var emailInput = document.getElementById('user_email');
                     var email = emailInput.value.trim();
                     if (email !== '') {
@@ -600,7 +643,6 @@
                     }
                 });
 
-                // Hàm hiển thị lỗi
                 function showError(input, message) {
                     alert(message);
                     if (!input) return;

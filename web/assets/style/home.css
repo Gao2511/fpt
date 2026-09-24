@@ -3074,3 +3074,143 @@ footer {
     .contact-wrapper h2 { font-size: 18px; }
     .pkg .price { font-size: 24px; }
 }
+/* =========================================================
+   MOBILE HAMBURGER MENU
+   ========================================================= */
+
+/* Nút hamburger — ẩn trên desktop */
+.hamburger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.25s;
+    flex-shrink: 0;
+}
+
+.hamburger-btn:hover {
+    background: rgba(255, 255, 255, 0.22);
+    transform: translateY(-1px);
+}
+
+.hamburger-btn span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 2px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+}
+
+/* Khi menu mở — biến 3 gạch thành dấu X */
+.hamburger-btn.active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+.hamburger-btn.active span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+.hamburger-btn.active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Menu mobile — dropdown từ trên xuống */
+.mobile-menu {
+    display: none;
+    position: fixed;
+    top: 70px;              /* ngay dưới navbar */
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #0a1f44 0%, #051228 100%);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    padding: 16px 20px 24px;
+    z-index: 999;
+    animation: slideDown 0.3s ease-out;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mobile-menu.active {
+    display: block;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mobile-menu a {
+    display: block;
+    padding: 14px 16px;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.2s;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mobile-menu a:last-child {
+    border-bottom: none;
+}
+
+.mobile-menu a:hover,
+.mobile-menu a:active {
+    background: rgba(243, 112, 33, 0.15);
+    color: #ffb26b;
+    padding-left: 22px;
+}
+
+/* Overlay — làm mờ nền khi menu mở */
+.mobile-menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    animation: fadeIn 0.3s;
+}
+
+.mobile-menu-overlay.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Chỉ hiển thị hamburger trên mobile */
+@media (max-width: 900px) {
+    .hamburger-btn {
+        display: flex;
+    }
+
+    .top-nav .menu {
+        display: none !important;
+    }
+}
+
+@media (min-width: 901px) {
+    .hamburger-btn { display: none !important; }
+    .mobile-menu { display: none !important; }
+    .mobile-menu-overlay { display: none !important; }
+}

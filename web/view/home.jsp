@@ -134,8 +134,24 @@
                         </c:otherwise>
                     </c:choose>
                 </div>
+
+                <!-- ⭐ NÚT HAMBURGER MENU (chỉ hiện trên mobile) -->
+                <button class="hamburger-btn" onclick="toggleMobileMenu(event)" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
         </header>
+
+        <!-- ⭐ MOBILE MENU -->
+        <div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="${pageContext.request.contextPath}/home">Trang chủ</a>
+            <a href="${pageContext.request.contextPath}/home#packages">Bảng giá</a>
+            <a href="${pageContext.request.contextPath}/home#contact">Tư vấn</a>
+            <a href="${pageContext.request.contextPath}/contact">Liên hệ</a>
+        </div>
 
         <!-- ============ HERO ============ -->
         <section class="hero">
@@ -459,78 +475,78 @@
 
                 <div class="footer-top">
 
-    <!-- Cột 1: Logo + Mô tả -->
-    <div>
-        <div class="brand-footer">
-            <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
-                 alt="FPT Telecom"
-                 style="height: 55px; width: auto; object-fit: contain; margin-right: 12px;">
-            <div class="brand-text">
-                <strong>FPT Telecom</strong>
-                <small>Hệ sinh thái số FPT</small>
-            </div>
-        </div>
-        <p class="company-desc">
-            Công ty Cổ phần Viễn thông FPT — Nhà cung cấp dịch vụ Internet tốc độ cao,
-            Truyền hình tương tác FPT Play và giải pháp Camera AI thông minh hàng đầu Việt Nam.
-            Đồng hành cùng hàng triệu hộ gia đình và doanh nghiệp trên toàn quốc.
-        </p>
-    </div>
+                    <!-- Cột 1: Logo + Mô tả -->
+                    <div>
+                        <div class="brand-footer">
+                            <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
+                                 alt="FPT Telecom"
+                                 style="height: 55px; width: auto; object-fit: contain; margin-right: 12px;">
+                            <div class="brand-text">
+                                <strong>FPT Telecom</strong>
+                                <small>Hệ sinh thái số FPT</small>
+                            </div>
+                        </div>
+                        <p class="company-desc">
+                            Công ty Cổ phần Viễn thông FPT — Nhà cung cấp dịch vụ Internet tốc độ cao,
+                            Truyền hình tương tác FPT Play và giải pháp Camera AI thông minh hàng đầu Việt Nam.
+                            Đồng hành cùng hàng triệu hộ gia đình và doanh nghiệp trên toàn quốc.
+                        </p>
+                    </div>
 
-    <!-- Cột 2: Liên hệ -->
-    <div>
-        <h4>Liên hệ với chúng tôi</h4>
-        <ul class="contact-list">
-            <li>
-                <span class="contact-icon">
-                    <svg viewBox="0 0 24 24">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                    <circle cx="12" cy="10" r="3"/>
-                    </svg>
-                </span>
-                <div>
-                    <strong>Trụ sở chính</strong>
-                    94 Phạm Hùng, Quy Nhơn, Gia Lai.
-                </div>
-            </li>
-            <li>
-                <span class="contact-icon">
-                    <svg viewBox="0 0 24 24">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                    </svg>
-                </span>
-                <div>
-                    <strong>Hotline đăng ký</strong>
-                    <span class="value">0932 079 469</span>
-                </div>
-            </li>
-            <li>
-                <span class="contact-icon">
-                    <svg viewBox="0 0 24 24">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                    </svg>
-                </span>
-                <div>
-                    <strong>Chăm sóc khách hàng</strong>
-                    <span class="value">1900 6600</span>
-                </div>
-            </li>
-            <li>
-                <span class="contact-icon">
-                    <svg viewBox="0 0 24 24">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                    <polyline points="22,6 12,13 2,6"/>
-                    </svg>
-                </span>
-                <div>
-                    <strong>Email</strong>
-                    <a href="mailto:hieulv20@fpt.com">PhucBN2@fpt.com</a>
-                </div>
-            </li>
-        </ul>
-    </div>
+                    <!-- Cột 2: Liên hệ -->
+                    <div>
+                        <h4>Liên hệ với chúng tôi</h4>
+                        <ul class="contact-list">
+                            <li>
+                                <span class="contact-icon">
+                                    <svg viewBox="0 0 24 24">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                    <circle cx="12" cy="10" r="3"/>
+                                    </svg>
+                                </span>
+                                <div>
+                                    <strong>Trụ sở chính</strong>
+                                    94 Phạm Hùng, Quy Nhơn, Gia Lai.
+                                </div>
+                            </li>
+                            <li>
+                                <span class="contact-icon">
+                                    <svg viewBox="0 0 24 24">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                    </svg>
+                                </span>
+                                <div>
+                                    <strong>Hotline đăng ký</strong>
+                                    <span class="value">0932 079 469</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="contact-icon">
+                                    <svg viewBox="0 0 24 24">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                    </svg>
+                                </span>
+                                <div>
+                                    <strong>Chăm sóc khách hàng</strong>
+                                    <span class="value">1900 6600</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="contact-icon">
+                                    <svg viewBox="0 0 24 24">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                    <polyline points="22,6 12,13 2,6"/>
+                                    </svg>
+                                </span>
+                                <div>
+                                    <strong>Email</strong>
+                                    <a href="mailto:hieulv20@fpt.com">PhucBN2@fpt.com</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
 
-</div>
+                </div>
 
                 <div class="footer-bottom">
 
@@ -627,6 +643,43 @@
                 }
             `;
             document.head.appendChild(style);
+
+            // ===== MOBILE MENU =====
+            function toggleMobileMenu(event) {
+                event.stopPropagation();
+                const menu = document.getElementById('mobileMenu');
+                const overlay = document.querySelector('.mobile-menu-overlay');
+                const btn = document.querySelector('.hamburger-btn');
+
+                menu.classList.toggle('active');
+                overlay.classList.toggle('active');
+                btn.classList.toggle('active');
+
+                if (menu.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
+
+            function closeMobileMenu() {
+                const menu = document.getElementById('mobileMenu');
+                const overlay = document.querySelector('.mobile-menu-overlay');
+                const btn = document.querySelector('.hamburger-btn');
+
+                menu.classList.remove('active');
+                overlay.classList.remove('active');
+                btn.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 900) closeMobileMenu();
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeMobileMenu();
+            });
         </script>
 
         <!-- ============ SCRIPT: LƯU FORM TƯ VẤN + CHUYỂN LOGIN ============ -->
@@ -638,12 +691,10 @@
                 var isLoggedIn = '${not empty sessionScope.user}' === 'true';
                 var STORAGE_KEY = 'contactFormBackup';
 
-                // ===== BƯỚC 1: Chặn submit khi CHƯA đăng nhập =====
                 if (!isLoggedIn) {
                     contactForm.addEventListener('submit', function (e) {
                         e.preventDefault();
 
-                        // Lấy địa chỉ từ hidden input (đã được address-picker ghép sẵn)
                         var finalAddr = document.querySelector('.addr-final[data-prefix="home"]');
                         var formData = {
                             user_name: document.getElementById('user_name').value,
@@ -666,15 +717,12 @@
                     });
                 }
 
-                // ===== BƯỚC 2: Khôi phục dữ liệu form khi quay lại =====
                 var saved = sessionStorage.getItem(STORAGE_KEY);
                 if (saved) {
                     try {
                         var data = JSON.parse(saved);
-
                         if (data.user_note)
                             document.getElementById('user_note').value = data.user_note;
-
                         if (isLoggedIn) {
                             setTimeout(function () {
                                 var contactSection = document.getElementById('contact');
@@ -695,7 +743,6 @@
                 var prefix = 'home';
                 var mode = window['getAddressMode_' + prefix] ? window['getAddressMode_' + prefix]() : 'new';
 
-                // ===== CHẾ ĐỘ TỰ NHẬP TAY =====
                 if (mode === 'manual') {
                     var manualInput = document.querySelector('.addr-manual-input[data-prefix="' + prefix + '"]');
                     if (!manualInput || manualInput.value.trim() === '') {
@@ -707,7 +754,6 @@
                     return true;
                 }
 
-                // ===== CHẾ ĐỘ CŨ (3 cấp) =====
                 if (mode === 'old') {
                     var provOld = document.querySelector('.addr-province-old[data-prefix="' + prefix + '"]');
                     var distOld = document.querySelector('.addr-district-old[data-prefix="' + prefix + '"]');
@@ -729,7 +775,6 @@
                     return true;
                 }
 
-                // ===== CHẾ ĐỘ MỚI (2 cấp) - mặc định =====
                 var provNew = document.querySelector('.addr-province-new[data-prefix="' + prefix + '"]');
                 var wardNew = document.querySelector('.addr-ward-new[data-prefix="' + prefix + '"]');
                 var detailNew = document.querySelector('.addr-detail[data-prefix="' + prefix + '"]');
