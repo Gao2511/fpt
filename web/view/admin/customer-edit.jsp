@@ -154,6 +154,13 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Địa chỉ lắp đặt</label>
+                    <input type="text" name="address" id="address"
+                           value="${customer.address}"
+                           placeholder="Ví dụ: 123 Lê Lợi, Phường Bến Nghé, Quận 1, TP. HCM">
+                </div>
+
+                <div class="form-group">
                     <label>Ghi chú nội bộ</label>
                     <textarea name="note" id="note" rows="4"
                               placeholder="VD: Khách gọi buổi tối, quan tâm camera...">${customer.note}</textarea>

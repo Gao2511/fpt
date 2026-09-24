@@ -298,32 +298,7 @@
                             Đồng hành cùng hàng triệu hộ gia đình và doanh nghiệp trên toàn quốc.
                         </p>
 
-                        <div class="certifications">
-                            <div class="cert-badge">
-                                <svg viewBox="0 0 24 24">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                </svg>
-                                Bộ Công Thương
-                            </div>
-                            <div class="cert-badge">
-                                <svg viewBox="0 0 24 24">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                <polyline points="22 4 12 14.01 9 11.01"/>
-                                </svg>
-                                ISO 27001
-                            </div>
-                            <div class="cert-badge">
-                                <svg viewBox="0 0 24 24">
-                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-                                <path d="M4 22h16"/>
-                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>
-                                </svg>
-                                Top 10 ISP
-                            </div>
-                        </div>
+                      
 
                         <div class="socials">
                             <a href="#" title="Facebook">
@@ -441,9 +416,9 @@
                     </div>
 
                     <div class="copyright">
-                        <strong>Copyright © 2026 FPT Telecom.</strong><br>
-                        Cơ quan chủ quản: Công Ty Cổ Phần Viễn Thông FPT.<br>
-                        Tất cả các quyền được bảo lưu theo quy định pháp luật Việt Nam.
+                        <strong>Copyright © 2024 Cơ quan chủ quản: Công Ty Cổ Phần Viễn Thông FPT</strong>
+                        
+                       
                     </div>
 
                 </div>

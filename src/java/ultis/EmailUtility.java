@@ -16,11 +16,11 @@ public class EmailUtility {
     // ====================================================
     // MAIL HỆ THỐNG - Gmail dùng để GỬI thông báo
     // ====================================================
-    private static final String FROM_EMAIL   = "gaoji281125@gmail.com";
+    private static final String FROM_EMAIL   = "mrnguyenben@gmail.com";
     
-    // ⚠️ THAY BẰNG APP PASSWORD 16 KÝ TỰ CỦA GAOJI281125@GMAIL.COM
+   
     // Cách lấy: https://myaccount.google.com/apppasswords
-    private static final String APP_PASSWORD = "bjyd xpjf dqbv tebe";
+    private static final String APP_PASSWORD = "wsbb keov gmmq gtgo";
 
     public static boolean sendEmail(String toEmail, String subject, String bodyText) {
         System.out.println("==================================================");

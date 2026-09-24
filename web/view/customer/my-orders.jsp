@@ -327,9 +327,8 @@
                         </div>
                     </div>
                     <div class="copyright">
-                        <strong>Copyright © 2026 FPT Telecom.</strong><br>
-                        Cơ quan chủ quản: Công Ty Cổ Phần Viễn Thông FPT.<br>
-                        Tất cả các quyền được bảo lưu theo quy định pháp luật Việt Nam.
+                        <strong>Copyright © 2024 Cơ quan chủ quản: Công Ty Cổ Phần Viễn Thông FPT</strong>
+                        
                     </div>
                 </div>
             </div>

@@ -91,6 +91,10 @@
                 </span>
             </div>
             <div class="detail-row">
+                <label>Địa chỉ:</label>
+                <span>${not empty customer.address ? customer.address : '—'}</span>
+            </div>
+            <div class="detail-row">
                 <label>Ngày đăng ký:</label>
                 <span><fmt:formatDate value="${customer.createdAt}" pattern="dd/MM/yyyy HH:mm"/></span>
             </div>

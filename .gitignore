@@ -1,21 +1,22 @@
-# Build
+# ===== Build output =====
 build/
-# dist/        
+dist/
 target/
-# *.war        
+*.war
+*.class
 
-# NetBeans
+# ===== NetBeans =====
 nbproject/private/
 nbproject/build-impl.xml
 
-# OS
+# ===== IDE =====
+.idea/
+.vscode/
+
+# ===== OS =====
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# IDE
-.idea/
-.vscode/
-
-# Logs
+# ===== Logs =====
 *.log

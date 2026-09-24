@@ -12,6 +12,9 @@
         <link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/home.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/badge.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/ai-chat.css">
+        <script src="${pageContext.request.contextPath}/js/address-data.js"></script>
+        <script src="${pageContext.request.contextPath}/js/address-picker.js" defer></script>
     </head>
     <body>
 
@@ -201,7 +204,7 @@
         <!-- ============ SECTION TITLE: PACKAGES ============ -->
         <div class="section-title">
             <span class="small-label">Bảng cước áp dụng cả năm</span>
-            <h2>${packages.size()} Gói Cước Internet FPT Đột Phá Bạn Chạy Nhất</h2>
+            <h2>${packages.size()} Gói Cước Internet FPT Đột Phá Bán Chạy Nhất</h2>
             <p>Cam kết đường truyền Internet ổn định, không lo gián đoạn trong suốt quá trình sử dụng.</p>
         </div>
 
@@ -371,14 +374,14 @@
                              alt="Box Ngoại Hạng Anh">
                     </div>
                     <div class="info">
-                        <h4>Box Ngoại Hạng Anh</h4>
+                        <h4>Tài Khoản FPT Play Vip</h4>
                         <p>Xem trọn vẹn Ngoại hạng Anh và nhiều giải đấu hấp dẫn khác với chất lượng 4K.</p>
                     </div>
                 </div>
 
             </div>
         </div>
-                             
+
 
         <!-- ============ CONTACT FORM ============ -->
         <section class="contact-section" id="contact">
@@ -418,17 +421,31 @@
                                    value="${not empty sessionScope.user.email ? sessionScope.user.email : ''}">
                         </div>
 
-                        <!-- ⭐ ĐỊA CHỈ: LUÔN ĐỂ TRỐNG -->
+                        <!-- ⭐ ĐỊA CHỈ: CASCADING DROPDOWN -->
                         <div class="full">
-                            <label>Địa chỉ lắp đặt</label>
-                            <input type="text" name="user_address" id="user_address"
-                                   placeholder="Số nhà, đường, phường, quận..."
-                                   value="">
+                            <label style="font-size:13px;font-weight:700;color:#1e293b;text-transform:uppercase;margin-bottom:10px;display:block;">
+                                Địa chỉ lắp đặt <span style="color:#f37021;">*</span>
+                            </label>
+                            <div id="addressPickerHome" data-address-picker="home"></div>
                         </div>
                         <div class="full">
                             <label>Ghi chú (không bắt buộc)</label>
-                            <textarea name="user_note" id="user_note"
-                                      placeholder="Ví dụ: nhà 3 tầng, dùng nhiều camera..."></textarea>
+                            <input type="text" name="user_note" id="user_note"
+                                   placeholder="Ví dụ: nhà 3 tầng, dùng nhiều camera..."
+                                   list="noteSuggestionsHome"
+                                   autocomplete="off">
+                            <datalist id="noteSuggestionsHome">
+                                <option value="Nhà riêng, 1 tầng">
+                                <option value="Nhà riêng, nhiều tầng">
+                                <option value="Căn hộ chung cư">
+                                <option value="Nhà mặt phố, kinh doanh">
+                                <option value="Văn phòng công ty">
+                                <option value="Quán cà phê / nhà hàng">
+                                <option value="Cần lắp nhiều camera">
+                                <option value="Cần lắp thêm FPT Play">
+                                <option value="Cần lắp cho phòng trọ">
+                                <option value="Lắp đặt ngoài giờ hành chính">
+                            </datalist>
                         </div>
                         <button type="submit">Đăng ký tư vấn ngay →</button>
                     </form>
@@ -458,32 +475,7 @@
                             Đồng hành cùng hàng triệu hộ gia đình và doanh nghiệp trên toàn quốc.
                         </p>
 
-                        <div class="certifications">
-                            <div class="cert-badge">
-                                <svg viewBox="0 0 24 24">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                </svg>
-                                Bộ Công Thương
-                            </div>
-                            <div class="cert-badge">
-                                <svg viewBox="0 0 24 24">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                <polyline points="22 4 12 14.01 9 11.01"/>
-                                </svg>
-                                ISO 27001
-                            </div>
-                            <div class="cert-badge">
-                                <svg viewBox="0 0 24 24">
-                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-                                <path d="M4 22h16"/>
-                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>
-                                </svg>
-                                Top 10 ISP
-                            </div>
-                        </div>
+
 
                         <div class="socials">
                             <a href="#" title="Facebook">
@@ -544,7 +536,7 @@
                                 </span>
                                 <div>
                                     <strong>Trụ sở chính</strong>
-                                    94 Phạm Hùng, TP Quy Nhơn, Bình Định
+                                    94 Phạm Hùng, Quy Nhơn, Gia Lai.
                                 </div>
                             </li>
                             <li>
@@ -601,9 +593,8 @@
                     </div>
 
                     <div class="copyright">
-                        <strong>Copyright © 2026 FPT Telecom.</strong><br>
-                        Cơ quan chủ quản: Công Ty Cổ Phần Viễn Thông FPT.<br>
-                        Tất cả các quyền được bảo lưu theo quy định pháp luật Việt Nam.
+                        <strong>Copyright © 2024 Cơ quan chủ quản: Công Ty Cổ Phần Viễn Thông FPT </strong>
+
                     </div>
 
                 </div>
@@ -611,153 +602,215 @@
             </div>
         </footer>
 
-        <!-- ============ SCRIPT CHUNG ============ -->
-        <script>
-            // ===== SCROLL REVEAL =====
-            const revealElements = document.querySelectorAll(
-                    '.section-title, .pkg, .feature, .device, .contact-wrapper'
-                    );
-            revealElements.forEach(el => el.classList.add('reveal'));
+                            <!-- ============ SCRIPT CHUNG ============ -->
+                            <script>
+                                // ===== SCROLL REVEAL =====
+                                const revealElements = document.querySelectorAll(
+                                        '.section-title, .pkg, .feature, .device, .contact-wrapper'
+                                        );
+                                revealElements.forEach(el => el.classList.add('reveal'));
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry, index) => {
-                    if (entry.isIntersecting) {
-                        setTimeout(() => {
-                            entry.target.classList.add('active');
-                        }, index * 80);
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            });
+                                const observer = new IntersectionObserver((entries) => {
+                                    entries.forEach((entry, index) => {
+                                        if (entry.isIntersecting) {
+                                            setTimeout(() => {
+                                                entry.target.classList.add('active');
+                                            }, index * 80);
+                                            observer.unobserve(entry.target);
+                                        }
+                                    });
+                                }, {
+                                    threshold: 0.1,
+                                    rootMargin: '0px 0px -50px 0px'
+                                });
 
-            revealElements.forEach(el => observer.observe(el));
+                                revealElements.forEach(el => observer.observe(el));
 
-            // ===== NAVBAR SCROLL EFFECT =====
-            const topNav = document.querySelector('.top-nav');
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    topNav.style.boxShadow = '0 4px 30px rgba(0,0,0,0.1)';
-                    topNav.style.padding = '8px 0';
-                } else {
-                    topNav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.06)';
-                    topNav.style.padding = '12px 0';
-                }
-            });
+                                // ===== NAVBAR SCROLL EFFECT =====
+                                const topNav = document.querySelector('.top-nav');
+                                window.addEventListener('scroll', () => {
+                                    if (window.scrollY > 50) {
+                                        topNav.style.boxShadow = '0 4px 30px rgba(0,0,0,0.1)';
+                                        topNav.style.padding = '8px 0';
+                                    } else {
+                                        topNav.style.boxShadow = '0 2px 20px rgba(0,0,0,0.06)';
+                                        topNav.style.padding = '12px 0';
+                                    }
+                                });
 
-            // ===== CLICK RIPPLE EFFECT CHO NÚT =====
-            document.querySelectorAll('.btn-pkg, .btn-device, .btn-hero-primary, .contact-form button').forEach(btn => {
-                btn.addEventListener('click', function (e) {
-                    const rect = this.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
+                                // ===== CLICK RIPPLE EFFECT CHO NÚT =====
+                                document.querySelectorAll('.btn-pkg, .btn-device, .btn-hero-primary, .contact-form button').forEach(btn => {
+                                    btn.addEventListener('click', function (e) {
+                                        const rect = this.getBoundingClientRect();
+                                        const x = e.clientX - rect.left;
+                                        const y = e.clientY - rect.top;
 
-                    const ripple = document.createElement('span');
-                    ripple.style.cssText = `
-                        position: absolute;
-                        width: 0;
-                        height: 0;
-                        border-radius: 50%;
-                        background: rgba(255,255,255,0.5);
-                        transform: translate(-50%, -50%);
-                        left: ${x}px;
-                        top: ${y}px;
-                        pointer-events: none;
-                        animation: rippleAnim 0.6s ease-out;
-                    `;
-                    this.style.position = 'relative';
-                    this.style.overflow = 'hidden';
-                    this.appendChild(ripple);
+                                        const ripple = document.createElement('span');
+                                        ripple.style.cssText = `
+                                            position: absolute;
+                                            width: 0;
+                                            height: 0;
+                                            border-radius: 50%;
+                                            background: rgba(255,255,255,0.5);
+                                            transform: translate(-50%, -50%);
+                                            left: ${x}px;
+                                            top: ${y}px;
+                                            pointer-events: none;
+                                            animation: rippleAnim 0.6s ease-out;
+                                        `;
+                                        this.style.position = 'relative';
+                                        this.style.overflow = 'hidden';
+                                        this.appendChild(ripple);
 
-                    setTimeout(() => ripple.remove(), 600);
-                });
-            });
+                                        setTimeout(() => ripple.remove(), 600);
+                                    });
+                                });
 
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes rippleAnim {
-                    to { width: 300px; height: 300px; opacity: 0; }
-                }
-            `;
-            document.head.appendChild(style);
-        </script>
+                                const style = document.createElement('style');
+                                style.textContent = `
+                                    @keyframes rippleAnim {
+                                        to { width: 300px; height: 300px; opacity: 0; }
+                                    }
+                                `;
+                                document.head.appendChild(style);
+                            </script>
 
-        <!-- ============ SCRIPT: LƯU FORM TƯ VẤN + CHUYỂN LOGIN ============ -->
-        <script>
-            (function () {
-                var contactForm = document.getElementById('contactForm');
-                if (!contactForm) {
-                    console.log('❌ Không tìm thấy form contact');
-                    return;
-                }
+                            <!-- ============ SCRIPT: LƯU FORM TƯ VẤN + CHUYỂN LOGIN ============ -->
+                            <script>
+                                (function () {
+                                    var contactForm = document.getElementById('contactForm');
+                                    if (!contactForm) return;
 
-                var isLoggedIn = '${not empty sessionScope.user}' === 'true';
-                var STORAGE_KEY = 'contactFormBackup';
+                                    var isLoggedIn = '${not empty sessionScope.user}' === 'true';
+                                    var STORAGE_KEY = 'contactFormBackup';
 
-                console.log('✅ Form contact đã load. isLoggedIn =', isLoggedIn);
+                                    // ===== BƯỚC 1: Chặn submit khi CHƯA đăng nhập =====
+                                    if (!isLoggedIn) {
+                                        contactForm.addEventListener('submit', function (e) {
+                                            e.preventDefault();
 
-                // ===== BƯỚC 1: Chặn submit khi CHƯA đăng nhập =====
-                if (!isLoggedIn) {
-                    contactForm.addEventListener('submit', function (e) {
-                        e.preventDefault();
-                        console.log('🔒 Chưa login → Lưu form và chuyển sang login');
+                                            // Lấy địa chỉ từ hidden input (đã được address-picker ghép sẵn)
+                                            var finalAddr = document.querySelector('.addr-final[data-prefix="home"]');
+                                            var formData = {
+                                                user_name: document.getElementById('user_name').value,
+                                                user_phone: document.getElementById('user_phone').value,
+                                                user_email: document.getElementById('user_email').value,
+                                                user_address: finalAddr ? finalAddr.value : '',
+                                                user_note: document.getElementById('user_note').value
+                                            };
 
-                        var formData = {
-                            user_name: document.getElementById('user_name').value,
-                            user_phone: document.getElementById('user_phone').value,
-                            user_email: document.getElementById('user_email').value,
-                            user_address: document.getElementById('user_address').value,
-                            user_note: document.getElementById('user_note').value
-                        };
+                                            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
 
-                        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
-                        console.log('💾 Đã lưu form:', formData);
+                                            var returnUrl = window.location.origin
+                                                    + window.location.pathname
+                                                    + '#contact';
 
-                        var returnUrl = window.location.origin
-                                + window.location.pathname
-                                + '#contact';
+                                            var loginUrl = '${pageContext.request.contextPath}/login'
+                                                    + '?returnUrl=' + encodeURIComponent(returnUrl);
 
-                        var loginUrl = '${pageContext.request.contextPath}/login'
-                                + '?returnUrl=' + encodeURIComponent(returnUrl);
+                                            window.location.href = loginUrl;
+                                        });
+                                    }
 
-                        console.log('➡️ Chuyển đến:', loginUrl);
-                        window.location.href = loginUrl;
-                    });
-                } else {
-                    console.log('👤 Đã login → Form submit bình thường');
-                }
+                                    // ===== BƯỚC 2: Khôi phục dữ liệu form khi quay lại =====
+                                    var saved = sessionStorage.getItem(STORAGE_KEY);
+                                    if (saved) {
+                                        try {
+                                            var data = JSON.parse(saved);
 
-                // ===== BƯỚC 2: Khôi phục dữ liệu form khi quay lại =====
-                var saved = sessionStorage.getItem(STORAGE_KEY);
-                if (saved) {
-                    try {
-                        var data = JSON.parse(saved);
-                        console.log('🔄 Khôi phục form:', data);
+                                            if (data.user_note)
+                                                document.getElementById('user_note').value = data.user_note;
 
-                        // ⭐ Chỉ khôi phục địa chỉ + ghi chú (không khôi phục user info)
-                        if (data.user_address)
-                            document.getElementById('user_address').value = data.user_address;
-                        if (data.user_note)
-                            document.getElementById('user_note').value = data.user_note;
+                                            if (isLoggedIn) {
+                                                setTimeout(function () {
+                                                    var contactSection = document.getElementById('contact');
+                                                    if (contactSection) {
+                                                        contactSection.scrollIntoView({behavior: 'smooth', block: 'start'});
+                                                    }
+                                                }, 500);
+                                            }
+                                            sessionStorage.removeItem(STORAGE_KEY);
+                                        } catch (e) {
+                                            sessionStorage.removeItem(STORAGE_KEY);
+                                        }
+                                    }
+                                })();
 
-                        if (isLoggedIn) {
-                            console.log('✅ Đã login + có dữ liệu → Scroll xuống form');
-                            setTimeout(function () {
-                                var contactSection = document.getElementById('contact');
-                                if (contactSection) {
-                                    contactSection.scrollIntoView({behavior: 'smooth', block: 'start'});
-                                }
-                            }, 500);
-                        }
-                    } catch (e) {
-                        console.error('❌ Lỗi khôi phục form:', e);
-                        sessionStorage.removeItem(STORAGE_KEY);
-                    }
-                }
-            })();
-        </script>
+                                // ============ VALIDATE FORM CONTACT ============
+                                document.getElementById('contactForm')?.addEventListener('submit', function (e) {
+                                    var prefix = 'home';
+                                    var mode = window['getAddressMode_' + prefix] ? window['getAddressMode_' + prefix]() : 'new';
+
+                                    // ===== CHẾ ĐỘ TỰ NHẬP TAY =====
+                                    if (mode === 'manual') {
+                                        var manualInput = document.querySelector('.addr-manual-input[data-prefix="' + prefix + '"]');
+                                        if (!manualInput || manualInput.value.trim() === '') {
+                                            e.preventDefault();
+                                            alert('Vui lòng nhập địa chỉ lắp đặt đầy đủ!');
+                                            if (manualInput) manualInput.focus();
+                                            return false;
+                                        }
+                                        return true;
+                                    }
+
+                                    // ===== CHẾ ĐỘ CŨ (3 cấp) =====
+                                    if (mode === 'old') {
+                                        var provOld = document.querySelector('.addr-province-old[data-prefix="' + prefix + '"]');
+                                        var distOld = document.querySelector('.addr-district-old[data-prefix="' + prefix + '"]');
+                                        var wardOld = document.querySelector('.addr-ward-old[data-prefix="' + prefix + '"]');
+                                        var detailOld = document.querySelector('.addr-detail-old[data-prefix="' + prefix + '"]');
+
+                                        if (!provOld || !provOld.value) {
+                                            e.preventDefault(); alert('Vui lòng chọn Tỉnh/Thành phố!'); if (provOld) provOld.focus(); return false;
+                                        }
+                                        if (!distOld || !distOld.value) {
+                                            e.preventDefault(); alert('Vui lòng chọn Quận/Huyện!'); if (distOld) distOld.focus(); return false;
+                                        }
+                                        if (!wardOld || !wardOld.value) {
+                                            e.preventDefault(); alert('Vui lòng chọn Phường/Xã!'); if (wardOld) wardOld.focus(); return false;
+                                        }
+                                        if (!detailOld || detailOld.value.trim() === '') {
+                                            e.preventDefault(); alert('Vui lòng nhập địa chỉ chi tiết (số nhà, tên đường...)!'); if (detailOld) detailOld.focus(); return false;
+                                        }
+                                        return true;
+                                    }
+
+                                    // ===== CHẾ ĐỘ MỚI (2 cấp) - mặc định =====
+                                    var provNew = document.querySelector('.addr-province-new[data-prefix="' + prefix + '"]');
+                                    var wardNew = document.querySelector('.addr-ward-new[data-prefix="' + prefix + '"]');
+                                    var detailNew = document.querySelector('.addr-detail[data-prefix="' + prefix + '"]');
+                                    var customProvNew = document.querySelector('.addr-custom-prov-new[data-prefix="' + prefix + '"]');
+                                    var customWardNew = document.querySelector('.addr-custom-ward-new[data-prefix="' + prefix + '"]');
+
+                                    var provVal = (provNew && provNew.value === 'custom')
+                                        ? (customProvNew ? customProvNew.value.trim() : '')
+                                        : (provNew ? provNew.value : '');
+                                    var wardVal = (wardNew && wardNew.value === 'custom')
+                                        ? (customWardNew ? customWardNew.value.trim() : '')
+                                        : (wardNew ? wardNew.value : '');
+
+                                    if (!provVal) {
+                                        e.preventDefault();
+                                        alert('Vui lòng chọn Tỉnh/Thành phố!');
+                                        if (provNew && provNew.value === 'custom' && customProvNew) customProvNew.focus();
+                                        else if (provNew) provNew.focus();
+                                        return false;
+                                    }
+                                    if (!wardVal) {
+                                        e.preventDefault();
+                                        alert('Vui lòng chọn Phường/Xã!');
+                                        if (wardNew && wardNew.value === 'custom' && customWardNew) customWardNew.focus();
+                                        else if (wardNew) wardNew.focus();
+                                        return false;
+                                    }
+                                    if (!detailNew || detailNew.value.trim() === '') {
+                                        e.preventDefault();
+                                        alert('Vui lòng nhập địa chỉ chi tiết (số nhà, tên đường...)!');
+                                        if (detailNew) detailNew.focus();
+                                        return false;
+                                    }
+                                });
+                            </script>
 
         <!-- ============ AI CHAT WIDGET ============ -->
         <div class="ai-chat-button" id="aiChatBtn" onclick="toggleAIChat()">
@@ -1115,67 +1168,59 @@
             });
         </script>
         <script>
-    // ===== HERO SLIDESHOW NÂNG CAO =====
-    (function() {
-        const slides = document.querySelectorAll('.hero-slide');
-        const dots = document.querySelectorAll('.dot-slide');
-        if (slides.length === 0) return;
+            // ===== HERO SLIDESHOW NÂNG CAO =====
+            (function () {
+                const slides = document.querySelectorAll('.hero-slide');
+                const dots = document.querySelectorAll('.dot-slide');
+                if (slides.length === 0)
+                    return;
 
-        let currentIndex = 0;
-        let autoTimer;
-        const INTERVAL = 4000;
+                let currentIndex = 0;
+                let autoTimer;
+                const INTERVAL = 4000;
 
-        function showSlide(index) {
-            slides.forEach(s => s.classList.remove('active'));
-            dots.forEach(d => d.classList.remove('active'));
+                function showSlide(index) {
+                    slides.forEach(s => s.classList.remove('active'));
+                    dots.forEach(d => d.classList.remove('active'));
 
-            slides[index].classList.add('active');
-            if (dots[index]) dots[index].classList.add('active');
+                    slides[index].classList.add('active');
+                    if (dots[index])
+                        dots[index].classList.add('active');
 
-            currentIndex = index;
-        }
+                    currentIndex = index;
+                }
 
-        function nextSlide() {
-            showSlide((currentIndex + 1) % slides.length);
-        }
+                function nextSlide() {
+                    showSlide((currentIndex + 1) % slides.length);
+                }
 
-        function prevSlide() {
-            showSlide((currentIndex - 1 + slides.length) % slides.length);
-        }
+                function prevSlide() {
+                    showSlide((currentIndex - 1 + slides.length) % slides.length);
+                }
 
-        function goToSlide(index) {
-            showSlide(index);
-            resetTimer();
-        }
+                function goToSlide(index) {
+                    showSlide(index);
+                    resetTimer();
+                }
 
-        function resetTimer() {
-            clearInterval(autoTimer);
-            autoTimer = setInterval(nextSlide, INTERVAL);
-        }
+                function resetTimer() {
+                    clearInterval(autoTimer);
+                    autoTimer = setInterval(nextSlide, INTERVAL);
+                }
 
-        resetTimer();
+                resetTimer();
 
-        const slideshow = document.querySelector('.hero-slideshow');
-        if (slideshow) {
-            slideshow.addEventListener('mouseenter', () => clearInterval(autoTimer));
-            slideshow.addEventListener('mouseleave', resetTimer);
-        }
+                const slideshow = document.querySelector('.hero-slideshow');
+                if (slideshow) {
+                    slideshow.addEventListener('mouseenter', () => clearInterval(autoTimer));
+                    slideshow.addEventListener('mouseleave', resetTimer);
+                }
 
-        window.nextSlide = nextSlide;
-        window.prevSlide = prevSlide;
-        window.goToSlide = goToSlide;
-    })();
-</script>
-<script>
-    document.getElementById('contactForm')?.addEventListener('submit', function(e) {
-        const address = document.getElementById('user_address').value.trim();
-        if (address === '') {
-            e.preventDefault();
-            alert('Vui lòng nhập địa chỉ lắp đặt!');
-            document.getElementById('user_address').focus();
-            return false;
-        }
-    });
-</script>
+                window.nextSlide = nextSlide;
+                window.prevSlide = prevSlide;
+                window.goToSlide = goToSlide;
+            })();
+        </script>
+      
     </body>
 </html>

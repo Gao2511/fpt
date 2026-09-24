@@ -210,6 +210,9 @@
                                 <div class="customer-info">
                                     <strong>${c.fullName}</strong>
                                     <span class="phone">${c.phone}</span>
+                                    <c:if test="${not empty c.address}">
+                                        <small style="color:#64748b;font-size:12px;display:block;" title="${c.address}">📍 ${c.address}</small>
+                                    </c:if>
                                 </div>
                             </td>
                             <td class="col-email">
