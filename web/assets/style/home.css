@@ -834,7 +834,7 @@ ul { list-style: none; }
 .hero-image {
     position: relative;
     text-align: center;
-   margin-left: -10px;
+    margin-right: -150px;
 }
 
 /* HERO SLIDESHOW */
