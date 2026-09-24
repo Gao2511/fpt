@@ -1,8 +1,6 @@
 # ===== Build output =====
 build/
-dist/
 target/
-*.war
 *.class
 
 # ===== NetBeans =====
