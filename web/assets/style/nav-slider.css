@@ -1,0 +1,65 @@
+/* =========================================================
+   NAV MENU SLIDER — Hiệu ứng slider cho menu nav
+   Dùng chung cho TẤT CẢ các trang
+   ========================================================= */
+
+.top-nav .menu {
+    display: flex;
+    gap: 0;
+    font-size: 14px;
+    font-weight: 600;
+    position: relative;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.top-nav .menu .nav-slider {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: 0;
+    background: linear-gradient(135deg, #f37021, #ff8c42);
+    border-radius: 20px;
+    box-shadow:
+        0 4px 15px rgba(243, 112, 33, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transition: all 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.top-nav .menu a {
+    position: relative;
+    z-index: 1;
+    padding: 8px 18px;
+    color: #ffffff;
+    font-weight: 700;
+    border-radius: 20px;
+    transition: color 0.3s ease;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.top-nav .menu a::after {
+    display: none;    /* ⭐ Bỏ gạch chân cũ */
+}
+
+.top-nav .menu a:hover {
+    color: #ffffff;
+}
+
+.top-nav .menu a.active {
+    color: #ffffff;
+}
+
+/* ⭐ Responsive — mobile */
+@media (max-width: 900px) {
+    .top-nav .menu {
+        display: none !important;
+    }
+}

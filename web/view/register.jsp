@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+ 
 <!DOCTYPE html>
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,8 +13,10 @@
     <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
     <link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/fpt-id.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/checkbox-premium.css">
 </head>
 <body>
+    <jsp:include page="/view/loading-runner.jsp" />
     <div class="fptid-box">
 
         <!-- NÚT QUAY LẠI TRANG CHỦ -->
@@ -168,17 +171,26 @@
                 </div>
             </div>
 
-            <!-- Điều khoản -->
-            <div class="checkbox-wrap">
-                <input type="checkbox" id="agree" name="agree" value="true" required>
-                <label for="agree">
-                    Tôi đã đọc và đồng ý với
-                    <a href="#">Điều khoản dịch vụ</a> &amp;
-                    <a href="#">Chính sách bảo mật</a> của FPT Telecom. <span style="color:#f37021;">*</span>
+            <!-- ⭐ ĐIỀU KHOẢN — CHECKBOX PREMIUM -->
+            <div class="cbx cbx--form" style="margin-bottom: 18px;">
+                <input id="agree" class="cbx__input" type="checkbox" name="agree" value="true" required>
+                <label class="cbx__label" for="agree">
+                    <span class="cbx__box" aria-hidden="true">
+                        <svg class="cbx__svg" viewBox="0 0 24 24" aria-hidden="true">
+                            <path class="cbx__path" d="M6 12l4 4 8-8"></path>
+                        </svg>
+                    </span>
+                    <span class="cbx__text">
+                        Tôi đã đọc và đồng ý với
+                        <a href="#" style="color:#f37021; font-weight:700; text-decoration:none;">Điều khoản dịch vụ</a>
+                        &amp;
+                        <a href="#" style="color:#f37021; font-weight:700; text-decoration:none;">Chính sách bảo mật</a>
+                        của FPT Telecom. <span style="color:#f37021;">*</span>
+                    </span>
                 </label>
             </div>
 
-                       <!-- Nút submit -->
+            <!-- Nút submit -->
             <button type="submit" class="btn-fptid">
                 ĐĂNG KÝ TÀI KHOẢN FPT ID
                 <svg viewBox="0 0 24 24">

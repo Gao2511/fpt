@@ -1,0 +1,499 @@
+/* =========================================================
+   THEME TOGGLE — Nút chuyển Dark/Light mode
+   Nguyên tắc: CHỈ đổi màu, KHÔNG đổi hiệu ứng gốc
+   ========================================================= */
+
+.theme-toggle-btn {
+    position: fixed;
+    bottom: 100px;
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffb347, #ffcc33);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+        0 8px 25px rgba(255, 179, 71, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    z-index: 9998;
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    overflow: hidden;
+    padding: 0;
+}
+
+.theme-toggle-btn:hover {
+    transform: scale(1.1) rotate(15deg);
+    box-shadow:
+        0 12px 35px rgba(255, 179, 71, 0.7),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.theme-toggle-btn:active {
+    transform: scale(0.95);
+}
+
+.theme-toggle-btn .icon-sun,
+.theme-toggle-btn .icon-moon {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    stroke: #ffffff;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.theme-toggle-btn .icon-sun {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+.theme-toggle-btn .icon-moon {
+    opacity: 0;
+    transform: rotate(-180deg) scale(0);
+}
+
+.theme-toggle-btn.dark-mode {
+    background: linear-gradient(135deg, #4a5568, #2d3748);
+    box-shadow:
+        0 8px 25px rgba(74, 85, 104, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.theme-toggle-btn.dark-mode:hover {
+    box-shadow:
+        0 12px 35px rgba(74, 85, 104, 0.7),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.theme-toggle-btn.dark-mode .icon-sun {
+    opacity: 0;
+    transform: rotate(180deg) scale(0);
+}
+
+.theme-toggle-btn.dark-mode .icon-moon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+/* =========================================================
+   DARK MODE — CHỈ đổi màu, giữ nguyên hiệu ứng gốc
+   ========================================================= */
+
+/* ⭐ BODY — đổi nền */
+body.dark-mode {
+    background: linear-gradient(-45deg,
+        #0a0f1c 0%,
+        #111827 25%,
+        #0f172a 50%,
+        #1a1f36 75%,
+        #0a0f1c 100%) !important;
+    color: #e5e7eb !important;
+}
+
+body.dark-mode::before {
+    background: radial-gradient(circle,
+        rgba(243, 112, 33, 0.12) 0%,
+        rgba(255, 178, 107, 0.06) 40%,
+        transparent 70%) !important;
+}
+
+body.dark-mode::after {
+    background: radial-gradient(circle,
+        rgba(66, 153, 225, 0.12) 0%,
+        rgba(26, 75, 140, 0.06) 40%,
+        transparent 70%) !important;
+}
+
+/* ⭐ SECTION TITLE */
+body.dark-mode .section-title h2 {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .section-title p {
+    color: #9ca3af !important;
+}
+
+body.dark-mode .section-title .small-label {
+    background: rgba(243, 112, 33, 0.15) !important;
+    color: #ffb26b !important;
+}
+
+/* ⭐ FEATURE CARDS — chỉ đổi background, GIỮ hover effects */
+body.dark-mode .feature {
+    background: #1f2937 !important;
+}
+
+body.dark-mode .feature h4 {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .feature p {
+    color: #9ca3af !important;
+}
+
+/* ⭐ DEVICE CARDS — chỉ đổi background */
+body.dark-mode .device {
+    background: #1f2937 !important;
+}
+
+body.dark-mode .device .img-wrap {
+    background: linear-gradient(135deg, #111827, #1f2937) !important;
+}
+
+body.dark-mode .device:hover .img-wrap {
+    background: linear-gradient(135deg, #422006, #78350f) !important;
+}
+
+body.dark-mode .device .info h4 {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .device .info p {
+    color: #9ca3af !important;
+}
+
+body.dark-mode .device:hover .info h4 {
+    color: #ffb26b !important;
+}
+
+/* =========================================================
+   ⭐ CONTACT SECTION — DARK MODE HOÀN CHỈNH
+   ⭐ Tắt animation gốc để background tối không bị đè
+   ========================================================= */
+
+body.dark-mode .contact-section {
+    /* ⭐ QUAN TRỌNG: Tắt animation contactBgMove gốc */
+    animation: none !important;
+    background: linear-gradient(135deg,
+        #0a0f1c 0%, #111827 50%, #0f172a 100%) !important;
+    background-size: 100% 100% !important;
+
+    /* ⭐ Override border-image cam ở top */
+    border-image: linear-gradient(90deg,
+        transparent 0%,
+        rgba(243, 112, 33, 0.1) 15%,
+        rgba(243, 112, 33, 0.5) 50%,
+        rgba(243, 112, 33, 0.1) 85%,
+        transparent 100%) 1 !important;
+}
+
+body.dark-mode .contact-wrapper {
+    background: #1f2937 !important;
+    border-color: rgba(243, 112, 33, 0.2) !important;
+    /* ⭐ Override box-shadow sáng của bản gốc */
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(243, 112, 33, 0.15) !important;
+}
+
+body.dark-mode .contact-wrapper .icon-large {
+    background: linear-gradient(135deg, #f37021, #ff8c42) !important;
+    box-shadow: 0 8px 20px rgba(243, 112, 33, 0.4) !important;
+}
+
+body.dark-mode .contact-wrapper h2 {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .contact-wrapper h2 span {
+    color: #ffb26b !important;
+}
+
+body.dark-mode .contact-wrapper > p {
+    color: #9ca3af !important;
+}
+
+body.dark-mode .contact-form label {
+    color: #d1d5db !important;
+}
+
+body.dark-mode .contact-form input,
+body.dark-mode .contact-form select,
+body.dark-mode .contact-form textarea {
+    background: #111827 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .contact-form input::placeholder,
+body.dark-mode .contact-form textarea::placeholder {
+    color: #6b7280 !important;
+}
+
+body.dark-mode .contact-form input:focus,
+body.dark-mode .contact-form textarea:focus {
+    border-color: #f37021 !important;
+    background: #0f172a !important;
+    box-shadow: 0 0 0 4px rgba(243, 112, 33, 0.15) !important;
+}
+
+body.dark-mode .contact-form button {
+    background: linear-gradient(135deg, #f37021, #ff8c42) !important;
+    box-shadow: 0 6px 18px rgba(243, 112, 33, 0.4) !important;
+}
+
+/* ⭐ PACKAGE CARDS — chỉ đổi background, GIỮ header cam + hiệu ứng */
+body.dark-mode .pkg-wrap {
+    background: #1f2937 !important;
+}
+
+body.dark-mode .pkg {
+    background-color: #1f2937 !important;
+    background-image:
+        radial-gradient(at 88% 100%, rgba(243, 112, 33, 0.08) 0px, transparent 60%),
+        radial-gradient(at 12% 95%, rgba(255, 178, 107, 0.08) 0px, transparent 55%),
+        radial-gradient(at 50% 100%, rgba(217, 88, 16, 0.04) 0px, transparent 60%) !important;
+}
+
+body.dark-mode .pkg ul li {
+    color: #d1d5db !important;
+}
+
+body.dark-mode .pkg .price .unit {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+body.dark-mode .pkg-body {
+    color: #e5e7eb !important;
+}
+
+/* ⭐ USER DROPDOWN */
+body.dark-mode .user-dropdown {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+}
+
+body.dark-mode .dropdown-header {
+    background: linear-gradient(135deg, #111827, #1f2937) !important;
+    border-color: #374151 !important;
+}
+
+body.dark-mode .dropdown-info strong {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .dropdown-info small {
+    color: #9ca3af !important;
+}
+
+body.dark-mode .dropdown-item {
+    color: #d1d5db !important;
+}
+
+body.dark-mode .dropdown-item:hover {
+    background: #374151 !important;
+    color: #ffb26b !important;
+}
+
+body.dark-mode .dropdown-divider {
+    background: #374151 !important;
+}
+
+/* ⭐ AI CHAT */
+body.dark-mode .ai-chat-window {
+    background: #1f2937 !important;
+}
+
+body.dark-mode .ai-chat-body {
+    background: #111827 !important;
+}
+
+body.dark-mode .ai-msg-bot {
+    background: #1f2937 !important;
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .ai-chat-footer {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+}
+
+body.dark-mode .ai-chat-footer input {
+    background: #111827 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .ai-chat-footer input::placeholder {
+    color: #6b7280 !important;
+}
+
+/* ⭐ SMOOTH TRANSITION — chỉ cho body, không ảnh hưởng element khác */
+body {
+    transition: background 0.5s ease, color 0.5s ease;
+}
+
+/* ⭐ Nút theme toggle mobile */
+@media (max-width: 640px) {
+    .theme-toggle-btn {
+        width: 52px;
+        height: 52px;
+        bottom: 80px;
+        right: 16px;
+    }
+    .theme-toggle-btn .icon-sun,
+    .theme-toggle-btn .icon-moon {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+/* =========================================================
+   ⭐ CONTACT HERO — DARK MODE + BẦU TRỜI SAO
+   ========================================================= */
+
+body.dark-mode .contact-hero {
+    animation: none !important;
+    /* ⭐ Nền đêm navy (khớp với hero trang chủ) */
+    background: linear-gradient(180deg,
+        #0b1a3a 0%,
+        #102a5c 30%,
+        #1a3a7a 60%,
+        #0f2350 100%) !important;
+    background-size: 100% 100% !important;
+
+    /* ⭐ Position + overflow để sao không tràn */
+    position: relative !important;
+    overflow: hidden !important;
+
+    /* ⭐ Viền cam dưới */
+    box-shadow:
+        inset 0 -3px 0 rgba(243, 112, 33, 0.9),
+        inset 0 -3px 8px rgba(243, 112, 33, 0.4) !important;
+}
+
+/* ⭐ Tắt vệt sáng cũ */
+body.dark-mode .contact-hero::before,
+body.dark-mode .contact-hero::after {
+    display: none !important;
+}
+
+body.dark-mode .contact-hero h1 {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .contact-hero p {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+body.dark-mode .contact-hero-icon {
+    background: linear-gradient(135deg, #f37021, #ff8c42) !important;
+    box-shadow:
+        0 10px 30px rgba(243, 112, 33, 0.5),
+        0 0 0 8px rgba(243, 112, 33, 0.15) !important;
+}
+
+/* =========================================================
+   ⭐ CONTACT INFO SECTION — DARK MODE
+   ========================================================= */
+
+body.dark-mode .contact-info-section {
+    background: linear-gradient(180deg, #0f172a 0%, #111827 100%) !important;
+}
+
+body.dark-mode .contact-info-card {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .contact-info-card:hover {
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6) !important;
+    border-color: rgba(243, 112, 33, 0.4) !important;
+}
+
+body.dark-mode .contact-info-label {
+    color: #ffb26b !important;
+}
+
+body.dark-mode .contact-info-value {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .contact-info-value a {
+    color: #ffb26b !important;
+}
+
+body.dark-mode .contact-info-value a:hover {
+    color: #ff8c42 !important;
+    border-bottom-color: #ff8c42 !important;
+}
+
+body.dark-mode .contact-info-desc {
+    color: #9ca3af !important;
+}
+
+/* Nút "Quay lại trang chủ" */
+body.dark-mode .contact-info-section a[href*="/home"] {
+    background: #1f2937 !important;
+    color: #ffb26b !important;
+    border-color: #f37021 !important;
+}
+
+body.dark-mode .contact-info-section a[href*="/home"]:hover {
+    background: linear-gradient(135deg, #f37021, #ff8c42) !important;
+    color: white !important;
+}
+
+/* =========================================================
+   ⭐ HERO / DASHBOARD — BẦU TRỜI ĐÊM KHI DARK MODE
+   ⭐ CHỈ áp dụng cho hero, dừng ở viền cam dưới hero
+   ========================================================= */
+
+body.dark-mode .hero {
+    /* ⭐ Đổi nền xanh navy sáng → xanh navy đêm */
+    background: linear-gradient(180deg,
+        #0b1a3a 0%,
+        #102a5c 30%,
+        #1a3a7a 60%,
+        #0f2350 100%) !important;
+    background-size: 100% 100% !important;
+    animation: none !important;
+
+    /* ⭐ QUAN TRỌNG: position + overflow để sao không tràn */
+    position: relative !important;
+    overflow: hidden !important;
+
+    /* ⭐ Viền cam dưới hero */
+    box-shadow:
+        inset 0 -2px 0 rgba(243, 112, 33, 0.85),
+        inset 0 -2px 6px rgba(243, 112, 33, 0.3) !important;
+}
+
+/* ⭐ Tắt vệt sáng cũ — đã có sao trong hero-stars */
+body.dark-mode .hero::before,
+body.dark-mode .hero::after {
+    display: none !important;
+}
+
+/* ⭐ Chữ trong hero đổi màu cho dễ đọc trên nền đêm */
+body.dark-mode .hero h1 {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .hero h1 .highlight {
+    color: #ffb26b !important;
+}
+
+body.dark-mode .hero .desc {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+body.dark-mode .hero .badge-top {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
+body.dark-mode .hero .badges span {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+}

@@ -1,0 +1,218 @@
+/* =========================================================
+   PREMIUM CHECKBOX — Hiệu ứng dấu tích vẽ SVG + viền sáng cam
+   ========================================================= */
+
+@property --p {
+  syntax: "<number>";
+  initial-value: 0;
+  inherits: false;
+}
+@property --fill {
+  syntax: "<number>";
+  initial-value: 0;
+  inherits: false;
+}
+@property --glow {
+  syntax: "<number>";
+  initial-value: 0;
+  inherits: false;
+}
+
+.cbx {
+  --saffron: #f37021;      /* ⭐ Đổi thành màu cam FPT */
+  --orange: #d95810;        /* ⭐ Đổi thành màu cam đậm FPT */
+  --ink: #fff;
+  --size: 24px;             /* ⭐ Giảm từ 42px xuống 24px cho phù hợp form */
+  --bw: 2px;                /* ⭐ Giảm từ 2.5px */
+  --radius: 6px;            /* ⭐ Giảm từ 12px */
+  --stroke: 3px;
+  display: inline-block;
+}
+
+.cbx__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
+  padding: 0;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
+.cbx__label {
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cbx__text {
+  font: 500 13px/1.5 'Be Vietnam Pro', system-ui, Segoe UI, Roboto, sans-serif;
+  letter-spacing: 0.01em;
+  color: #4b5563;
+  transition: color 0.25s ease, transform 0.2s ease;
+}
+
+/* Khi checkbox được tick → text đổi màu cam */
+.cbx__input:checked + .cbx__label .cbx__text {
+  color: #f37021;
+  font-weight: 600;
+  transform: translateY(-1px);
+}
+
+.cbx__box {
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  border-radius: var(--radius);
+  border: var(--bw) solid rgba(243, 112, 33, 0.4);
+  background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.9),
+      rgba(248, 250, 252, 0.9)
+    )
+    padding-box;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.5),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.05),
+    0 0 calc(10px * var(--glow)) calc(2px * var(--glow))
+      rgba(243, 112, 33, 0.4);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+  overflow: hidden;
+  flex-shrink: 0;
+  --p: 0;
+  --fill: 0;
+  --glow: 0;
+}
+
+/* Vòng xoay bao quanh */
+.cbx__box::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--bw) * -1);
+  padding: var(--bw);
+  border-radius: inherit;
+  background: conic-gradient(
+    from -90deg,
+    #f37021 0 calc(var(--p) * 1turn),
+    transparent 0 1turn
+  );
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0) border-box;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0) border-box;
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.28;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* Nền fill cam khi tick */
+.cbx__box::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #f37021, #ff8c42);
+  transform-origin: left center;
+  transform: scaleX(var(--fill));
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.cbx__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cbx__path {
+  fill: none;
+  stroke: #f37021;
+  stroke-width: var(--stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  transition:
+    stroke-dashoffset 0.28s cubic-bezier(0.2, 0.8, 0.3, 1) 0.06s,
+    filter 0.2s;
+  filter: drop-shadow(0 0 0.2rem rgba(243, 112, 33, 0.4));
+}
+
+/* Focus state */
+.cbx__input:focus-visible + .cbx__label .cbx__box {
+  border-color: #f37021;
+  box-shadow:
+    0 0 0 0.18rem rgba(243, 112, 33, 0.25),
+    0 0 0 0.38rem rgba(255, 140, 66, 0.1);
+}
+
+/* ⭐ TRẠNG THÁI ĐƯỢC TICK */
+.cbx__input:checked + .cbx__label .cbx__box {
+  --p: 1;
+  --fill: 1;
+  --glow: 1;
+  border-color: #f37021;
+  background: linear-gradient(135deg, #f37021, #ff8c42) padding-box;
+}
+
+.cbx__input:checked + .cbx__label .cbx__box::before {
+  opacity: 0.9;
+}
+
+.cbx__input:checked + .cbx__label .cbx__path {
+  stroke: #ffffff;              /* ⭐ Dấu tích trắng trên nền cam */
+  stroke-dashoffset: 0;
+  filter: drop-shadow(0 0 0.3rem rgba(255, 255, 255, 0.8));
+}
+
+/* Hover effect */
+.cbx:hover .cbx__box {
+  border-color: #f37021;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.5),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.05),
+    0 0 12px 2px rgba(243, 112, 33, 0.2);
+}
+
+/* ⭐ SIZE BIẾN THỂ — cho form register */
+.cbx--form {
+  --size: 22px;
+  --bw: 2px;
+  --radius: 5px;
+}
+
+.cbx--form .cbx__label {
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+
+.cbx--form .cbx__text {
+  font-size: 13px;
+  line-height: 1.55;
+  padding-top: 1px;
+}
+
+/* ⭐ SIZE BIẾN THỂ — cho form login */
+.cbx--remember {
+  --size: 20px;
+  --bw: 2px;
+  --radius: 5px;
+}
+
+.cbx--remember .cbx__text {
+  font-size: 13px;
+  color: #4b5563;
+}

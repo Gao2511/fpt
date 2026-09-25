@@ -1,6 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -16,7 +17,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/admin/admin-settings.css">
 </head>
 <body>
-
+<jsp:include page="/view/loading-runner.jsp" />
 <!-- ============ HEADER ============ -->
 <header class="admin-header">
     <div class="header-left">

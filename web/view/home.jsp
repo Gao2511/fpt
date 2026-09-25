@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -13,11 +14,17 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/home.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/ai-chat.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/pkg-card.css">
-         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/fonts.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/fonts.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/hero-stars.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/theme-toggle.css">
         <script src="${pageContext.request.contextPath}/js/address-data.js"></script>
         <script src="${pageContext.request.contextPath}/js/address-picker.js" defer></script>
     </head>
     <body>
+        <!-- ⭐ LOADING RUNNER -->
+        <jsp:include page="/view/loading-runner.jsp" />
+        <jsp:include page="/view/nav-slider.jsp" />
+        <jsp:include page="/view/theme-toggle.jsp" />
 
         <!-- ============ TOP NAV ============ -->
         <header class="top-nav">
@@ -27,7 +34,7 @@
                          alt="FPT Telecom"
                          style="height: 50px; width: auto; object-fit: contain; display: block;">
                 </a>
-                <nav class="menu">
+                <nav class="menu">                
                     <a href="${pageContext.request.contextPath}/home">Trang chủ</a>
                     <a href="#packages">Bảng giá</a>
                     <a href="#contact">Tư vấn</a>
@@ -156,6 +163,17 @@
 
         <!-- ============ HERO ============ -->
         <section class="hero">
+            <!-- ⭐ BẦU TRỜI SAO — chỉ hiện khi dark mode -->
+            <div class="hero-stars">
+                <div class="stars stars-1"></div>
+                <div class="stars stars-2"></div>
+                <div class="stars stars-3"></div>
+                <div class="meteor m1"></div>
+                <div class="meteor m2"></div>
+                <div class="meteor m3"></div>
+                <div class="moon"></div>
+            </div>
+
             <div class="container">
                 <div class="hero-text">
                     <c:if test="${not empty sessionScope.user && sessionScope.user.role == 'customer'}">
@@ -951,59 +969,60 @@
                 }
             });
         </script>
+
         <script>
-    // ===== HERO SLIDESHOW NÂNG CAO =====
-    (function () {
-        const slides = document.querySelectorAll('.hero-slide');
-        const dots = document.querySelectorAll('.dot-slide');
-        if (slides.length === 0) return;
+            // ===== HERO SLIDESHOW NÂNG CAO =====
+            (function () {
+                const slides = document.querySelectorAll('.hero-slide');
+                const dots = document.querySelectorAll('.dot-slide');
+                if (slides.length === 0) return;
 
-        let currentIndex = 0;
-        let autoTimer;
-        const INTERVAL = 4000;
+                let currentIndex = 0;
+                let autoTimer;
+                const INTERVAL = 4000;
 
-        function showSlide(index) {
-            slides.forEach(s => s.classList.remove('active'));
-            dots.forEach(d => d.classList.remove('active'));
+                function showSlide(index) {
+                    slides.forEach(s => s.classList.remove('active'));
+                    dots.forEach(d => d.classList.remove('active'));
 
-            slides[index].classList.add('active');
-            if (dots[index]) dots[index].classList.add('active');
+                    slides[index].classList.add('active');
+                    if (dots[index]) dots[index].classList.add('active');
 
-            currentIndex = index;
-        }
+                    currentIndex = index;
+                }
 
-        function nextSlide() {
-            showSlide((currentIndex + 1) % slides.length);
-            resetTimer();                    /* ⭐ reset timer khi click next */
-        }
+                function nextSlide() {
+                    showSlide((currentIndex + 1) % slides.length);
+                    resetTimer();
+                }
 
-        function prevSlide() {
-            showSlide((currentIndex - 1 + slides.length) % slides.length);
-            resetTimer();                    /* ⭐ reset timer khi click prev */
-        }
+                function prevSlide() {
+                    showSlide((currentIndex - 1 + slides.length) % slides.length);
+                    resetTimer();
+                }
 
-        function goToSlide(index) {
-            showSlide(index);
-            resetTimer();                    /* ⭐ reset timer khi click dot */
-        }
+                function goToSlide(index) {
+                    showSlide(index);
+                    resetTimer();
+                }
 
-        function resetTimer() {
-            clearInterval(autoTimer);
-            autoTimer = setInterval(nextSlide, INTERVAL);
-        }
+                function resetTimer() {
+                    clearInterval(autoTimer);
+                    autoTimer = setInterval(nextSlide, INTERVAL);
+                }
 
-        resetTimer();
+                resetTimer();
 
-        const slideshow = document.querySelector('.hero-slideshow');
-        if (slideshow) {
-            slideshow.addEventListener('mouseenter', () => clearInterval(autoTimer));
-            slideshow.addEventListener('mouseleave', resetTimer);
-        }
+                const slideshow = document.querySelector('.hero-slideshow');
+                if (slideshow) {
+                    slideshow.addEventListener('mouseenter', () => clearInterval(autoTimer));
+                    slideshow.addEventListener('mouseleave', resetTimer);
+                }
 
-        window.nextSlide = nextSlide;
-        window.prevSlide = prevSlide;
-        window.goToSlide = goToSlide;
-    })();
+                window.nextSlide = nextSlide;
+                window.prevSlide = prevSlide;
+                window.goToSlide = goToSlide;
+            })();
         </script>
 
     </body>

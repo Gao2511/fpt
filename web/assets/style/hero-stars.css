@@ -1,0 +1,173 @@
+/* =========================================================
+   HERO STARS — Bầu trời sao cho .hero và .contact-hero
+   CHỈ nằm trong section, KHÔNG tràn xuống dưới
+   ========================================================= */
+
+/* ⭐ QUAN TRỌNG: cả 2 section phải có overflow hidden */
+.hero,
+.contact-hero {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Container sao — CHỈ hiện khi dark mode */
+.hero-stars {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+    z-index: 0;
+    overflow: hidden;
+}
+
+body.dark-mode .hero-stars {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ⭐ 3 lớp sao lấp lánh */
+.hero-stars .stars {
+    position: absolute;
+    inset: 0;
+    background-repeat: repeat;
+    pointer-events: none;
+}
+
+.hero-stars .stars-1 {
+    background-image:
+        radial-gradient(1px 1px at 10% 10%, #fff, transparent),
+        radial-gradient(1px 1px at 30% 20%, #fff, transparent),
+        radial-gradient(1px 1px at 50% 50%, #fff, transparent),
+        radial-gradient(1px 1px at 70% 30%, #fff, transparent),
+        radial-gradient(1px 1px at 90% 10%, #fff, transparent),
+        radial-gradient(1px 1px at 15% 60%, #fff, transparent),
+        radial-gradient(1px 1px at 45% 80%, #fff, transparent),
+        radial-gradient(1px 1px at 75% 75%, #fff, transparent);
+    background-size: 200px 200px;
+    animation: heroTwinkle 3s ease-in-out infinite;
+}
+
+.hero-stars .stars-2 {
+    background-image:
+        radial-gradient(1.5px 1.5px at 20% 40%, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 60% 85%, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 85% 65%, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 35% 15%, #ffe9c4, transparent);
+    background-size: 300px 300px;
+    animation: heroTwinkle 5s ease-in-out infinite 1s;
+}
+
+.hero-stars .stars-3 {
+    background-image:
+        radial-gradient(2px 2px at 40% 70%, #fff, transparent),
+        radial-gradient(2px 2px at 10% 80%, #fff, transparent),
+        radial-gradient(2px 2px at 80% 40%, #ffe9c4, transparent),
+        radial-gradient(2px 2px at 55% 30%, #fff, transparent);
+    background-size: 400px 400px;
+    animation: heroTwinkle 7s ease-in-out infinite 2s;
+}
+
+@keyframes heroTwinkle {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.3; }
+}
+
+/* ⭐ Sao băng */
+.hero-stars .meteor {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.6);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.hero-stars .meteor::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100px;
+    height: 1.5px;
+    background: linear-gradient(90deg, #fff, transparent);
+}
+
+.hero-stars .m1 {
+    top: 10%;
+    left: 110%;
+    animation: heroShoot 8s linear infinite;
+}
+.hero-stars .m2 {
+    top: 30%;
+    left: 110%;
+    animation: heroShoot 12s linear infinite 4s;
+}
+.hero-stars .m3 {
+    top: 50%;
+    left: 110%;
+    animation: heroShoot 10s linear infinite 2s;
+}
+
+@keyframes heroShoot {
+    0% {
+        transform: translateX(0) translateY(0) rotate(-35deg);
+        opacity: 0;
+    }
+    5% { opacity: 1; }
+    15% {
+        transform: translateX(-1500px) translateY(1000px) rotate(-35deg);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(-1500px) translateY(1000px) rotate(-35deg);
+        opacity: 0;
+    }
+}
+
+/* ⭐ Mặt trăng — góc phải */
+.hero-stars .moon {
+    position: absolute;
+    top: 12%;
+    right: 6%;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: transparent;
+    box-shadow: 12px 12px 0 0 #fdfbd3;
+    filter: drop-shadow(0 0 20px rgba(253, 251, 211, 0.5));
+    z-index: 10;
+    animation: heroMoonGlow 4s ease-in-out infinite;
+}
+
+@keyframes heroMoonGlow {
+    0%, 100% {
+        filter: drop-shadow(0 0 20px rgba(253, 251, 211, 0.4));
+    }
+    50% {
+        filter: drop-shadow(0 0 35px rgba(253, 251, 211, 0.7));
+    }
+}
+
+/* ⭐ Đảm bảo nội dung nằm trên sao */
+.hero > .container,
+.contact-hero > .container {
+    position: relative;
+    z-index: 2;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+    .hero-stars .moon {
+        width: 44px;
+        height: 44px;
+        top: 8%;
+        right: 6%;
+        box-shadow: 9px 9px 0 0 #fdfbd3;
+    }
+}

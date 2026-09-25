@@ -1,0 +1,215 @@
+/* =========================================================
+   RUNNER LOADER — Người chạy khi trang đang load
+   ========================================================= */
+
+/* ⭐ OVERLAY — Che toàn màn hình */
+.page-loading {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #0a1f44 0%, #1e3a5f 50%, #0a1f44 100%);
+    background-size: 200% 200%;
+    animation: loadingBgMove 3s ease infinite;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.page-loading.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+@keyframes loadingBgMove {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+}
+
+/* ===== RUNNER LOADER ===== */
+.loader {
+    scale: 0.75;
+    position: relative;
+    width: 200px;
+    height: 200px;
+    translate: 10px -20px;
+}
+.loader svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.head {
+    translate: 27px -30px;
+    z-index: 3;
+    animation: bob 1s infinite ease-in;
+}
+.bod {
+    translate: 0px 30px;
+    z-index: 3;
+    animation: bob 1s infinite ease-in-out;
+}
+.legr {
+    translate: 75px 135px;
+    z-index: 0;
+    animation: rstep 1s infinite ease-in;
+}
+.legr {
+    animation-delay: 0.45s;
+}
+
+.legl {
+    translate: 30px 155px;
+    z-index: 3;
+    animation: lstep 1s infinite ease-in;
+}
+
+@keyframes bob {
+    0% {
+        transform: translateY(0) rotate(3deg);
+    }
+    5% {
+        transform: translateY(0) rotate(3deg);
+    }
+    25% {
+        transform: translateY(5px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(0px) rotate(-3deg);
+    }
+    70% {
+        transform: translateY(5px) rotate(0deg);
+    }
+    100% {
+        transform: translateY(0) rotate(3deg);
+    }
+}
+
+@keyframes lstep {
+    0% {
+        transform: translateY(0) rotate(-5deg);
+    }
+    33% {
+        transform: translateY(-15px) translate(32px) rotate(35deg);
+    }
+    66% {
+        transform: translateY(0) translate(25px) rotate(-25deg);
+    }
+    100% {
+        transform: translateY(0) rotate(-5deg);
+    }
+}
+
+@keyframes rstep {
+    0% {
+        transform: translateY(0) translate(0px) rotate(-5deg);
+    }
+    33% {
+        transform: translateY(-10px) translate(30px) rotate(35deg);
+    }
+    66% {
+        transform: translateY(0) translate(20px) rotate(-25deg);
+    }
+    100% {
+        transform: translateY(0) translate(0px) rotate(-5deg);
+    }
+}
+
+#gnd {
+    translate: -140px 0;
+    rotate: 10deg;
+    z-index: -1;
+    filter: blur(0.5px) drop-shadow(1px 3px 5px #000000);
+    opacity: 0.25;
+    animation: scroll 5s infinite linear;
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateY(25px) translate(50px);
+        opacity: 0;
+    }
+    33% {
+        opacity: 0.25;
+    }
+    66% {
+        opacity: 0.25;
+    }
+    to {
+        transform: translateY(-50px) translate(-100px);
+        opacity: 0;
+    }
+}
+
+/* ⭐ TEXT "ĐANG TẢI" */
+.page-loading .loading-text {
+    color: #ffffff;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    opacity: 0.9;
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+}
+
+.page-loading .loading-text span {
+    display: inline-block;
+    animation: textBounce 1.4s ease-in-out infinite;
+}
+
+.page-loading .loading-text span:nth-child(1) { animation-delay: 0s; }
+.page-loading .loading-text span:nth-child(2) { animation-delay: 0.1s; }
+.page-loading .loading-text span:nth-child(3) { animation-delay: 0.2s; }
+.page-loading .loading-text span:nth-child(4) { animation-delay: 0.3s; }
+.page-loading .loading-text span:nth-child(5) { animation-delay: 0.4s; }
+.page-loading .loading-text span:nth-child(6) { animation-delay: 0.5s; }
+.page-loading .loading-text span:nth-child(7) { animation-delay: 0.6s; }
+.page-loading .loading-text span:nth-child(8) { animation-delay: 0.7s; }
+.page-loading .loading-text span:nth-child(9) { animation-delay: 0.8s; }
+
+@keyframes textBounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.9; }
+    30%           { transform: translateY(-8px); opacity: 1; }
+}
+
+/* ⭐ LOGO FPT phía trên */
+.page-loading .loading-logo {
+    height: 55px;
+    width: auto;
+    border-radius: 10px;
+    filter: drop-shadow(0 4px 20px rgba(243, 112, 33, 0.6));
+    animation: logoPulse 2s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 4px 20px rgba(243, 112, 33, 0.6));
+    }
+    50% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 4px 30px rgba(243, 112, 33, 0.9));
+    }
+}
+
+/* ⭐ Responsive mobile */
+@media (max-width: 640px) {
+    .loader {
+        scale: 0.55;
+    }
+    .page-loading .loading-logo {
+        height: 45px;
+    }
+    .page-loading .loading-text {
+        font-size: 12px;
+        letter-spacing: 1.5px;
+    }
+}

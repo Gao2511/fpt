@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -9,8 +10,13 @@
     <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
     <link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/home.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/theme-toggle.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/hero-stars.css">
 </head>
 <body>
+<jsp:include page="/view/loading-runner.jsp" />
+<jsp:include page="/view/nav-slider.jsp" />
+<jsp:include page="/view/theme-toggle.jsp" />
 
 <!-- ============ TOP NAV ============ -->
 <header class="top-nav">
@@ -56,6 +62,17 @@
 
 <!-- ============ HERO CONTACT ============ -->
 <div class="contact-hero">
+    <!-- ⭐ BẦU TRỜI SAO — chỉ hiện khi dark mode -->
+    <div class="hero-stars">
+        <div class="stars stars-1"></div>
+        <div class="stars stars-2"></div>
+        <div class="stars stars-3"></div>
+        <div class="meteor m1"></div>
+        <div class="meteor m2"></div>
+        <div class="meteor m3"></div>
+        <div class="moon"></div>
+    </div>
+
     <div class="container">
         <div class="contact-hero-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

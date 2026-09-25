@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -13,7 +14,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/admin/admin-package.css">
 </head>
 <body>
-
+<jsp:include page="/view/loading-runner.jsp" />
 <header class="admin-header">
     <div class="header-left">
         <div class="logo">

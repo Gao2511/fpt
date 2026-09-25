@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+ 
 <!DOCTYPE html>
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,8 +14,10 @@
     <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
     <link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/fpt-id.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/checkbox-premium.css">
 </head>
 <body>
+    <jsp:include page="/view/loading-runner.jsp" />
     <div class="fptid-box">
 
         <!-- NÚT QUAY LẠI TRANG CHỦ -->
@@ -113,7 +116,19 @@
                 </div>
             </div>
 
-     
+            <!-- ⭐ CHECKBOX GHI NHỚ ĐĂNG NHẬP — PREMIUM -->
+            <div class="cbx cbx--remember" style="margin-bottom: 18px;">
+                <input id="rememberMe" class="cbx__input" type="checkbox" name="rememberMe" value="true" />
+                <label class="cbx__label" for="rememberMe">
+                    <span class="cbx__box" aria-hidden="true">
+                        <svg class="cbx__svg" viewBox="0 0 24 24" aria-hidden="true">
+                            <path class="cbx__path" d="M6 12l4 4 8-8"></path>
+                        </svg>
+                    </span>
+                    <span class="cbx__text">Ghi nhớ đăng nhập</span>
+                </label>
+            </div>
+
             <!-- Nút đăng nhập -->
             <button type="submit" class="btn-fptid">
                 <svg viewBox="0 0 24 24">

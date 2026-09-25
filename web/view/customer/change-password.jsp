@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -12,7 +13,9 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/customer/profile.css">
 </head>
 <body>
-
+<jsp:include page="/view/loading-runner.jsp" />
+<jsp:include page="/view/nav-slider.jsp" />
+ <jsp:include page="/view/theme-toggle.jsp" />
 <!-- TOP NAV -->
 <header class="top-nav">
     <div class="container">
