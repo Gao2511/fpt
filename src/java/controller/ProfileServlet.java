@@ -17,13 +17,13 @@ import javax.servlet.http.*;
  * ProfileServlet - Xem & chỉnh sửa hồ sơ cá nhân
  * URL: /profile
  * 
- * FIX: Không bắt buộc username khi user Google cập nhật profile
+ * ĐÃ BỎ HẾT RÀNG BUỘC — không bắt buộc nhập gì cả
  */
 @WebServlet("/profile")
 @MultipartConfig(
-    fileSizeThreshold = 1024 * 1024 * 2,   // 2MB
-    maxFileSize       = 1024 * 1024 * 5,   // 5MB
-    maxRequestSize    = 1024 * 1024 * 10   // 10MB
+    fileSizeThreshold = 1024 * 1024 * 2,
+    maxFileSize       = 1024 * 1024 * 5,
+    maxRequestSize    = 1024 * 1024 * 10
 )
 public class ProfileServlet extends HttpServlet {
 
@@ -64,7 +64,7 @@ public class ProfileServlet extends HttpServlet {
     }
 
     // =====================================================
-    // POST: Cập nhật profile (KHÔNG RÀNG BUỘC USERNAME)
+    // POST: Cập nhật profile — KHÔNG RÀNG BUỘC GÌ CẢ
     // =====================================================
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -96,74 +96,20 @@ public class ProfileServlet extends HttpServlet {
         phone       = phone.trim();
         email       = email.trim();
 
-        // ===== ⭐ FIX: USERNAME =====
-        // Nếu form KHÔNG có field username HOẶC rỗng → GIỮ NGUYÊN username cũ
+        // ===== USERNAME =====
+        // Nếu không nhập → giữ nguyên username cũ
         if (newUsername.isEmpty()) {
             newUsername = user.getUsername();
         }
 
-        // Chỉ validate nếu user THỰC SỰ muốn đổi username
-        boolean isChangingUsername = !newUsername.equals(user.getUsername());
-
-        if (isChangingUsername) {
-            // Validate độ dài
-            if (newUsername.length() < 3 || newUsername.length() > 50) {
-                session.setAttribute("message", "✗ Tên đăng nhập phải có 3-50 ký tự");
-                session.setAttribute("messageType", "error");
-                response.sendRedirect(request.getContextPath() + "/profile");
-                return;
-            }
-
-            // Không cho khoảng trắng
-            if (newUsername.contains(" ")) {
-                session.setAttribute("message", "✗ Tên đăng nhập không được chứa khoảng trắng");
-                session.setAttribute("messageType", "error");
-                response.sendRedirect(request.getContextPath() + "/profile");
-                return;
-            }
-
-            // Kiểm tra trùng username
-            UserDTO existing = userDAO.getByUsername(newUsername);
-            if (existing != null && existing.getId() != user.getId()) {
-                session.setAttribute("message", "✗ Tên đăng nhập '" + newUsername + "' đã được sử dụng");
-                session.setAttribute("messageType", "error");
-                response.sendRedirect(request.getContextPath() + "/profile");
-                return;
-            }
-        }
-
-        // ===== VALIDATE EMAIL (CHỈ validate nếu CÓ nhập) =====
-        if (!email.isEmpty()) {
-            if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-                session.setAttribute("message", "✗ Email không hợp lệ");
-                session.setAttribute("messageType", "error");
-                response.sendRedirect(request.getContextPath() + "/profile");
-                return;
-            }
-
-            // ⭐ Kiểm tra email trùng với user khác
-            UserDTO existing = userDAO.getByEmail(email);
-            if (existing != null && existing.getId() != user.getId()) {
-                session.setAttribute("message", "✗ Email này đã được sử dụng bởi tài khoản khác");
-                session.setAttribute("messageType", "error");
-                response.sendRedirect(request.getContextPath() + "/profile");
-                return;
-            }
-        }
-
-        // ===== VALIDATE PHONE (CHỈ validate nếu CÓ nhập) =====
-        if (!phone.isEmpty()) {
-            String cleanPhone = phone.replaceAll("[\\s.\\-]", "");
-            if (!cleanPhone.matches("^[0-9]{10,11}$")) {
-                session.setAttribute("message", "✗ Số điện thoại không hợp lệ (10-11 số)");
-                session.setAttribute("messageType", "error");
-                response.sendRedirect(request.getContextPath() + "/profile");
-                return;
-            }
+        // ===== EMAIL =====
+        // Nếu không nhập → giữ nguyên email cũ
+        if (email.isEmpty()) {
+            email = user.getEmail();
         }
 
         // ===== XỬ LÝ UPLOAD AVATAR =====
-        String avatarUrl = user.getAvatarUrl(); // giữ nguyên nếu không upload
+        String avatarUrl = user.getAvatarUrl();
         Part filePart = request.getPart("avatar");
 
         if (filePart != null && filePart.getSize() > 0) {
@@ -180,19 +126,16 @@ public class ProfileServlet extends HttpServlet {
                 return;
             }
 
-            // Tạo tên file unique
             String newFileName = "avatar_" + user.getId() + "_" + UUID.randomUUID() + ext;
 
-            // Đường dẫn thư mục thật
             String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIR;
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) uploadDir.mkdirs();
 
-            // Lưu file
             File saveFile = new File(uploadDir, newFileName);
             filePart.write(saveFile.getAbsolutePath());
 
-            // Xóa avatar cũ nếu có
+            // Xóa avatar cũ
             if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
                 String oldPath = getServletContext().getRealPath("") + File.separator
                                + user.getAvatarUrl().replace("/", File.separator);
@@ -206,7 +149,7 @@ public class ProfileServlet extends HttpServlet {
         // ===== UPDATE DB =====
         boolean ok = userDAO.updateProfile(
             user.getId(),
-            newUsername,       // ⭐ Có thể là username cũ nếu không đổi
+            newUsername,
             fullName,
             phone,
             email,
@@ -214,7 +157,6 @@ public class ProfileServlet extends HttpServlet {
         );
 
         if (ok) {
-            // Reload user mới
             UserDTO updated = userDAO.getById(user.getId());
             session.setAttribute("user", updated);
             session.setAttribute("message", "✓ Cập nhật hồ sơ thành công!");

@@ -195,7 +195,7 @@
                         </div>
                         <div>
                             <h3>Thông tin cá nhân</h3>
-                            <p>Chỉ Tên đăng nhập là bắt buộc — các trường khác có thể để trống</p>
+                            <p>Tất cả các trường đều không bắt buộc</p>
                         </div>
                     </div>
 
@@ -211,7 +211,6 @@
                         <input type="tel" name="phone"
                                value="${sessionScope.user.phone}"
                                placeholder="VD: 0912 345 678">
-                        <small class="field-hint">💡 Nếu nhập, phải là 10-11 chữ số</small>
                     </div>
 
                     <div class="form-group">
@@ -463,8 +462,7 @@
                 }
             });
 
-            // ⭐ ĐÃ XÓA ĐOẠN VALIDATE USERNAME
-            // Vì form không có field username → không cần validate
+            // ⭐ KHÔNG CÓ VALIDATE NÀO CẢ — submit luôn thành công
         </script>
 
     </body>
