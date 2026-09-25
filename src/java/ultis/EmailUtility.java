@@ -78,4 +78,16 @@ public class EmailUtility {
             return false;
         }
     }
+        public static boolean sendResetPasswordEmail(String toEmail, String userName, String resetLink) {
+        String subject = "Đặt lại mật khẩu FPT ID";
+        String body = "Xin chào " + (userName != null ? userName : "bạn") + ",\n\n"
+                    + "Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản FPT ID của bạn.\n\n"
+                    + "Click vào link sau để đặt lại mật khẩu (hết hạn sau 15 phút):\n"
+                    + resetLink + "\n\n"
+                    + "Nếu bạn KHÔNG yêu cầu đặt lại mật khẩu, hãy bỏ qua email này.\n\n"
+                    + "Trân trọng,\n"
+                    + "FPT Telecom\n";
+                 
+        return sendEmail(toEmail, subject, body);
+    }
 }

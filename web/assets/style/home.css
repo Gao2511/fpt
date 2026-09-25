@@ -690,7 +690,7 @@ ul { list-style: none; }
 
 .hero .container {
     display: grid;
-    grid-template-columns: 1fr 1.2fr;
+    grid-template-columns: 1fr 1.8fr;
     gap: 40px;
     align-items: center;
     position: relative;
@@ -720,7 +720,7 @@ ul { list-style: none; }
 
 .hero h1 {
     font-family: 'Be Vietnam Pro', sans-serif;
-    font-size: 40px;
+    font-size: 52px;
     font-weight: 900;
     line-height: 1.2;
     margin-bottom: 18px;
@@ -834,7 +834,7 @@ ul { list-style: none; }
 .hero-image {
     position: relative;
     text-align: center;
-    margin-right: -150px;
+    margin-right: -40px;
 }
 
 /* HERO SLIDESHOW */
@@ -842,8 +842,8 @@ ul { list-style: none; }
     position: relative;
     width: 100%;
     max-width: 700px;
-    height: 450px;
-    margin: 0 auto;
+    height: 460px;
+    margin: 0 0 0 auto;
     border-radius: 16px;
     overflow: hidden;
     background: #0a1f44;
@@ -950,7 +950,6 @@ ul { list-style: none; }
     0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
     50%      { opacity: 0.7; box-shadow: 0 0 0 8px rgba(40, 167, 69, 0); }
 }
-
 /* =========================================================
    SECTION TITLES
    ========================================================= */
@@ -1008,139 +1007,17 @@ ul { list-style: none; }
 }
 
 /* =========================================================
-   PACKAGES — 4 GÓI / HÀNG, TỰ ĐỘNG XUỐNG HÀNG
+   PACKAGES CONTAINER — Layout 4 cột (cho pkg-card.css)
    ========================================================= */
-
 .packages {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;   /* ⭐ căn giữa các gói */
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 20px;
     padding-bottom: 50px;
     position: relative;
     z-index: 1;
     max-width: 1240px;
     margin: 0 auto;
-}
-
-.pkg {
-    background: white;
-    border-radius: 16px;
-    padding: 0 0 22px;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
-    position: relative;
-    transition: all var(--transition-normal);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    border: 2px solid transparent;
-    cursor: pointer;
-
-    /* ⭐ 4 gói/hàng, tự co giãn */
-    flex: 0 0 calc((100% - 60px) / 4);   /* 3 khoảng gap × 20px = 60px */
-    max-width: calc((100% - 60px) / 4);
-    box-sizing: border-box;
-}
-
-.pkg:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
-    border-color: var(--fpt-orange);
-}
-
-.pkg.featured {
-    border-color: var(--fpt-orange);
-    box-shadow: 0 8px 30px rgba(243, 112, 33, 0.18);
-}
-
-.pkg .pkg-header {
-    padding: 18px 16px;
-    text-align: center;
-    color: white;
-    font-weight: 800;
-    font-size: 16px;
-    background: linear-gradient(135deg, #FF9800 0%, #F37021 100%);
-    box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1);
-}
-
-.pkg .pkg-header small {
-    display: block;
-    font-size: 11px;
-    font-weight: 500;
-    opacity: 0.95;
-    margin-top: 4px;
-    line-height: 1.4;
-}
-
-.pkg-body {
-    padding: 22px 20px 0;
-    text-align: center;
-    flex: 1;
-}
-
-.pkg .price {
-    font-family: 'Be Vietnam Pro', sans-serif;
-    font-size: 30px;
-    font-weight: 900;
-    color: var(--fpt-orange);
-    line-height: 1;
-    margin: 6px 0 4px;
-    letter-spacing: -1px;
-}
-
-.pkg .price .unit {
-    font-size: 13px;
-    color: var(--fpt-text-muted);
-    font-weight: 500;
-    margin-left: 2px;
-}
-
-.pkg ul {
-    text-align: left;
-    padding: 18px 0;
-    border-top: 1px dashed var(--fpt-border);
-    margin-top: 18px;
-}
-
-.pkg ul li {
-    font-size: 13px;
-    color: #4a5568;
-    padding: 5px 0 5px 22px;
-    position: relative;
-    line-height: 1.5;
-}
-
-.pkg ul li::before {
-    content: "✓";
-    position: absolute;
-    left: 0;
-    color: var(--fpt-green);
-    font-weight: 800;
-    font-size: 13px;
-}
-
-.pkg .btn-pkg {
-    display: block;
-    margin: 14px 20px 0;
-    padding: 12px;
-    text-align: center;
-    border-radius: 30px;
-    font-weight: 800;
-    font-size: 13px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    border: 2px solid #F37021;
-    background: linear-gradient(135deg, #FF9800, #F37021);
-    color: white;
-    box-shadow: 0 4px 12px rgba(243, 112, 33, 0.3);
-    text-decoration: none;
-}
-
-.pkg .btn-pkg:hover {
-    background: linear-gradient(135deg, #F37021, #E65100);
-    border-color: #E65100;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(243, 112, 33, 0.5);
 }
 
 /* =========================================================
@@ -2163,7 +2040,6 @@ a[href*="/home"][style*="border: 2px solid #f37021"]:hover,
         ),
         linear-gradient(180deg, #f0f4f8 0%, #e2e8f0 100%);
 }
-
 /* =========================================================
    RESPONSIVE
    ========================================================= */
@@ -2370,6 +2246,7 @@ footer {
     transform: scale(1.1) !important;
     filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8)) !important;
 }
+
 /* =========================================================
    ADDRESS PICKER (cascading dropdown)
    ========================================================= */
@@ -2531,6 +2408,7 @@ footer {
     outline: none;
     box-shadow: 0 0 0 4px rgba(243, 112, 33, 0.1);
 }
+
 /* =========================================================
    NÚT TOGGLE ADDRESS PICKER — NỔI BẬT NHƯNG KHÔNG PHÁ FORM
    ========================================================= */
@@ -2612,6 +2490,7 @@ footer {
 .addr-toggle-btn:hover svg {
     transform: rotate(-10deg) scale(1.1) !important;
 }
+
 /* =========================================================
    ADDRESS PICKER — 2 CHẾ ĐỘ (MỚI + CŨ)
    ========================================================= */
@@ -2626,7 +2505,6 @@ footer {
     flex-wrap: wrap !important;
 }
 
-/* Nút chuyển chế độ (bên trái) */
 /* Nút chuyển chế độ (bên trái) - MÀU CAM GIỐNG NÚT TOGGLE */
 .addr-mode-btn {
     display: inline-flex !important;
@@ -2829,9 +2707,9 @@ footer {
         align-items: stretch !important;
     }
 }
+
 /* =========================================================
    MOBILE OPTIMIZATION — GHI ĐÈ TOÀN BỘ RESPONSIVE CŨ
-   Paste vào CUỐI file home.css
    ========================================================= */
 
 /* ===== TABLET (≤1024px) ===== */
@@ -2843,6 +2721,10 @@ footer {
 
     .hero-image { margin-right: -80px; }
     .hero-slideshow { max-width: 550px; height: 380px; }
+
+    .packages {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
 }
 
 /* ===== TABLET NHỎ (≤900px) ===== */
@@ -2854,7 +2736,7 @@ footer {
 
     .hero-image {
         margin-right: 0;
-        order: -1;             /* Hình ảnh lên trước text */
+        order: -1;
     }
 
     .hero-slideshow {
@@ -2866,6 +2748,10 @@ footer {
 
     .features { grid-template-columns: repeat(2, 1fr); }
     .devices { grid-template-columns: repeat(2, 1fr); }
+
+    .packages {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
 }
 
 /* ===== MOBILE (≤640px) ===== */
@@ -2923,23 +2809,12 @@ footer {
     .section-title p { font-size: 13px; }
     .section-title .small-label { font-size: 10.5px; padding: 4px 10px; }
 
-    /* ---- PACKAGES (fix: chuyển flex → block) ---- */
+    /* ---- PACKAGES ---- */
     .packages {
-        display: flex !important;
-        flex-direction: column !important;
+        grid-template-columns: 1fr !important;
         gap: 16px !important;
         padding-bottom: 30px;
     }
-
-    .pkg {
-        flex: 1 1 100% !important;
-        max-width: 100% !important;
-        width: 100% !important;
-    }
-
-    .pkg .price { font-size: 26px; }
-    .pkg .pkg-header { font-size: 15px; padding: 14px 12px; }
-    .pkg ul li { font-size: 12.5px; }
 
     /* ---- FEATURES ---- */
     .features {
@@ -3049,7 +2924,7 @@ footer {
     }
     .footer .copyright { font-size: 11.5px; text-align: center; }
 
-    /* ---- AI CHAT (đã có sẵn, ghi đè lại cho chắc) ---- */
+    /* ---- AI CHAT ---- */
     .ai-chat-button {
         width: 52px;
         height: 52px;
@@ -3072,8 +2947,8 @@ footer {
     .section-title h2 { font-size: 18px; }
     .contact-wrapper { padding: 24px 16px; }
     .contact-wrapper h2 { font-size: 18px; }
-    .pkg .price { font-size: 24px; }
 }
+
 /* =========================================================
    MOBILE HAMBURGER MENU
    ========================================================= */
@@ -3127,7 +3002,7 @@ footer {
 .mobile-menu {
     display: none;
     position: fixed;
-    top: 70px;              /* ngay dưới navbar */
+    top: 70px;
     left: 0;
     right: 0;
     background: linear-gradient(135deg, #0a1f44 0%, #051228 100%);
@@ -3213,4 +3088,137 @@ footer {
     .hamburger-btn { display: none !important; }
     .mobile-menu { display: none !important; }
     .mobile-menu-overlay { display: none !important; }
+}
+
+/* =========================================================
+   HERO NAVIGATION — Nút prev/next + dots
+   ========================================================= */
+
+/* ⭐ Nút prev/next — hình tròn, nằm 2 bên */
+.hero-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(243, 112, 33, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.hero-slideshow:hover .hero-nav {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.hero-nav:hover {
+    background: linear-gradient(135deg, #f37021, #ff8c42);
+    border-color: #ffb26b;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow:
+        0 8px 25px rgba(243, 112, 33, 0.5),
+        0 0 0 4px rgba(243, 112, 33, 0.15);
+}
+
+.hero-nav svg {
+    width: 20px;
+    height: 20px;
+    stroke: #f37021;
+    transition: stroke 0.3s ease;
+}
+
+.hero-nav:hover svg {
+    stroke: #ffffff;
+}
+
+.hero-nav-prev {
+    left: 16px;
+}
+
+.hero-nav-next {
+    right: 16px;
+}
+
+/* ⭐ Dots indicator — nằm dưới cùng */
+.hero-dots {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 20;
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.hero-slideshow:hover .hero-dots {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.dot-slide {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dot-slide:hover {
+    background: rgba(255, 255, 255, 0.8);
+    transform: scale(1.2);
+}
+
+.dot-slide.active {
+    background: #ffffff;
+    width: 28px;
+    border-radius: 5px;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+}
+
+/* ⭐ Responsive mobile */
+@media (max-width: 640px) {
+    .hero-nav {
+        width: 36px;
+        height: 36px;
+    }
+    .hero-nav svg {
+        width: 16px;
+        height: 16px;
+    }
+    .hero-nav-prev { left: 8px; }
+    .hero-nav-next { right: 8px; }
+
+    .hero-dots {
+        bottom: 10px;
+        padding: 4px 8px;
+        gap: 6px;
+    }
+    .dot-slide {
+        width: 8px;
+        height: 8px;
+    }
+    .dot-slide.active {
+        width: 22px;
+    }
 }

@@ -1,0 +1,441 @@
+/* =========================================================
+   PACKAGE CARD — UIVERSE STYLE + CAM FPT
+   Wrapper + overflow hidden → viền xoay không lòi ra ngoài
+   ========================================================= */
+
+/* ===== CONTAINER — FLEX WRAP + CĂN GIỮA ===== */
+.packages {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 22px;
+    padding-bottom: 50px;
+    position: relative;
+    z-index: 1;
+    max-width: 1240px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   WRAPPER — chứa viền xoay + card, overflow hidden
+   ========================================================= */
+.pkg-wrap {
+    position: relative;
+    border-radius: 1rem;
+    padding: 1px;                      /* ⭐ chừa 1px cho viền xoay */
+    background: #ffffff;
+    overflow: hidden;                  /* ⭐ CẮT mọi thứ lòi ra ngoài */
+    isolation: isolate;
+
+    /* ⭐ Kích thước cố định: 4 card + 3 gap = 100% */
+    flex: 0 0 calc((100% - 3 * 22px) / 4);
+    max-width: calc((100% - 3 * 22px) / 4);
+    min-height: 450px;
+    height: 450px;
+    box-sizing: border-box;
+
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.pkg-wrap:hover {
+    transform: translateY(-6px);
+}
+
+/* ⭐ Viền xoay — dùng transform rotate (nhanh, không lag) */
+.pkg-wrap::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 250%;                       /* ⭐ to hơn card để phủ hết */
+    aspect-ratio: 1 / 1;
+    transform: translate(-50%, -50%);
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        transparent 240deg,
+        #f37021 280deg,
+        #ffb26b 310deg,
+        #ff8c42 340deg,
+        #f37021 360deg
+    );
+    animation: pkgWrapSpin 15s linear infinite;
+    opacity: 0.8;
+    transition: opacity 0.35s ease;
+    z-index: 0;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.pkg-wrap:hover::before {
+    opacity: 1;
+}
+
+@keyframes pkgWrapSpin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* =========================================================
+   CARD — nội dung bên trong wrapper
+   ========================================================= */
+.pkg {
+    /* Biến màu */
+    --white: #1a1a1a;
+    --paragraph: rgba(30, 30, 30, 0.7);
+    --line: rgba(243, 112, 33, 0.15);
+    --primary: #f37021;
+    --primary-light: #f37021;
+
+    /* ⭐ Chiếm hết wrapper */
+    width: 100%;
+    height: 100%;
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border-radius: calc(1rem - 1px);   /* ⭐ nhỏ hơn wrapper 1px */
+
+    /* ⭐ NỀN TRẮNG + ÁNH SÁNG CAM Ở ĐÁY */
+    background-color: #ffffff;
+    background-image:
+        radial-gradient(at 88% 100%, rgba(243, 112, 33, 0.18) 0px, transparent 60%),
+        radial-gradient(at 12% 95%, rgba(255, 178, 107, 0.25) 0px, transparent 55%),
+        radial-gradient(at 50% 100%, rgba(217, 88, 16, 0.1) 0px, transparent 60%);
+
+    box-shadow:
+        inset 0 -20px 30px -10px rgba(243, 112, 33, 0.25);
+
+    z-index: 1;
+}
+
+/* ⭐ Hover: sáng cam mạnh hơn */
+.pkg-wrap:hover .pkg {
+    box-shadow:
+        inset 0 -20px 30px -10px rgba(243, 112, 33, 0.4);
+}
+
+/* Nội dung nằm trên viền */
+.pkg > * {
+    position: relative;
+    z-index: 2;
+}
+
+/* ===== HEADER — NỀN CAM, CHỮ TRẮNG ===== */
+.pkg .pkg-header {
+    margin: 0;
+    padding: 1.4rem 1.2rem 1.2rem;
+
+    /* ⭐ Nền cam gradient */
+    background-image: linear-gradient(135deg, #f37021 0%, #ff8c42 50%, #ffb26b 100%);
+
+    text-align: left;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.15rem;
+    line-height: 1.3;
+    border-bottom: none;
+    border-radius: calc(1rem - 1px) calc(1rem - 1px) 0 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    position: relative;
+
+    /* ⭐ Ánh sáng nhẹ + bóng đổ */
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.08),
+        0 4px 12px rgba(243, 112, 33, 0.25);
+}
+
+.pkg .pkg-header small {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 0.4rem;
+    line-height: 1.5;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    max-width: 90%;
+}
+
+/* ===== BODY ===== */
+.pkg-body {
+    padding: 1.4rem 1.2rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    gap: 1rem;
+}
+
+/* ===== GIÁ ===== */
+.pkg .price {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: #f37021;
+    line-height: 1;
+    text-align: center;
+    letter-spacing: -1px;
+    margin: 0;
+    text-shadow: 0 2px 12px rgba(243, 112, 33, 0.3);
+    white-space: nowrap;
+}
+
+.pkg .price .unit {
+    font-size: 0.85rem;
+    color: rgba(30, 30, 30, 0.6);
+    font-weight: 500;
+    margin-left: 4px;
+    text-shadow: none;
+    white-space: nowrap;
+}
+
+/* ===== DANH SÁCH QUYỀN LỢI ===== */
+.pkg ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    text-align: left;
+    flex: 1;
+    min-width: 0;
+}
+
+.pkg ul li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    color: #1a1a1a;
+    line-height: 1.5;
+    padding: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    min-width: 0;
+}
+
+/* ⭐ Check icon — SVG trắng trong hình tròn cam */
+.pkg ul li::before {
+    content: "";
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 50%;
+    background-color: var(--primary);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3E%3Cpath fill-rule='evenodd' d='M12.416 3.376a.75.75 0 0 1 .208 1.04l-5 7.5a.75.75 0 0 1-1.154.114l-3-3a.75.75 0 0 1 1.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 0 1 1.04-.207Z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    background-size: 0.8rem 0.8rem;
+    background-position: center;
+    background-repeat: no-repeat;
+    box-shadow: 0 0 10px rgba(243, 112, 33, 0.5);
+    margin-top: 0.15rem;
+}
+
+/* ===== NÚT MUA NGAY ===== */
+.pkg .btn-pkg {
+    display: block;
+    cursor: pointer;
+    margin-top: auto;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    box-sizing: border-box;
+
+    background-image: linear-gradient(0deg, #d95810 0%, #ffb26b 100%);
+
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: none;
+    color: var(--white);
+
+    border: 0;
+    border-radius: 9999px;
+    box-shadow: inset 0 -2px 25px -4px rgba(255, 255, 255, 0.7);
+
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.pkg .btn-pkg::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+    transition: left 0.6s ease;
+}
+
+.pkg .btn-pkg:hover::before {
+    left: 100%;
+}
+
+.pkg .btn-pkg:hover {
+    background-image: linear-gradient(0deg, #ff8c42 0%, #ffd4a8 100%);
+    transform: translateY(-2px);
+    box-shadow:
+        inset 0 -2px 25px -4px rgba(255, 255, 255, 0.9),
+        0 8px 25px rgba(243, 112, 33, 0.5);
+}
+
+/* ===== RIBBON HOT / NỔI BẬT ===== */
+.pkg .pkg-ribbon {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 12px 6px;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #ffffff;
+    line-height: 1;
+    white-space: nowrap;
+    z-index: 10;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pkg .pkg-ribbon svg {
+    width: 11px;
+    height: 11px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+}
+
+/* Ribbon HOT */
+.pkg .pkg-ribbon-hot {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f97316 100%);
+    box-shadow:
+        0 4px 12px rgba(220, 38, 38, 0.5),
+        0 0 15px rgba(239, 68, 68, 0.7),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    animation: ribbonHotPulse 2s ease-in-out infinite;
+}
+
+@keyframes ribbonHotPulse {
+    0%, 100% {
+        box-shadow:
+            0 4px 12px rgba(220, 38, 38, 0.5),
+            0 0 15px rgba(239, 68, 68, 0.7),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    50% {
+        box-shadow:
+            0 4px 12px rgba(220, 38, 38, 0.7),
+            0 0 22px rgba(239, 68, 68, 0.9),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+}
+
+/* Ribbon NỔI BẬT */
+.pkg .pkg-ribbon-featured {
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 50%, #fbbf24 100%);
+    box-shadow:
+        0 4px 12px rgba(217, 119, 6, 0.5),
+        0 0 15px rgba(251, 191, 36, 0.7),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    animation: ribbonFeaturedPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes ribbonFeaturedPulse {
+    0%, 100% {
+        box-shadow:
+            0 4px 12px rgba(217, 119, 6, 0.5),
+            0 0 15px rgba(251, 191, 36, 0.7),
+            inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+    50% {
+        box-shadow:
+            0 4px 12px rgba(217, 119, 6, 0.7),
+            0 0 22px rgba(251, 191, 36, 0.9),
+            inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+}
+
+.pkg-wrap:hover .pkg-ribbon {
+    transform: translateY(-2px) scale(1.05);
+}
+
+/* Chừa chỗ cho ribbon trong header */
+.pkg:has(.pkg-ribbon) .pkg-header {
+    padding-right: 75px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    /* 3 cột */
+    .pkg-wrap {
+        flex: 0 0 calc((100% - 2 * 22px) / 3);
+        max-width: calc((100% - 2 * 22px) / 3);
+    }
+}
+
+@media (max-width: 900px) {
+    /* 2 cột */
+    .pkg-wrap {
+        flex: 0 0 calc((100% - 1 * 22px) / 2);
+        max-width: calc((100% - 1 * 22px) / 2);
+    }
+}
+
+@media (max-width: 640px) {
+    /* 1 cột */
+    .packages {
+        gap: 18px;
+        padding-bottom: 30px;
+    }
+    .pkg-wrap {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    .pkg .price { font-size: 1.75rem; }
+    .pkg:has(.pkg-ribbon) .pkg-header { padding-right: 65px; }
+}
+/* ⭐ Tiêu đề section — gradient cam FPT */
+.section-title h2 {
+    background: linear-gradient(135deg,
+        #d95810 0%,
+        #f37021 25%,
+        #ffb26b 50%,
+        #f37021 75%,
+        #d95810 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: h2Shimmer 4s linear infinite;
+    text-shadow: none;   /* ⭐ bỏ text-shadow vì không hoạt động với transparent text */
+}
+
+@keyframes h2Shimmer {
+    to { background-position: 200% center; }
+}

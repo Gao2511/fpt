@@ -11,8 +11,9 @@
         <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
         <link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/home.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/badge.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/ai-chat.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/pkg-card.css">
+         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/fonts.css">
         <script src="${pageContext.request.contextPath}/js/address-data.js"></script>
         <script src="${pageContext.request.contextPath}/js/address-picker.js" defer></script>
     </head>
@@ -41,7 +42,7 @@
                         </div>
                         <div class="text">
                             <small>Hotline</small>
-                            <strong>1900 6600</strong>
+                            <strong>0932 079 469</strong>
                         </div>
                     </div>
                     <c:choose>
@@ -164,7 +165,7 @@
                         </div>
                     </c:if>
                     <span class="badge-top">WiFi 6 - Hiện đại - Tốc độ cao</span>
-                    <h1>BẢNG GIÁ INTERNET FPT<br><span class="highlight">CÁP QUANG TỐC ĐỘ CAO</span></h1>
+                    <h1>FPT WIFI 6<br><span class="highlight">TỐC ĐỘ CAO, HỖ TRỢ 24/7</span></h1>
                     <p class="desc">
                         Trang bị Modem Wifi 6 hiện đại giúp kết nối mạng ổn định,
                         Tốc độ cao đáp ứng nhu cầu làm việc, giải trí và học tập trực tuyến.
@@ -209,18 +210,39 @@
                              alt="FPT WiFi 6" class="hero-slide">
                         <img src="${pageContext.request.contextPath}/assets/images/Hero3.png"
                              alt="FPT Camera" class="hero-slide">
-                    </div>
-                    <div class="floating-tag">
-                        <span class="dot"></span> WiFi 6 hiện đại
+                        <img src="${pageContext.request.contextPath}/assets/images/Hero4.png"
+                             alt="FPT Camera" class="hero-slide">
+                        <img src="${pageContext.request.contextPath}/assets/images/Hero5.png"
+                             alt="FPT Camera" class="hero-slide">
+
+                        <%-- ⭐ NÚT CHUYỂN SLIDE --%>
+                        <button class="hero-nav hero-nav-prev" onclick="prevSlide()" aria-label="Previous">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"/>
+                            </svg>
+                        </button>
+                        <button class="hero-nav hero-nav-next" onclick="nextSlide()" aria-label="Next">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                        </button>
+
+                        <%-- ⭐ DOTS INDICATOR --%>
+                        <div class="hero-dots">
+                            <button class="dot-slide active" onclick="goToSlide(0)" aria-label="Slide 1"></button>
+                            <button class="dot-slide" onclick="goToSlide(1)" aria-label="Slide 2"></button>
+                            <button class="dot-slide" onclick="goToSlide(2)" aria-label="Slide 3"></button>
+                            <button class="dot-slide" onclick="goToSlide(3)" aria-label="Slide 4"></button>
+                            <button class="dot-slide" onclick="goToSlide(4)" aria-label="Slide 5"></button>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- ============ SECTION TITLE: PACKAGES ============ -->
-        <div class="section-title">
-            <span class="small-label">Bảng cước áp dụng cả năm</span>
-            <h2>${packages.size()} Gói Cước Internet FPT Đột Phá Bán Chạy Nhất</h2>
+        <div class="section-title">           
+            <h2>${packages.size()} GÓI CƯỚC WIFI FPT TỐC ĐỘ CAO BÁN CHẠY NHẤT</h2>
             <p>Cam kết đường truyền Internet ổn định, không lo gián đoạn trong suốt quá trình sử dụng.</p>
         </div>
 
@@ -228,6 +250,7 @@
         <div class="container" id="packages">
             <div class="packages">
                 <c:forEach items="${packages}" var="pkg">
+                    <div class="pkg-wrap">
                     <div class="pkg ${pkg.badgeType == 'hot' ? 'featured' : ''}">
 
                         <%-- RIBBON HOT (SVG) --%>
@@ -279,6 +302,7 @@
                                class="btn-pkg">Mua ngay →</a>
                         </div>
                     </div>
+                </div>
                 </c:forEach>
 
                 <c:if test="${empty packages}">
@@ -408,7 +432,7 @@
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                         </svg>
                     </div>
-                    <h2>Liên Hệ Tư Vấn Khảo Sát &<br><span>Nhận Khuyến Mãi Lớn Nhất</span></h2>
+                    <h2><span>Liên hệ tư vấn khảo sát và nhận ưu đãi có hạn </span></h2>
                     <p>Chuyên viên của chúng tôi sẽ liên hệ với bạn sớm nhất có thể, tư vấn gói cước phù hợp và nhanh chóng lắp đặt.</p>
 
                     <form class="contact-form"
@@ -928,58 +952,58 @@
             });
         </script>
         <script>
-            // ===== HERO SLIDESHOW NÂNG CAO =====
-            (function () {
-                const slides = document.querySelectorAll('.hero-slide');
-                const dots = document.querySelectorAll('.dot-slide');
-                if (slides.length === 0)
-                    return;
+    // ===== HERO SLIDESHOW NÂNG CAO =====
+    (function () {
+        const slides = document.querySelectorAll('.hero-slide');
+        const dots = document.querySelectorAll('.dot-slide');
+        if (slides.length === 0) return;
 
-                let currentIndex = 0;
-                let autoTimer;
-                const INTERVAL = 4000;
+        let currentIndex = 0;
+        let autoTimer;
+        const INTERVAL = 4000;
 
-                function showSlide(index) {
-                    slides.forEach(s => s.classList.remove('active'));
-                    dots.forEach(d => d.classList.remove('active'));
+        function showSlide(index) {
+            slides.forEach(s => s.classList.remove('active'));
+            dots.forEach(d => d.classList.remove('active'));
 
-                    slides[index].classList.add('active');
-                    if (dots[index])
-                        dots[index].classList.add('active');
+            slides[index].classList.add('active');
+            if (dots[index]) dots[index].classList.add('active');
 
-                    currentIndex = index;
-                }
+            currentIndex = index;
+        }
 
-                function nextSlide() {
-                    showSlide((currentIndex + 1) % slides.length);
-                }
+        function nextSlide() {
+            showSlide((currentIndex + 1) % slides.length);
+            resetTimer();                    /* ⭐ reset timer khi click next */
+        }
 
-                function prevSlide() {
-                    showSlide((currentIndex - 1 + slides.length) % slides.length);
-                }
+        function prevSlide() {
+            showSlide((currentIndex - 1 + slides.length) % slides.length);
+            resetTimer();                    /* ⭐ reset timer khi click prev */
+        }
 
-                function goToSlide(index) {
-                    showSlide(index);
-                    resetTimer();
-                }
+        function goToSlide(index) {
+            showSlide(index);
+            resetTimer();                    /* ⭐ reset timer khi click dot */
+        }
 
-                function resetTimer() {
-                    clearInterval(autoTimer);
-                    autoTimer = setInterval(nextSlide, INTERVAL);
-                }
+        function resetTimer() {
+            clearInterval(autoTimer);
+            autoTimer = setInterval(nextSlide, INTERVAL);
+        }
 
-                resetTimer();
+        resetTimer();
 
-                const slideshow = document.querySelector('.hero-slideshow');
-                if (slideshow) {
-                    slideshow.addEventListener('mouseenter', () => clearInterval(autoTimer));
-                    slideshow.addEventListener('mouseleave', resetTimer);
-                }
+        const slideshow = document.querySelector('.hero-slideshow');
+        if (slideshow) {
+            slideshow.addEventListener('mouseenter', () => clearInterval(autoTimer));
+            slideshow.addEventListener('mouseleave', resetTimer);
+        }
 
-                window.nextSlide = nextSlide;
-                window.prevSlide = prevSlide;
-                window.goToSlide = goToSlide;
-            })();
+        window.nextSlide = nextSlide;
+        window.prevSlide = prevSlide;
+        window.goToSlide = goToSlide;
+    })();
         </script>
 
     </body>

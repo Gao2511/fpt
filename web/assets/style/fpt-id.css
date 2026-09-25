@@ -804,3 +804,30 @@ body::after {
     .input-wrap input { padding: 13px 42px; font-size: 13.5px; }
     .btn-fptid { font-size: 13px; padding: 14px; letter-spacing: 0.8px; }
 }
+/* =========================================================
+   OAUTH BUTTONS
+   ========================================================= */
+.divider-or {
+    display: flex; align-items: center; gap: 12px;
+    margin: 20px 0; color: #9ca3af; font-size: 12.5px; font-weight: 600;
+}
+.divider-or::before, .divider-or::after {
+    content: ""; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+}
+.btn-oauth {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 13px 20px;
+    background: #fff; border: 1.5px solid #e5e7eb; border-radius: 12px;
+    font-family: inherit; font-size: 14px; font-weight: 700;
+    color: #1f2937; text-decoration: none; cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 10px;
+}
+.btn-oauth:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border-color: #4285F4;
+    background: #f8fafc;
+}
+.btn-oauth svg { flex-shrink: 0; }

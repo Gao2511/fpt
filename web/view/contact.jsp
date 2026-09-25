@@ -35,7 +35,7 @@
                 </div>
                 <div class="text">
                     <small>Hotline</small>
-                    <strong>1900 6600</strong>
+                    <strong>0932 079 469</strong>
                 </div>
             </div>
             <c:choose>

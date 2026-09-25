@@ -23,6 +23,12 @@ public class UserDTO {
     private String email;
     private String phone;
 
+    // ⭐ OAUTH FIELDS
+    private String googleId;
+    private String facebookId;
+    private String authProvider;    // 'local' | 'google' | 'facebook'
+    private boolean emailVerified;
+
     public UserDTO() {}
 
     public UserDTO(int id, String username, String password, String role, boolean isActive, Date createdAt) {
@@ -67,6 +73,23 @@ public class UserDTO {
 
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+
+    // ⭐ OAUTH GETTERS & SETTERS
+    public String getGoogleId() { return googleId; }
+    public void setGoogleId(String googleId) { this.googleId = googleId; }
+
+    public String getFacebookId() { return facebookId; }
+    public void setFacebookId(String facebookId) { this.facebookId = facebookId; }
+
+    public String getAuthProvider() { return authProvider; }
+    public void setAuthProvider(String authProvider) { this.authProvider = authProvider; }
+
+    public boolean isEmailVerified() { return emailVerified; }
+    public void setEmailVerified(boolean emailVerified) { this.emailVerified = emailVerified; }
+
+    public boolean isOAuthUser() {
+        return authProvider != null && !"local".equals(authProvider);
+    }
 
     // ===== HELPER METHODS =====
     public String getInitial() {
