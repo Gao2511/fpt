@@ -148,10 +148,8 @@
                 <!-- THÔNG TIN NGƯỜI DÙNG -->
                 <div class="avatar-info" style="flex:1 !important; min-width:200px !important;">
 
-                    <!-- Tên hiển thị -->
                     <h2 class="avatar-display-name">${sessionScope.user.displayName}</h2>
 
-                    <!-- Role badge -->
                     <span class="role-badge role-${sessionScope.user.role}">
                         <c:choose>
                             <c:when test="${sessionScope.user.role == 'admin'}">
@@ -200,8 +198,6 @@
                             <p>Chỉ Tên đăng nhập là bắt buộc — các trường khác có thể để trống</p>
                         </div>
                     </div>
-
-                 
 
                     <div class="form-group">
                         <label>Họ và tên <span class="optional-tag">(không bắt buộc)</span></label>
@@ -297,8 +293,6 @@
                             Truyền hình tương tác FPT Play và giải pháp Camera AI thông minh hàng đầu Việt Nam.
                             Đồng hành cùng hàng triệu hộ gia đình và doanh nghiệp trên toàn quốc.
                         </p>
-
-                      
 
                         <div class="socials">
                             <a href="#" title="Facebook">
@@ -469,27 +463,8 @@
                 }
             });
 
-            document.getElementById('profileForm').addEventListener('submit', function (e) {
-                const username = document.querySelector('input[name="username"]').value.trim();
-
-                if (!username) {
-                    e.preventDefault();
-                    alert('Tên đăng nhập không được để trống!');
-                    return false;
-                }
-
-                if (username.length < 3 || username.length > 50) {
-                    e.preventDefault();
-                    alert('Tên đăng nhập phải có 3-50 ký tự!');
-                    return false;
-                }
-
-                if (username.includes(' ')) {
-                    e.preventDefault();
-                    alert('Tên đăng nhập không được chứa khoảng trắng!');
-                    return false;
-                }
-            });
+            // ⭐ ĐÃ XÓA ĐOẠN VALIDATE USERNAME
+            // Vì form không có field username → không cần validate
         </script>
 
     </body>
