@@ -6,9 +6,9 @@
 /* ===== CONTAINER — FLEX WRAP + CĂN GIỮA ===== */
 .packages {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-start;
+    flex-wrap: wrap;                   /* ⭐ Cho phép xuống hàng */
+    justify-content: center;           /* ⭐ Căn giữa hàng lẻ */
+    align-items: stretch;              /* ⭐ Card cùng hàng cao bằng nhau */
     gap: 22px;
     padding-bottom: 50px;
     position: relative;
@@ -25,20 +25,26 @@
 .pkg-wrap {
     position: relative;
     border-radius: 1rem;
-    padding: 1px;                      /* ⭐ chừa 1px cho viền xoay */
+    padding: 1px;
     background: #ffffff;
-    overflow: hidden;                  /* ⭐ CẮT mọi thứ lòi ra ngoài */
+    overflow: hidden;
     isolation: isolate;
 
     /* ⭐ Kích thước cố định: 4 card + 3 gap = 100% */
     flex: 0 0 calc((100% - 3 * 22px) / 4);
     max-width: calc((100% - 3 * 22px) / 4);
-    min-height: 600px;
-    height: 600px;
+    min-width: 260px;                  /* ⭐ MỚI: không cho card hẹp hơn 260px */
     box-sizing: border-box;
+
+    /* ⭐ MỚI: Chiều cao tối thiểu cho mọi card */
+    min-height: 480px;
 
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
+    display: flex;                     /* ⭐ Flex column */
+    flex-direction: column;
+    height: auto;
+    align-self: stretch;               /* ⭐ Ép card stretch hết hàng */
 }
 
 .pkg-wrap:hover {
@@ -51,7 +57,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 250%;                       /* ⭐ to hơn card để phủ hết */
+    width: 250%;
     aspect-ratio: 1 / 1;
     transform: translate(-50%, -50%);
     background: conic-gradient(
@@ -100,7 +106,7 @@
     gap: 0;
     padding: 0;
     box-sizing: border-box;
-    border-radius: calc(1rem - 1px);   /* ⭐ nhỏ hơn wrapper 1px */
+    border-radius: calc(1rem - 1px);
 
     /* ⭐ NỀN TRẮNG + ÁNH SÁNG CAM Ở ĐÁY */
     background-color: #ffffff;
@@ -115,13 +121,11 @@
     z-index: 1;
 }
 
-/* ⭐ Hover: sáng cam mạnh hơn */
 .pkg-wrap:hover .pkg {
     box-shadow:
         inset 0 -20px 30px -10px rgba(243, 112, 33, 0.4);
 }
 
-/* Nội dung nằm trên viền */
 .pkg > * {
     position: relative;
     z-index: 2;
@@ -132,7 +136,6 @@
     margin: 0;
     padding: 1.4rem 1.2rem 1.2rem;
 
-    /* ⭐ Nền cam gradient */
     background-image: linear-gradient(135deg, #f37021 0%, #ff8c42 50%, #ffb26b 100%);
 
     text-align: left;
@@ -147,7 +150,6 @@
     white-space: normal;
     position: relative;
 
-    /* ⭐ Ánh sáng nhẹ + bóng đổ */
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.25),
         inset 0 -1px 0 rgba(0, 0, 0, 0.08),
@@ -250,7 +252,7 @@
 .pkg .btn-pkg {
     display: block;
     cursor: pointer;
-    margin-top: auto;
+    margin-top: auto;                  /* ⭐ Nút luôn ở đáy card */
     padding: 0.75rem 1rem;
     width: 100%;
     box-sizing: border-box;
@@ -331,7 +333,6 @@
     flex-shrink: 0;
 }
 
-/* Ribbon HOT */
 .pkg .pkg-ribbon-hot {
     background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f97316 100%);
     box-shadow:
@@ -356,7 +357,6 @@
     }
 }
 
-/* Ribbon NỔI BẬT */
 .pkg .pkg-ribbon-featured {
     background: linear-gradient(135deg, #d97706 0%, #f59e0b 50%, #fbbf24 100%);
     box-shadow:
@@ -385,7 +385,6 @@
     transform: translateY(-2px) scale(1.05);
 }
 
-/* Chừa chỗ cho ribbon trong header */
 .pkg:has(.pkg-ribbon) .pkg-header {
     padding-right: 75px;
 }
@@ -416,10 +415,13 @@
     .pkg-wrap {
         flex: 0 0 100%;
         max-width: 100%;
+        min-width: 100%;               /* ⭐ Mobile: full width */
+        min-height: auto;              /* ⭐ Mobile: không ép chiều cao */
     }
     .pkg .price { font-size: 1.75rem; }
     .pkg:has(.pkg-ribbon) .pkg-header { padding-right: 65px; }
 }
+
 /* ⭐ Tiêu đề section — gradient cam FPT */
 .section-title h2 {
     background: linear-gradient(135deg,
@@ -433,7 +435,7 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
     animation: h2Shimmer 4s linear infinite;
-    text-shadow: none;   /* ⭐ bỏ text-shadow vì không hoạt động với transparent text */
+    text-shadow: none;
 }
 
 @keyframes h2Shimmer {
