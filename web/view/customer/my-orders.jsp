@@ -326,7 +326,7 @@
                         </div>
                         <div class="phone-info">
                             <small>Hotline hỗ trợ 24/7</small>
-                            <strong>1900 6600</strong>
+                            <strong>0932 079 469</strong>
                         </div>
                     </div>
                     <div class="copyright">

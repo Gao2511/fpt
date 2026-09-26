@@ -331,11 +331,12 @@ body {
 }
 
 /* ⭐ Nút theme toggle mobile */
+/* ⭐ Nút theme toggle mobile — nằm TRÊN nút AI chat */
 @media (max-width: 640px) {
     .theme-toggle-btn {
         width: 52px;
         height: 52px;
-        bottom: 80px;
+        bottom: 100px;
         right: 16px;
     }
     .theme-toggle-btn .icon-sun,

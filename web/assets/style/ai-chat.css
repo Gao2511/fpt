@@ -237,3 +237,22 @@
                     height: 70vh;
                 }
             }
+/* ⭐ AI chat button — mobile layout */
+@media (max-width: 640px) {
+    .ai-chat-button {
+        width: 52px;
+        height: 52px;
+        bottom: 20px;
+        right: 16px;
+    }
+    .ai-chat-button svg {
+        width: 22px;
+        height: 22px;
+    }
+    .ai-chat-window {
+        width: calc(100vw - 20px);
+        right: 10px;
+        bottom: 85px;
+        height: 70vh;
+    }
+}

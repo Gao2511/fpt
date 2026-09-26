@@ -157,7 +157,7 @@
                     </svg>
                 </div>
                 <div class="contact-info-content">
-                    <div class="contact-info-label">HOTLINE HỖ TRỢ KỸ THUẬT (CHUNG)</div>
+                    <div class="contact-info-label">CHĂM SÓC KHÁCH HÀNG</div>
                     <div class="contact-info-value">
                         <a href="tel:19006600">1900 6600</a>
                     </div>
@@ -195,7 +195,7 @@
                 </div>
                 <div class="phone-info">
                     <small>Hotline hỗ trợ 24/7</small>
-                    <strong>1900 6600</strong>
+                    <strong>0932 079 469</strong>
                 </div>
             </div>
             <div class="copyright">
