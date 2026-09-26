@@ -16,9 +16,9 @@ public class SettingsDAO {
         String sql = "SELECT setting_value FROM settings WHERE setting_key = ?";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setNString(1, key);
+            ps.setString(1, key);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return rs.getNString("setting_value");
+                if (rs.next()) return rs.getString("setting_value");
             }
         } catch (Exception e) { e.printStackTrace(); }
         return null;
@@ -32,7 +32,7 @@ public class SettingsDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                map.put(rs.getNString("setting_key"), rs.getNString("setting_value"));
+                map.put(rs.getString("setting_key"), rs.getString("setting_value"));
             }
         } catch (Exception e) { e.printStackTrace(); }
         return map;
@@ -48,9 +48,9 @@ public class SettingsDAO {
             while (rs.next()) {
                 SettingsDTO s = new SettingsDTO();
                 s.setId(rs.getInt("id"));
-                s.setSettingKey(rs.getNString("setting_key"));
-                s.setSettingValue(rs.getNString("setting_value"));
-                s.setDescription(rs.getNString("description"));
+                s.setSettingKey(rs.getString("setting_key"));
+                s.setSettingValue(rs.getString("setting_value"));
+                s.setDescription(rs.getString("description"));
                 s.setUpdatedAt(rs.getTimestamp("updated_at"));
                 list.add(s);
             }
@@ -60,29 +60,28 @@ public class SettingsDAO {
 
     /** Cập nhật giá trị setting */
     public boolean update(String key, String value) {
-        String sql = "UPDATE settings SET setting_value = ?, updated_at = GETDATE() WHERE setting_key = ?";
+        String sql = "UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setNString(1, value);
-            ps.setNString(2, key);
+            ps.setString(1, value);
+            ps.setString(2, key);
             return ps.executeUpdate() > 0;
         } catch (Exception e) { e.printStackTrace(); return false; }
     }
 
-    /** Insert hoặc Update (upsert) */
+    /** Insert hoặc Update (upsert) — PostgreSQL ON CONFLICT */
     public boolean upsert(String key, String value, String description) {
-        String sql = "MERGE settings AS target "
-                   + "USING (SELECT ? AS setting_key, ? AS setting_value, ? AS description) AS source "
-                   + "ON target.setting_key = source.setting_key "
-                   + "WHEN MATCHED THEN UPDATE SET setting_value = source.setting_value, "
-                   + "    description = source.description, updated_at = GETDATE() "
-                   + "WHEN NOT MATCHED THEN INSERT (setting_key, setting_value, description) "
-                   + "    VALUES (source.setting_key, source.setting_value, source.description);";
+        String sql = "INSERT INTO settings (setting_key, setting_value, description, updated_at) "
+                   + "VALUES (?, ?, ?, NOW()) "
+                   + "ON CONFLICT (setting_key) "
+                   + "DO UPDATE SET setting_value = EXCLUDED.setting_value, "
+                   + "              description = EXCLUDED.description, "
+                   + "              updated_at = NOW()";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setNString(1, key);
-            ps.setNString(2, value);
-            ps.setNString(3, description);
+            ps.setString(1, key);
+            ps.setString(2, value);
+            ps.setString(3, description);
             return ps.executeUpdate() > 0;
         } catch (Exception e) { e.printStackTrace(); return false; }
     }

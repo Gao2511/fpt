@@ -32,10 +32,10 @@ public class EmailLogDAO {
             } else {
                 ps.setNull(1, Types.INTEGER);
             }
-            ps.setNString(2, recipientEmail);
-            ps.setNString(3, subject);
-            ps.setNString(4, status);
-            ps.setNString(5, errorMessage);
+            ps.setString(2, recipientEmail);
+            ps.setString(3, subject);
+            ps.setString(4, status);
+            ps.setString(5, errorMessage);
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -58,7 +58,7 @@ public class EmailLogDAO {
 
             while (rs.next()) {
                 EmailLogDTO log = mapResultSet(rs);
-                log.setCustomerName(rs.getNString("customer_name"));
+                log.setCustomerName(rs.getString("customer_name"));
                 list.add(log);
             }
         } catch (Exception e) {
@@ -83,7 +83,7 @@ public class EmailLogDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     EmailLogDTO log = mapResultSet(rs);
-                    log.setCustomerName(rs.getNString("customer_name"));
+                    log.setCustomerName(rs.getString("customer_name"));
                     list.add(log);
                 }
             }
@@ -101,10 +101,10 @@ public class EmailLogDAO {
         int customerId = rs.getInt("customer_id");
         log.setCustomerId(rs.wasNull() ? null : customerId);
 
-        log.setRecipientEmail(rs.getNString("recipient_email"));
-        log.setSubject(rs.getNString("subject"));
-        log.setStatus(rs.getNString("status"));
-        log.setErrorMessage(rs.getNString("error_message"));
+        log.setRecipientEmail(rs.getString("recipient_email"));
+        log.setSubject(rs.getString("subject"));
+        log.setStatus(rs.getString("status"));
+        log.setErrorMessage(rs.getString("error_message"));
         log.setSentAt(rs.getTimestamp("sent_at"));
         return log;
     }
@@ -149,10 +149,9 @@ public class EmailLogDAO {
             params.add(java.sql.Date.valueOf(dateTo));
         }
 
-        sql.append(" ORDER BY e.sent_at DESC ");
-        sql.append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ");
-        params.add((page - 1) * pageSize);
+        sql.append(" ORDER BY e.sent_at DESC LIMIT ? OFFSET ? ");
         params.add(pageSize);
+        params.add((page - 1) * pageSize);
 
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -164,7 +163,7 @@ public class EmailLogDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     EmailLogDTO log = mapResultSet(rs);
-                    log.setCustomerName(rs.getNString("customer_name"));
+                    log.setCustomerName(rs.getString("customer_name"));
                     list.add(log);
                 }
             }
@@ -220,7 +219,7 @@ public class EmailLogDAO {
         String sql = "SELECT COUNT(*) FROM email_logs WHERE status = ?";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setNString(1, status);
+            ps.setString(1, status);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getInt(1);
             }
@@ -270,7 +269,7 @@ public class EmailLogDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     EmailLogDTO log = mapResultSet(rs);
-                    log.setCustomerName(rs.getNString("customer_name"));
+                    log.setCustomerName(rs.getString("customer_name"));
                     return log;
                 }
             }

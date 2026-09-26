@@ -18,8 +18,8 @@ public class ApiKeyHistoryDAO {
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setNString(1, apiKey);
-            ps.setNString(2, model);
+            ps.setString(1, apiKey);
+            ps.setString(2, model);
 
             if (changedBy > 0) {
                 ps.setInt(3, changedBy);
@@ -27,9 +27,9 @@ public class ApiKeyHistoryDAO {
                 ps.setNull(3, Types.INTEGER);
             }
 
-            ps.setNString(4, changedByName);
-            ps.setNString(5, action != null ? action : "UPDATE");
-            ps.setNString(6, note);
+            ps.setString(4, changedByName);
+            ps.setString(5, action != null ? action : "UPDATE");
+            ps.setString(6, note);
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) { e.printStackTrace(); return false; }
@@ -38,8 +38,8 @@ public class ApiKeyHistoryDAO {
     /** Lấy tất cả lịch sử (mới nhất trước) */
     public List<ApiKeyHistoryDTO> getAll(int limit) {
         List<ApiKeyHistoryDTO> list = new ArrayList<>();
-        String sql = "SELECT TOP (?) * FROM api_key_history "
-                   + "ORDER BY created_at DESC";
+        String sql = "SELECT * FROM api_key_history "
+                   + "ORDER BY created_at DESC LIMIT ?";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, limit);
@@ -83,15 +83,15 @@ public class ApiKeyHistoryDAO {
     private ApiKeyHistoryDTO mapResultSet(ResultSet rs) throws SQLException {
         ApiKeyHistoryDTO h = new ApiKeyHistoryDTO();
         h.setId(rs.getInt("id"));
-        h.setApiKey(rs.getNString("api_key"));
-        h.setModel(rs.getNString("model"));
+        h.setApiKey(rs.getString("api_key"));
+        h.setModel(rs.getString("model"));
 
         int cid = rs.getInt("changed_by");
         h.setChangedBy(rs.wasNull() ? null : cid);
 
-        h.setChangedByName(rs.getNString("changed_by_name"));
-        h.setAction(rs.getNString("action"));
-        h.setNote(rs.getNString("note"));
+        h.setChangedByName(rs.getString("changed_by_name"));
+        h.setAction(rs.getString("action"));
+        h.setNote(rs.getString("note"));
         h.setCreatedAt(rs.getTimestamp("created_at"));
         return h;
     }

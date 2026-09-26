@@ -16,9 +16,9 @@ public class PackageDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             if (badgeType == null || badgeType.trim().isEmpty()) {
-                ps.setNull(1, Types.NVARCHAR);
+                ps.setNull(1, Types.VARCHAR);
             } else {
-                ps.setNString(1, badgeType);
+                ps.setString(1, badgeType);
             }
             ps.setInt(2, id);
             return ps.executeUpdate() > 0;
@@ -47,7 +47,7 @@ public class PackageDAO {
         List<PackageDTO> list = new ArrayList<>();
         String sql = "SELECT id, package_code, name, price, speed_mbps, "
                    + "description, long_description, is_hot, badge_type, created_at "
-                   + "FROM packages WHERE is_hot = 1";
+                   + "FROM packages WHERE is_hot = TRUE";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -78,7 +78,7 @@ public class PackageDAO {
                    + "FROM packages WHERE package_code = ?";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setNString(1, packageCode);
+            ps.setString(1, packageCode);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapResultSet(rs);
             }
@@ -93,17 +93,17 @@ public class PackageDAO {
                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setNString(1, p.getPackageCode());
-            ps.setNString(2, p.getName());
+            ps.setString(1, p.getPackageCode());
+            ps.setString(2, p.getName());
             ps.setLong(3, p.getPrice());
             ps.setInt(4, p.getSpeedMbps());
-            ps.setNString(5, p.getDescription());
-            ps.setNString(6, p.getLongDescription());
-            ps.setBoolean(7, p.isHot());   // JDBC tự map boolean → BIT
+            ps.setString(5, p.getDescription());
+            ps.setString(6, p.getLongDescription());
+            ps.setBoolean(7, p.isHot());
             if (p.getBadgeType() == null || p.getBadgeType().trim().isEmpty()) {
-                ps.setNull(8, Types.NVARCHAR);
+                ps.setNull(8, Types.VARCHAR);
             } else {
-                ps.setNString(8, p.getBadgeType());
+                ps.setString(8, p.getBadgeType());
             }
             return ps.executeUpdate() > 0;
         } catch (Exception e) { e.printStackTrace(); return false; }
@@ -116,17 +116,17 @@ public class PackageDAO {
                    + "is_hot = ?, badge_type = ? WHERE id = ?";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setNString(1, p.getPackageCode());
-            ps.setNString(2, p.getName());
+            ps.setString(1, p.getPackageCode());
+            ps.setString(2, p.getName());
             ps.setLong(3, p.getPrice());
             ps.setInt(4, p.getSpeedMbps());
-            ps.setNString(5, p.getDescription());
-            ps.setNString(6, p.getLongDescription());
+            ps.setString(5, p.getDescription());
+            ps.setString(6, p.getLongDescription());
             ps.setBoolean(7, p.isHot());
             if (p.getBadgeType() == null || p.getBadgeType().trim().isEmpty()) {
-                ps.setNull(8, Types.NVARCHAR);
+                ps.setNull(8, Types.VARCHAR);
             } else {
-                ps.setNString(8, p.getBadgeType());
+                ps.setString(8, p.getBadgeType());
             }
             ps.setInt(9, p.getId());
             return ps.executeUpdate() > 0;
@@ -150,14 +150,14 @@ public class PackageDAO {
     private PackageDTO mapResultSet(ResultSet rs) throws SQLException {
         PackageDTO p = new PackageDTO();
         p.setId(rs.getInt("id"));
-        p.setPackageCode(rs.getNString("package_code"));
-        p.setName(rs.getNString("name"));
+        p.setPackageCode(rs.getString("package_code"));
+        p.setName(rs.getString("name"));
         p.setPrice(rs.getLong("price"));
         p.setSpeedMbps(rs.getInt("speed_mbps"));
-        p.setDescription(rs.getNString("description"));
-        p.setLongDescription(rs.getNString("long_description"));
+        p.setDescription(rs.getString("description"));
+        p.setLongDescription(rs.getString("long_description"));
         p.setHot(rs.getBoolean("is_hot"));
-        p.setBadgeType(rs.getNString("badge_type"));
+        p.setBadgeType(rs.getString("badge_type"));
         p.setCreatedAt(rs.getTimestamp("created_at"));
         return p;
     }
@@ -184,10 +184,9 @@ public class PackageDAO {
         else if ("speed".equals(sortBy))      sql.append(" ORDER BY speed_mbps DESC ");
         else                                  sql.append(" ORDER BY id ASC ");
 
-        // ⭐ SQL Server: OFFSET ... ROWS FETCH NEXT ... ROWS ONLY
-        sql.append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ");
-        params.add((page - 1) * pageSize);  // OFFSET
-        params.add(pageSize);                // FETCH NEXT
+        sql.append(" LIMIT ? OFFSET ? ");
+        params.add(pageSize);
+        params.add((page - 1) * pageSize);
 
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -225,7 +224,7 @@ public class PackageDAO {
         String sql = "SELECT COUNT(*) FROM packages WHERE package_code = ? AND id <> ?";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setNString(1, packageCode);
+            ps.setString(1, packageCode);
             ps.setInt(2, excludeId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getInt(1) > 0;
@@ -236,7 +235,7 @@ public class PackageDAO {
 
     // ===== COUNT HOT =====
     public int countHot() {
-        String sql = "SELECT COUNT(*) FROM packages WHERE is_hot = 1";
+        String sql = "SELECT COUNT(*) FROM packages WHERE is_hot = TRUE";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
