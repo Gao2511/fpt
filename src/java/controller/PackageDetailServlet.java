@@ -11,7 +11,7 @@ import javax.servlet.http.*;
 
 /**
  * PackageDetailServlet - Trang chi tiết gói cước
- * CHỈ CHO THÀNH VIÊN ĐÃ ĐĂNG NHẬP
+ * CHO PHÉP CẢ KHÁCH CHƯA ĐĂNG NHẬP
  * URL: /package-detail?id=x
  */
 @WebServlet("/package-detail")
@@ -26,7 +26,7 @@ public class PackageDetailServlet extends HttpServlet {
         // ===== LẤY ID GÓI =====
         String idStr = request.getParameter("id");
         
-        // ⭐ DEBUG
+        // DEBUG
         System.out.println("==========================================");
         System.out.println("🔵 [PackageDetail] Vào servlet");
         System.out.println("   - idStr = " + idStr);
@@ -47,27 +47,14 @@ public class PackageDetailServlet extends HttpServlet {
             return;
         }
 
-        // ===== KIỂM TRA ĐĂNG NHẬP =====
+        // ===== LẤY USER (NẾU ĐÃ LOGIN) — KHÔNG BẮT BUỘC =====
         HttpSession session = request.getSession(false);
         UserDTO user = (session != null) ? (UserDTO) session.getAttribute("user") : null;
 
         System.out.println("   - session = " + (session != null ? "có" : "null"));
-        System.out.println("   - user = " + (user != null ? user.getUsername() : "null"));
+        System.out.println("   - user = " + (user != null ? user.getUsername() : "GUEST (chưa login)"));
 
-        if (user == null) {
-            // ⭐ TẠO URL ĐẦY ĐỦ (đã có context path)
-            String originalUrl = request.getContextPath() + "/package-detail?id=" + pkgId;
-            
-            System.out.println("   🔒 Chưa login → Lưu redirectAfterLogin = " + originalUrl);
-
-            session = request.getSession(true);
-            session.setAttribute("redirectAfterLogin", originalUrl);
-            session.setAttribute("message", "Vui lòng đăng nhập để xem chi tiết gói cước");
-            session.setAttribute("messageType", "info");
-
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
+        // ⭐ ĐÃ BỎ CHECK LOGIN — Khách vẫn vào được
 
         // ===== LẤY GÓI CƯỚC =====
         PackageDTO pkg = packageDAO.getById(pkgId);
@@ -84,7 +71,7 @@ public class PackageDetailServlet extends HttpServlet {
         System.out.println("==========================================");
 
         request.setAttribute("pkg", pkg);
-        request.setAttribute("currentUser", user);
+        request.setAttribute("currentUser", user);  // Có thể null nếu khách
         request.getRequestDispatcher("/view/customer/package-detail.jsp")
                .forward(request, response);
     }

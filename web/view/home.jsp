@@ -261,8 +261,7 @@
 
         <!-- ============ SECTION TITLE: PACKAGES ============ -->
         <div class="section-title">           
-            <h2>${packages.size()} GÓI CƯỚC WIFI FPT TỐC ĐỘ CAO BÁN CHẠY NHẤT</h2>
-            <p>Cam kết đường truyền Internet ổn định, không lo gián đoạn trong suốt quá trình sử dụng.</p>
+            <h2>${packages.size()} GÓI CƯỚC WIFI FPT TỐC ĐỘ CAO BÁN CHẠY NHẤT</h2>           
         </div>
 
         <!-- ============ GÓI CƯỚC — LOAD ĐỘNG TỪ DB ============ -->
@@ -334,8 +333,7 @@
 
         <!-- ============ FEATURES ============ -->
         <div class="section-title">
-            <h2>Cam Kết Chất Lượng Dịch Vụ Hàng Đầu FPT</h2>
-            <p>Đảm bảo sự ổn định và an toàn trong suốt quá trình sử dụng dịch vụ của bạn.</p>
+            <h2>Cam Kết Chất Lượng Dịch Vụ Hàng Đầu FPT</h2>            
         </div>
 
         <div class="container">
@@ -451,8 +449,7 @@
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                         </svg>
                     </div>
-                    <h2><span>Liên hệ tư vấn khảo sát và nhận ưu đãi có hạn </span></h2>
-                    <p>Chuyên viên của chúng tôi sẽ liên hệ với bạn sớm nhất có thể, tư vấn gói cước phù hợp và nhanh chóng lắp đặt.</p>
+                    <h2><span>Liên hệ tư vấn khảo sát và nhận ưu đãi có hạn </span></h2>                 
 
                     <form class="contact-form"
                           action="${pageContext.request.contextPath}/ContactServlet"
@@ -530,9 +527,7 @@
                             </div>
                         </div>
                         <p class="company-desc">
-                            Công ty Cổ phần Viễn thông FPT — Nhà cung cấp dịch vụ Internet tốc độ cao,
-                            Truyền hình tương tác FPT Play và giải pháp Camera AI thông minh hàng đầu Việt Nam.
-                            Đồng hành cùng hàng triệu hộ gia đình và doanh nghiệp trên toàn quốc.
+                            Công ty Cổ phần Viễn thông FPT — Nhà cung cấp dịch vụ Internet tốc độ cao.                           
                         </p>
                     </div>
 

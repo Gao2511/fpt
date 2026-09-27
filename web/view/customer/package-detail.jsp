@@ -2,25 +2,52 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
+<%-- ⭐ FALLBACK NẾU DATA NULL --%>
+<c:if test="${empty pkg.name}">
+    <c:set var="pkgName" value="Gói cước FPT"/>
+</c:if>
+<c:if test="${not empty pkg.name}">
+    <c:set var="pkgName" value="${pkg.name}"/>
+</c:if>
+
+<c:if test="${empty pkg.description}">
+    <c:set var="pkgDesc" value="Gói cước Internet tốc độ cao FPT Telecom"/>
+</c:if>
+<c:if test="${not empty pkg.description}">
+    <c:set var="pkgDesc" value="${pkg.description}"/>
+</c:if>
+
+<c:if test="${empty pkg.packageCode}">
+    <c:set var="pkgCode" value="FPT"/>
+</c:if>
+<c:if test="${not empty pkg.packageCode}">
+    <c:set var="pkgCode" value="${pkg.packageCode}"/>
+</c:if>
+
 <!DOCTYPE html>
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${pkg.name} - Chi tiết gói cước FPT</title>
+        <title>${pkgName} - Chi tiết gói cước FPT</title>
         <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
         <link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/home.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/customer/package-detail.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/badge.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/performance-optimize.css">
+        <!-- ⭐ Font Inter + Poppins cho trang package-detail -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
         <script src="${pageContext.request.contextPath}/js/address-data.js"></script>
         <script src="${pageContext.request.contextPath}/js/address-picker.js" defer></script>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/performance-optimize.css">
     </head>
     <body>
-<jsp:include page="/view/loading-runner.jsp" />
-<jsp:include page="/view/nav-slider.jsp" />
- <jsp:include page="/view/theme-toggle.jsp" />
+        <jsp:include page="/view/loading-runner.jsp" />
+        <jsp:include page="/view/nav-slider.jsp" />
+        <jsp:include page="/view/theme-toggle.jsp" />
+
         <!-- TOP NAV -->
         <header class="top-nav">
             <div class="container">
@@ -48,7 +75,6 @@
                         </div>
                     </div>
 
-                    <%-- AVATAR DROPDOWN --%>
                     <c:choose>
                         <c:when test="${empty sessionScope.user}">
                             <a href="${pageContext.request.contextPath}/login" class="btn-login-small">Đăng nhập</a>
@@ -135,7 +161,6 @@
                     </c:choose>
                 </div>
 
-                <!-- ⭐ NÚT HAMBURGER MENU -->
                 <button class="hamburger-btn" onclick="toggleMobileMenu(event)" aria-label="Menu">
                     <span></span>
                     <span></span>
@@ -144,7 +169,7 @@
             </div>
         </header>
 
-        <!-- ⭐ MOBILE MENU -->
+        <!-- MOBILE MENU -->
         <div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
         <div class="mobile-menu" id="mobileMenu">
             <a href="${pageContext.request.contextPath}/home">Trang chủ</a>
@@ -160,7 +185,7 @@
                 <span>›</span>
                 <a href="${pageContext.request.contextPath}/home#packages">Bảng giá</a>
                 <span>›</span>
-                <strong>${pkg.name}</strong>
+                <strong>${pkgName}</strong>
             </div>
         </div>
 
@@ -168,68 +193,88 @@
         <main class="detail-main">
             <div class="container">
 
-                <!-- HERO GÓI CƯỚC -->
-                <div class="pkg-hero">
-                    <div class="pkg-hero-left">
-                        <span class="pkg-hero-badge">${pkg.packageCode}</span>
-                        <h1>${pkg.name}</h1>
-                        <p class="pkg-hero-desc">${pkg.description}</p>
+                <!-- ============ HERO GÓI — HIỆU ỨNG ÁNH SÁNG CAM ============ -->
+                <div class="pkg-hero-glow">
+                    <div class="pkg-hero-card">
+                        <!-- RAY SÁNG CHÉO -->
+                        <div class="ray"></div>
 
-                        <div class="pkg-hero-price">
-                            <span class="price-num">
-                                <fmt:formatNumber value="${pkg.price}" pattern="#,###"/>
+                        <!-- QUẦNG SÁNG GÓC PHẢI -->
+                        <div class="glow-orb"></div>
+
+                        <!-- KHUNG LINE TRẮNG + DOT CHẠY QUANH -->
+                        <div class="frame">
+                            <div class="dot"></div>
+                        </div>
+                        <div class="frame-corner"></div>
+
+                        <!-- NỘI DUNG BÊN TRÁI -->
+                        <div class="pkg-hero-content">
+                            <%-- ⭐ BADGE — chỉ hiện khi có hot/featured --%>
+                            <c:if test="${pkg.badgeType == 'hot'}">
+                                <span class="pkg-hero-badge pkg-hero-badge-hot">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+                                    </svg>
+                                    HOT
+                                </span>
+                            </c:if>
+
+                            <c:if test="${pkg.badgeType == 'featured'}">
+                                <span class="pkg-hero-badge pkg-hero-badge-featured">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                    </svg>
+                                    NỔI BẬT
+                                </span>
+                            </c:if>
+
+                            <%-- ⭐ Gói thường → KHÔNG hiển thị gì cả --%>
+
+                            <h1>${pkgName}</h1>
+                            <p class="pkg-hero-desc">${pkgDesc}</p>
+
+                            <div class="pkg-hero-price">
+                                <span class="price-num">
+                                    <c:choose>
+                                        <c:when test="${not empty pkg.price and pkg.price > 0}">
+                                            <fmt:formatNumber value="${pkg.price}" pattern="#,###"/>
+                                        </c:when>
+                                        <c:otherwise>0</c:otherwise>
+                                    </c:choose>
+                                </span>
+                                <span class="price-unit">đ/tháng</span>
+                            </div>
+
+                            <div class="pkg-hero-actions">
+                                <a href="tel:0932079469" class="btn-glow-primary">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                    </svg>
+                                    Gọi tư vấn ngay
+                                </a>
+                                <a href="${pageContext.request.contextPath}/home#contact" class="btn-glow-secondary">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M9 11l3 3L22 4"/>
+                                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                                    </svg>
+                                    Đăng ký lắp đặt
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- BADGE TỐC ĐỘ BÊN PHẢI -->
+                        <div class="pkg-hero-speed">
+                            <span class="speed-label">Tốc độ</span>
+                            <span class="speed-value">
+                                <c:choose>
+                                    <c:when test="${not empty pkg.speedMbps and pkg.speedMbps > 0}">
+                                        ${pkg.speedMbps} Mbps
+                                    </c:when>
+                                    <c:otherwise>Đang cập nhật</c:otherwise>
+                                </c:choose>
                             </span>
-                            <span class="price-unit">đ/tháng</span>
                         </div>
-
-                        <div class="pkg-hero-actions">
-                            <a href="tel:0932079469" class="btn-primary-lg">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                                </svg>
-                                Gọi tư vấn ngay
-                            </a>
-                            <a href="${pageContext.request.contextPath}/home#contact" class="btn-secondary-lg">
-                                Đăng ký lắp đặt
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="pkg-hero-right">
-                        <div class="info-badge">
-                            <span class="info-label">Tốc độ</span>
-                            <span class="info-value">${pkg.speedMbps} Mbps</span>
-                        </div>
-
-                        <%-- BADGE HOT --%>
-                        <c:if test="${pkg.badgeType == 'hot'}">
-                            <div class="info-badge hot">
-                                <span class="info-label">Ưu đãi</span>
-                                <span class="info-value" style="display:flex;align-items:center;">
-                                    <span class="pkg-badge pkg-badge-hot">
-                                        <svg viewBox="0 0 24 24">
-                                        <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
-                                        </svg>
-                                        GÓI HOT
-                                    </span>
-                                </span>
-                            </div>
-                        </c:if>
-
-                        <%-- BADGE NỔI BẬT --%>
-                        <c:if test="${pkg.badgeType == 'featured'}">
-                            <div class="info-badge featured">
-                                <span class="info-label">Đề xuất</span>
-                                <span class="info-value" style="display:flex;align-items:center;">
-                                    <span class="pkg-badge pkg-badge-featured">
-                                        <svg viewBox="0 0 24 24">
-                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                                        </svg>
-                                        NỔI BẬT
-                                    </span>
-                                </span>
-                            </div>
-                        </c:if>
                     </div>
                 </div>
 
@@ -292,10 +337,10 @@
                         <path d="M12 20h9"/>
                         <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
                         </svg>
-                        Đăng ký gói "${pkg.name}"
+                        Đăng ký gói "${pkgName}"
                     </h2>
 
-                    <%-- ⭐ GỢI Ý ĐĂNG NHẬP CHO KHÁCH CHƯA LOGIN --%>
+                    <%-- GỢI Ý ĐĂNG NHẬP --%>
                     <c:if test="${empty sessionScope.user}">
                         <div style="padding:12px 16px; background:#fff3e0; border:1px solid #f37021; border-radius:10px; margin-bottom:16px; font-size:13.5px; color:#92400e; display:flex; align-items:center; gap:8px;">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px; height:18px; flex-shrink:0;">
@@ -319,7 +364,7 @@
                     </p>
 
                     <form action="${pageContext.request.contextPath}/ContactServlet" method="POST" class="quick-contact-form">
-                        <input type="hidden" name="user_package" value="${pkg.name}">
+                        <input type="hidden" name="user_package" value="${pkgName}">
 
                         <div class="form-row">
                             <input type="text" name="user_name" id="user_name"
@@ -337,7 +382,6 @@
                                placeholder="Email (không bắt buộc)"
                                value="${not empty sessionScope.user.email ? sessionScope.user.email : ''}">
 
-                        <%-- ⭐ ĐỊA CHỈ: CASCADING DROPDOWN --%>
                         <div id="addressPickerDetail" data-address-picker="detail" style="margin-bottom:12px;"></div>
                         <input type="text" name="user_note" id="user_note_detail"
                                placeholder="Ghi chú (không bắt buộc)"
@@ -376,7 +420,6 @@
 
                 <div class="footer-top">
 
-                    <!-- Cột 1: Logo + Mô tả -->
                     <div>
                         <div class="brand-footer">
                             <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
@@ -388,13 +431,10 @@
                             </div>
                         </div>
                         <p class="company-desc">
-                            Công ty Cổ phần Viễn thông FPT — Nhà cung cấp dịch vụ Internet tốc độ cao,
-                            Truyền hình tương tác FPT Play và giải pháp Camera AI thông minh hàng đầu Việt Nam.
-                            Đồng hành cùng hàng triệu hộ gia đình và doanh nghiệp trên toàn quốc.
+                            Công ty Cổ phần Viễn thông FPT — Nhà cung cấp dịch vụ Internet tốc độ cao.             
                         </p>
                     </div>
 
-                    <!-- Cột 2: Liên hệ -->
                     <div>
                         <h4>Liên hệ với chúng tôi</h4>
                         <ul class="contact-list">
@@ -473,31 +513,23 @@
             </div>
         </footer>
 
-        <!-- ============ SCRIPT: MOBILE MENU + TOGGLE USER MENU ============ -->
+        <!-- SCRIPTS -->
         <script>
-            // ===== MOBILE MENU =====
             function toggleMobileMenu(event) {
                 event.stopPropagation();
                 const menu = document.getElementById('mobileMenu');
                 const overlay = document.querySelector('.mobile-menu-overlay');
                 const btn = document.querySelector('.hamburger-btn');
-
                 menu.classList.toggle('active');
                 overlay.classList.toggle('active');
                 btn.classList.toggle('active');
-
-                if (menu.classList.contains('active')) {
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    document.body.style.overflow = '';
-                }
+                document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : '';
             }
 
             function closeMobileMenu() {
                 const menu = document.getElementById('mobileMenu');
                 const overlay = document.querySelector('.mobile-menu-overlay');
                 const btn = document.querySelector('.hamburger-btn');
-
                 menu.classList.remove('active');
                 overlay.classList.remove('active');
                 btn.classList.remove('active');
@@ -512,7 +544,6 @@
                 if (e.key === 'Escape') closeMobileMenu();
             });
 
-            // ===== TOGGLE USER MENU =====
             function toggleUserMenu(event) {
                 event.stopPropagation();
                 const dropdown = document.getElementById('userDropdown');
@@ -526,27 +557,13 @@
             document.addEventListener('click', function (event) {
                 const dropdown = document.getElementById('userDropdown');
                 const avatar = document.querySelector('.user-avatar');
-                if (dropdown && avatar
-                        && !avatar.contains(event.target)
-                        && !dropdown.contains(event.target)) {
+                if (dropdown && avatar && !avatar.contains(event.target) && !dropdown.contains(event.target)) {
                     dropdown.classList.remove('active');
                     avatar.classList.remove('active');
                 }
             });
-
-            document.addEventListener('keydown', function (event) {
-                if (event.key === 'Escape') {
-                    const dropdown = document.getElementById('userDropdown');
-                    const avatar = document.querySelector('.user-avatar');
-                    if (dropdown && avatar) {
-                        dropdown.classList.remove('active');
-                        avatar.classList.remove('active');
-                    }
-                }
-            });
         </script>
 
-        <!-- ============ SCRIPT: VALIDATE FORM ĐĂNG KÝ NHANH ============ -->
         <script>
             (function () {
                 var quickForm = document.querySelector('.quick-contact-form');
@@ -568,82 +585,12 @@
                         return false;
                     }
 
-                    var prefix = 'detail';
-                    var mode = window['getAddressMode_' + prefix] ? window['getAddressMode_' + prefix]() : 'new';
-
-                    if (mode === 'manual') {
-                        var manualInput = document.querySelector('.addr-manual-input[data-prefix="' + prefix + '"]');
-                        if (!manualInput || manualInput.value.trim() === '') {
-                            e.preventDefault();
-                            showError(manualInput, 'Vui lòng nhập địa chỉ lắp đặt đầy đủ!');
-                            return false;
-                        }
-                    } else if (mode === 'old') {
-                        var provOld = document.querySelector('.addr-province-old[data-prefix="' + prefix + '"]');
-                        var distOld = document.querySelector('.addr-district-old[data-prefix="' + prefix + '"]');
-                        var wardOld = document.querySelector('.addr-ward-old[data-prefix="' + prefix + '"]');
-                        var detailOld = document.querySelector('.addr-detail-old[data-prefix="' + prefix + '"]');
-
-                        if (!provOld || !provOld.value) {
-                            e.preventDefault();
-                            showError(provOld, 'Vui lòng chọn Tỉnh/Thành phố!');
-                            return false;
-                        }
-                        if (!distOld || !distOld.value) {
-                            e.preventDefault();
-                            showError(distOld, 'Vui lòng chọn Quận/Huyện!');
-                            return false;
-                        }
-                        if (!wardOld || !wardOld.value) {
-                            e.preventDefault();
-                            showError(wardOld, 'Vui lòng chọn Phường/Xã!');
-                            return false;
-                        }
-                        if (!detailOld || detailOld.value.trim() === '') {
-                            e.preventDefault();
-                            showError(detailOld, 'Vui lòng nhập địa chỉ chi tiết (số nhà, tên đường...)!');
-                            return false;
-                        }
-                    } else {
-                        var provNew = document.querySelector('.addr-province-new[data-prefix="' + prefix + '"]');
-                        var wardNew = document.querySelector('.addr-ward-new[data-prefix="' + prefix + '"]');
-                        var detailNew = document.querySelector('.addr-detail[data-prefix="' + prefix + '"]');
-                        var customProvNew = document.querySelector('.addr-custom-prov-new[data-prefix="' + prefix + '"]');
-                        var customWardNew = document.querySelector('.addr-custom-ward-new[data-prefix="' + prefix + '"]');
-
-                        var provVal = (provNew && provNew.value === 'custom')
-                            ? (customProvNew ? customProvNew.value.trim() : '')
-                            : (provNew ? provNew.value : '');
-                        var wardVal = (wardNew && wardNew.value === 'custom')
-                            ? (customWardNew ? customWardNew.value.trim() : '')
-                            : (wardNew ? wardNew.value : '');
-
-                        if (!provVal) {
-                            e.preventDefault();
-                            showError(provNew && provNew.value === 'custom' ? customProvNew : provNew, 'Vui lòng chọn hoặc nhập Tỉnh/Thành phố!');
-                            return false;
-                        }
-                        if (!wardVal) {
-                            e.preventDefault();
-                            showError(wardNew && wardNew.value === 'custom' ? customWardNew : wardNew, 'Vui lòng chọn hoặc nhập Phường/Xã!');
-                            return false;
-                        }
-                        if (!detailNew || detailNew.value.trim() === '') {
-                            e.preventDefault();
-                            showError(detailNew, 'Vui lòng nhập địa chỉ chi tiết (số nhà, tên đường...)!');
-                            return false;
-                        }
-                    }
-
                     var emailInput = document.getElementById('user_email');
                     var email = emailInput.value.trim();
-                    if (email !== '') {
-                        var emailRegex = /^[A-Za-z0-9+_.-]+@(.+)$/;
-                        if (!emailRegex.test(email)) {
-                            e.preventDefault();
-                            showError(emailInput, 'Email không hợp lệ!');
-                            return false;
-                        }
+                    if (email !== '' && !/^[A-Za-z0-9+_.-]+@(.+)$/.test(email)) {
+                        e.preventDefault();
+                        showError(emailInput, 'Email không hợp lệ!');
+                        return false;
                     }
                 });
 
@@ -654,7 +601,6 @@
                     input.scrollIntoView({behavior: 'smooth', block: 'center'});
                     input.style.borderColor = '#dc2626';
                     input.style.boxShadow = '0 0 0 4px rgba(220, 38, 38, 0.15)';
-                    input.style.transition = 'all 0.3s';
                     input.addEventListener('input', function handler() {
                         input.style.borderColor = '';
                         input.style.boxShadow = '';

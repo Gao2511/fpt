@@ -498,3 +498,463 @@ body.dark-mode .hero .badges span {
     border-color: rgba(255, 255, 255, 0.15) !important;
     color: #ffffff !important;
 }
+/* =========================================================
+   ⭐ PACKAGE DETAIL — DARK MODE
+   ========================================================= */
+
+body.dark-mode .breadcrumb-wrap {
+    background: #0f172a !important;
+    border-bottom-color: #1f2937 !important;
+}
+body.dark-mode .breadcrumb-wrap a { color: #94a3b8 !important; }
+body.dark-mode .breadcrumb-wrap a:hover { color: #ffb26b !important; }
+body.dark-mode .breadcrumb-wrap strong { color: #f3f4f6 !important; }
+
+body.dark-mode .detail-main { background: #0a0f1c !important; }
+
+body.dark-mode .detail-block {
+    background: #1f2937 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+body.dark-mode .detail-block h2 { color: #f3f4f6 !important; }
+body.dark-mode .detail-block h2 svg { stroke: #ffb26b !important; }
+body.dark-mode .benefit-list li {
+    color: #d1d5db !important;
+    border-bottom-color: #374151 !important;
+}
+body.dark-mode .benefit-list li::before {
+    background: rgba(22, 163, 74, 0.2) !important;
+    color: #4ade80 !important;
+}
+
+body.dark-mode .quick-contact-form input,
+body.dark-mode .quick-contact-form textarea {
+    background: #111827 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+}
+body.dark-mode .quick-contact-form input::placeholder,
+body.dark-mode .quick-contact-form textarea::placeholder {
+    color: #6b7280 !important;
+}
+body.dark-mode .quick-contact-form input:focus,
+body.dark-mode .quick-contact-form textarea:focus {
+    border-color: #f37021 !important;
+    background: #0f172a !important;
+    box-shadow: 0 0 0 4px rgba(243, 112, 33, 0.15) !important;
+}
+/* =========================================================
+   ⭐ ADDRESS PICKER — DARK MODE
+   (Dropdown Tỉnh/Thành, Phường/Xã, address preview)
+   ========================================================= */
+
+/* Select dropdown */
+body.dark-mode .addr-col select,
+body.dark-mode .addr-detail-wrap input,
+body.dark-mode .addr-detail-old,
+body.dark-mode .addr-custom-input {
+    background: #111827 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .addr-col select:focus,
+body.dark-mode .addr-detail-wrap input:focus,
+body.dark-mode .addr-detail-old:focus,
+body.dark-mode .addr-custom-input:focus {
+    border-color: #f37021 !important;
+    background: #0f172a !important;
+    box-shadow: 0 0 0 4px rgba(243, 112, 33, 0.15) !important;
+}
+
+body.dark-mode .addr-col select:disabled {
+    background: #1f2937 !important;
+    color: #6b7280 !important;
+}
+
+/* Label */
+body.dark-mode .addr-col label,
+body.dark-mode .addr-detail-wrap label {
+    color: #d1d5db !important;
+}
+
+/* ⭐ Khung preview địa chỉ (nền vàng nhạt → tối) */
+body.dark-mode .addr-preview {
+    background: rgba(243, 112, 33, 0.12) !important;
+    border-color: rgba(243, 112, 33, 0.5) !important;
+    color: #ffb26b !important;
+}
+
+body.dark-mode .addr-preview svg {
+    stroke: #ffb26b !important;
+}
+
+/* Textarea nhập địa chỉ tay */
+body.dark-mode .addr-manual-wrap textarea {
+    background: #111827 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .addr-manual-wrap textarea:focus {
+    border-color: #f37021 !important;
+    background: #0f172a !important;
+}
+
+/* Nút "Dùng địa chỉ cũ" / "Tự nhập tay" — giữ tông cam nhưng tối hơn */
+body.dark-mode .addr-toggle-btn,
+body.dark-mode .addr-mode-btn {
+    background: linear-gradient(135deg, rgba(243, 112, 33, 0.2) 0%, rgba(255, 140, 66, 0.15) 100%) !important;
+    border-color: #f37021 !important;
+    color: #ffb26b !important;
+}
+
+body.dark-mode .addr-toggle-btn:hover,
+body.dark-mode .addr-mode-btn:hover {
+    background: linear-gradient(135deg, #f37021 0%, #ff8c42 100%) !important;
+    color: #ffffff !important;
+}
+
+/* =========================================================
+   ⭐ HEADING TRONG DETAIL BLOCK — Dark mode
+   ========================================================= */
+
+body.dark-mode .detail-block h2 {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .detail-block > p {
+    color: #9ca3af !important;
+}
+
+/* ⭐ Khung "Mẹo đăng nhập" (nền vàng nhạt) → nền tối cam */
+body.dark-mode .detail-block > div[style*="background:#fff3e0"],
+body.dark-mode .detail-block > div[style*="background: #fff3e0"] {
+    background: rgba(243, 112, 33, 0.12) !important;
+    border-color: rgba(243, 112, 33, 0.5) !important;
+    color: #ffb26b !important;
+}
+
+/* ⭐ Chữ "Đăng nhập" bên trong khung mẹo */
+body.dark-mode .detail-block > div[style*="background:#fff3e0"] a,
+body.dark-mode .detail-block > div[style*="background: #fff3e0"] a {
+    color: #ffb26b !important;
+    text-decoration-color: #ffb26b !important;
+}
+/* =========================================================
+   ⭐ PROFILE PAGE — DARK MODE
+   ========================================================= */
+
+/* Container + Header */
+body.dark-mode .profile-container {
+    background: transparent !important;
+}
+body.dark-mode .profile-header h1 {
+    color: #f3f4f6 !important;
+}
+body.dark-mode .profile-header p {
+    color: #9ca3af !important;
+}
+
+/* Avatar card */
+body.dark-mode .avatar-card {
+    background:
+        linear-gradient(90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0) 15%,
+        rgba(30, 41, 59, 0.7) 40%,
+        rgba(15, 23, 42, 0.9) 65%,
+        rgba(0, 0, 0, 1) 100%),
+        linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%) !important;
+    border-color: #f37021 !important;
+}
+
+body.dark-mode .avatar-card .avatar-info h2,
+body.dark-mode .avatar-card .avatar-display-name {
+    color: #ff8c42 !important;
+    -webkit-text-stroke: 2px #0f172a;
+    text-shadow:
+        0 0 6px rgba(255, 140, 66, 0.9),
+        0 0 12px rgba(243, 112, 33, 0.5),
+        0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .avatar-card .avatar-info .avatar-username-row {
+    color: #d1d5db !important;
+    -webkit-text-stroke: 0.8px #0f172a;
+}
+
+body.dark-mode .avatar-card .avatar-info .avatar-username-row strong {
+    color: #ff8c42 !important;
+    -webkit-text-stroke: 1px #0f172a;
+}
+
+/* Profile card — form container */
+body.dark-mode .profile-card {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .profile-card-header {
+    border-bottom-color: #374151 !important;
+}
+
+body.dark-mode .profile-card-header h3 {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .profile-card-header p {
+    color: #9ca3af !important;
+}
+
+/* Form group label */
+body.dark-mode .form-group label {
+    color: #e5e7eb !important;
+}
+
+body.dark-mode .form-group label .readonly-tag,
+body.dark-mode .form-group label .optional-tag {
+    color: #6b7280 !important;
+}
+
+/* ⭐ INPUT — NỀN TỐI */
+body.dark-mode .form-group input {
+    background: #111827 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .form-group input:focus {
+    border-color: #f37021 !important;
+    background: #0f172a !important;
+    box-shadow: 0 0 0 4px rgba(243, 112, 33, 0.15) !important;
+}
+
+body.dark-mode .form-group input[readonly] {
+    background: #1f2937 !important;
+    color: #6b7280 !important;
+}
+
+body.dark-mode .form-group input::placeholder {
+    color: #6b7280 !important;
+}
+
+body.dark-mode .form-group .field-hint {
+    color: #6b7280 !important;
+}
+
+/* Alert */
+body.dark-mode .alert-success {
+    background: linear-gradient(135deg, #064e3b, #065f46) !important;
+    color: #6ee7b7 !important;
+    border-left-color: #10b981 !important;
+}
+
+body.dark-mode .alert-error {
+    background: linear-gradient(135deg, #7f1d1d, #991b1b) !important;
+    color: #fca5a5 !important;
+    border-left-color: #ef4444 !important;
+}
+
+/* Form actions */
+body.dark-mode .form-actions {
+    border-top-color: #374151 !important;
+}
+
+body.dark-mode .btn-secondary {
+    background: #374151 !important;
+    color: #d1d5db !important;
+}
+
+body.dark-mode .btn-secondary:hover {
+    background: #4b5563 !important;
+}
+
+body.dark-mode .btn-danger {
+    background: rgba(220, 38, 38, 0.2) !important;
+    color: #fca5a5 !important;
+    border-color: rgba(220, 38, 38, 0.5) !important;
+}
+
+body.dark-mode .btn-danger:hover {
+    background: #dc2626 !important;
+    color: white !important;
+}
+
+/* Quick actions */
+body.dark-mode .quick-action-btn {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+}
+
+body.dark-mode .quick-action-btn:hover {
+    border-color: #f37021 !important;
+    box-shadow: 0 10px 25px rgba(243, 112, 33, 0.2) !important;
+}
+
+body.dark-mode .quick-action-btn .qa-icon {
+    background: rgba(243, 112, 33, 0.15) !important;
+}
+
+body.dark-mode .quick-action-btn .qa-info strong {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .quick-action-btn .qa-info small {
+    color: #9ca3af !important;
+}
+/* =========================================================
+   ⭐ MY ORDERS PAGE — DARK MODE
+   ========================================================= */
+
+/* Container */
+body.dark-mode .orders-container {
+    background: transparent !important;
+}
+
+/* Header */
+body.dark-mode .orders-header h1 {
+    color: #ff8c42 !important;
+    text-shadow:
+        0 0 8px rgba(255, 140, 66, 0.6),
+        0 0 16px rgba(243, 112, 33, 0.3) !important;
+}
+
+body.dark-mode .orders-header p {
+    color: #9ca3af !important;
+}
+
+/* Orders count badge */
+body.dark-mode .orders-count {
+    background: linear-gradient(135deg, #f37021, #ff8c42) !important;
+    box-shadow: 0 4px 12px rgba(243, 112, 33, 0.4) !important;
+}
+
+/* =========================================================
+   ⭐ EMPTY STATE — NỀN TỐI (như ảnh)
+   ========================================================= */
+
+body.dark-mode .empty-orders {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+    border-color: #f37021 !important;
+    box-shadow:
+        0 4px 30px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(243, 112, 33, 0.15) !important;
+}
+
+/* Quầng sáng tròn phía trên empty state */
+body.dark-mode .empty-orders::before {
+    background: radial-gradient(circle,
+        rgba(243, 112, 33, 0.12) 0%,
+        rgba(243, 112, 33, 0.04) 45%,
+        transparent 70%) !important;
+}
+
+/* Illustration (hình hộp) */
+body.dark-mode .empty-illustration {
+    filter: drop-shadow(0 14px 30px rgba(243, 112, 33, 0.25))
+            brightness(0.9) !important;
+}
+
+/* Tiêu đề "Chưa có đơn đăng ký nào" */
+body.dark-mode .empty-orders h3 {
+    color: #f3f4f6 !important;
+}
+
+/* Mô tả */
+body.dark-mode .empty-orders p {
+    color: #9ca3af !important;
+}
+
+/* Nút CTA vẫn giữ màu cam */
+body.dark-mode .btn-cta {
+    background: linear-gradient(135deg, #f37021, #ff8c42) !important;
+    box-shadow: 0 8px 20px rgba(243, 112, 33, 0.4) !important;
+}
+
+body.dark-mode .btn-cta:hover {
+    box-shadow: 0 15px 35px rgba(243, 112, 33, 0.55) !important;
+}
+
+/* =========================================================
+   ORDER CARDS (khi có đơn) — DARK MODE
+   ========================================================= */
+
+body.dark-mode .order-card {
+    background: rgba(31, 41, 55, 0.95) !important;
+    border-color: #f37021 !important;
+    box-shadow:
+        0 4px 20px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(243, 112, 33, 0.1) !important;
+}
+
+body.dark-mode .order-card:hover {
+    box-shadow:
+        0 12px 35px rgba(243, 112, 33, 0.25),
+        0 0 0 1px rgba(243, 112, 33, 0.2) !important;
+}
+
+body.dark-mode .order-header {
+    border-bottom-color: #374151 !important;
+}
+
+body.dark-mode .order-id {
+    color: #ffb26b !important;
+}
+
+body.dark-mode .order-label {
+    color: #9ca3af !important;
+}
+
+body.dark-mode .order-value {
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .order-footer {
+    border-top-color: #374151 !important;
+    color: #6b7280 !important;
+}
+
+body.dark-mode .order-footer svg {
+    stroke: #6b7280 !important;
+}
+
+/* =========================================================
+   PAGINATION — DARK MODE
+   ========================================================= */
+
+body.dark-mode .orders-pagination a,
+body.dark-mode .orders-pagination span {
+    background: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #d1d5db !important;
+}
+
+body.dark-mode .orders-pagination a:hover {
+    border-color: #f37021 !important;
+    color: #ffb26b !important;
+    box-shadow: 0 4px 12px rgba(243, 112, 33, 0.25) !important;
+}
+
+body.dark-mode .orders-pagination .page-active {
+    background: linear-gradient(135deg, #f37021, #ff8c42) !important;
+    color: white !important;
+    border-color: #f37021 !important;
+}
+
+body.dark-mode .orders-pagination .page-dots {
+    background: transparent !important;
+    border: none !important;
+    color: #6b7280 !important;
+}
+
+body.dark-mode .orders-page-info {
+    background: rgba(31, 41, 55, 0.7) !important;
+    border-color: #374151 !important;
+    color: #9ca3af !important;
+}
+
+body.dark-mode .orders-page-info strong {
+    color: #ffb26b !important;
+}
