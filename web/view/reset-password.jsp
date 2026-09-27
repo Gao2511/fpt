@@ -9,6 +9,7 @@
     <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
     <link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/fpt-id.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/performance-optimize.css">
 </head>
 <body>   
     <jsp:include page="/view/loading-runner.jsp" />

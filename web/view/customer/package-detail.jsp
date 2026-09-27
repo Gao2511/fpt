@@ -15,6 +15,7 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/badge.css">
         <script src="${pageContext.request.contextPath}/js/address-data.js"></script>
         <script src="${pageContext.request.contextPath}/js/address-picker.js" defer></script>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/performance-optimize.css">
     </head>
     <body>
 <jsp:include page="/view/loading-runner.jsp" />

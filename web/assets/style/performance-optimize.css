@@ -1,0 +1,462 @@
+/* =========================================================
+   PERFORMANCE OPTIMIZE — Tối ưu hiệu năng đa nền tảng
+   iOS / Android / macOS / Windows / Mobile yếu
+   ⭐ File này load CUỐI CÙNG để override
+   ========================================================= */
+
+/* =========================================================
+   1. GIẢM ANIMATION TRÊN THIẾT BỊ YẾU
+   ========================================================= */
+
+/* ⭐ Tắt animation nặng trên mobile + tablet */
+@media (max-width: 1024px) {
+    /* Tắt animation nền body */
+    body,
+    body::before,
+    body::after {
+        animation: none !important;
+    }
+    
+    /* Tắt animation hero + contact hero */
+    .hero,
+    .contact-hero,
+    .hero-slideshow,
+    .hero-slideshow::after,
+    .contact-hero::before,
+    .contact-hero::after,
+    .contact-hero-icon {
+        animation: none !important;
+    }
+    
+    /* Tắt animation top-nav + footer */
+    .top-nav::after,
+    .footer::before {
+        animation: none !important;
+        background-size: 100% 100% !important;
+    }
+    
+    /* Tắt animation nút + icon */
+    .top-nav .hotline-box .icon,
+    .footer .hotline-box-footer .phone-icon,
+    .hero .badge-top,
+    .section-title h2,
+    .welcome-banner::after,
+    .welcome-line-2,
+    .contact-hero-icon {
+        animation: none !important;
+    }
+    
+    /* Tắt animation card + pkg */
+    .pkg-wrap::before,
+    .pkg-ribbon-hot,
+    .pkg-ribbon-featured,
+    .btn-pkg::before,
+    .addr-toggle-btn {
+        animation: none !important;
+    }
+    
+    /* Tắt backdrop-filter — tốn GPU */
+    .top-nav,
+    .user-avatar,
+    .mobile-menu,
+    .hero .badge-top,
+    .hero .badges span,
+    .btn-hero-secondary,
+    .hero-nav,
+    .hero-dots,
+    .contact-hero .container {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    
+    /* Tắt background-attachment: fixed */
+    body,
+    html {
+        background-attachment: scroll !important;
+    }
+    
+    /* ⭐ Giảm shadow nặng */
+    .hero,
+    .hero-slideshow,
+    .feature,
+    .device,
+    .pkg-wrap,
+    .pkg,
+    .contact-wrapper,
+    .contact-info-card,
+    .footer,
+    .top-nav,
+    .user-dropdown,
+    .ai-chat-window {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+    }
+    
+    /* ⭐ Tắt will-change — giải phóng bộ nhớ GPU */
+    .pkg-wrap::before,
+    .hero-nav {
+        will-change: auto !important;
+    }
+    
+    /* ⭐ Tắt filter blur nặng */
+    body::before,
+    body::after {
+        filter: blur(20px) !important;
+    }
+    
+    .midnight-sky::before,
+    .midnight-sky::after {
+        filter: blur(20px) !important;
+    }
+}
+
+/* =========================================================
+   2. THIẾT BỊ YẾU (RAM thấp) — TẮT NHIỀU HƠN
+   ========================================================= */
+
+@media (max-width: 640px) {
+    /* Tắt tất cả animation phức tạp */
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.15s !important;
+    }
+    
+    /* Ngoại lệ — giữ transition cơ bản */
+    .btn-pkg,
+    .btn-hero-primary,
+    .btn-hero-secondary,
+    .btn-fptid,
+    .top-nav .menu a,
+    .dropdown-item,
+    .mobile-menu a {
+        transition-duration: 0.2s !important;
+    }
+    
+    /* ⭐ Giảm số sao trong hero-stars */
+    .hero-stars .stars-3 {
+        display: none !important;
+    }
+    
+    .hero-stars .m2,
+    .hero-stars .m3 {
+        display: none !important;
+    }
+    
+    /* ⭐ Giảm số sao trong midnight-sky */
+    .midnight-sky .stars-3 {
+        display: none !important;
+    }
+    
+    .midnight-sky .m2,
+    .midnight-sky .m3 {
+        display: none !important;
+    }
+    
+    /* ⭐ Tắt sao lấp lánh phức tạp */
+    .hero-stars .stars-1,
+    .hero-stars .stars-2,
+    .midnight-sky .stars-1,
+    .midnight-sky .stars-2 {
+        animation: none !important;
+        opacity: 0.8 !important;
+    }
+    
+    /* ⭐ Giảm blur và shadow */
+    .ai-chat-button,
+    .theme-toggle-btn,
+    .ai-chat-window,
+    .hero-nav,
+    .contact-info-card {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    /* ⭐ Tắt hiệu ứng hover phức tạp (mobile không cần) */
+    .pkg-wrap:hover,
+    .feature:hover,
+    .device:hover,
+    .contact-info-card:hover,
+    .user-avatar:hover,
+    .btn-pkg:hover,
+    .btn-hero-primary:hover,
+    .btn-hero-secondary:hover {
+        transform: none !important;
+    }
+    
+    /* ⭐ Tắt viền xoay pkg — chỉ hiện viền tĩnh */
+    .pkg-wrap::before {
+        animation: none !important;
+        background: linear-gradient(135deg, #f37021 0%, #ffb26b 50%, #f37021 100%) !important;
+        opacity: 0.3 !important;
+    }
+    
+    /* ⭐ Tắt ripple effect animation */
+    @keyframes rippleAnim {
+        to { width: 200px; height: 200px; opacity: 0; }
+    }
+    
+    /* ⭐ Giảm gradient phức tạp */
+    .hero {
+        background: linear-gradient(180deg, #1a4b8c 0%, #0f3266 100%) !important;
+    }
+    
+    body.dark-mode .hero,
+    body.dark-mode .contact-hero {
+        background: linear-gradient(180deg, #0b1a3a 0%, #0f2350 100%) !important;
+    }
+    
+    /* ⭐ Tắt box-shadow glow lớn */
+    .hero-slideshow {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    /* ⭐ Tắt text-shadow nặng */
+    .welcome-line-2,
+    .hero h1 .highlight,
+    .pkg .price {
+        text-shadow: none !important;
+    }
+    
+    /* ⭐ Đơn giản hóa gradient text */
+    .section-title h2,
+    .welcome-line-2 {
+        background: none !important;
+        -webkit-text-fill-color: #d95810 !important;
+        color: #d95810 !important;
+    }
+    
+    body.dark-mode .section-title h2 {
+        color: #f3f4f6 !important;
+        -webkit-text-fill-color: #f3f4f6 !important;
+    }
+}
+
+/* =========================================================
+   3. TÔN TRỌNG CÀI ĐẶT USER — REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    
+    .hero,
+    .contact-hero,
+    body,
+    body::before,
+    body::after {
+        animation: none !important;
+    }
+}
+
+/* =========================================================
+   4. TỐI ƯU CHO iOS — SMOOTH SCROLLING
+   ========================================================= */
+
+@supports (-webkit-touch-callout: none) {
+    /* iOS-specific */
+    body,
+    .hero,
+    .contact-hero {
+        -webkit-overflow-scrolling: touch;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* iOS Safari — fix 100vh issue */
+    .mobile-menu,
+    .ai-chat-window {
+        max-height: 90vh;
+        max-height: -webkit-fill-available;
+    }
+    
+    /* iOS — giảm animation để tiết kiệm pin */
+    body,
+    .hero,
+    .contact-hero {
+        animation: none !important;
+    }
+    
+    /* iOS — tắt parallax */
+    body {
+        background-attachment: scroll !important;
+    }
+}
+
+/* =========================================================
+   5. TỐI ƯU CHO ANDROID — TẮT HIỆU ỨNG NẶNG
+   ========================================================= */
+
+/* Android dùng Chrome — detect qua -webkit- prefix */
+@supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+    /* Android-specific */
+    html {
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Android — tắt backdrop-filter triệt để */
+    .top-nav,
+    .user-avatar,
+    .mobile-menu,
+    .ai-chat-window,
+    .hero-dots,
+    .hero-nav {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background: rgba(10, 31, 68, 0.95) !important;
+    }
+    
+    /* Android — fix scroll lag */
+    body {
+        overscroll-behavior-y: contain;
+    }
+    
+    /* Android — tắt transform 3D phức tạp */
+    .pkg-wrap,
+    .pkg {
+        transform: translateZ(0);
+        backface-visibility: hidden;
+    }
+    
+    /* Android — tắt animation pulse */
+    .ai-chat-button,
+    .contact-hero-icon,
+    .footer .hotline-box-footer .phone-icon {
+        animation: none !important;
+    }
+}
+
+/* =========================================================
+   6. TỐI ƯU CHO macOS / WINDOWS — GIỮ HIỆU ỨNG ĐẸP
+   ========================================================= */
+
+@media (min-width: 1025px) {
+    /* Desktop — giữ nguyên tất cả hiệu ứng đẹp */
+    
+    /* Tối ưu rendering */
+    html {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+    
+    /* GPU acceleration cho element chuyển động */
+    .hero-slideshow,
+    .hero-slide,
+    .pkg-wrap,
+    .pkg-wrap::before,
+    .hero-nav,
+    .dot-slide,
+    .ai-chat-button {
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+    
+    /* Will-change cho element animate liên tục */
+    .pkg-wrap::before,
+    .hero-slideshow::after,
+    .hero-stars .meteor,
+    .midnight-sky .meteor {
+        will-change: transform, opacity;
+    }
+    
+    /* Tắt will-change cho element ít animate */
+    .pkg-ribbon-hot,
+    .pkg-ribbon-featured,
+    .hero-nav {
+        will-change: auto;
+    }
+}
+
+/* =========================================================
+   7. TỐI ƯU CHUNG — CHO TẤT CẢ THIẾT BỊ
+   ========================================================= */
+
+/* ⭐ Tắt animation khi tab ẩn — tiết kiệm pin */
+body:not(:hover) .pkg-wrap::before,
+body:not(:hover) .hero-slideshow::after {
+    animation-play-state: paused;
+}
+
+/* ⭐ Fix layout shift — tránh giật khi load font */
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+/* ⭐ Tối ưu scroll cho mọi thiết bị */
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+}
+
+@media (max-width: 640px) {
+    html {
+        scroll-padding-top: 60px;
+    }
+}
+
+/* ⭐ Đảm bảo image không bị lag khi scroll */
+img {
+    content-visibility: auto;
+}
+
+/* ⭐ Tối ưu render cho section dưới màn hình */
+.features,
+.devices,
+.contact-section,
+.footer {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+}
+
+/* ⭐ Tránh layout shift cho img */
+.device .img-wrap img,
+.hero-slide {
+    aspect-ratio: 16 / 9;
+}
+
+/* ⭐ Tắt animation khi user scroll nhanh */
+@media (prefers-reduced-motion: no-preference) {
+    .reveal {
+        will-change: opacity, transform;
+    }
+    
+    .reveal.active {
+        will-change: auto;
+    }
+}
+
+/* =========================================================
+   8. FALLBACK — NẾU TRÌNH DUYỆT KHÔNG HỖ TRỢ
+   ========================================================= */
+
+/* Fallback cho trình duyệt cũ không hỗ trợ aspect-ratio */
+@supports not (aspect-ratio: 1) {
+    .device .img-wrap {
+        padding-top: 75%;
+        position: relative;
+    }
+    
+    .device .img-wrap img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+/* Fallback cho trình duyệt cũ không hỗ trợ content-visibility */
+@supports not (content-visibility: auto) {
+    .features,
+    .devices,
+    .contact-section {
+        content-visibility: visible;
+    }
+}

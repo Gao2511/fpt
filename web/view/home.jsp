@@ -17,6 +17,7 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/fonts.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/hero-stars.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/theme-toggle.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/performance-optimize.css">
         <script src="${pageContext.request.contextPath}/js/address-data.js"></script>
         <script src="${pageContext.request.contextPath}/js/address-picker.js" defer></script>
     </head>
@@ -34,10 +35,10 @@
                          alt="FPT Telecom"
                          style="height: 50px; width: auto; object-fit: contain; display: block;">
                 </a>
-                <nav class="menu">                
-                    <a href="${pageContext.request.contextPath}/home">Trang chủ</a>
-                    <a href="#packages">Bảng giá</a>
-                    <a href="#contact">Tư vấn</a>
+                <nav class="menu">
+                   <a href="${pageContext.request.contextPath}/home" onclick="goHome(event)">Trang chủ</a>
+                    <a href="#packages" onclick="scrollToSection(event, 'packages')">Bảng giá</a>
+                    <a href="#contact" onclick="scrollToSection(event, 'contact')">Tư vấn</a>
                     <a href="${pageContext.request.contextPath}/contact">Liên hệ</a>
                 </nav>
                 <div class="right">
@@ -1024,6 +1025,32 @@
                 window.goToSlide = goToSlide;
             })();
         </script>
-
+        <script>
+            // ⭐ Scroll tới section mà KHÔNG redirect
+            function scrollToSection(event, sectionId) {
+                event.preventDefault();
+                const target = document.getElementById(sectionId);
+                if (target) {
+                    target.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                }
+                // Cập nhật URL hash mà KHÔNG reload
+                history.pushState(null, '', '#' + sectionId);
+                // ⭐ Trigger hashchange cho nav-slider cập nhật active
+                window.dispatchEvent(new HashChangeEvent('hashchange'));
+            }
+        </script>
+        <script>// ⭐ Về trang chủ — xóa hash cũ
+function goHome(event) {
+    event.preventDefault();
+    // Xóa hash khỏi URL
+    history.pushState(null, '', window.location.pathname);
+    // Scroll lên đầu
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Trigger hashchange để nav-slider cập nhật
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+}</script>
     </body>
 </html>

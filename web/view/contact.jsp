@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/home.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/theme-toggle.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/hero-stars.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/performance-optimize.css">
 </head>
 <body>
 <jsp:include page="/view/loading-runner.jsp" />
