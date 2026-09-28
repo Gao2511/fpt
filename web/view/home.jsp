@@ -233,6 +233,10 @@
                              alt="FPT Camera" class="hero-slide">
                         <img src="${pageContext.request.contextPath}/assets/images/Hero5.png"
                              alt="FPT Camera" class="hero-slide">
+                        <img src="${pageContext.request.contextPath}/assets/images/Hero6.png"
+                             alt="FPT Camera" class="hero-slide">
+                        <img src="${pageContext.request.contextPath}/assets/images/Hero7.png"
+                             alt="FPT Camera" class="hero-slide">
 
                         <%-- ⭐ NÚT CHUYỂN SLIDE --%>
                         <button class="hero-nav hero-nav-prev" onclick="prevSlide()" aria-label="Previous">
@@ -253,6 +257,8 @@
                             <button class="dot-slide" onclick="goToSlide(2)" aria-label="Slide 3"></button>
                             <button class="dot-slide" onclick="goToSlide(3)" aria-label="Slide 4"></button>
                             <button class="dot-slide" onclick="goToSlide(4)" aria-label="Slide 5"></button>
+                            <button class="dot-slide" onclick="goToSlide(5)" aria-label="Slide 6"></button>
+                            <button class="dot-slide" onclick="goToSlide(6)" aria-label="Slide 7"></button>
                         </div>
                     </div>
                 </div>
