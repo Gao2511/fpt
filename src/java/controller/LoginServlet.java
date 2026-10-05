@@ -22,7 +22,12 @@ public class LoginServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("user") != null) {
-            response.sendRedirect(request.getContextPath() + "/dashboard");
+            UserDTO user = (UserDTO) session.getAttribute("user");
+            if ("admin".equals(user.getRole())) {
+                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/home");
+            }
             return;
         }
         request.getRequestDispatcher("/view/login.jsp").forward(request, response);
@@ -114,14 +119,17 @@ public class LoginServlet extends HttpServlet {
         if (returnUrl != null && !returnUrl.trim().isEmpty()) {
             finalRedirect = returnUrl;
             session.removeAttribute("redirectAfterLogin");
-            System.out.println("   → Dùng returnUrl param");
-        } else if (redirectUrl != null) {
+            System.out.println("   → Dùng returnUrl param: " + finalRedirect);
+        } else if (redirectUrl != null && !redirectUrl.toString().contains("/login")) {
             finalRedirect = (String) redirectUrl;
             session.removeAttribute("redirectAfterLogin");
-            System.out.println("   → Dùng redirectAfterLogin session");
+            System.out.println("   → Dùng redirectAfterLogin session: " + finalRedirect);
+        } else if ("admin".equals(user.getRole())) {
+            finalRedirect = request.getContextPath() + "/admin/dashboard";
+            System.out.println("   → Dùng mặc định admin /admin/dashboard");
         } else {
-            finalRedirect = request.getContextPath() + "/dashboard";
-            System.out.println("   → Dùng mặc định /dashboard");
+            finalRedirect = request.getContextPath() + "/home";
+            System.out.println("   → Dùng mặc định /home");
         }
 
         System.out.println("   ➡️ FINAL REDIRECT: " + finalRedirect);

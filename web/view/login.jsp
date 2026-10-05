@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500;600&family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- Stylesheet chính (Glassmorphism Dark) -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/login-glass.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/login-glass.css?v=3.2">
 </head>
 <body class="login-body">
 
@@ -137,8 +137,8 @@
                     <button type="button" id="btnTogglePassword" class="glass-toggle-pass" aria-label="Toggle Password">
                         <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                     </button>
-                    <!-- Nút submit đăng nhập -->
-                    <button type="submit" id="btnLoginSubmit" class="glass-submit-btn" aria-label="Đăng nhập">
+                    <!-- Nút submit đăng nhập tròn -->
+                    <button type="submit" id="btnLoginSubmit" class="glass-submit-btn" aria-label="Đăng nhập" title="Đăng nhập">
                         <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                     </button>
                 </div>
@@ -148,8 +148,14 @@
                     <a href="${pageContext.request.contextPath}/forgot-password" id="linkForgotPassword" class="login-forgot-link">Quên mật khẩu?</a>
                 </div>
 
-                <!-- 3.8. Liên kết chuyển sang Đăng ký -->
-                <p class="login-sub blur-fade" data-delay="7" style="margin-top: 10px;">
+                <!-- 3.8. Nút bấm Đăng Nhập dạng đầy đủ rõ ràng -->
+                <button type="submit" id="btnLoginPrimary" class="glass-btn-primary blur-fade" data-delay="7" style="max-width: 300px;">
+                    <span>ĐĂNG NHẬP</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </button>
+
+                <!-- 3.9. Liên kết chuyển sang Đăng ký -->
+                <p class="login-sub blur-fade" data-delay="7" style="margin-top: 6px;">
                     Chưa có tài khoản?
                     <a href="${pageContext.request.contextPath}/register">Đăng ký ngay</a>
                 </p>
@@ -162,6 +168,6 @@
     <jsp:include page="/view/auth-modal.jsp" />
 
     <!-- 5. SCRIPT XỬ LÝ (JS Controller) -->
-    <script src="${pageContext.request.contextPath}/js/login-glass.js"></script>
+    <script src="${pageContext.request.contextPath}/js/login-glass.js?v=3.2"></script>
 </body>
 </html>
