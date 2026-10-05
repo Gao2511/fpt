@@ -36,7 +36,6 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/performance-optimize.css">
         <script src="${pageContext.request.contextPath}/js/address-data.js"></script>
         <script src="${pageContext.request.contextPath}/js/address-picker.js" defer></script>
-        <script src="${pageContext.request.contextPath}/js/tech-text.js"></script>
     </head>
     <body>
         <!-- ⭐ LOADING RUNNER -->
@@ -72,55 +71,12 @@
                         </div>
                     </c:if>
 
-                    <!-- ⭐ TECH TEXT — Hiệu ứng chữ tương tác "FPT WIFI 6" -->
-                    <div class="tech-text-wrap" id="techTextContainer"></div>
-
-                    <!-- ⭐ TEXT EFFECT — Chữ vẽ nét rồi phát sáng neon cam -->
-                    <div class="text-hover-wrap">
-                        <svg class="text-hover-svg" viewBox="0 0 920 280" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <linearGradient id="textGradientOrange" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" stop-color="#ffa54f"/>
-                                    <stop offset="50%" stop-color="#ff7a18"/>
-                                    <stop offset="100%" stop-color="#ffa54f"/>
-                                </linearGradient>
-                            </defs>
-
-                            <!-- ⭐ DÒNG 1: "TỐC ĐỘ CAO" -->
-                            <text x="50%" y="75" text-anchor="middle" dominant-baseline="central"
-                                  stroke-width="1.2" stroke="#ffffff" fill="none"
-                                  font-family="'Be Vietnam Pro', sans-serif" font-size="105" font-weight="900"
-                                  class="th-draw">
-                                TỐC ĐỘ CAO
-                            </text>
-                            <text x="50%" y="75" text-anchor="middle" dominant-baseline="central"
-                                  fill="url(#textGradientOrange)"
-                                  stroke="#ffa54f"
-                                  stroke-width="1"
-                                  paint-order="stroke fill"
-                                  font-family="'Be Vietnam Pro', sans-serif" font-size="105" font-weight="900"
-                                  class="th-main">
-                                TỐC ĐỘ CAO
-                            </text>
-
-                            <!-- ⭐ DÒNG 2: "HỖ TRỢ 24/7" (Tách xa dòng 1 tránh cấn dấu ngã/mũ) -->
-                            <text x="50%" y="215" text-anchor="middle" dominant-baseline="central"
-                                  stroke-width="1.2" stroke="#ffffff" fill="none"
-                                  font-family="'Be Vietnam Pro', sans-serif" font-size="105" font-weight="900"
-                                  class="th-draw">
-                                HỖ TRỢ 24/7
-                            </text>
-                            <text x="50%" y="215" text-anchor="middle" dominant-baseline="central"
-                                  fill="url(#textGradientOrange)"
-                                  stroke="#ffa54f"
-                                  stroke-width="1"
-                                  paint-order="stroke fill"
-                                  font-family="'Be Vietnam Pro', sans-serif" font-size="105" font-weight="900"
-                                  class="th-main">
-                                HỖ TRỢ 24/7
-                            </text>
-                        </svg>
-                    </div>  
+                    <span class="badge-top">WiFi 6 - Hiện đại - Tốc độ cao</span>
+                    <h1>FPT WIFI 6<br><span class="highlight">TỐC ĐỘ CAO, HỖ TRỢ 24/7</span></h1>
+                    <p class="desc">
+                        Trang bị Modem Wifi 6 hiện đại giúp kết nối mạng ổn định,
+                        Tốc độ cao đáp ứng nhu cầu làm việc, giải trí và học tập trực tuyến.
+                    </p>  
                     <div class="badges">
                         <span>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -943,30 +899,5 @@ function goHome(event) {
     // Trigger hashchange để nav-slider cập nhật
     window.dispatchEvent(new HashChangeEvent('hashchange'));
 }
-</script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const container = document.getElementById('techTextContainer');
-                if (container && window.TechText) {
-                    window.TechText.init(container, {
-                        text: 'FPT WIFI 6',
-                        fontFamily: "'Orbitron', 'Plus Jakarta Sans', sans-serif",
-                        fontSize: 600,
-                        fontWeight: 900,
-                        letterSpacing: 0.04,
-                        color: '#ffffff',
-                        accentColor: '#ff9933',
-                        reach: 195,
-                        softness: 0.6,
-                        specks: 18,
-                        selection: true,
-                        labels: true,
-                        draggable: true,
-                        sweep: true,
-                        speed: 0.6
-                    });
-                }
-            });
-        </script>
     </body>
 </html>
