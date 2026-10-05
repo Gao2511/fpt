@@ -1,4 +1,4 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
@@ -58,10 +58,11 @@
                     <div class="user-avatar-big">
                         <c:choose>
                             <c:when test="${not empty targetUser.avatarUrl}">
-                                <img src="${pageContext.request.contextPath}/${targetUser.avatarUrl}" alt="Avatar">
+                                <img src="${pageContext.request.contextPath}/${targetUser.avatarUrl}" alt="Avatar"
+                                     onerror="this.src='${pageContext.request.contextPath}/${targetUser.defaultAvatar}'">
                             </c:when>
                             <c:otherwise>
-                                <span>${targetUser.initial}</span>
+                                <img src="${pageContext.request.contextPath}/${targetUser.defaultAvatar}" alt="Avatar">
                             </c:otherwise>
                         </c:choose>
                     </div>

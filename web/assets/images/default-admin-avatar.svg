@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient: Cyber Obsidian & Electric Indigo -->
+    <linearGradient id="adminBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="50%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+
+    <!-- Admin Gold & FPT Orange Gradient -->
+    <linearGradient id="adminGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="40%" stop-color="#F59E0B"/>
+      <stop offset="80%" stop-color="#F37021"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+
+    <!-- Face / Head Gradient -->
+    <linearGradient id="adminHeadGrad" x1="30%" y1="0%" x2="70%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="65%" stop-color="#F1F5F9"/>
+      <stop offset="100%" stop-color="#CBD5E1"/>
+    </linearGradient>
+
+    <!-- Admin Suit / Uniform Gradient -->
+    <linearGradient id="adminSuitGrad" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="60%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+
+    <!-- Soft Drop Shadow -->
+    <filter id="adminShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Circular Clip Path -->
+  <clipPath id="adminClip">
+    <circle cx="100" cy="100" r="96"/>
+  </clipPath>
+
+  <!-- Main Background -->
+  <circle cx="100" cy="100" r="98" fill="url(#adminBgGrad)"/>
+
+  <!-- Admin Tech Cyber Geometry Background -->
+  <g opacity="0.25" stroke="#F37021" stroke-width="1.5" fill="none">
+    <circle cx="100" cy="100" r="82" stroke-dasharray="10 8"/>
+    <circle cx="100" cy="100" r="66" stroke-dasharray="6 6" stroke="#38BDF8"/>
+    <!-- Radar crosshairs -->
+    <line x1="100" y1="12" x2="100" y2="40" stroke="#F59E0B"/>
+    <line x1="100" y1="160" x2="100" y2="188" stroke="#F59E0B"/>
+    <line x1="12" y1="100" x2="40" y2="100" stroke="#F59E0B"/>
+    <line x1="160" y1="100" x2="188" y2="100" stroke="#F59E0B"/>
+  </g>
+
+  <!-- Content Clustered Inside Circular Frame -->
+  <g clip-path="url(#adminClip)" filter="url(#adminShadow)">
+    
+    <!-- Torso / Executive Blazer -->
+    <path d="M 32 195 C 32 148, 56 130, 100 130 C 144 130, 168 148, 168 195 Z"
+          fill="url(#adminSuitGrad)"/>
+
+    <!-- Crisp White Collar Shirt -->
+    <path d="M 80 130 L 100 162 L 120 130 Z" fill="#FFFFFF"/>
+
+    <!-- FPT Orange Admin Tie -->
+    <path d="M 96 134 L 104 134 L 106 170 L 100 180 L 94 170 Z" fill="url(#adminGoldGrad)"/>
+
+    <!-- Neck -->
+    <path d="M 84 100 L 116 100 L 114 126 L 86 126 Z"
+          fill="#E2E8F0"/>
+
+    <!-- Head / Face Silhouette -->
+    <ellipse cx="100" cy="80" rx="35" ry="40" fill="url(#adminHeadGrad)"/>
+
+    <!-- Sleek Executive Haircut -->
+    <path d="M 65 74 C 65 48, 80 38, 100 38 C 122 38, 135 48, 135 74 C 126 66, 114 62, 100 62 C 84 62, 74 67, 65 74 Z"
+          fill="#0F172A"/>
+
+    <!-- Admin Security Shield Badge On Lapel -->
+    <g transform="translate(132, 142) scale(0.9)">
+      <!-- Shield Shape -->
+      <path d="M 0 0 L 18 0 C 18 14, 9 22, 0 26 C -9 22, -18 14, -18 0 Z"
+            fill="url(#adminGoldGrad)" stroke="#FFFFFF" stroke-width="1.5"/>
+      <!-- Star in Shield -->
+      <path d="M 0 5 L 2 10 L 7 10 L 3 13 L 5 18 L 0 15 L -5 18 L -3 13 L -7 10 L -2 10 Z"
+            fill="#FFFFFF"/>
+    </g>
+  </g>
+
+  <!-- Crown / Tech Circlet Accent on Top -->
+  <g transform="translate(100, 32) scale(0.8)">
+    <path d="M -16 6 L -10 14 L 0 4 L 10 14 L 16 6 L 12 18 L -12 18 Z"
+          fill="url(#adminGoldGrad)"/>
+    <circle cx="0" cy="2" r="2.5" fill="#FFFFFF"/>
+    <circle cx="-16" cy="4" r="2" fill="#FFFFFF"/>
+    <circle cx="16" cy="4" r="2" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Outer Ring (Gold & FPT Orange border) -->
+  <circle cx="100" cy="100" r="97" fill="none" stroke="url(#adminGoldGrad)" stroke-width="3.5"/>
+</svg>

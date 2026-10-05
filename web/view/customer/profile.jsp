@@ -53,12 +53,13 @@
                             <c:when test="${not empty sessionScope.user.avatarUrl}">
                                 <img src="${pageContext.request.contextPath}/${sessionScope.user.avatarUrl}"
                                      alt="Avatar"
+                                     onerror="this.src='${pageContext.request.contextPath}/${sessionScope.user.defaultAvatar}'"
                                      style="position:absolute !important; top:0 !important; left:0 !important; width:120px !important; height:120px !important; min-width:120px !important; min-height:120px !important; max-width:120px !important; max-height:120px !important; object-fit:cover !important; object-position:center !important; border-radius:50% !important; display:block !important; margin:0 !important; padding:0 !important;">
                             </c:when>
                             <c:otherwise>
-                                <div style="width:120px !important; height:120px !important; display:flex !important; align-items:center !important; justify-content:center !important; font-size:48px !important; font-weight:900 !important; color:white !important; text-transform:uppercase !important; line-height:1 !important;">
-                                    ${sessionScope.user.initial}
-                                </div>
+                                <img src="${pageContext.request.contextPath}/${sessionScope.user.defaultAvatar}"
+                                     alt="Default Avatar"
+                                     style="position:absolute !important; top:0 !important; left:0 !important; width:120px !important; height:120px !important; min-width:120px !important; min-height:120px !important; max-width:120px !important; max-height:120px !important; object-fit:cover !important; object-position:center !important; border-radius:50% !important; display:block !important; margin:0 !important; padding:0 !important;">
                             </c:otherwise>
                         </c:choose>
                     </div>

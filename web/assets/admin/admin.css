@@ -248,6 +248,14 @@ a { text-decoration: none; color: inherit; }
     font-size: 13px;
     color: white;
     box-shadow: 0 4px 12px rgba(243, 112, 33, 0.4);
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+}
+
+img.avatar {
+    display: block;
+    object-fit: cover;
 }
 
 .user-text strong {

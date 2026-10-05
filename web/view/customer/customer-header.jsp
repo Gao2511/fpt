@@ -71,10 +71,12 @@
                             <c:choose>
                                 <c:when test="${not empty sessionScope.user.avatarUrl}">
                                     <img src="${pageContext.request.contextPath}/${sessionScope.user.avatarUrl}"
-                                         alt="Avatar" class="avatar-img-small">
+                                         alt="Avatar" class="avatar-img-small"
+                                         onerror="this.src='${pageContext.request.contextPath}/${sessionScope.user.defaultAvatar}'">
                                 </c:when>
                                 <c:otherwise>
-                                    <span class="avatar-initial">${sessionScope.user.initial}</span>
+                                    <img src="${pageContext.request.contextPath}/${sessionScope.user.defaultAvatar}"
+                                         alt="Default Avatar" class="avatar-img-small">
                                 </c:otherwise>
                             </c:choose>
                             <span class="avatar-name">${sessionScope.user.displayName}</span>
@@ -89,10 +91,12 @@
                                 <c:choose>
                                     <c:when test="${not empty sessionScope.user.avatarUrl}">
                                         <img src="${pageContext.request.contextPath}/${sessionScope.user.avatarUrl}"
-                                             alt="Avatar" class="dropdown-avatar-img">
+                                             alt="Avatar" class="dropdown-avatar-img"
+                                             onerror="this.src='${pageContext.request.contextPath}/${sessionScope.user.defaultAvatar}'">
                                     </c:when>
                                     <c:otherwise>
-                                        <div class="dropdown-avatar">${sessionScope.user.initial}</div>
+                                        <img src="${pageContext.request.contextPath}/${sessionScope.user.defaultAvatar}"
+                                             alt="Default Avatar" class="dropdown-avatar-img">
                                     </c:otherwise>
                                 </c:choose>
                                 <div class="dropdown-info">

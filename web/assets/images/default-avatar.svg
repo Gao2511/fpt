@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient: Signature FPT Orange & Deep Coral -->
+    <linearGradient id="fptBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7A1A"/>
+      <stop offset="45%" stop-color="#F37021"/>
+      <stop offset="100%" stop-color="#D9480F"/>
+    </linearGradient>
+
+    <!-- Subtle Outer Ring Glow -->
+    <radialGradient id="ringGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="70%" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="96%" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.8"/>
+    </radialGradient>
+
+    <!-- Face / Head Gradient -->
+    <linearGradient id="headGrad" x1="30%" y1="0%" x2="70%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="70%" stop-color="#FFF1E6"/>
+      <stop offset="100%" stop-color="#FED7AA"/>
+    </linearGradient>
+
+    <!-- Body / Shoulders Gradient -->
+    <linearGradient id="bodyGrad" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="60%" stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#E2E8F0"/>
+    </linearGradient>
+
+    <!-- Tech Telecom Headset Gradient -->
+    <linearGradient id="techGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#005A9C"/>
+      <stop offset="50%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+
+    <!-- Soft Drop Shadow -->
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#7C2D12" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Circular Clip Path -->
+  <clipPath id="avatarClip">
+    <circle cx="100" cy="100" r="96"/>
+  </clipPath>
+
+  <!-- Main Background -->
+  <circle cx="100" cy="100" r="98" fill="url(#fptBgGrad)"/>
+
+  <!-- High-Tech Cyber Grid / Signal Wave Lines in Background -->
+  <g opacity="0.18" stroke="#FFFFFF" stroke-width="2" fill="none">
+    <circle cx="100" cy="100" r="82" stroke-dasharray="8 6"/>
+    <circle cx="100" cy="100" r="64" stroke-dasharray="4 4"/>
+    <path d="M 25 150 Q 100 130 175 150"/>
+    <path d="M 35 168 Q 100 152 165 168"/>
+  </g>
+
+  <!-- Content Clustered Inside Circular Frame -->
+  <g clip-path="url(#avatarClip)" filter="url(#softShadow)">
+    
+    <!-- Torso / Shoulders -->
+    <path d="M 36 195 C 36 152, 60 134, 100 134 C 140 134, 164 152, 164 195 Z"
+          fill="url(#bodyGrad)"/>
+
+    <!-- Collar / High-Tech V-Neck Accent -->
+    <path d="M 78 134 L 100 158 L 122 134 C 114 139, 86 139, 78 134 Z"
+          fill="#FED7AA" opacity="0.7"/>
+
+    <!-- FPT Signature Brand Accent Ribbon on Chest -->
+    <path d="M 92 165 L 108 165 L 100 177 Z"
+          fill="#F37021" opacity="0.9"/>
+
+    <!-- Neck -->
+    <path d="M 84 105 L 116 105 L 114 130 L 86 130 Z"
+          fill="#FED7AA"/>
+
+    <!-- Head / Face Silhouette -->
+    <ellipse cx="100" cy="85" rx="36" ry="42" fill="url(#headGrad)"/>
+
+    <!-- Modern Hair Style / Cap Form -->
+    <path d="M 64 80 C 64 52, 82 43, 100 43 C 122 43, 136 54, 136 80 C 128 70, 118 68, 100 68 C 82 68, 72 72, 64 80 Z"
+          fill="#1E293B"/>
+
+    <!-- FPT Telecom Smart Headset / Operator / Tech Feature -->
+    <!-- Headband -->
+    <path d="M 64 84 C 61 62, 74 48, 100 48 C 124 48, 137 60, 136 84"
+          fill="none" stroke="url(#techGrad)" stroke-width="4.5" stroke-linecap="round"/>
+    
+    <!-- Left Earpiece -->
+    <rect x="58" y="74" width="8" height="20" rx="4" fill="#0284C7"/>
+    <circle cx="62" cy="84" r="2.5" fill="#FFFFFF"/>
+
+    <!-- Right Earpiece -->
+    <rect x="134" y="74" width="8" height="20" rx="4" fill="#0284C7"/>
+    
+    <!-- Sleek Microphone Arm Extending to Mouth -->
+    <path d="M 136 85 C 138 102, 126 114, 112 114"
+          fill="none" stroke="#0284C7" stroke-width="3" stroke-linecap="round"/>
+    <!-- Mic Tip (FPT Orange indicator light) -->
+    <circle cx="110" cy="114" r="3.5" fill="#F37021"/>
+    <circle cx="110" cy="114" r="1.5" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Glowing Inner / Border Rim -->
+  <circle cx="100" cy="100" r="97" fill="url(#ringGlow)" pointer-events="none"/>
+  <circle cx="100" cy="100" r="97" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-opacity="0.6"/>
+</svg>

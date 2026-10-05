@@ -102,6 +102,20 @@ public class UserDTO {
     }
 
     // ===== HELPER METHODS =====
+    public String getDefaultAvatar() {
+        if ("admin".equals(role)) {
+            return "assets/images/default-admin-avatar.svg";
+        }
+        return "assets/images/default-avatar.svg";
+    }
+
+    public String getEffectiveAvatarUrl() {
+        if (avatarUrl != null && !avatarUrl.trim().isEmpty()) {
+            return avatarUrl;
+        }
+        return getDefaultAvatar();
+    }
+
     public String getInitial() {
         String source = (fullName != null && !fullName.trim().isEmpty())
                         ? fullName.trim()

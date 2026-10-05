@@ -88,7 +88,15 @@
     <div class="header-right">
         <span class="role-badge">Admin</span>
         <div class="user-info">
-            <div class="avatar">${not empty sessionScope.user.initial ? sessionScope.user.initial : 'AD'}</div>
+            <c:choose>
+                <c:when test="${not empty sessionScope.user.avatarUrl}">
+                    <img src="${pageContext.request.contextPath}/${sessionScope.user.avatarUrl}" class="avatar" alt="Admin"
+                         onerror="this.src='${pageContext.request.contextPath}/${sessionScope.user.defaultAvatar}'">
+                </c:when>
+                <c:otherwise>
+                    <img src="${pageContext.request.contextPath}/${sessionScope.user.defaultAvatar}" class="avatar" alt="Admin">
+                </c:otherwise>
+            </c:choose>
             <div class="user-text">
                 <strong>${sessionScope.user.fullName != null ? sessionScope.user.fullName : sessionScope.user.username}</strong>
                 <small><span class="online-dot"></span> Online</small>
