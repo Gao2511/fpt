@@ -1,7 +1,11 @@
-/* =========================================================
-   FPT SALE - WEB FONTS
-   Plus Jakarta Sans (heading) + Manrope (body)
-   ========================================================= */
+/* ==========================================================================
+   WEB FONTS STYLESHEET - BỘ PHÔNG CHỮ CHUẨN FPT TELECOM
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. GOOGLE FONTS IMPORT  - Nạp Plus Jakarta Sans, Manrope, Inter
+   02. FONT VARIABLES       - Khai báo các biến CSS font-family
+   03. TYPOGRAPHY RULES     - Áp dụng font chữ cho body, tiêu đề, số liệu
+   ========================================================================== */
 
 /* ⭐ Plus Jakarta Sans — heading hiện đại, độc đáo */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -12,6 +16,9 @@
 /* Inter — fallback */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
+/* ⭐ Orbitron — Display font công nghệ cao, WiFi 6 & tương lai */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&display=swap');
+
 /* =========================================================
    BIẾN FONT
    ========================================================= */
@@ -21,6 +28,7 @@
     --font-heading: 'Plus Jakarta Sans', 'Manrope', 'Inter', sans-serif;
     --font-number:  'Plus Jakarta Sans', 'Manrope', sans-serif;
     --font-mono:    'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+    --font-tech:    'Orbitron', 'Plus Jakarta Sans', sans-serif;
 }
 
 /* Áp dụng */

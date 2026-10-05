@@ -20,113 +20,10 @@
 <jsp:include page="/view/nav-slider.jsp" />
  <jsp:include page="/view/theme-toggle.jsp" />
         <!-- ============ TOP NAV ============ -->
-        <header class="top-nav">
-            <div class="container">
-                <a href="${pageContext.request.contextPath}/home" class="logo">
-                    <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
-                         alt="FPT Telecom"
-                         style="height: 50px; width: auto; object-fit: contain; display: block;">
-                </a>
-                <nav class="menu">
-                    <a href="${pageContext.request.contextPath}/home">Trang chủ</a>
-                    <a href="${pageContext.request.contextPath}/home#packages">Bảng giá</a>
-                    <a href="${pageContext.request.contextPath}/my-orders" class="active">Xem đơn</a>
-                    <a href="${pageContext.request.contextPath}/home#contact-info">Liên hệ</a>
-                </nav>
-                <div class="right">
-                    <div class="hotline-box">
-                        <div class="icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                            </svg>
-                        </div>
-                        <div class="text">
-                            <small>Hotline</small>
-                            <strong>1900 6600</strong>
-                        </div>
-                    </div>
-                    <c:choose>
-                        <c:when test="${empty sessionScope.user}">
-                            <a href="${pageContext.request.contextPath}/login" class="btn-login-small">Đăng nhập</a>
-                            <a href="${pageContext.request.contextPath}/register" class="btn-register-small">Đăng ký ngay</a>
-                        </c:when>
-                        <c:when test="${sessionScope.user.role == 'admin'}">
-                            <a href="${pageContext.request.contextPath}/admin/dashboard" class="btn-login-small">Trang quản trị</a>
-                            <a href="${pageContext.request.contextPath}/logout" class="btn-register-small">Đăng xuất</a>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="user-avatar-wrap">
-                                <div class="user-avatar" onclick="toggleUserMenu(event)">
-                                    <c:choose>
-                                        <c:when test="${not empty sessionScope.user.avatarUrl}">
-                                            <img src="${pageContext.request.contextPath}/${sessionScope.user.avatarUrl}"
-                                                 alt="Avatar" class="avatar-img-small">
-                                        </c:when>
-                                        <c:otherwise>
-                                            <span class="avatar-initial">${sessionScope.user.initial}</span>
-                                        </c:otherwise>
-                                    </c:choose>
-                                    <span class="avatar-name">${sessionScope.user.displayName}</span>
-                                    <svg class="avatar-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="6 9 12 15 18 9"/>
-                                    </svg>
-                                </div>
-                                <div class="user-dropdown" id="userDropdown">
-                                    <div class="dropdown-header">
-                                        <c:choose>
-                                            <c:when test="${not empty sessionScope.user.avatarUrl}">
-                                                <img src="${pageContext.request.contextPath}/${sessionScope.user.avatarUrl}"
-                                                     alt="Avatar" class="dropdown-avatar-img">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <div class="dropdown-avatar">${sessionScope.user.initial}</div>
-                                            </c:otherwise>
-                                        </c:choose>
-                                        <div class="dropdown-info">
-                                            <strong>${sessionScope.user.displayName}</strong>
-                                            <small>${sessionScope.user.username}</small>
-                                        </div>
-                                    </div>
-                                    <div class="dropdown-divider"></div>
-                                    <a href="${pageContext.request.contextPath}/home" class="dropdown-item">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                                        <polyline points="9 22 9 12 15 12 15 22"/>
-                                        </svg>
-                                        Trang chủ
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/home#packages" class="dropdown-item">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="2" y="7" width="20" height="14" rx="2"/>
-                                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                                        </svg>
-                                        Bảng giá gói cước
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/my-orders" class="dropdown-item">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                        <polyline points="14 2 14 8 20 8"/>
-                                        <line x1="16" y1="13" x2="8" y2="13"/>
-                                        <line x1="16" y1="17" x2="8" y2="17"/>
-                                        </svg>
-                                        Xem đơn
-                                    </a>
-                                    <div class="dropdown-divider"></div>
-                                    <a href="${pageContext.request.contextPath}/logout" class="dropdown-item dropdown-logout">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                                        <polyline points="16 17 21 12 16 7"/>
-                                        <line x1="21" y1="12" x2="9" y2="12"/>
-                                        </svg>
-                                        Đăng xuất
-                                    </a>
-                                </div>
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-            </div>
-        </header>
+        <!-- ============ TOP NAV (DÙNG CHUNG) ============ -->
+<jsp:include page="/view/customer/customer-header.jsp">
+    <jsp:param name="activeMenu" value="orders"/>
+</jsp:include>
 
         <!-- ============ MAIN ============ -->
         <main class="orders-container">
@@ -338,37 +235,7 @@
             </div>
         </footer>
 
-        <script>
-            function toggleUserMenu(event) {
-                event.stopPropagation();
-                const dropdown = document.getElementById('userDropdown');
-                const avatar = document.querySelector('.user-avatar');
-                dropdown.classList.toggle('active');
-                avatar.classList.toggle('active');
-            }
 
-            document.addEventListener('click', function (event) {
-                const dropdown = document.getElementById('userDropdown');
-                const avatar = document.querySelector('.user-avatar');
-                if (dropdown && avatar
-                        && !avatar.contains(event.target)
-                        && !dropdown.contains(event.target)) {
-                    dropdown.classList.remove('active');
-                    avatar.classList.remove('active');
-                }
-            });
-
-            document.addEventListener('keydown', function (event) {
-                if (event.key === 'Escape') {
-                    const dropdown = document.getElementById('userDropdown');
-                    const avatar = document.querySelector('.user-avatar');
-                    if (dropdown && avatar) {
-                        dropdown.classList.remove('active');
-                        avatar.classList.remove('active');
-                    }
-                }
-            });
-        </script>
 
     </body>
 </html>

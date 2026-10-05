@@ -1,6 +1,15 @@
-        /* ============================================================
-           DARK THEME — SETTINGS PAGE
-           ============================================================ */
+/* ==========================================================================
+   ADMIN SETTINGS STYLESHEET - CÀI ĐẶT HỆ THỐNG & CẤU HÌNH (DARK THEME)
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. PAGE WRAPPER & CONTAINER  - Bố cục trang cài đặt trên nền tối
+   02. PAGE HEADER               - Tiêu đề trang & mô tả cấu hình
+   03. SETTINGS NAVIGATION TABS  - Các tab danh mục cài đặt (Email, Hệ thống, v.v.)
+   04. FORM CARDS & SECTIONS     - Thẻ nhóm cài đặt và mô tả tham số
+   05. FORM INPUTS & TOGGLES     - Ô nhập cấu hình, công tắc bật/tắt tính năng
+   06. TEST EMAIL & ACTIONS      - Nút kiểm tra kết nối SMTP & lưu thiết lập
+   07. RESPONSIVE DESIGN         - Tương thích giao diện tablet và mobile
+   ========================================================================== */
         .settings-page {
             background: linear-gradient(180deg, #0f172a 0%, #1a2332 100%);
             min-height: 100vh;

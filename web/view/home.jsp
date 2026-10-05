@@ -3,6 +3,22 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
+<%-- =========================================================================
+     TRANG CHỦ FPT TELECOM - HOME.JSP
+     =========================================================================
+     MỤC LỤC / TABLE OF CONTENTS:
+     01. META & STYLESHEETS        - Imports CSS, Fonts, Address Picker
+     02. SHARED WIDGETS            - Runner Loader, Nav Slider, Theme Toggle
+     03. TOP NAVIGATION HEADER     - Header dùng chung (/view/customer/customer-header.jsp)
+     04. HERO BANNER & SLIDESHOW   - Banner công nghệ WiFi 6 & Neon Glow FX
+     05. STATS COUNTER BAR         - Khối số liệu ấn tượng (Khách hàng, hạ tầng)
+     06. PACKAGES SECTION (#packages) - Bảng giá Internet, FPT Play & Camera
+     07. FEATURES & ADVANTAGES     - Ưu điểm vượt trội của mạng FPT
+     08. CONSULTATION FORM (#contact) - Form đăng ký tư vấn lắp đặt & Address Picker
+     09. FOOTER SECTION            - Chân trang, hotline hỗ trợ, bản quyền
+     10. FLOATING AI CHAT WIDGET   - Khung chat tư vấn AI tự động
+     11. PAGE SCRIPTS              - Slideshow controller, Smooth scrolling
+     ========================================================================= --%>
 <!DOCTYPE html>
 <html lang="vi">
     <head>
@@ -20,6 +36,7 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/performance-optimize.css">
         <script src="${pageContext.request.contextPath}/js/address-data.js"></script>
         <script src="${pageContext.request.contextPath}/js/address-picker.js" defer></script>
+        <script src="${pageContext.request.contextPath}/js/tech-text.js"></script>
     </head>
     <body>
         <!-- ⭐ LOADING RUNNER -->
@@ -28,139 +45,10 @@
         <jsp:include page="/view/theme-toggle.jsp" />
 
         <!-- ============ TOP NAV ============ -->
-        <header class="top-nav">
-            <div class="container">
-                <a href="${pageContext.request.contextPath}/home" class="logo">
-                    <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
-                         alt="FPT Telecom"
-                         style="height: 50px; width: auto; object-fit: contain; display: block;">
-                </a>
-                <nav class="menu">
-                   <a href="${pageContext.request.contextPath}/home" onclick="goHome(event)">Trang chủ</a>
-                    <a href="#packages" onclick="scrollToSection(event, 'packages')">Bảng giá</a>
-                    <a href="#contact" onclick="scrollToSection(event, 'contact')">Tư vấn</a>
-                    <a href="${pageContext.request.contextPath}/contact">Liên hệ</a>
-                </nav>
-                <div class="right">
-                    <div class="hotline-box">
-                        <div class="icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                            </svg>
-                        </div>
-                        <div class="text">
-                            <small>Hotline</small>
-                            <strong>0932 079 469</strong>
-                        </div>
-                    </div>
-                    <c:choose>
-                        <%-- Chưa đăng nhập --%>
-                        <c:when test="${empty sessionScope.user}">
-                            <a href="${pageContext.request.contextPath}/login" class="btn-login-small">Đăng nhập</a>
-                            <a href="${pageContext.request.contextPath}/register" class="btn-register-small">Đăng ký ngay</a>
-                        </c:when>
-
-                        <%-- Admin --%>
-                        <c:when test="${sessionScope.user.role == 'admin'}">
-                            <a href="${pageContext.request.contextPath}/admin/dashboard" class="btn-login-small">
-                                Trang quản trị
-                            </a>
-                            <a href="${pageContext.request.contextPath}/logout" class="btn-register-small">
-                                Đăng xuất
-                            </a>
-                        </c:when>
-
-                        <%-- Customer --%>
-                        <c:otherwise>
-                            <div class="user-avatar-wrap">
-                                <div class="user-avatar" onclick="toggleUserMenu(event)">
-                                    <c:choose>
-                                        <c:when test="${not empty sessionScope.user.avatarUrl}">
-                                            <img src="${pageContext.request.contextPath}/${sessionScope.user.avatarUrl}"
-                                                 alt="Avatar" class="avatar-img-small">
-                                        </c:when>
-                                        <c:otherwise>
-                                            <span class="avatar-initial">${sessionScope.user.initial}</span>
-                                        </c:otherwise>
-                                    </c:choose>
-                                    <span class="avatar-name">${sessionScope.user.displayName}</span>
-                                    <svg class="avatar-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="6 9 12 15 18 9"/>
-                                    </svg>
-                                </div>
-
-                                <%-- Dropdown menu --%>
-                                <div class="user-dropdown" id="userDropdown">
-                                    <div class="dropdown-header">
-                                        <c:choose>
-                                            <c:when test="${not empty sessionScope.user.avatarUrl}">
-                                                <img src="${pageContext.request.contextPath}/${sessionScope.user.avatarUrl}"
-                                                     alt="Avatar" class="dropdown-avatar-img">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <div class="dropdown-avatar">${sessionScope.user.initial}</div>
-                                            </c:otherwise>
-                                        </c:choose>
-                                        <div class="dropdown-info">
-                                            <strong>${sessionScope.user.displayName}</strong>
-                                            <small>${sessionScope.user.username}</small>
-                                        </div>
-                                    </div>
-                                    <div class="dropdown-divider"></div>
-                                    <a href="${pageContext.request.contextPath}/profile" class="dropdown-item">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                        <circle cx="12" cy="7" r="4"/>
-                                        </svg>
-                                        Hồ sơ cá nhân
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/my-orders" class="dropdown-item">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                        <polyline points="14 2 14 8 20 8"/>
-                                        <line x1="16" y1="13" x2="8" y2="13"/>
-                                        <line x1="16" y1="17" x2="8" y2="17"/>
-                                        </svg>
-                                        Đơn của tôi
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/change-password" class="dropdown-item">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                                        </svg>
-                                        Đổi mật khẩu
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/logout" class="dropdown-item dropdown-logout">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                                        <polyline points="16 17 21 12 16 7"/>
-                                        <line x1="21" y1="12" x2="9" y2="12"/>
-                                        </svg>
-                                        Đăng xuất
-                                    </a>
-                                </div>
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-
-                <!-- ⭐ NÚT HAMBURGER MENU (chỉ hiện trên mobile) -->
-                <button class="hamburger-btn" onclick="toggleMobileMenu(event)" aria-label="Menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-        </header>
-
-        <!-- ⭐ MOBILE MENU -->
-        <div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
-        <div class="mobile-menu" id="mobileMenu">
-            <a href="${pageContext.request.contextPath}/home">Trang chủ</a>
-            <a href="${pageContext.request.contextPath}/home#packages">Bảng giá</a>
-            <a href="${pageContext.request.contextPath}/home#contact">Tư vấn</a>
-            <a href="${pageContext.request.contextPath}/contact">Liên hệ</a>
-        </div>
+        <jsp:include page="/view/customer/customer-header.jsp">
+            <jsp:param name="isHomePage" value="true" />
+            <jsp:param name="activeMenu" value="home" />
+        </jsp:include>
 
         <!-- ============ HERO ============ -->
         <section class="hero">
@@ -183,16 +71,60 @@
                             <span class="welcome-line-2">${sessionScope.user.fullName}!</span>
                         </div>
                     </c:if>
-                    <span class="badge-top">WiFi 6 - Hiện đại - Tốc độ cao</span>
-                    <h1>FPT WIFI 6<br><span class="highlight">TỐC ĐỘ CAO, HỖ TRỢ 24/7</span></h1>
-                    <p class="desc">
-                        Trang bị Modem Wifi 6 hiện đại giúp kết nối mạng ổn định,
-                        Tốc độ cao đáp ứng nhu cầu làm việc, giải trí và học tập trực tuyến.
-                    </p>
+
+                    <!-- ⭐ TECH TEXT — Hiệu ứng chữ tương tác "FPT WIFI 6" -->
+                    <div class="tech-text-wrap" id="techTextContainer"></div>
+
+                    <!-- ⭐ TEXT EFFECT — Chữ vẽ nét rồi phát sáng neon cam -->
+                    <div class="text-hover-wrap">
+                        <svg class="text-hover-svg" viewBox="0 0 920 280" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="textGradientOrange" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#ffa54f"/>
+                                    <stop offset="50%" stop-color="#ff7a18"/>
+                                    <stop offset="100%" stop-color="#ffa54f"/>
+                                </linearGradient>
+                            </defs>
+
+                            <!-- ⭐ DÒNG 1: "TỐC ĐỘ CAO" -->
+                            <text x="50%" y="75" text-anchor="middle" dominant-baseline="central"
+                                  stroke-width="1.2" stroke="#ffffff" fill="none"
+                                  font-family="'Be Vietnam Pro', sans-serif" font-size="105" font-weight="900"
+                                  class="th-draw">
+                                TỐC ĐỘ CAO
+                            </text>
+                            <text x="50%" y="75" text-anchor="middle" dominant-baseline="central"
+                                  fill="url(#textGradientOrange)"
+                                  stroke="#ffa54f"
+                                  stroke-width="1"
+                                  paint-order="stroke fill"
+                                  font-family="'Be Vietnam Pro', sans-serif" font-size="105" font-weight="900"
+                                  class="th-main">
+                                TỐC ĐỘ CAO
+                            </text>
+
+                            <!-- ⭐ DÒNG 2: "HỖ TRỢ 24/7" (Tách xa dòng 1 tránh cấn dấu ngã/mũ) -->
+                            <text x="50%" y="215" text-anchor="middle" dominant-baseline="central"
+                                  stroke-width="1.2" stroke="#ffffff" fill="none"
+                                  font-family="'Be Vietnam Pro', sans-serif" font-size="105" font-weight="900"
+                                  class="th-draw">
+                                HỖ TRỢ 24/7
+                            </text>
+                            <text x="50%" y="215" text-anchor="middle" dominant-baseline="central"
+                                  fill="url(#textGradientOrange)"
+                                  stroke="#ffa54f"
+                                  stroke-width="1"
+                                  paint-order="stroke fill"
+                                  font-family="'Be Vietnam Pro', sans-serif" font-size="105" font-weight="900"
+                                  class="th-main">
+                                HỖ TRỢ 24/7
+                            </text>
+                        </svg>
+                    </div>  
                     <div class="badges">
                         <span>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="20 6 9 17 4 12"/>
+                                <polyline points="20 6 9 17 4 12"/>
                             </svg>
                             WiFi 6 hiện đại
                         </span>
@@ -688,34 +620,6 @@
             `;
             document.head.appendChild(style);
 
-            // ===== MOBILE MENU =====
-            function toggleMobileMenu(event) {
-                event.stopPropagation();
-                const menu = document.getElementById('mobileMenu');
-                const overlay = document.querySelector('.mobile-menu-overlay');
-                const btn = document.querySelector('.hamburger-btn');
-
-                menu.classList.toggle('active');
-                overlay.classList.toggle('active');
-                btn.classList.toggle('active');
-
-                if (menu.classList.contains('active')) {
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    document.body.style.overflow = '';
-                }
-            }
-
-            function closeMobileMenu() {
-                const menu = document.getElementById('mobileMenu');
-                const overlay = document.querySelector('.mobile-menu-overlay');
-                const btn = document.querySelector('.hamburger-btn');
-
-                menu.classList.remove('active');
-                overlay.classList.remove('active');
-                btn.classList.remove('active');
-                document.body.style.overflow = '';
-            }
 
             window.addEventListener('resize', function () {
                 if (window.innerWidth > 900) closeMobileMenu();
@@ -938,39 +842,6 @@
             }
         </script>
 
-        <script>
-            function toggleUserMenu(event) {
-                event.stopPropagation();
-                const dropdown = document.getElementById('userDropdown');
-                const avatar = document.querySelector('.user-avatar');
-
-                dropdown.classList.toggle('active');
-                avatar.classList.toggle('active');
-            }
-
-            document.addEventListener('click', function (event) {
-                const dropdown = document.getElementById('userDropdown');
-                const avatar = document.querySelector('.user-avatar');
-
-                if (dropdown && avatar
-                        && !avatar.contains(event.target)
-                        && !dropdown.contains(event.target)) {
-                    dropdown.classList.remove('active');
-                    avatar.classList.remove('active');
-                }
-            });
-
-            document.addEventListener('keydown', function (event) {
-                if (event.key === 'Escape') {
-                    const dropdown = document.getElementById('userDropdown');
-                    const avatar = document.querySelector('.user-avatar');
-                    if (dropdown && avatar) {
-                        dropdown.classList.remove('active');
-                        avatar.classList.remove('active');
-                    }
-                }
-            });
-        </script>
 
         <script>
             // ===== HERO SLIDESHOW NÂNG CAO =====
@@ -1019,6 +890,25 @@
                 if (slideshow) {
                     slideshow.addEventListener('mouseenter', () => clearInterval(autoTimer));
                     slideshow.addEventListener('mouseleave', resetTimer);
+
+                    // ⭐ Touch swipe cho mobile
+                    let touchStartX = 0;
+                    let touchEndX = 0;
+                    slideshow.addEventListener('touchstart', function(e) {
+                        touchStartX = e.changedTouches[0].screenX;
+                    }, { passive: true });
+
+                    slideshow.addEventListener('touchend', function(e) {
+                        touchEndX = e.changedTouches[0].screenX;
+                        const diff = touchEndX - touchStartX;
+                        if (Math.abs(diff) > 40) {
+                            if (diff < 0) {
+                                nextSlide();
+                            } else {
+                                prevSlide();
+                            }
+                        }
+                    }, { passive: true });
                 }
 
                 window.nextSlide = nextSlide;
@@ -1052,6 +942,31 @@ function goHome(event) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     // Trigger hashchange để nav-slider cập nhật
     window.dispatchEvent(new HashChangeEvent('hashchange'));
-}</script>
+}
+</script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const container = document.getElementById('techTextContainer');
+                if (container && window.TechText) {
+                    window.TechText.init(container, {
+                        text: 'FPT WIFI 6',
+                        fontFamily: "'Orbitron', 'Plus Jakarta Sans', sans-serif",
+                        fontSize: 600,
+                        fontWeight: 900,
+                        letterSpacing: 0.04,
+                        color: '#ffffff',
+                        accentColor: '#ff9933',
+                        reach: 195,
+                        softness: 0.6,
+                        specks: 18,
+                        selection: true,
+                        labels: true,
+                        draggable: true,
+                        sweep: true,
+                        speed: 0.6
+                    });
+                }
+            });
+        </script>
     </body>
 </html>

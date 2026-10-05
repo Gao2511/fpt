@@ -1,11 +1,18 @@
 /**
- * FPT Address Picker - Phiên bản 2 CHẾ ĐỘ
- * ============================================
- * - Chế độ MỚI (mặc định): Tỉnh/Thành phố → Phường/Xã (dùng PROVINCE_DATA)
- * - Chế độ CŨ: Tỉnh/Thành phố → Quận/Huyện → Phường/Xã (dùng API open-api.vn)
- *
- * Dữ liệu: biến toàn cục PROVINCE_DATA (file address-data.js)
- * Tương thích: JSP thuần (NetBeans Web Project)
+ * ============================================================================
+ * FPT TELECOM - VIETNAMESE ADDRESS PICKER (BỘ CHỌN ĐỊA CHỈ HÀNH CHÍNH)
+ * ============================================================================
+ * MỤC LỤC / TABLE OF CONTENTS:
+ * 01. MODULE SETUP & CONSTANTS   - Khai báo chế độ strict, URL API địa giới hành chính
+ * 02. DATA VALIDATION HELPER     - Kiểm tra tính sẵn sàng của bộ dữ liệu PROVINCE_DATA
+ * 03. HTML TEMPLATE BUILDER      - Hàm renderAddressPicker(): sinh giao diện chọn 2/3 cấp
+ * 04. CONTROLLER & EVENT BINDING - Hàm initAddressPicker(): lắng nghe sự kiện người dùng:
+ *     - [A] Chế độ MỚI (Tỉnh/TP -> Phường/Xã) từ file address-data.js nội bộ
+ *     - [B] Chế độ CŨ (Tỉnh/TP -> Quận/Huyện -> Phường/Xã) gọi open-api.vn
+ *     - [C] Chế độ Tự nhập tay khi không tìm thấy địa giới
+ *     - [D] Đồng bộ dữ liệu vào hidden input 'address' để submit form
+ * 05. AUTO INITIALIZATION        - Tự động kích hoạt khi trang tải xong DOMContentLoaded
+ * ============================================================================
  */
 (function () {
     'use strict';

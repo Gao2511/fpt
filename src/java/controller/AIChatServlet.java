@@ -21,6 +21,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @WebServlet("/ai-chat")
 public class AIChatServlet extends HttpServlet {
@@ -149,6 +150,23 @@ public class AIChatServlet extends HttpServlet {
             return;
         }
 
+        // ===== RATE LIMITING (chống spam làm cạn quota API Key) =====
+        HttpSession session = request.getSession(true);
+        Long lastChatTime = (Long) session.getAttribute("ai_last_chat_time");
+        Integer chatCount = (Integer) session.getAttribute("ai_chat_count");
+        long now = System.currentTimeMillis();
+
+        if (lastChatTime == null || now - lastChatTime > 60000) {
+            session.setAttribute("ai_last_chat_time", now);
+            session.setAttribute("ai_chat_count", 1);
+        } else {
+            if (chatCount != null && chatCount >= 10) {
+                writeJson(response, "Anh/chị đang gửi câu hỏi quá nhanh. Vui lòng đợi 1 phút rồi thử lại giúp em nhé.");
+                return;
+            }
+            session.setAttribute("ai_chat_count", (chatCount != null ? chatCount : 0) + 1);
+        }
+
         // ===== BLOCK KEYWORD (chặn trước khi gọi API) =====
         if (containsBlockedKeyword(userMessage)) {
             System.out.println("🚫 [AI Chat] Blocked keyword: " + userMessage);
@@ -161,8 +179,13 @@ public class AIChatServlet extends HttpServlet {
         String model = settingsDAO.getValue("gemini_model");
         String systemPrompt = settingsDAO.getValue("gemini_system_prompt");
 
-        // Fallback nếu DB chưa có
-        if (apiKey == null || apiKey.trim().isEmpty()) apiKey = DEFAULT_API_KEY;
+        // Kiểm tra an toàn: nếu Admin chưa nhập API Key
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            System.out.println("⚠️ [AI Chat] Chưa cấu hình Gemini API Key trong Admin Settings.");
+            writeJson(response, "Hệ thống tư vấn AI đang được cập nhật cấu hình. Anh/chị vui lòng gọi hotline 0932 079 469 để được hỗ trợ ngay ạ.");
+            return;
+        }
+
         if (model == null || model.trim().isEmpty()) model = DEFAULT_MODEL;
         if (systemPrompt == null || systemPrompt.trim().isEmpty()) systemPrompt = DEFAULT_SYSTEM_PROMPT;
 

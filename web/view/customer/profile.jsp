@@ -20,87 +20,10 @@
 <jsp:include page="/view/nav-slider.jsp" />
  <jsp:include page="/view/theme-toggle.jsp" />
         <!-- ============ TOP NAV ============ -->
-        <header class="top-nav">
-            <div class="container">
-                <a href="${pageContext.request.contextPath}/home" class="logo">
-                    <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
-                         alt="FPT Telecom"
-                         style="height: 50px; width: auto; object-fit: contain; display: block;">
-                </a>
-                <nav class="menu">
-                    <a href="${pageContext.request.contextPath}/home">Trang chủ</a>
-                    <a href="${pageContext.request.contextPath}/home#packages">Bảng giá</a>
-                    <a href="${pageContext.request.contextPath}/my-orders">Xem đơn</a>
-                </nav>
-                <div class="right">
-                    <div class="user-avatar-wrap">
-                        <div class="user-avatar" onclick="toggleUserMenu(event)">
-                            <c:choose>
-                                <c:when test="${not empty sessionScope.user.avatarUrl}">
-                                    <img src="${pageContext.request.contextPath}/${sessionScope.user.avatarUrl}"
-                                         alt="Avatar" class="avatar-img-small">
-                                </c:when>
-                                <c:otherwise>
-                                    <span class="avatar-initial">${sessionScope.user.initial}</span>
-                                </c:otherwise>
-                            </c:choose>
-                            <span class="avatar-name">${sessionScope.user.displayName}</span>
-                            <svg class="avatar-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9"/>
-                            </svg>
-                        </div>
-                        <div class="user-dropdown" id="userDropdown">
-                            <div class="dropdown-header">
-                                <c:choose>
-                                    <c:when test="${not empty sessionScope.user.avatarUrl}">
-                                        <img src="${pageContext.request.contextPath}/${sessionScope.user.avatarUrl}"
-                                             alt="Avatar" class="dropdown-avatar-img">
-                                    </c:when>
-                                    <c:otherwise>
-                                        <div class="dropdown-avatar">${sessionScope.user.initial}</div>
-                                    </c:otherwise>
-                                </c:choose>
-                                <div class="dropdown-info">
-                                    <strong>${sessionScope.user.displayName}</strong>
-                                    <small>${sessionScope.user.username}</small>
-                                </div>
-                            </div>
-                            <div class="dropdown-divider"></div>
-                            <a href="${pageContext.request.contextPath}/profile" class="dropdown-item">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                <circle cx="12" cy="7" r="4"/>
-                                </svg>
-                                Hồ sơ cá nhân
-                            </a>
-                            <a href="${pageContext.request.contextPath}/my-orders" class="dropdown-item">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                                </svg>
-                                Đơn của tôi
-                            </a>
-                            <a href="${pageContext.request.contextPath}/change-password" class="dropdown-item">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                                </svg>
-                                Đổi mật khẩu
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a href="${pageContext.request.contextPath}/logout" class="dropdown-item dropdown-logout">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                                <polyline points="16 17 21 12 16 7"/>
-                                <line x1="21" y1="12" x2="9" y2="12"/>
-                                </svg>
-                                Đăng xuất
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
+        <!-- ============ TOP NAV (DÙNG CHUNG) ============ -->
+<jsp:include page="/view/customer/customer-header.jsp">
+    <jsp:param name="activeMenu" value="profile"/>
+</jsp:include>
 
         <!-- ============ MAIN ============ -->
         <main class="profile-container">
@@ -402,22 +325,6 @@
                 }
             }
 
-            function toggleUserMenu(event) {
-                event.stopPropagation();
-                document.getElementById('userDropdown').classList.toggle('active');
-                document.querySelector('.user-avatar').classList.toggle('active');
-            }
-
-            document.addEventListener('click', function (event) {
-                const dropdown = document.getElementById('userDropdown');
-                const avatar = document.querySelector('.user-avatar');
-                if (dropdown && avatar
-                        && !avatar.contains(event.target)
-                        && !dropdown.contains(event.target)) {
-                    dropdown.classList.remove('active');
-                    avatar.classList.remove('active');
-                }
-            });
 
             // ⭐ KHÔNG CÓ VALIDATE NÀO CẢ — submit luôn thành công
         </script>

@@ -1,6 +1,26 @@
-/* =========================================================
-   FPT SALE - LANDING PAGE (PREMIUM + ANIMATION)
-   ========================================================= */
+/* ==========================================================================
+   FPT TELECOM LANDING PAGE - HOME STYLESHEET (PREMIUM & INTERACTIVE)
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. DESIGN TOKENS & RESET      - Biến màu sắc, transitions, reset box-sizing
+   02. USER AVATAR & DROPDOWN     - Menu tài khoản khách hàng / admin trên navbar
+   03. HTML & BODY LAYOUT         - Gradient nền chuyển màu, scroll-behavior
+   04. SCROLL REVEAL & ANIMATIONS - Hiệu ứng cuộn trang xuất hiện nội dung
+   05. TOP NAV & MAIN HEADER      - Thanh điều hướng chính, logo, hotline, menu links
+   06. HERO SECTION & SLIDESHOW   - Banner giới thiệu, slide ảnh và thông điệp chính
+   07. TECH TEXT & INTERACTIVE    - Chữ tương tác 3D Canvas và SVG text-hover
+   08. STATS & COUNTER SECTION    - Số liệu thống kê ấn tượng (khách hàng, phủ sóng)
+   09. PACKAGES GRID & CARDS      - Bảng giá gói cước Internet & Combo FPT
+   10. WHY CHOOSE FPT / FEATURES  - Lợi thế dịch vụ, công nghệ WiFi 6
+   11. QUICK CONTACT / ADVICE     - Form đăng ký tư vấn trực tuyến & chọn địa chỉ
+   12. PROMOTION / INSTALLATION   - Quy trình lắp đặt siêu tốc trong 24h
+   13. FOOTER & SOCIAL LINKS      - Chân trang, thông tin liên hệ và bản quyền
+   14. RESPONSIVE BREAKPOINTS     - Tương thích Tablet (1024px, 900px) & Mobile (640px, 400px)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   01. DESIGN TOKENS & RESET
+   -------------------------------------------------------------------------- */
 
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Inter:wght@400;600;700;800;900&display=swap');
 
@@ -282,68 +302,47 @@ body {
     font-size: 14px;
     -webkit-font-smoothing: antialiased;
 
-    background: linear-gradient(-45deg,
+    background: linear-gradient(180deg,
         #f0f6ff 0%,
-        #fdf2e8 25%,
-        #eef6f0 50%,
-        #f4f0fb 75%,
-        #f0f6ff 100%);
-    background-size: 400% 400%;
-    animation: bgGradientMove 20s ease infinite;
-    background-attachment: fixed;
+        #fdf5ec 18%,
+        #f7f9fc 40%,
+        #f8fafc 100%);
+    background-size: 100% 100%;
 
     position: relative;
     min-height: 100vh;
 }
 
-@keyframes bgGradientMove {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
 body::before {
     content: "";
-    position: fixed;
-    top: -150px;
-    left: -150px;
-    width: 650px;
-    height: 650px;
+    position: absolute;
+    top: -80px;
+    left: -80px;
+    width: 450px;
+    height: 450px;
     background: radial-gradient(circle,
-        rgba(243, 112, 33, 0.25) 0%,
-        rgba(255, 178, 107, 0.15) 40%,
+        rgba(243, 112, 33, 0.10) 0%,
+        rgba(255, 178, 107, 0.05) 40%,
         transparent 70%);
     border-radius: 50%;
-    animation: bgFloat1 18s ease-in-out infinite;
     pointer-events: none;
     z-index: 0;
 }
 
 body::after {
     content: "";
-    position: fixed;
-    bottom: -150px;
-    right: -150px;
-    width: 750px;
-    height: 750px;
+    position: absolute;
+    bottom: 250px;
+    right: -80px;
+    width: 450px;
+    height: 450px;
     background: radial-gradient(circle,
-        rgba(26, 75, 140, 0.22) 0%,
-        rgba(66, 153, 225, 0.12) 40%,
+        rgba(26, 75, 140, 0.08) 0%,
+        rgba(66, 153, 225, 0.04) 40%,
         transparent 70%);
     border-radius: 50%;
-    animation: bgFloat2 22s ease-in-out infinite;
     pointer-events: none;
     z-index: 0;
-}
-
-@keyframes bgFloat1 {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50%      { transform: translate(80px, 100px) scale(1.15); }
-}
-
-@keyframes bgFloat2 {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50%      { transform: translate(-100px, -80px) scale(1.2); }
 }
 
 a { text-decoration: none; color: inherit; transition: var(--transition-normal); }
@@ -466,19 +465,10 @@ ul { list-style: none; }
     height: 3px;
     background: linear-gradient(90deg,
         #f37021, #ff8c42, #ffb26b, #ff8c42, #f37021);
-    background-size: 200% 100%;
-    animation: slideGradient 6s linear infinite;
-    box-shadow:
-        0 0 8px rgba(243, 112, 33, 0.9),
-        0 0 16px rgba(243, 112, 33, 0.6),
-        0 0 24px rgba(243, 112, 33, 0.4);
+    background-size: 100% 100%;
+    box-shadow: 0 0 8px rgba(243, 112, 33, 0.7);
     z-index: 2;
     pointer-events: none;
-}
-
-@keyframes slideGradient {
-    0%   { background-position: 0% 50%; }
-    100% { background-position: 200% 50%; }
 }
 
 .top-nav .container {
@@ -644,9 +634,8 @@ ul { list-style: none; }
    HERO
    ========================================================= */
 .hero {
-    background: linear-gradient(135deg, var(--fpt-blue) 0%, #2c6cb5 50%, #1a4b8c 100%);
-    background-size: 200% 200%;
-    animation: gradientShift 12s ease infinite;
+    background: linear-gradient(135deg, var(--fpt-blue) 0%, #22599c 50%, #174480 100%);
+    background-size: 100% 100%;
     color: white;
     padding: 150px 0 60px 0;
     position: relative;
@@ -658,29 +647,24 @@ ul { list-style: none; }
         inset 0 -2px 6px rgba(243, 112, 33, 0.3);
 }
 
-@keyframes gradientShift {
-    0%, 100% { background-position: 0% 50%; }
-    50%      { background-position: 100% 50%; }
-}
-
 .hero::before {
     content: "";
     position: absolute;
-    top: -50%; right: -20%;
-    width: 600px; height: 600px;
+    top: -40%; right: -15%;
+    width: 500px; height: 500px;
     background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
     border-radius: 50%;
-    animation: float 8s ease-in-out infinite;
+    pointer-events: none;
 }
 
 .hero::after {
     content: "";
     position: absolute;
-    bottom: -30%; left: -10%;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(243,112,33,0.15), transparent 70%);
+    bottom: -25%; left: -10%;
+    width: 380px; height: 380px;
+    background: radial-gradient(circle, rgba(243,112,33,0.12), transparent 70%);
     border-radius: 50%;
-    animation: float 10s ease-in-out infinite reverse;
+    pointer-events: none;
 }
 
 @keyframes float {
@@ -690,109 +674,178 @@ ul { list-style: none; }
 
 .hero .container {
     display: grid;
-    grid-template-columns: 1fr 1.8fr;
+    grid-template-columns: 0.9fr 1.35fr;
     gap: 40px;
     align-items: center;
     position: relative;
     z-index: 1;
+    max-width: 1620px;
 }
 
-.hero .badge-top {
-    display: inline-block;
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(10px);
-    color: white;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    border: 1px solid rgba(255,255,255,0.2);
-    animation: pulse-badge 2s infinite;
+.hero .hero-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    min-width: 0;
+    position: relative;
+    z-index: 5;
 }
 
-@keyframes pulse-badge {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
-    50%      { box-shadow: 0 0 0 12px rgba(255,255,255,0); }
+/* =========================================================
+   TECH TEXT — Hiệu ứng chữ canvas "FPT WIFI 6"
+   ========================================================= */
+.tech-text-wrap {
+    width: 100%;
+    max-width: 760px;
+    height: 140px;
+    margin: 0 auto;
+    padding: 0;
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    overflow: visible;
+    pointer-events: auto;
+    z-index: 10;
+    font-family: var(--font-tech);
+    filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.35));
+    transition: filter 0.3s ease;
 }
 
-.hero h1 {
-    font-family: 'Be Vietnam Pro', sans-serif;
-    font-size: 52px;
-    font-weight: 900;
-    line-height: 1.2;
-    margin-bottom: 18px;
-    letter-spacing: -0.5px;
-    animation: fadeInUp 0.8s ease-out;
+.tech-text-wrap:hover {
+    filter: drop-shadow(0 6px 24px rgba(0, 0, 0, 0.5));
 }
 
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to   { opacity: 1; transform: translateY(0); }
+.tech-text-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
-.hero h1 .highlight {
-    color: #ffb26b;
-    display: inline-block;
-    animation: shimmer 3s ease-in-out infinite;
+/* =========================================================
+   TEXT EFFECT — Hiệu ứng vẽ stroke rồi phát sáng cam
+   ========================================================= */
+.text-hover-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 720px;
+    height: 220px;
+    margin: 0 auto;
+    user-select: none;
+    pointer-events: none;
 }
 
-@keyframes shimmer {
-    0%, 100% { text-shadow: 0 0 10px rgba(255, 178, 107, 0.5); }
-    50%      { text-shadow: 0 0 20px rgba(255, 178, 107, 0.9), 0 0 30px rgba(255, 178, 107, 0.5); }
+.text-hover-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
 }
 
-.hero .desc {
-    font-size: 14.5px;
-    line-height: 1.7;
-    opacity: 0.92;
-    margin-bottom: 26px;
-    max-width: 100%;
+/* Layer 1: Vẽ nét stroke (4.8s - nhanh hơn một chút, giữ độ mượt) */
+.th-draw {
+    stroke-dasharray: 1500;
+    stroke-dashoffset: 1500;
+    animation:
+        textDrawIn 4.8s ease-in-out forwards,
+        textFadeOut 0.6s ease-out 4.8s forwards;
+}
+
+@keyframes textDrawIn {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes textFadeOut {
+    to { opacity: 0.3; }
+}
+
+/* Layer 2: Chữ cam phát sáng neon nổi bật & rõ nét */
+.th-main {
+    fill: url(#textGradientOrange);
+    opacity: 0;
+    filter: drop-shadow(0 0 10px rgba(255, 138, 48, 0.6))
+            drop-shadow(0 0 20px rgba(255, 110, 24, 0.35))
+            drop-shadow(0 3px 6px rgba(0, 0, 0, 0.45));
+    animation: textGlowIn 1.2s ease-out 4.8s forwards;
+}
+
+@keyframes textGlowIn {
+    0% {
+        opacity: 0;
+        filter: drop-shadow(0 0 4px rgba(255, 138, 48, 0.2))
+                drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+    50% {
+        opacity: 0.85;
+        filter: drop-shadow(0 0 12px rgba(255, 138, 48, 0.7))
+                drop-shadow(0 0 24px rgba(255, 110, 24, 0.4))
+                drop-shadow(0 3px 6px rgba(0, 0, 0, 0.4));
+    }
+    100% {
+        opacity: 1;
+        filter: drop-shadow(0 0 10px rgba(255, 138, 48, 0.6))
+                drop-shadow(0 0 20px rgba(255, 110, 24, 0.35))
+                drop-shadow(0 3px 6px rgba(0, 0, 0, 0.45));
+    }
 }
 
 .hero .badges {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 12px;
-    margin-bottom: 30px;
+    margin-top: 20px;
+    margin-bottom: 24px;
 }
 
 .hero .badges span {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    background: rgba(255,255,255,0.15);
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.14);
     backdrop-filter: blur(10px);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12.5px;
+    -webkit-backdrop-filter: blur(10px);
+    padding: 9px 20px;
+    border-radius: 30px;
+    font-size: 14px;
     font-weight: 600;
-    border: 1px solid rgba(255,255,255,0.15);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: var(--transition-normal);
 }
 
+.hero .badges span svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    stroke: #ffffff;
+}
+
 .hero .badges span:hover {
-    background: rgba(255,255,255,0.25);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .hero .cta-buttons {
     display: flex;
+    justify-content: center;
+    align-items: center;
     gap: 14px;
     flex-wrap: wrap;
 }
 
 .btn-hero-primary {
-    padding: 14px 28px;
+    padding: 15px 32px;
     background: linear-gradient(135deg, var(--fpt-orange), #ff8c42);
-    color: white;
+    color: #ffffff;
     font-weight: 800;
-    font-size: 14px;
+    font-size: 15.5px;
     border-radius: 30px;
-    box-shadow: 0 8px 20px rgba(243, 112, 33, 0.4);
+    box-shadow: 0 8px 22px rgba(243, 112, 33, 0.45);
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -801,76 +854,62 @@ ul { list-style: none; }
     overflow: hidden;
     border: none;
     cursor: pointer;
+    text-decoration: none;
 }
 
 .btn-hero-primary:hover {
     transform: translateY(-3px);
-    box-shadow: 0 15px 35px rgba(243, 112, 33, 0.5);
+    box-shadow: 0 15px 35px rgba(243, 112, 33, 0.55);
 }
 
 .btn-hero-secondary {
-    padding: 14px 24px;
-    background: rgba(255,255,255,0.12);
+    padding: 15px 28px;
+    background: rgba(255, 255, 255, 0.12);
     backdrop-filter: blur(10px);
-    color: white;
+    -webkit-backdrop-filter: blur(10px);
+    color: #ffffff;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 15px;
     border-radius: 30px;
-    border: 1.5px solid rgba(255,255,255,0.4);
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
     display: inline-flex;
     align-items: center;
     gap: 8px;
     transition: var(--transition-normal);
     cursor: pointer;
+    text-decoration: none;
 }
 
 .btn-hero-secondary:hover {
-    background: rgba(255,255,255,0.25);
-    border-color: rgba(255,255,255,0.7);
+    background: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.6);
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
 .hero-image {
     position: relative;
     text-align: center;
-    margin-right: -70px;
+    margin-right: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* HERO SLIDESHOW */
+/* HERO SLIDESHOW — Kích thước lớn nổi bật, bao quát cả màn hình */
 .hero-slideshow {
     position: relative;
     width: 100%;
-    max-width: 800px;
-    height: 460px;
-    margin: 0 0 0 auto;
-    border-radius: 16px;
+    max-width: 880px;
+    height: 640px;
+    margin: 0 auto;
+    border-radius: 24px;
     overflow: hidden;
     background: #0a1f44;
-    animation: rotateGlow 6s linear infinite;
-}
-
-@keyframes rotateGlow {
-    0%, 100% {
-        box-shadow:
-            8px 0 30px rgba(243, 112, 33, 0.7),
-            -8px 0 30px rgba(255, 140, 66, 0.4);
-    }
-    25% {
-        box-shadow:
-            0 8px 30px rgba(243, 112, 33, 0.7),
-            0 -8px 30px rgba(255, 140, 66, 0.4);
-    }
-    50% {
-        box-shadow:
-            -8px 0 30px rgba(243, 112, 33, 0.7),
-            8px 0 30px rgba(255, 140, 66, 0.4);
-    }
-    75% {
-        box-shadow:
-            0 -8px 30px rgba(243, 112, 33, 0.7),
-            0 8px 30px rgba(255, 140, 66, 0.4);
-    }
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.25),
+        0 0 25px rgba(243, 112, 33, 0.35);
 }
 
 .hero-slide {
@@ -883,7 +922,7 @@ ul { list-style: none; }
     object-position: center;
     opacity: 0;
     transition: opacity 1.2s ease-in-out;
-    border-radius: 16px;
+    border-radius: 24px;
     display: block;
 }
 
@@ -895,24 +934,14 @@ ul { list-style: none; }
     content: "";
     position: absolute;
     inset: 0;
-    border-radius: 16px;
+    border-radius: 24px;
     background:
-        radial-gradient(circle at 15% 25%, rgba(255,255,255,0.5) 0%, transparent 4%),
-        radial-gradient(circle at 85% 55%, rgba(255,220,150,0.6) 0%, transparent 4%),
-        radial-gradient(circle at 45% 85%, rgba(255,255,255,0.5) 0%, transparent 3%),
-        radial-gradient(circle at 70% 15%, rgba(243,112,33,0.5) 0%, transparent 3%),
-        radial-gradient(circle at 30% 65%, rgba(255,255,255,0.4) 0%, transparent 3%);
-    background-size: 200% 200%;
-    animation: sparkle 7s ease-in-out infinite;
+        radial-gradient(circle at 15% 25%, rgba(255,255,255,0.3) 0%, transparent 4%),
+        radial-gradient(circle at 85% 55%, rgba(255,220,150,0.35) 0%, transparent 4%),
+        radial-gradient(circle at 45% 85%, rgba(255,255,255,0.3) 0%, transparent 3%);
     pointer-events: none;
     z-index: 5;
-}
-
-@keyframes sparkle {
-    0%, 100% { opacity: 0.2; background-position: 0% 0%; }
-    25%      { opacity: 0.8; background-position: 50% 30%; }
-    50%      { opacity: 1;   background-position: 100% 100%; }
-    75%      { opacity: 0.6; background-position: 30% 70%; }
+    opacity: 0.6;
 }
 
 .hero-image .floating-tag {
@@ -1198,8 +1227,7 @@ ul { list-style: none; }
 .contact-section {
     background: linear-gradient(135deg,
         #fff9f5 0%, #fff3e0 50%, #ffedd5 100%);
-    background-size: 200% 200%;
-    animation: contactBgMove 15s ease infinite;
+    background-size: 100% 100%;
     padding: 60px 0 100px 0;
     margin: 0;
     position: relative;
@@ -1213,12 +1241,6 @@ ul { list-style: none; }
         rgba(243, 112, 33, 0.15) 85%,
         transparent 100%) 1;
     border-bottom: none;
-}
-
-@keyframes contactBgMove {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
 }
 
 .contact-wrapper {
@@ -1439,12 +1461,8 @@ ul { list-style: none; }
     top: 0; left: 0; right: 0;
     height: 4px;
     background: linear-gradient(90deg, #f37021, #ff8c42, #ffb26b, #ff8c42, #f37021);
-    background-size: 200% 100%;
-    animation: slideGradient 6s linear infinite;
-    box-shadow:
-        0 0 8px rgba(243, 112, 33, 0.9),
-        0 0 16px rgba(243, 112, 33, 0.6),
-        0 0 24px rgba(243, 112, 33, 0.4);
+    background-size: 100% 100%;
+    box-shadow: 0 0 8px rgba(243, 112, 33, 0.7);
     z-index: 2;
 }
 
@@ -1717,15 +1735,8 @@ ul { list-style: none; }
     position: absolute;
     bottom: 0; left: 0;
     width: 80px; height: 3px;
-    background: linear-gradient(90deg, #ffb26b, #ff8c42, #f37021, #ff8c42, #ffb26b);
-    background-size: 200% 100%;
+    background: linear-gradient(90deg, #f37021, #ff8c42, #ffb26b);
     border-radius: 3px;
-    animation: underlineShine 3s ease-in-out infinite;
-}
-
-@keyframes underlineShine {
-    0%, 100% { background-position: 0% 50%; width: 80px; }
-    50%      { background-position: 100% 50%; width: 160px; }
 }
 
 .welcome-line-1 {
@@ -1742,60 +1753,41 @@ ul { list-style: none; }
     line-height: 1.15;
     text-shadow: 0 2px 20px rgba(243, 112, 33, 0.4);
     background: linear-gradient(90deg, #ffffff 0%, #ffd4a8 50%, #ffffff 100%);
-    background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: shimmerText 3.5s linear infinite;
-}
-
-@keyframes shimmerText {
-    to { background-position: 200% center; }
 }
 
 /* =========================================================
    TRANG LIÊN HỆ — NÂNG CẤP GIAO DIỆN
    ========================================================= */
 .contact-hero {
-  background: linear-gradient(135deg, #64748b 0%, #94a3b8 50%, #64748b 100%);
-    background-size: 200% 200%;
-    animation: contactHeroMove 10s ease infinite;
+    background: linear-gradient(135deg, #1a4b8c 0%, #205493 50%, #153e75 100%);
+    background-size: 100% 100%;
     padding: 120px 0 60px 0;
     text-align: center;
     position: relative;
     overflow: hidden;
 }
 
-@keyframes contactHeroMove {
-    0%, 100% { background-position: 0% 50%; }
-    50%      { background-position: 100% 50%; }
-}
-
 .contact-hero::before {
     content: "";
     position: absolute;
-    top: -50%; left: -10%;
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(243, 112, 33, 0.2), transparent 70%);
+    top: -40%; left: -10%;
+    width: 450px; height: 450px;
+    background: radial-gradient(circle, rgba(243, 112, 33, 0.15), transparent 70%);
     border-radius: 50%;
-    animation: heroGlow 8s ease-in-out infinite;
     pointer-events: none;
 }
 
 .contact-hero::after {
     content: "";
     position: absolute;
-    bottom: -50%; right: -10%;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(66, 153, 225, 0.15), transparent 70%);
+    bottom: -40%; right: -10%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(66, 153, 225, 0.12), transparent 70%);
     border-radius: 50%;
-    animation: heroGlow 10s ease-in-out infinite reverse;
     pointer-events: none;
-}
-
-@keyframes heroGlow {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50%      { transform: translate(40px, 30px) scale(1.1); }
 }
 
 .contact-hero .container {
@@ -2063,7 +2055,9 @@ a[href*="/home"][style*="border: 2px solid #f37021"]:hover,
     .features { grid-template-columns: repeat(2, 1fr); }
     .devices { grid-template-columns: repeat(2, 1fr); }
     .hero .container { grid-template-columns: 1fr; }
-    .hero-image img { max-width: 400px; }
+    .hero-slideshow { max-width: 600px; height: 460px; }
+    .tech-text-wrap { height: 110px; }
+    .text-hover-wrap { height: 175px; }
 }
 
 /* Mobile: 1 cột */
@@ -2082,8 +2076,9 @@ a[href*="/home"][style*="border: 2px solid #f37021"]:hover,
     .features { grid-template-columns: 1fr; }
     .devices { grid-template-columns: 1fr; }
     .contact-form { grid-template-columns: 1fr; }
-    .hero h1 { font-size: 28px; }
-    .hero .desc { font-size: 13px; }
+    .hero-slideshow { max-width: 100%; height: 320px; }
+    .tech-text-wrap { height: 80px; }
+    .text-hover-wrap { height: 140px; }
     .top-nav .menu { display: none; }
 
     .contact-hero { padding: 100px 0 40px 0; }
@@ -2110,7 +2105,9 @@ html,
 body {
     margin: 0 !important;
     padding-bottom: 0 !important;
-    background-attachment: fixed;
+    background-attachment: scroll;
+    overflow-x: clip;
+    max-width: 100vw;
 }
 
 .footer {
@@ -2121,6 +2118,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    -webkit-overflow-scrolling: touch;
 }
 
 main {
@@ -2719,8 +2717,8 @@ footer {
     .footer-bottom { flex-direction: column; text-align: center; }
     .footer .copyright { text-align: center; max-width: 100%; }
 
-    .hero-image { margin-right: -80px; }
-    .hero-slideshow { max-width: 550px; height: 380px; }
+    .hero-image { margin-right: 0; }
+    .hero-slideshow { max-width: 650px; height: 480px; }
 
     .packages {
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
@@ -2759,16 +2757,65 @@ footer {
     /* ---- NAV ---- */
     .top-nav { padding: 8px 0; }
     .top-nav .menu { display: none; }
-    .top-nav .hotline-box { padding: 4px 8px; margin-right: 0; }
+    .top-nav .container { padding: 0 14px; }
+    .top-nav .hotline-box { padding: 4px 6px; margin-right: 0; }
     .top-nav .hotline-box .text small { display: none; }
-    .top-nav .hotline-box .text strong { font-size: 12px; }
-    .top-nav .logo img { height: 42px !important; }
+    .top-nav .hotline-box .text strong { font-size: 11.5px; }
+    .top-nav .logo img { height: 38px !important; }
     .top-nav .right { gap: 6px; }
 
     .btn-login-small,
     .btn-register-small {
         padding: 6px 10px;
         font-size: 11.5px;
+    }
+
+    .user-avatar {
+        height: 38px !important;
+        padding: 4px !important;
+        gap: 0 !important;
+    }
+    .user-avatar .avatar-name,
+    .user-avatar .avatar-chevron {
+        display: none !important;
+    }
+
+    .user-dropdown {
+        width: calc(100vw - 32px) !important;
+        right: -10px !important;
+    }
+
+    /* ---- HERO SLIDESHOW NAV TRÊN MOBILE ---- */
+    .hero-nav {
+        opacity: 0.85 !important;
+        pointer-events: auto !important;
+        width: 36px !important;
+        height: 36px !important;
+        background: rgba(255, 255, 255, 0.85) !important;
+    }
+    .hero-nav svg { width: 16px !important; height: 16px !important; }
+    .hero-nav-prev { left: 8px !important; }
+    .hero-nav-next { right: 8px !important; }
+
+    .hero-dots {
+        bottom: 8px !important;
+        padding: 4px 8px !important;
+    }
+    .dot-slide {
+        width: 8px !important;
+        height: 8px !important;
+        padding: 6px !important;
+        box-sizing: content-box !important;
+    }
+
+    /* ---- TEXT HOVER & TECH TEXT ---- */
+    .text-hover-wrap {
+        height: 120px !important;
+        overflow: hidden !important;
+    }
+    .tech-text-wrap {
+        height: 70px !important;
+        overflow: hidden !important;
     }
 
     /* ---- HERO ---- */
@@ -2940,12 +2987,38 @@ footer {
     }
 }
 
+/* ===== MOBILE VỪA VÀ NHỎ (≤480px) ===== */
+@media (max-width: 480px) {
+    .top-nav .hotline-box {
+        border-right: none !important;
+        padding: 4px !important;
+        margin-right: 0 !important;
+    }
+    .top-nav .hotline-box .text {
+        display: none !important;
+    }
+    .btn-register-small {
+        display: none !important;
+    }
+    .btn-login-small {
+        padding: 5px 9px !important;
+        font-size: 11px !important;
+    }
+    .top-nav .logo img {
+        height: 32px !important;
+    }
+    .hamburger-btn {
+        width: 36px !important;
+        height: 36px !important;
+    }
+}
+
 /* ===== MOBILE NHỎ (≤400px) ===== */
 @media (max-width: 400px) {
     .hero h1 { font-size: 22px; }
     .hero-slideshow { height: 200px; }
     .section-title h2 { font-size: 18px; }
-    .contact-wrapper { padding: 24px 16px; }
+    .contact-wrapper { padding: 20px 14px; }
     .contact-wrapper h2 { font-size: 18px; }
 }
 

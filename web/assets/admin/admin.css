@@ -1,7 +1,25 @@
-/* =========================================================
-   ADMIN DASHBOARD - FPT SALE MANAGER (DARK PREMIUM - OPTIMIZED)
-   ========================================================= */
+/* ==========================================================================
+   FPT SALE MANAGER - ADMIN CORE STYLESHEET (DARK PREMIUM)
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. DESIGN TOKENS & RESET      - Biến màu sắc, fonts, box-sizing
+   02. BODY & AMBIENT GLOW        - Background gradient animation & hiệu ứng vòm sáng
+   03. ADMIN HEADER & NAVBAR      - Thanh điều hướng admin, tabs, avatar & logout
+   04. CONTAINER & MAIN LAYOUT    - Khung bố cục chính (admin-container)
+   05. STATS CARDS & KPI WIDGETS  - Thẻ thống kê số liệu tổng quan
+   06. CHARTS & DATA PANELS       - Khung hiển thị biểu đồ và bảng dữ liệu
+   07. TABLES & DATA LISTS        - Kiểu hiển thị bảng danh sách admin
+   08. STATUS BADGES & BUTTONS    - Huy hiệu trạng thái và các nút chức năng
+   09. COLOR VARIANT CARDS        - Các biến thể màu thẻ (Orange, Blue, Green, Purple)
+   10. ALERTS & NOTIFICATIONS     - Thông báo hệ thống (success, error, warning)
+   11. MODALS & FORMS             - Hộp thoại popup và trường nhập liệu
+   12. PAGINATION CONTROLS        - Phân trang dữ liệu
+   13. RESPONSIVE DESIGN          - Tương thích giao diện tablet và mobile
+   ========================================================================== */
 
+/* --------------------------------------------------------------------------
+   01. DESIGN TOKENS & RESET
+   -------------------------------------------------------------------------- */
 @import url('../style/fonts.css');
 
 :root {

@@ -34,7 +34,6 @@
         <link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/home.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/customer/package-detail.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/badge.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/performance-optimize.css">
         <!-- ⭐ Font Inter + Poppins cho trang package-detail -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,134 +48,10 @@
         <jsp:include page="/view/theme-toggle.jsp" />
 
         <!-- TOP NAV -->
-        <header class="top-nav">
-            <div class="container">
-                <a href="${pageContext.request.contextPath}/home" class="logo">
-                    <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
-                         alt="FPT Telecom"
-                         style="height: 50px; width: auto; object-fit: contain; display: block;">
-                </a>
-                <nav class="menu">
-                    <a href="${pageContext.request.contextPath}/home">Trang chủ</a>
-                    <a href="${pageContext.request.contextPath}/home#packages">Bảng giá</a>
-                    <a href="${pageContext.request.contextPath}/my-orders">Xem đơn</a>
-                    <a href="${pageContext.request.contextPath}/contact">Liên hệ</a>
-                </nav>
-                <div class="right">
-                    <div class="hotline-box">
-                        <div class="icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                            </svg>
-                        </div>
-                        <div class="text">
-                            <small>Hotline</small>
-                            <strong>1900 6600</strong>
-                        </div>
-                    </div>
-
-                    <c:choose>
-                        <c:when test="${empty sessionScope.user}">
-                            <a href="${pageContext.request.contextPath}/login" class="btn-login-small">Đăng nhập</a>
-                            <a href="${pageContext.request.contextPath}/register" class="btn-register-small">Đăng ký ngay</a>
-                        </c:when>
-                        <c:when test="${sessionScope.user.role == 'admin'}">
-                            <a href="${pageContext.request.contextPath}/admin/dashboard" class="btn-login-small">
-                                Trang quản trị
-                            </a>
-                            <a href="${pageContext.request.contextPath}/logout" class="btn-register-small">
-                                Đăng xuất
-                            </a>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="user-avatar-wrap">
-                                <div class="user-avatar" onclick="toggleUserMenu(event)">
-                                    <c:choose>
-                                        <c:when test="${not empty sessionScope.user.avatarUrl}">
-                                            <img src="${pageContext.request.contextPath}/${sessionScope.user.avatarUrl}"
-                                                 alt="Avatar" class="avatar-img-small">
-                                        </c:when>
-                                        <c:otherwise>
-                                            <span class="avatar-initial">${sessionScope.user.initial}</span>
-                                        </c:otherwise>
-                                    </c:choose>
-                                    <span class="avatar-name">${sessionScope.user.displayName}</span>
-                                    <svg class="avatar-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="6 9 12 15 18 9"/>
-                                    </svg>
-                                </div>
-
-                                <div class="user-dropdown" id="userDropdown">
-                                    <div class="dropdown-header">
-                                        <c:choose>
-                                            <c:when test="${not empty sessionScope.user.avatarUrl}">
-                                                <img src="${pageContext.request.contextPath}/${sessionScope.user.avatarUrl}"
-                                                     alt="Avatar" class="dropdown-avatar-img">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <div class="dropdown-avatar">${sessionScope.user.initial}</div>
-                                            </c:otherwise>
-                                        </c:choose>
-                                        <div class="dropdown-info">
-                                            <strong>${sessionScope.user.displayName}</strong>
-                                            <small>${sessionScope.user.username}</small>
-                                        </div>
-                                    </div>
-                                    <div class="dropdown-divider"></div>
-                                    <a href="${pageContext.request.contextPath}/profile" class="dropdown-item">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                        <circle cx="12" cy="7" r="4"/>
-                                        </svg>
-                                        Hồ sơ cá nhân
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/my-orders" class="dropdown-item">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                        <polyline points="14 2 14 8 20 8"/>
-                                        <line x1="16" y1="13" x2="8" y2="13"/>
-                                        <line x1="16" y1="17" x2="8" y2="17"/>
-                                        </svg>
-                                        Đơn của tôi
-                                    </a>
-                                    <a href="${pageContext.request.contextPath}/change-password" class="dropdown-item">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                                        </svg>
-                                        Đổi mật khẩu
-                                    </a>
-                                    <div class="dropdown-divider"></div>
-                                    <a href="${pageContext.request.contextPath}/logout" class="dropdown-item dropdown-logout">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                                        <polyline points="16 17 21 12 16 7"/>
-                                        <line x1="21" y1="12" x2="9" y2="12"/>
-                                        </svg>
-                                        Đăng xuất
-                                    </a>
-                                </div>
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-
-                <button class="hamburger-btn" onclick="toggleMobileMenu(event)" aria-label="Menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-        </header>
-
-        <!-- MOBILE MENU -->
-        <div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
-        <div class="mobile-menu" id="mobileMenu">
-            <a href="${pageContext.request.contextPath}/home">Trang chủ</a>
-            <a href="${pageContext.request.contextPath}/home#packages">Bảng giá</a>
-            <a href="${pageContext.request.contextPath}/my-orders">Xem đơn</a>
-            <a href="${pageContext.request.contextPath}/contact">Liên hệ</a>
-        </div>
+        <!-- ============ TOP NAV (DÙNG CHUNG) ============ -->
+<jsp:include page="/view/customer/customer-header.jsp">
+    <jsp:param name="activeMenu" value="packages"/>
+</jsp:include>
 
         <!-- BREADCRUMB -->
         <div class="breadcrumb-wrap">
@@ -514,55 +389,7 @@
         </footer>
 
         <!-- SCRIPTS -->
-        <script>
-            function toggleMobileMenu(event) {
-                event.stopPropagation();
-                const menu = document.getElementById('mobileMenu');
-                const overlay = document.querySelector('.mobile-menu-overlay');
-                const btn = document.querySelector('.hamburger-btn');
-                menu.classList.toggle('active');
-                overlay.classList.toggle('active');
-                btn.classList.toggle('active');
-                document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : '';
-            }
 
-            function closeMobileMenu() {
-                const menu = document.getElementById('mobileMenu');
-                const overlay = document.querySelector('.mobile-menu-overlay');
-                const btn = document.querySelector('.hamburger-btn');
-                menu.classList.remove('active');
-                overlay.classList.remove('active');
-                btn.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-
-            window.addEventListener('resize', function () {
-                if (window.innerWidth > 900) closeMobileMenu();
-            });
-
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') closeMobileMenu();
-            });
-
-            function toggleUserMenu(event) {
-                event.stopPropagation();
-                const dropdown = document.getElementById('userDropdown');
-                const avatar = document.querySelector('.user-avatar');
-                if (dropdown && avatar) {
-                    dropdown.classList.toggle('active');
-                    avatar.classList.toggle('active');
-                }
-            }
-
-            document.addEventListener('click', function (event) {
-                const dropdown = document.getElementById('userDropdown');
-                const avatar = document.querySelector('.user-avatar');
-                if (dropdown && avatar && !avatar.contains(event.target) && !dropdown.contains(event.target)) {
-                    dropdown.classList.remove('active');
-                    avatar.classList.remove('active');
-                }
-            });
-        </script>
 
         <script>
             (function () {

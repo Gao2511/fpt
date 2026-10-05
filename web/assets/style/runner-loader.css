@@ -1,6 +1,12 @@
-/* =========================================================
-   RUNNER LOADER — Người chạy khi trang đang load
-   ========================================================= */
+/* ==========================================================================
+   PAGE RUNNER LOADER STYLESHEET - HIỆU ỨNG TẢI TRANG NGƯỜI CHẠY FPT
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. FULLSCREEN OVERLAY       - Nền gradient chuyển động che toàn màn hình
+   02. RUNNER ANIMATION (SVG)   - Hoạt họa vận động viên chạy nước rút
+   03. LOADING TRACK & PROGRESS - Đường chạy và thanh phần trăm tiến trình
+   04. LOADING TEXT & GLOW      - Dòng chữ thông báo kết nối FPT Telecom
+   ========================================================================== */
 
 /* ⭐ OVERLAY — Che toàn màn hình */
 .page-loading {
@@ -23,6 +29,7 @@
 .page-loading.hidden {
     opacity: 0;
     visibility: hidden;
+    pointer-events: none !important;
 }
 
 @keyframes loadingBgMove {

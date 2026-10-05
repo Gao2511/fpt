@@ -1,7 +1,16 @@
-/* =========================================================
-   THEME TOGGLE — Nút chuyển Dark/Light mode
-   Nguyên tắc: CHỈ đổi màu, KHÔNG đổi hiệu ứng gốc
-   ========================================================= */
+/* ==========================================================================
+   THEME TOGGLE STYLESHEET - BỘ CHUYỂN ĐỔI CHẾ ĐỘ SÁNG / TỐI (DARK/LIGHT MODE)
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. TOGGLE BUTTON & ICONS      - Nút tròn mặt trăng/mặt trời & hiệu ứng xoay
+   02. BODY & GLOBAL DARK PALETTE - Nền tổng thể, text & biến màu chế độ tối
+   03. TOP NAV & HEADER OVERRIDES - Thanh navbar & menu điều hướng trên nền tối
+   04. HERO & SLIDESHOW THEME     - Banner hero và slide hiển thị ban đêm
+   05. PACKAGES & CARDS DARK      - Bảng giá cước & thẻ dịch vụ dark mode
+   06. FORMS & INPUTS DARK        - Các ô nhập dữ liệu, dropdown & nhãn trong nền tối
+   07. FOOTER & WIDGETS DARK      - Chân trang và các tiện ích tương thích
+   08. RESPONSIVE ADJUSTMENTS     - Vị trí nút toggle trên màn hình nhỏ
+   ========================================================================== */
 
 .theme-toggle-btn {
     position: fixed;
@@ -957,4 +966,28 @@ body.dark-mode .orders-page-info {
 
 body.dark-mode .orders-page-info strong {
     color: #ffb26b !important;
+}
+
+/* =========================================================
+   MOBILE RESPONSIVE — THEME TOGGLE
+   ========================================================= */
+@media (max-width: 640px) {
+    .theme-toggle-btn {
+        width: 44px;
+        height: 44px;
+        bottom: 74px;
+        right: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .theme-toggle-btn .icon-sun,
+    .theme-toggle-btn .icon-moon {
+        width: 22px;
+        height: 22px;
+    }
+}
+
+body:has(.ai-chat-window.active) .theme-toggle-btn {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
 }

@@ -1,6 +1,19 @@
-/* =========================================================
-   MY ORDERS - TRANG XEM ĐƠN ĐĂNG KÝ
-   ========================================================= */
+/* ==========================================================================
+   CUSTOMER MY ORDERS STYLESHEET - TRANG XEM ĐƠN ĐĂNG KÝ
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. CONTAINER & HEADER      - Khung bao ngoài & tiêu đề trang đơn hàng
+   02. ORDER CARDS             - Khung hiển thị từng đơn đăng ký gói cước
+   03. STATUS BADGES           - Trạng thái đơn (Chờ xử lý, Đang lắp, Hoàn tất, Hủy)
+   04. PAGINATION CONTROLS     - Thanh phân trang danh sách đơn
+   05. EMPTY STATE             - Giao diện khi chưa có đơn hàng nào
+   06. DARK MODE OVERRIDES     - Tương thích nền tối (dark mode)
+   07. RESPONSIVE DESIGN       - Tối ưu hiển thị cho mobile & tablet
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   01. CONTAINER & HEADER
+   -------------------------------------------------------------------------- */
 
 .orders-container {
     max-width: 1000px;

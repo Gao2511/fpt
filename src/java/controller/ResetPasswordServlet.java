@@ -26,7 +26,8 @@ public class ResetPasswordServlet extends HttpServlet {
         UserDTO user = userDAO.findByValidToken(token);
         if (user == null) {
             request.setAttribute("error",
-                "Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.");
+                "Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu mã xác thực mới.");
+            request.setAttribute("step", "email");
             request.getRequestDispatcher("/view/forgot-password.jsp").forward(request, response);
             return;
         }
@@ -49,8 +50,8 @@ public class ResetPasswordServlet extends HttpServlet {
             return;
         }
 
-        if (newPassword == null || newPassword.length() < 6) {
-            request.setAttribute("error", "Mật khẩu phải có ít nhất 6 ký tự!");
+        if (newPassword == null || newPassword.length() < 8) {
+            request.setAttribute("error", "Mật khẩu phải có ít nhất 8 ký tự!");
             request.setAttribute("token", token);
             request.getRequestDispatcher("/view/reset-password.jsp").forward(request, response);
             return;
@@ -66,7 +67,8 @@ public class ResetPasswordServlet extends HttpServlet {
         try {
             UserDTO user = userDAO.findByValidToken(token);
             if (user == null) {
-                request.setAttribute("error", "Link không hợp lệ hoặc đã hết hạn.");
+                request.setAttribute("error", "Link không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu mã xác thực mới.");
+                request.setAttribute("step", "email");
                 request.getRequestDispatcher("/view/forgot-password.jsp").forward(request, response);
                 return;
             }

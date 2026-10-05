@@ -1,6 +1,17 @@
-/* =========================================================
-   ADMIN PACKAGE - QUẢN LÝ GÓI CƯỚC
-   ========================================================= */
+/* ==========================================================================
+   ADMIN PACKAGE MANAGEMENT STYLESHEET - QUẢN LÝ GÓI CƯỚC
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. BADGES & CODE CHIPS       - Mã gói, thẻ giá cước, tốc độ truyền tải
+   02. DESCRIPTIONS & FIELD HINTS- Gợi ý mô tả và thông số kỹ thuật gói
+   03. PACKAGE DATA TABLE        - Bảng danh sách gói cước & bộ chuyển đổi trạng thái
+   04. ACTIVE / INACTIVE TOGGLE  - Toggle kích hoạt hoặc tạm dừng kinh doanh gói
+   05. PACKAGE FORM LAYOUT       - Khung form thêm mới / cập nhật gói cước
+   06. FORM INPUTS & SELECTS     - Nhập liệu tên gói, giá niêm yết, băng thông
+   07. BADGE CARDS & NEON GLOW   - Chọn nhãn nổi bật (HOT, Ưa chuộng, Mới)
+   08. READONLY INFO & WARNINGS  - Thông tin cố định & cảnh báo hệ thống
+   09. RESPONSIVE DESIGN         - Tối ưu giao diện tablet và mobile
+   ========================================================================== */
 
 /* ===== MÃ GÓI ===== */
 .pkg-code {

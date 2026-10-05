@@ -1,6 +1,16 @@
-/* =========================================================
-   ADMIN USER - QUẢN LÝ TÀI KHOẢN (DARK NEON)
-   ========================================================= */
+/* ==========================================================================
+   ADMIN USER MANAGEMENT STYLESHEET - QUẢN LÝ TÀI KHOẢN (DARK NEON)
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. USER CELL & AVATAR       - Hiển thị avatar đại diện và thông tin user trong bảng
+   02. ROLE BADGES              - Huy hiệu phân quyền (Admin, Customer, Staff)
+   03. STATUS SWITCH & TOGGLE   - Công tắc kích hoạt / khóa tài khoản
+   04. USER FILTER & SEARCH     - Thanh tìm kiếm và bộ lọc người dùng
+   05. USER DATA TABLE          - Bảng danh sách tài khoản hệ thống
+   06. CREATE USER MODAL        - Modal tạo mới tài khoản quản trị
+   07. EDIT PASSWORD FORM       - Đổi mật khẩu tài khoản người dùng
+   08. RESPONSIVE DESIGN        - Tương thích giao diện tablet và mobile
+   ========================================================================== */
 
 /* =========================================================
    USER CELL

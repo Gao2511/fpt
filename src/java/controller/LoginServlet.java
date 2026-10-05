@@ -35,27 +35,62 @@ public class LoginServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
 
-        // ⭐ Đổi tên param từ "username" → "username" nhưng cho phép nhập SĐT/Email
-        String input    = request.getParameter("username");
+        // ⭐ CHỈ NHẬN EMAIL + PASSWORD
+        String email    = request.getParameter("email");
         String password = request.getParameter("password");
 
-        // ===== VALIDATE =====
-        if (input == null || input.trim().isEmpty()
+        // ===== VALIDATE RỖNG =====
+        if (email == null || email.trim().isEmpty()
                 || password == null || password.trim().isEmpty()) {
-            request.setAttribute("error", "Vui lòng nhập đầy đủ tài khoản và mật khẩu.");
-            request.setAttribute("username", input);
+            request.setAttribute("error", "Vui lòng nhập đầy đủ email và mật khẩu.");
+            request.setAttribute("email", email);
             request.getRequestDispatcher("/view/login.jsp").forward(request, response);
             return;
         }
 
-        input = input.trim();
+        email = email.trim().toLowerCase();
 
-        // ⭐ ĐĂNG NHẬP BẰNG SĐT HOẶC EMAIL HOẶC USERNAME
-        UserDTO user = userDAO.checkLoginByPhoneOrEmail(input, password);
+        // ===== VALIDATE ĐỊNH DẠNG EMAIL =====
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            request.setAttribute("error", "Email không hợp lệ!");
+            request.setAttribute("email", email);
+            request.getRequestDispatcher("/view/login.jsp").forward(request, response);
+            return;
+        }
+
+        // ===== BƯỚC 1: Kiểm tra email có tồn tại không =====
+        UserDTO byEmail = userDAO.getByEmail(email);
+
+        if (byEmail == null) {
+            request.setAttribute("error", "Email không tồn tại trong hệ thống!");
+            request.setAttribute("email", email);
+            request.getRequestDispatcher("/view/login.jsp").forward(request, response);
+            return;
+        }
+
+        // ===== BƯỚC 2: ⭐ CHẶN TÀI KHOẢN GOOGLE =====
+        if (byEmail.isGoogleUser() && (byEmail.getPassword() == null || byEmail.getPassword().trim().isEmpty())) {
+            request.setAttribute("error",
+                "Tài khoản này được đăng ký bằng Google. Vui lòng nhấn \"Continue with Google\" để đăng nhập.");
+            request.setAttribute("email", email);
+            request.getRequestDispatcher("/view/login.jsp").forward(request, response);
+            return;
+        }
+
+        // Kiểm tra tài khoản bị khóa
+        if (!byEmail.isActive()) {
+            request.setAttribute("error", "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ bộ phận hỗ trợ.");
+            request.setAttribute("email", email);
+            request.getRequestDispatcher("/view/login.jsp").forward(request, response);
+            return;
+        }
+
+        // ===== BƯỚC 3: Login tài khoản LOCAL =====
+        UserDTO user = userDAO.checkLoginLocalByEmail(email, password);
 
         if (user == null) {
-            request.setAttribute("error", "Số điện thoại / Email hoặc mật khẩu không đúng!");
-            request.setAttribute("username", input);
+            request.setAttribute("error", "Mật khẩu không đúng!");
+            request.setAttribute("email", email);
             request.getRequestDispatcher("/view/login.jsp").forward(request, response);
             return;
         }
@@ -67,14 +102,14 @@ public class LoginServlet extends HttpServlet {
 
         System.out.println("==========================================");
         System.out.println("✅ [Login] Đăng nhập thành công: " + user.getUsername());
-        System.out.println("   - Input nhập: " + input);
+        System.out.println("   - Email: " + email);
         System.out.println("   - Role: " + user.getRole());
 
         // ===== XỬ LÝ REDIRECT =====
         String returnUrl = request.getParameter("returnUrl");
         Object redirectUrl = session.getAttribute("redirectAfterLogin");
 
-        String finalRedirect = null;
+        String finalRedirect;
 
         if (returnUrl != null && !returnUrl.trim().isEmpty()) {
             finalRedirect = returnUrl;

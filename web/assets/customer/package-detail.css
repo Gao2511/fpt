@@ -1,8 +1,22 @@
-/* =========================================================
-   PACKAGE DETAIL - CHI TIẾT GÓI CƯỚC
-   4 line kéo dài xuyên qua + ray sáng góc + font ốm thanh thoát
-   Font: Inter (số) + Poppins (heading)
-   ========================================================= */
+/* ==========================================================================
+   CUSTOMER PACKAGE DETAIL STYLESHEET - CHI TIẾT GÓI CƯỚC
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. BREADCRUMB & WRAPPER - Đường dẫn điều hướng & khung chính
+   02. PKG HERO CARD        - Card banner gói cước, bo góc và hiệu ứng
+   03. BORDER LINES & DOTS  - 4 đường line ánh sáng viền ngoài & điểm sáng chạy
+   04. GLOW ORBS & LIGHT    - Hiệu ứng phát sáng neon & hào quang
+   05. BADGES & PRICING     - Nhãn HOT/NỔI BẬT, tên gói, giá cước & tốc độ
+   06. ACTION BUTTONS       - Nút Đăng ký lắp đặt & liên hệ tư vấn
+   07. PACKAGE HIGHLIGHTS   - Khung danh sách ưu đãi & thông số kỹ thuật
+   08. REGISTRATION FORM    - Form đăng ký lắp đặt nhanh (thông tin + địa chỉ)
+   09. DARK MODE THEME      - Tương thích giao diện ban đêm (dark mode)
+   10. RESPONSIVE DESIGN    - Co giãn theo kích thước màn hình điện thoại/tablet
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   01. BREADCRUMB & WRAPPER
+   -------------------------------------------------------------------------- */
 
 /* Breadcrumb */
 .breadcrumb-wrap {
@@ -739,15 +753,15 @@
     }
 
     .pkg-hero-glow .pkg-hero-card {
-        padding: 50px 32px;
+        padding: 28px 18px;
         gap: 20px;
         border-radius: 10px;
     }
 
-    .pkg-hero-glow h1 { font-size: 24px; }
+    .pkg-hero-glow h1 { font-size: 22px; }
 
     .pkg-hero-glow .pkg-hero-price .price-num {
-        font-size: 40px;
+        font-size: 32px;
     }
 
     .pkg-hero-glow .pkg-hero-actions {

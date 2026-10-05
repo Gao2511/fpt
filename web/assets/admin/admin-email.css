@@ -1,6 +1,14 @@
-/* =========================================================
-   ADMIN EMAIL LOG - THÔNG BÁO & LỊCH SỬ EMAIL
-   ========================================================= */
+/* ==========================================================================
+   ADMIN EMAIL LOG STYLESHEET - THÔNG BÁO & LỊCH SỬ EMAIL
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. EMAIL KPI STATS CARDS     - Thống kê email đã gửi, thành công, thất bại
+   02. FILTER & SEARCH CONTROLS  - Lọc theo loại email, trạng thái, người nhận
+   03. EMAIL LOG TABLE           - Bảng lịch sử email & chi tiết nội dung
+   04. STATUS BADGES & TIMESTAMPS- Huy hiệu thành công/thất bại và thời gian gửi
+   05. EMAIL PREVIEW MODAL       - Xem trước mẫu email đã gửi cho khách hàng
+   06. RESPONSIVE DESIGN         - Tương thích giao diện mobile và tablet
+   ========================================================================== */
 
 /* ===== 4 STAT CARDS ===== */
 .email-stats {

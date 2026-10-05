@@ -1,8 +1,14 @@
-/* =========================================================
-   PERFORMANCE OPTIMIZE — Tối ưu hiệu năng đa nền tảng
-   iOS / Android / macOS / Windows / Mobile yếu
-   ⭐ File này load CUỐI CÙNG để override
-   ========================================================= */
+/* ==========================================================================
+   PERFORMANCE OPTIMIZATION STYLESHEET - TỐI ƯU HIỆU NĂNG ĐA NỀN TẢNG
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. ANIMATION THROTTLING     - Tắt animation tiêu tốn CPU/pin trên màn hình nhỏ
+   02. HARDWARE ACCELERATION    - Kích hoạt GPU (will-change, transform: translateZ)
+   03. CONTENT VISIBILITY       - Tối ưu tải ngầm các thành phần nằm ngoài viewport
+   04. FONT RENDERING SMOOTHING - Chống răng cưa font trên macOS, iOS và Windows
+   05. TOUCH INTERACTION TWEAKS - Tối ưu phản hồi cảm ứng trên thiết bị di động
+   06. MEMORY & PAINT SAVINGS   - Giảm thiểu hiện tượng repaint / reflow liên tục
+   ========================================================================== */
 
 /* =========================================================
    1. GIẢM ANIMATION TRÊN THIẾT BỊ YẾU
@@ -100,12 +106,7 @@
     /* ⭐ Tắt filter blur nặng */
     body::before,
     body::after {
-        filter: blur(20px) !important;
-    }
-    
-    .midnight-sky::before,
-    .midnight-sky::after {
-        filter: blur(20px) !important;
+        filter: none !important;
     }
 }
 
@@ -114,24 +115,37 @@
    ========================================================= */
 
 @media (max-width: 640px) {
-    /* Tắt tất cả animation phức tạp */
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.15s !important;
+    /* ⭐ Tắt các hoạt ảnh trang trí nặng tiêu tốn GPU/CPU */
+    .hero,
+    .hero::before,
+    .hero::after,
+    .hero-slideshow::after,
+    .contact-hero,
+    .contact-hero::before,
+    .contact-hero::after,
+    .pkg-wrap::before,
+    .section-title h2,
+    .th-draw,
+    .th-main {
+        animation: none !important;
     }
-    
-    /* Ngoại lệ — giữ transition cơ bản */
+
+    /* Giữ transition nhẹ nhàng cho tương tác mượt mà */
+    button,
+    a,
+    input,
+    select,
+    textarea,
+    .hamburger-btn,
+    .hamburger-btn span,
+    .mobile-menu,
+    .mobile-menu-overlay,
+    .user-dropdown,
+    .ai-chat-window,
     .btn-pkg,
     .btn-hero-primary,
-    .btn-hero-secondary,
-    .btn-fptid,
-    .top-nav .menu a,
-    .dropdown-item,
-    .mobile-menu a {
-        transition-duration: 0.2s !important;
+    .btn-hero-secondary {
+        transition-duration: 0.25s !important;
     }
     
     /* ⭐ Giảm số sao trong hero-stars */
@@ -402,18 +416,54 @@ html {
     }
 }
 
-/* ⭐ Đảm bảo image không bị lag khi scroll */
-img {
-    content-visibility: auto;
+/* ⭐ Tối ưu render — chỉ áp dụng content-visibility trên desktop để tránh giật cuộn mobile */
+@media (min-width: 1025px) {
+    .features,
+    .devices,
+    .contact-section,
+    .footer {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 600px;
+    }
 }
 
-/* ⭐ Tối ưu render cho section dưới màn hình */
-.features,
-.devices,
-.contact-section,
-.footer {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 500px;
+@media (max-width: 1024px) {
+    .features,
+    .devices,
+    .contact-section,
+    .footer {
+        content-visibility: visible !important;
+    }
+}
+
+/* ⭐ Ngăn iOS Safari tự động phóng to màn hình khi bấm vào ô nhập liệu */
+@media (max-width: 768px) {
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+
+    /* Chống tràn ngang tuyệt đối trên mọi thiết bị di động */
+    html,
+    body {
+        overflow-x: clip !important;
+        max-width: 100vw !important;
+        position: relative;
+    }
+
+    /* Tối ưu phản hồi chạm tức thì, không bị trễ 300ms */
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    .hamburger-btn,
+    .theme-toggle-btn,
+    .ai-chat-button,
+    .dot-slide {
+        touch-action: manipulation;
+    }
 }
 
 /* ⭐ Tránh layout shift cho img */

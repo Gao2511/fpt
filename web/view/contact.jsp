@@ -1,6 +1,17 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
+<%-- =========================================================================
+     TRANG LIÊN HỆ FPT TELECOM - CONTACT.JSP
+     =========================================================================
+     MỤC LỤC / TABLE OF CONTENTS:
+     01. META & STYLESHEETS        - Imports CSS giao diện & theme toggle
+     02. SHARED WIDGETS            - Runner Loader, Nav Slider, Theme Toggle
+     03. TOP NAVIGATION HEADER     - Header dùng chung (/view/customer/customer-header.jsp)
+     04. CONTACT HERO BANNER       - Banner liên hệ với hiệu ứng bầu trời sao
+     05. CONTACT CHANNELS GRID     - 3 kênh hỗ trợ (Tư vấn viên, Hotline & CSKH)
+     06. SUPPORT OFFICES & BRANCH  - Danh sách điểm giao dịch FPT Telecom
+     07. FOOTER SECTION            - Chân trang & bản quyền
+     ========================================================================= --%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -20,46 +31,10 @@
 <jsp:include page="/view/theme-toggle.jsp" />
 
 <!-- ============ TOP NAV ============ -->
-<header class="top-nav">
-    <div class="container">
-        <a href="${pageContext.request.contextPath}/home" class="logo">
-            <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
-                 alt="FPT Telecom"
-                 style="height: 55px; width: auto; object-fit: contain; display: block;">
-        </a>
-        <nav class="menu">
-            <a href="${pageContext.request.contextPath}/home">Trang chủ</a>
-            <a href="${pageContext.request.contextPath}/home#packages">Bảng giá</a>
-            <a href="${pageContext.request.contextPath}/home#contact">Tư vấn</a>
-            <a href="${pageContext.request.contextPath}/contact" class="active">Liên hệ</a>
-        </nav>
-        <div class="right">
-            <div class="hotline-box">
-                <div class="icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                    </svg>
-                </div>
-                <div class="text">
-                    <small>Hotline</small>
-                    <strong>0932 079 469</strong>
-                </div>
-            </div>
-            <c:choose>
-                <c:when test="${empty sessionScope.user}">
-                    <a href="${pageContext.request.contextPath}/login" class="btn-login-small">Đăng nhập</a>
-                    <a href="${pageContext.request.contextPath}/register" class="btn-register-small">Đăng ký ngay</a>
-                </c:when>
-                <c:otherwise>
-                    <a href="${pageContext.request.contextPath}/profile" class="btn-login-small">
-                        ${sessionScope.user.displayName}
-                    </a>
-                    <a href="${pageContext.request.contextPath}/logout" class="btn-register-small">Đăng xuất</a>
-                </c:otherwise>
-            </c:choose>
-        </div>
-    </div>
-</header>
+<jsp:include page="/view/customer/customer-header.jsp">
+    <jsp:param name="activeMenu" value="contact" />
+</jsp:include>
+
 
 <!-- ============ HERO CONTACT ============ -->
 <div class="contact-hero">

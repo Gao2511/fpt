@@ -10,8 +10,36 @@ import java.util.List;
 public class UserDAO {
 
     // =========================================================
-    // ĐĂNG NHẬP
+    // ⭐ ĐĂNG NHẬP — CHỈ EMAIL + PASSWORD (tài khoản LOCAL)
     // =========================================================
+    /**
+     * Login CHỈ tài khoản LOCAL (có password).
+     * KHÔNG login tài khoản Google (password = NULL).
+     */
+    public UserDTO checkLoginLocalByEmail(String email, String password) {
+        String sql = "SELECT u.id, u.username, u.password, u.role, u.is_active, u.created_at, "
+                   + "       u.avatar_url, u.email, u.phone, u.full_name, "
+                   + "       u.google_id, u.facebook_id, u.auth_provider, u.email_verified, "
+                   + "       u.id AS consultant_id "
+                   + "FROM users u "
+                   + "WHERE LOWER(u.email) = LOWER(?) "
+                   + "  AND u.password IS NOT NULL "
+                   + "  AND u.password = ? "
+                   + "  AND u.is_active = TRUE "
+                   + "LIMIT 1";
+
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email.trim());
+            ps.setString(2, password);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapResultSet(rs);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return null;
+    }
+
+    // ⭐ Giữ lại method cũ nếu chỗ khác còn dùng
     public UserDTO checkLoginByPhoneOrEmail(String input, String password) {
         String sql = "SELECT u.id, u.username, u.password, u.role, u.is_active, u.created_at, "
                    + "       u.avatar_url, u.email, u.phone, u.full_name, "
@@ -76,12 +104,13 @@ public class UserDAO {
         return null;
     }
 
+    // ⭐ getByEmail dùng LOWER() để không phân biệt hoa/thường
     public UserDTO getByEmail(String email) {
         String sql = "SELECT u.id, u.username, u.password, u.role, u.is_active, u.created_at, "
                    + "       u.avatar_url, u.email, u.phone, u.full_name, "
                    + "       u.google_id, u.facebook_id, u.auth_provider, u.email_verified, "
                    + "       u.id AS consultant_id "
-                   + "FROM users u WHERE u.email = ?";
+                   + "FROM users u WHERE LOWER(u.email) = LOWER(?) LIMIT 1";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
@@ -244,8 +273,8 @@ public class UserDAO {
     // =========================================================
     public int register(String username, String password) {
         if (getByUsername(username) != null) return -1;
-        String sql = "INSERT INTO users (username, password, role, is_active) "
-                   + "VALUES (?, ?, 'customer', TRUE)";
+        String sql = "INSERT INTO users (username, password, role, is_active, auth_provider) "
+                   + "VALUES (?, ?, 'customer', TRUE, 'local')";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, username);
@@ -265,7 +294,7 @@ public class UserDAO {
         if (getByUsername(username) != null) return -1;
 
         String sql = "INSERT INTO users (username, password, role, is_active, "
-                   + "full_name, phone, email) VALUES (?, ?, 'customer', TRUE, ?, ?, ?)";
+                   + "full_name, phone, email, auth_provider) VALUES (?, ?, 'customer', TRUE, ?, ?, ?, 'local')";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, username);
@@ -406,7 +435,6 @@ public class UserDAO {
     // =========================================================
     // ⭐ QUÊN MẬT KHẨU
     // =========================================================
-
     public UserDTO findByEmailOrPhone(String identifier) {
         String sql = "SELECT u.id, u.username, u.password, u.role, u.is_active, u.created_at, "
                    + "       u.avatar_url, u.email, u.phone, u.full_name, "
@@ -467,6 +495,26 @@ public class UserDAO {
         return null;
     }
 
+    public UserDTO findByValidTokenAndEmail(String token, String email) {
+        if (token == null || email == null) return null;
+        String sql = "SELECT u.id, u.username, u.password, u.role, u.is_active, u.created_at, "
+                   + "       u.avatar_url, u.email, u.phone, u.full_name, "
+                   + "       u.google_id, u.facebook_id, u.auth_provider, u.email_verified, "
+                   + "       u.id AS consultant_id "
+                   + "FROM users u "
+                   + "JOIN password_reset_token t ON u.id = t.user_id "
+                   + "WHERE t.token = ? AND LOWER(u.email) = LOWER(?) AND t.used = FALSE AND t.expires_at > NOW()";
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, token.trim());
+            ps.setString(2, email.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapResultSet(rs);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return null;
+    }
+
     public boolean markTokenAsUsed(String token) {
         String sql = "UPDATE password_reset_token SET used = TRUE WHERE token = ?";
         try (Connection conn = DBUtils.getConnection();
@@ -479,7 +527,6 @@ public class UserDAO {
     // =========================================================
     // ⭐ OAUTH
     // =========================================================
-
     public UserDTO findByGoogleId(String googleId) {
         String sql = "SELECT u.id, u.username, u.password, u.role, u.is_active, u.created_at, "
                    + "       u.avatar_url, u.email, u.phone, u.full_name, "
@@ -539,5 +586,24 @@ public class UserDAO {
             }
         } catch (Exception e) { e.printStackTrace(); }
         return -1;
+    }
+
+    // ⭐ Bonus: Kiểm tra user có phải tài khoản Google không
+    public boolean isGoogleAccount(int userId) {
+        String sql = "SELECT google_id, auth_provider, password FROM users WHERE id = ?";
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String googleId = rs.getString("google_id");
+                    String authProvider = rs.getString("auth_provider");
+                    String password = rs.getString("password");
+                    return "google".equalsIgnoreCase(authProvider)
+                        || (googleId != null && !googleId.isEmpty() && (password == null || password.isEmpty()));
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return false;
     }
 }

@@ -1,6 +1,24 @@
-/* =========================================================
-   PROFILE PAGE - HỒ SƠ CÁ NHÂN
-   ========================================================= */
+/* ==========================================================================
+   CUSTOMER PROFILE STYLESHEET - HỒ SƠ CÁ NHÂN & BẢO MẬT
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. CONTAINER & HEADER      - Khung bao ngoài & tiêu đề trang cá nhân
+   02. AVATAR CARD             - Card thông tin đại diện, gradient & hiệu ứng ánh sáng
+   03. USER INFO & BADGES      - Tên người dùng, vai trò & tag phân loại
+   04. ADDRESS DISPLAY         - Khung hiển thị địa chỉ hiện tại & nút chỉnh sửa
+   05. PROFILE FORM            - Form thông tin cá nhân (họ tên, email, sđt)
+   06. FORM INPUTS & LABELS    - Định dạng ô nhập liệu & nhãn bắt buộc
+   07. ACTION BUTTONS          - Nút Cập nhật thông tin, Đổi mật khẩu, Hủy bỏ
+   08. ALERTS & NOTIFICATIONS  - Khung thông báo kết quả cập nhật (success/error)
+   09. SECURITY & PASSWORD     - Khung đổi mật khẩu & gợi ý bảo mật
+   10. DARK MODE OVERRIDES     - Tương thích giao diện chế độ tối (dark mode)
+   11. SNOW LAYER & FX         - Hiệu ứng tuyết rơi / glow nền trang trí
+   12. RESPONSIVE DESIGN       - Giao diện trên thiết bị di động & tablet
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   01. CONTAINER & HEADER
+   -------------------------------------------------------------------------- */
 
 .profile-container {
     max-width: 900px;
@@ -43,8 +61,7 @@
         rgba(15, 23, 42, 0.8) 65%,
         rgba(0, 0, 0, 1) 100%),
         linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
-    background-size: 100% 100%, 200% 200%;
-    animation: avatarCardBg 10s ease infinite;
+    background-size: 100% 100%;
     border: 2px solid #f37021;
     border-radius: 20px;
     padding: 32px;
@@ -58,11 +75,6 @@
         0 0 0 1px rgba(243, 112, 33, 0.1);
     transition: all 0.3s ease;
     flex-direction: row;
-}
-
-@keyframes avatarCardBg {
-    0%, 100% { background-position: 0% 50%; }
-    50%      { background-position: 100% 50%; }
 }
 
 .avatar-card:hover {

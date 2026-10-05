@@ -1,7 +1,12 @@
-/* =========================================================
-   HERO STARS — Bầu trời sao cho .hero và .contact-hero
-   CHỈ nằm trong section, KHÔNG tràn xuống dưới
-   ========================================================= */
+/* ==========================================================================
+   HERO STARS STYLESHEET - BẦU TRỜI SAO & HIỆU ỨNG THIÊN THẠCH (DARK MODE)
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. HERO CONTAINER CONFINEMENT - Giới hạn vùng chứa sao (overflow hidden)
+   02. STAR LAYERS (1, 2, 3)      - 3 lớp sao với tốc độ lấp lánh khác nhau
+   03. METEORS / SHOOTING STARS   - Sao băng bay vút qua màn hình
+   04. MOON & AMBIENT GLOW        - Mặt trăng và ánh sáng dạ quang huyền ảo
+   ========================================================================== */
 
 /* ⭐ QUAN TRỌNG: cả 2 section phải có overflow hidden */
 .hero,
@@ -162,12 +167,23 @@ body.dark-mode .hero-stars {
 }
 
 /* Mobile */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+    .hero-stars .meteor {
+        display: none !important;
+    }
+    .hero-stars .stars-1,
+    .hero-stars .stars-2,
+    .hero-stars .stars-3 {
+        animation: none !important;
+        opacity: 0.7 !important;
+    }
     .hero-stars .moon {
-        width: 44px;
-        height: 44px;
-        top: 8%;
-        right: 6%;
-        box-shadow: 9px 9px 0 0 #fdfbd3;
+        width: 36px;
+        height: 36px;
+        top: 6%;
+        right: 4%;
+        box-shadow: 7px 7px 0 0 #fdfbd3;
+        animation: none !important;
+        filter: drop-shadow(0 0 10px rgba(253, 251, 211, 0.4));
     }
 }

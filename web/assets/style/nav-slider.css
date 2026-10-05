@@ -1,7 +1,12 @@
-/* =========================================================
-   NAV MENU SLIDER — Hiệu ứng slider cho menu nav
-   Dùng chung cho TẤT CẢ các trang
-   ========================================================= */
+/* ==========================================================================
+   NAV MENU SLIDER STYLESHEET - HIỆU ỨNG TRƯỢT MENU TRÊN THANH ĐIỀU HƯỚNG
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. NAV MENU CONTAINER   - Khung kính mờ bo tròn chứa các link menu
+   02. SLIDING PILL WIDGET  - Viên nang cam trượt theo mục menu đang chọn
+   03. MENU LINKS & STATES  - Định dạng liên kết, trạng thái hover & active
+   04. RESPONSIVE BREAKPOINT- Ẩn menu ngang trên mobile (<900px)
+   ========================================================================== */
 
 .top-nav .menu {
     display: flex;

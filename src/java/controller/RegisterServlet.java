@@ -1,6 +1,7 @@
 package controller;
 
 import dao.UserDAO;
+import dto.UserDTO;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -44,129 +45,144 @@ public class RegisterServlet extends HttpServlet {
         // Chuẩn hóa
         if (fullName != null) fullName = fullName.trim();
         if (phone != null)    phone = phone.trim();
-        if (email != null)    email = email.trim();
+        if (email != null)    email = email.trim().toLowerCase();  // ⭐ lowercase email
 
         // ===== VALIDATE =====
 
         // 1. Họ tên
         if (fullName == null || fullName.isEmpty()) {
-            request.setAttribute("error", "Vui lòng nhập Họ và tên");
+            request.setAttribute("error", "Vui lòng nhập Họ và tên.");
             forward(request, response);
             return;
         }
 
-        // 2. ⭐ BẮT BUỘC: SĐT HOẶC EMAIL (ít nhất 1 trong 2)
-        boolean hasPhone = (phone != null && !phone.isEmpty());
-        boolean hasEmail = (email != null && !email.isEmpty());
-
-        if (!hasPhone && !hasEmail) {
-            request.setAttribute("error",
-                "Bạn phải nhập ít nhất 1 trong 2: Số điện thoại HOẶC Email");
+        // 2. Email (Bắt buộc để đăng nhập)
+        if (email == null || email.isEmpty()) {
+            request.setAttribute("error", "Vui lòng nhập địa chỉ Email.");
             forward(request, response);
             return;
         }
 
-        // 3. Validate SĐT nếu có nhập
-        if (hasPhone) {
-            String cleanPhone = phone.replaceAll("[\\s.\\-]", "");
-            if (!cleanPhone.matches("^[0-9]{10,11}$")) {
-                request.setAttribute("error", "Số điện thoại không hợp lệ (phải là 10-11 chữ số)");
-                forward(request, response);
-                return;
-            }
-            phone = cleanPhone;
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            request.setAttribute("error", "Địa chỉ Email không đúng định dạng.");
+            forward(request, response);
+            return;
         }
 
-        // 4. Validate Email nếu có nhập
-        if (hasEmail) {
-            if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-                request.setAttribute("error", "Email không hợp lệ");
-                forward(request, response);
-                return;
-            }
+        // 3. Số điện thoại (Bắt buộc)
+        if (phone == null || phone.isEmpty()) {
+            request.setAttribute("error", "Vui lòng nhập Số điện thoại liên hệ.");
+            forward(request, response);
+            return;
         }
 
-        // 5. Mật khẩu
+        String cleanPhone = phone.replaceAll("[\\s.\\-]", "");
+        if (!cleanPhone.matches("^[0-9]{10,11}$")) {
+            request.setAttribute("error", "Số điện thoại không hợp lệ (phải gồm 10-11 chữ số).");
+            forward(request, response);
+            return;
+        }
+        phone = cleanPhone;
+
+        // 4. Mật khẩu
         if (password == null || password.trim().isEmpty()) {
-            request.setAttribute("error", "Vui lòng nhập mật khẩu");
+            request.setAttribute("error", "Vui lòng nhập mật khẩu.");
             forward(request, response);
             return;
         }
 
         if (password.length() < 8) {
-            request.setAttribute("error", "Mật khẩu phải có ít nhất 8 ký tự");
+            request.setAttribute("error", "Mật khẩu phải có ít nhất 8 ký tự.");
             forward(request, response);
             return;
         }
 
         if (!password.equals(confirm)) {
-            request.setAttribute("error", "Mật khẩu xác nhận không khớp");
+            request.setAttribute("error", "Mật khẩu xác nhận không khớp.");
             forward(request, response);
             return;
         }
 
-        // 6. Điều khoản
+        // 5. Điều khoản
         if (agree == null) {
-            request.setAttribute("error", "Bạn phải đồng ý với Điều khoản dịch vụ");
+            request.setAttribute("error", "Bạn cần đồng ý với Điều khoản dịch vụ & Chính sách của FPT.");
+            forward(request, response);
+            return;
+        }
+
+        // =========================================================
+        // ⭐ KIỂM TRA TRÙNG EMAIL — PHÂN BIỆT RÕ TÀI KHOẢN GOOGLE
+        // =========================================================
+        UserDTO existingByEmail = userDAO.getByEmail(email);
+        if (existingByEmail != null) {
+            if (existingByEmail.isGoogleUser()) {
+                request.setAttribute("error",
+                    "Email này đã được đăng ký bằng tài khoản Google. Vui lòng đăng nhập bằng Google hoặc sử dụng email khác.");
+            } else {
+                request.setAttribute("error",
+                    "Email này đã được đăng ký tài khoản. Vui lòng đăng nhập hoặc sử dụng email khác.");
+            }
+            forward(request, response);
+            return;
+        }
+
+        // ⭐ KIỂM TRA TRÙNG SỐ ĐIỆN THOẠI
+        UserDTO existingByPhone = userDAO.getByPhone(phone);
+        if (existingByPhone != null) {
+            request.setAttribute("error",
+                "Số điện thoại này đã được đăng ký. Vui lòng sử dụng số điện thoại khác.");
             forward(request, response);
             return;
         }
 
         // ===== XÁC ĐỊNH USERNAME =====
-        // ⭐ Ưu tiên SĐT → nếu không có SĐT thì dùng Email
-        String username;
-        if (hasPhone) {
-            username = phone;
-        } else {
-            username = email;
-        }
+        String username = phone;
 
-        // ===== KIỂM TRA TRÙNG USERNAME =====
-        if (userDAO.getByUsername(username) != null) {
-            String field = hasPhone ? "Số điện thoại" : "Email";
-            request.setAttribute("error",
-                field + " này đã được đăng ký. Vui lòng đăng nhập hoặc dùng thông tin khác.");
+        // ⭐ KIỂM TRA TRÙNG USERNAME
+        UserDTO existingByUsername = userDAO.getByUsername(username);
+        if (existingByUsername != null) {
+            if (existingByUsername.isGoogleUser()) {
+                request.setAttribute("error",
+                    "Tài khoản này đã được đăng ký bằng Google. Vui lòng đăng nhập bằng Google.");
+            } else {
+                request.setAttribute("error",
+                    "Số điện thoại này đã được đăng ký tài khoản. Vui lòng đăng nhập.");
+            }
             forward(request, response);
             return;
         }
 
-        // ⭐ KIỂM TRA TRÙNG EMAIL (nếu có email và username là SĐT)
-        if (hasEmail && hasPhone) {
-            // Kiểm tra email có bị trùng không
-            if (userDAO.getByEmail(email) != null) {
+        // Kiểm tra thêm nếu username là email đã từng được lưu
+        UserDTO existingByUsernameEmail = userDAO.getByUsername(email);
+        if (existingByUsernameEmail != null) {
+            if (existingByUsernameEmail.isGoogleUser()) {
                 request.setAttribute("error",
-                    "Email này đã được đăng ký. Vui lòng dùng email khác.");
-                forward(request, response);
-                return;
+                    "Email này đã được đăng ký bằng tài khoản Google. Vui lòng đăng nhập bằng Google.");
+            } else {
+                request.setAttribute("error",
+                    "Email này đã được đăng ký. Vui lòng đăng nhập.");
             }
+            forward(request, response);
+            return;
         }
 
-        // ⭐ KIỂM TRA TRÙNG PHONE (nếu có phone và username là email)
-        if (hasPhone && hasEmail && !hasPhone) {
-            // Trường hợp này không xảy ra vì hasPhone = true
-        }
-
-        // ===== ĐĂNG KÝ =====
-        String emailToSave = hasEmail ? email : null;
-        String phoneToSave = hasPhone ? phone : null;
-
-        int consultantId = userDAO.registerFull(
+        // ===== TIẾN HÀNH ĐĂNG KÝ TÀI KHOẢN LOCAL =====
+        int newUserId = userDAO.registerFull(
             username,
             password,
             fullName,
-            phoneToSave,
-            emailToSave
+            phone,
+            email
         );
 
-        if (consultantId > 0) {
-            // Thành công → chuyển về login
+        if (newUserId > 0) {
+            // Thành công → chuyển về trang login kèm thông báo
             request.setAttribute("success",
-                "Đăng ký thành công! Vui lòng đăng nhập bằng "
-                + (hasPhone ? "SĐT " + phone : "Email " + email));
-            request.setAttribute("username", username);
+                "Đăng ký tài khoản thành công! Vui lòng đăng nhập bằng Email " + email);
+            request.setAttribute("email", email);
             request.getRequestDispatcher("/view/login.jsp").forward(request, response);
         } else {
-            request.setAttribute("error", "Đăng ký thất bại. Vui lòng thử lại sau.");
+            request.setAttribute("error", "Đăng ký thất bại do lỗi hệ thống. Vui lòng thử lại sau.");
             forward(request, response);
         }
     }

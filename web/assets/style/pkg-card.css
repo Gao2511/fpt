@@ -1,8 +1,16 @@
-/* =========================================================
-   PACKAGE CARD — UIVERSE STYLE + CAM FPT
-   Wrapper + overflow hidden → viền xoay không lòi ra ngoài
-   Font: Be Vietnam Pro gradient + letter-spacing đẹp
-   ========================================================= */
+/* ==========================================================================
+   PACKAGE CARD STYLESHEET - BẢNG GIÁ & THẺ GÓI CƯỚC (PREMIUM NEON)
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. PACKAGES GRID CONTAINER  - Bố cục danh sách lưới căn giữa
+   02. CARD WRAPPER & GLOW      - Viền chuyển động xoay tròn neon & bo góc
+   03. CARD HEADER & BADGES     - Nhãn HOT / Ưa chuộng & tốc độ Mbps
+   04. PRICING & PROMOTIONS     - Giá cước hàng tháng và ưu đãi giảm giá
+   05. FEATURE LIST & ICONS     - Danh sách đặc điểm gói cước với icon SVG
+   06. CTA BUTTONS & DETAILS    - Nút Đăng ký lắp đặt & Xem chi tiết
+   07. DARK MODE THEME          - Tương thích giao diện chế độ tối
+   08. RESPONSIVE BREAKPOINTS   - Co giãn linh hoạt theo thiết bị
+   ========================================================================== */
 
 /* ===== CONTAINER — FLEX WRAP + CĂN GIỮA ===== */
 .packages {
@@ -467,16 +475,31 @@
 
 @media (max-width: 640px) {
     .packages {
-        gap: 18px;
+        gap: 16px;
         padding-bottom: 30px;
     }
     .pkg-wrap {
         flex: 0 0 100%;
         max-width: 100%;
-        min-width: 100%;
+        min-width: 0;
+        width: 100%;
         min-height: auto;
     }
-    .pkg .price { font-size: 1.9rem; }
+    /* ⭐ Tắt xoay conic gradient nặng GPU trên mobile */
+    .pkg-wrap::before {
+        animation: none !important;
+        transform: none !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: linear-gradient(135deg, #f37021, #ffb26b) !important;
+        opacity: 0.35 !important;
+    }
+    .pkg-wrap:hover {
+        transform: none !important;
+    }
+    .pkg .price { font-size: 1.85rem; }
     .pkg .pkg-header { font-size: 1.1rem; }
     .pkg:has(.pkg-ribbon) .pkg-header { padding-right: 65px; }
 }
@@ -523,25 +546,18 @@ body.dark-mode .pkg-body {
     color: #e5e7eb !important;
 }
 
-/* ⭐ Section title — Gradient cam FPT (giữ nguyên, đẹp trên cả 2 mode) */
+/* ⭐ Section title — Gradient cam FPT (tĩnh, sắc nét, siêu mượt) */
 .section-title h2 {
     font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
     font-weight: 900;
     letter-spacing: -0.8px;
     background: linear-gradient(135deg,
         #d95810 0%,
-        #f37021 25%,
-        #ffb26b 50%,
-        #f37021 75%,
+        #f37021 35%,
+        #ff8c42 70%,
         #d95810 100%);
-    background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: h2Shimmer 4s linear infinite;
     text-shadow: none;
-}
-
-@keyframes h2Shimmer {
-    to { background-position: 200% center; }
 }

@@ -87,13 +87,18 @@
 
 <!-- ⭐ SCRIPT ẨN/HIỆN LOADING -->
 <script>
-    // Ẩn loading khi trang load xong
-    window.addEventListener('load', function() {
-        var loading = document.getElementById('pageLoading');
-        if (loading) {
-            setTimeout(function() {
+    (function() {
+        function hideLoading() {
+            var loading = document.getElementById('pageLoading');
+            if (loading && !loading.classList.contains('hidden')) {
                 loading.classList.add('hidden');
-            }, 400);   // Đợi 400ms cho mượt
+            }
         }
-    });   
+        // Ẩn khi trang load xong
+        window.addEventListener('load', function() {
+            setTimeout(hideLoading, 300);
+        });
+        // ⭐ Fallback tối đa 1.2s tránh lag/kẹt mạng trên mobile
+        setTimeout(hideLoading, 1200);
+    })();
 </script>

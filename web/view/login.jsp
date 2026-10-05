@@ -1,191 +1,167 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
- 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<!-- Google Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập FPT ID</title>
+    <title>Đăng nhập — FPT Telecom</title>
+
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
-    <link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/fpt-id.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/checkbox-premium.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/performance-optimize.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500;600&family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet chính (Glassmorphism Dark) -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/login-glass.css">
 </head>
-<body>
-    <jsp:include page="/view/loading-runner.jsp" />
-    <div class="fptid-box">
+<body class="login-body">
 
-        <!-- NÚT QUAY LẠI TRANG CHỦ -->
-        <div class="back-home-wrapper">
-            <a href="${pageContext.request.contextPath}/home" class="btn-back-home">
-                <svg viewBox="0 0 24 24">
-                    <line x1="19" y1="12" x2="5" y2="12"/>
-                    <polyline points="12 19 5 12 12 5"/>
-                </svg>
-                Quay lại trang chủ
-            </a>
-        </div>
+    <!-- 1. HIỆU ỨNG NỀN GRADIENT ĐỘNG (Dùng chung) -->
+    <jsp:include page="/view/auth-bg.jsp" />
 
-        <!-- LOGO -->
-        <div class="fptid-logo">
-            <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
-                 alt="FPT Telecom"
-                 class="fptid-logo-img">
-            <div class="tagline">Hệ sinh thái số FPT</div>
-        </div>
+    <!-- 2. THANH ĐIỀU HƯỚNG TRÊN CÙNG: NÚT QUAY LẠI & LOGO FPT (Dùng chung) -->
+    <jsp:include page="/view/auth-header.jsp" />
 
-        <!-- TABS -->
-        <div class="fptid-tabs">
-            <a href="${pageContext.request.contextPath}/login" class="active">Đăng Nhập</a>
-            <a href="${pageContext.request.contextPath}/register">Đăng Ký Mới</a>
-        </div>
+    <!-- 3. KHUNG FORM ĐĂNG NHẬP CHÍNH -->
+    <main class="login-main">
+        <div class="login-wrap">
+            <form id="loginForm" class="login-form" method="POST" action="${pageContext.request.contextPath}/login">
 
-        <!-- TIÊU ĐỀ -->
-        <div class="fptid-title">
-            <h1>Chào mừng <span>bạn trở lại!</span></h1>
-            <p>Đăng nhập tài khoản FPT ID để quản lý toàn bộ dịch vụ</p>
-        </div>
+                <!-- 3.1. Tiêu đề trang -->
+                <h1 class="login-title blur-fade" data-delay="1">Welcome Back</h1>
+                <p class="login-sub blur-fade" data-delay="2">Đăng nhập tài khoản để tiếp tục</p>
 
-        <!-- ALERT -->
-        <% if (request.getAttribute("error") != null) { %>
-            <div class="alert-error">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                </svg>
-                ${error}
-            </div>
-        <% } %>
-        <% if (request.getAttribute("success") != null) { %>
-            <div class="alert-success">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
-                ${success}
-            </div>
-        <% } %>
-
-        <!-- FORM -->
-        <form action="${pageContext.request.contextPath}/login" method="POST" id="loginForm">
-            <!-- Hidden field để giữ returnUrl -->
-            <input type="hidden" name="returnUrl" id="returnUrl"
-                   value="${param.returnUrl}">
-
-            <!-- Tài khoản -->
-            <div class="form-group">
-                <label>Số điện thoại hoặc Email FPT ID <span class="req">*</span></label>
-                <div class="input-wrap">
-                    <span class="icon">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-                        </svg>
-                    </span>
-                    <input type="text" name="username" placeholder="VD: 0987654321 hoặc ten@fpt.vn"
-                           value="${username}" required autofocus>
-                </div>
-            </div>
-
-            <!-- Mật khẩu -->
-            <div class="form-group">
-                <label>
-                    Mật khẩu truy cập <span class="req">*</span>
-                   <a href="${pageContext.request.contextPath}/forgot-password" class="forgot">Quên mật khẩu?</a>
-                </label>
-                <div class="input-wrap">
-                    <span class="icon">
-                        <svg viewBox="0 0 24 24">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                        </svg>
-                    </span>
-                    <input type="password" id="password" name="password" placeholder="Nhập mật khẩu của bạn" required>
-                    <button type="button" class="toggle-eye" onclick="togglePwd('password', this)">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                            <circle cx="12" cy="12" r="3"/>
-                        </svg>
+                <!-- 3.2. Nút đăng nhập Google OAuth -->
+                <div class="login-socials blur-fade" data-delay="3">
+                    <button type="button" class="glass-btn" onclick="location.href='${pageContext.request.contextPath}/google-login'">
+                        <svg viewBox="0 0 64 64" fill="none"><path fill="#4285F4" d="M57.8 30.15c0-2.42-.2-4.19-.62-6.03H29.5v10.95h16.25c-.33 2.72-2.1 6.82-6.03 9.57l-.06.37 8.76 6.78.6.06c5.58-5.15 8.79-12.72 8.79-21.7z"/><path fill="#34A853" d="M29.5 58.99c7.96 0 14.65-2.62 19.53-7.14l-9.31-7.21c-2.49 1.74-5.83 2.95-10.22 2.95-7.8 0-14.42-5.15-16.78-12.26l-.35.03-9.1 7.05-.12.33c4.85 9.63 14.81 16.25 26.35 16.25z"/><path fill="#FBBC05" d="M12.72 35.33c-.62-1.84-.98-3.8-.98-5.83s.36-4 .95-5.83l-.02-.39-9.22-7.16-.3.14C1.15 20.25 0 24.74 0 29.5s1.15 9.24 3.15 13.24l9.57-7.41z"/><path fill="#EB4335" d="M29.5 11.4c5.54 0 9.27 2.39 11.4 4.39l8.32-8.13C44.11 2.92 37.46 0 29.5 0 17.96 0 8 6.62 3.15 16.25l9.54 7.41C15.08 16.55 21.7 11.4 29.5 11.4z"/></svg>
+                        Continue with Google
                     </button>
                 </div>
-            </div>
 
-            <!-- ⭐ CHECKBOX GHI NHỚ ĐĂNG NHẬP — PREMIUM -->
-            <div class="cbx cbx--remember" style="margin-bottom: 18px;">
-                <input id="rememberMe" class="cbx__input" type="checkbox" name="rememberMe" value="true" />
-                <label class="cbx__label" for="rememberMe">
-                    <span class="cbx__box" aria-hidden="true">
-                        <svg class="cbx__svg" viewBox="0 0 24 24" aria-hidden="true">
-                            <path class="cbx__path" d="M6 12l4 4 8-8"></path>
-                        </svg>
-                    </span>
-                    <span class="cbx__text">Ghi nhớ đăng nhập</span>
-                </label>
-            </div>
+                <!-- 3.3. Đường phân cách OR -->
+                <div class="login-divider blur-fade" data-delay="4">OR</div>
 
-            <!-- Nút đăng nhập -->
-            <button type="submit" class="btn-fptid">
-                <svg viewBox="0 0 24 24">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                </svg>
-                ĐĂNG NHẬP FPT ID
-            </button>
-        </form>
+                <!-- 3.4. Bảng thông báo (Alert Banners) -->
+                <c:if test="${not empty error}">
+                    <div class="glass-alert glass-alert-error blur-fade" data-delay="4">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <span>${error}</span>
+                    </div>
+                </c:if>
 
-        <!-- ⭐ HOẶC ĐĂNG NHẬP VỚI GOOGLE -->
-        <div style="display:flex; align-items:center; gap:12px; margin:20px 0;">
-            <div style="flex:1; height:1px; background:linear-gradient(90deg, transparent, #e5e7eb, transparent);"></div>
-            <span style="color:#9ca3af; font-size:12.5px; font-weight:600;">hoặc</span>
-            <div style="flex:1; height:1px; background:linear-gradient(90deg, transparent, #e5e7eb, transparent);"></div>
+                <c:if test="${not empty success}">
+                    <div class="glass-alert glass-alert-success blur-fade" data-delay="4">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        <span>${success}</span>
+                    </div>
+                </c:if>
+
+                <c:if test="${param.reset == 'success'}">
+                    <div class="glass-alert glass-alert-success blur-fade" data-delay="4">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        <span>Đặt lại mật khẩu thành công! Vui lòng đăng nhập bằng mật khẩu mới của bạn.</span>
+                    </div>
+                </c:if>
+
+                <c:if test="${param.error == 'email_is_local'}">
+                    <div class="glass-alert glass-alert-error blur-fade" data-delay="4">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <span>Email này đã đăng ký tài khoản mật khẩu thường. Vui lòng đăng nhập bằng email & mật khẩu bên dưới.</span>
+                    </div>
+                </c:if>
+
+                <c:if test="${param.error == 'account_locked'}">
+                    <div class="glass-alert glass-alert-error blur-fade" data-delay="4">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <span>Tài khoản của bạn đã bị khóa. Vui lòng liên hệ bộ phận hỗ trợ.</span>
+                    </div>
+                </c:if>
+
+                <c:if test="${param.error == 'google_cancelled' or param.error == 'cancelled'}">
+                    <div class="glass-alert glass-alert-error blur-fade" data-delay="4">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <span>Bạn đã huỷ phiên đăng nhập Google.</span>
+                    </div>
+                </c:if>
+
+                <c:if test="${param.error == 'invalid_state'}">
+                    <div class="glass-alert glass-alert-error blur-fade" data-delay="4">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <span>Phiên đăng nhập Google không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.</span>
+                    </div>
+                </c:if>
+
+                <c:if test="${param.error == 'google_no_email'}">
+                    <div class="glass-alert glass-alert-error blur-fade" data-delay="4">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <span>Không lấy được email từ tài khoản Google. Vui lòng thử lại.</span>
+                    </div>
+                </c:if>
+
+                <c:if test="${param.error == 'oauth_failed'}">
+                    <div class="glass-alert glass-alert-error blur-fade" data-delay="4">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <span>Đăng nhập Google thất bại. Vui lòng thử lại sau.</span>
+                    </div>
+                </c:if>
+
+                <c:if test="${param.error == 'create_failed'}">
+                    <div class="glass-alert glass-alert-error blur-fade" data-delay="4">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <span>Không thể khởi tạo tài khoản từ Google.</span>
+                    </div>
+                </c:if>
+
+                <!-- 3.5. Ô nhập: Email -->
+                <div class="glass-input-wrap blur-fade" data-delay="5">
+                    <div class="glass-input-icon">
+                        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    </div>
+                    <input type="email" id="inputEmail" name="email" class="glass-input" placeholder="Địa chỉ email"
+                           autocomplete="email" required
+                           value="${not empty email ? email : ''}">
+                </div>
+
+                <!-- 3.6. Ô nhập: Mật khẩu -->
+                <div class="glass-input-wrap blur-fade" data-delay="6" style="position: relative;">
+                    <div class="glass-input-icon">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <input type="password" id="inputPassword" name="password" class="glass-input" placeholder="Mật khẩu" autocomplete="current-password" required>
+                    <!-- Nút ẩn/hiện mật khẩu -->
+                    <button type="button" id="btnTogglePassword" class="glass-toggle-pass" aria-label="Toggle Password">
+                        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                    <!-- Nút submit đăng nhập -->
+                    <button type="submit" id="btnLoginSubmit" class="glass-submit-btn" aria-label="Đăng nhập">
+                        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </button>
+                </div>
+
+                <!-- 3.7. Liên kết Quên mật khẩu -->
+                <div class="blur-fade" data-delay="6" style="width: 100%; max-width: 300px; display: flex; justify-content: flex-end;">
+                    <a href="${pageContext.request.contextPath}/forgot-password" id="linkForgotPassword" class="login-forgot-link">Quên mật khẩu?</a>
+                </div>
+
+                <!-- 3.8. Liên kết chuyển sang Đăng ký -->
+                <p class="login-sub blur-fade" data-delay="7" style="margin-top: 10px;">
+                    Chưa có tài khoản?
+                    <a href="${pageContext.request.contextPath}/register">Đăng ký ngay</a>
+                </p>
+
+            </form>
         </div>
+    </main>
 
-        <a href="${pageContext.request.contextPath}/google-login"
-           style="display:flex; align-items:center; justify-content:center; gap:10px;
-                  width:100%; padding:13px 20px; background:#fff;
-                  border:1.5px solid #e5e7eb; border-radius:12px;
-                  font-size:14px; font-weight:700; color:#1f2937;
-                  text-decoration:none; cursor:pointer; margin-bottom:10px;
-                  box-shadow:0 2px 8px rgba(0,0,0,0.04);
-                  transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);"
-           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.1)'; this.style.borderColor='#4285F4';"
-           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'; this.style.borderColor='#e5e7eb';">
-            <svg viewBox="0 0 24 24" width="20" height="20">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-            </svg>
-            Đăng nhập với Google
-        </a>
+    <!-- 4. MODAL THÔNG BÁO TIẾN TRÌNH / LỖI (Dùng chung) -->
+    <jsp:include page="/view/auth-modal.jsp" />
 
-        <!-- Switch -->
-        <div class="switch-auth">
-            Chưa có tài khoản FPT ID?
-            <a href="${pageContext.request.contextPath}/register">Đăng ký ngay</a>
-        </div>
-
-    </div>
-
-    <script>
-        function togglePwd(id, btn) {
-            const inp = document.getElementById(id);
-            const svg = btn.querySelector("svg");
-            if (inp.type === "password") {
-                inp.type = "text";
-                svg.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
-            } else {
-                inp.type = "password";
-                svg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-            }
-        }
-    </script>
+    <!-- 5. SCRIPT XỬ LÝ (JS Controller) -->
+    <script src="${pageContext.request.contextPath}/js/login-glass.js"></script>
 </body>
 </html>

@@ -20,19 +20,23 @@ import com.google.gson.JsonObject;
 @WebServlet("/google-callback")
 public class GoogleCallbackServlet extends HttpServlet {
 
+    private final UserDAO userDAO = new UserDAO();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String code = request.getParameter("code");
+        String code  = request.getParameter("code");
         String state = request.getParameter("state");
         String error = request.getParameter("error");
 
+        // ===== User huỷ trên Google =====
         if (error != null) {
-            response.sendRedirect(request.getContextPath() + "/login?error=cancelled");
+            response.sendRedirect(request.getContextPath() + "/login?error=google_cancelled");
             return;
         }
 
+        // ===== Kiểm tra state (CSRF) =====
         HttpSession session = request.getSession();
         String savedState = (String) session.getAttribute("oauth_state");
         if (savedState == null || !savedState.equals(state)) {
@@ -42,37 +46,76 @@ public class GoogleCallbackServlet extends HttpServlet {
         session.removeAttribute("oauth_state");
 
         try {
+            // ===== 1. Đổi code → access_token =====
             JsonObject tokenResponse = exchangeCodeForToken(code);
             String accessToken = tokenResponse.get("access_token").getAsString();
 
+            // ===== 2. Lấy user info từ Google =====
             JsonObject userInfo = getUserInfo(accessToken);
             String googleId = userInfo.get("sub").getAsString();
-            String email = userInfo.has("email") ? userInfo.get("email").getAsString() : null;
-            String name = userInfo.has("name") ? userInfo.get("name").getAsString() : email;
-            String picture = userInfo.has("picture") ? userInfo.get("picture").getAsString() : null;
+            String email    = userInfo.has("email") ? userInfo.get("email").getAsString() : null;
+            String name     = userInfo.has("name") ? userInfo.get("name").getAsString() : email;
+            String picture  = userInfo.has("picture") ? userInfo.get("picture").getAsString() : null;
 
-            UserDAO userDAO = new UserDAO();
+            if (email == null || email.isEmpty()) {
+                response.sendRedirect(request.getContextPath() + "/login?error=google_no_email");
+                return;
+            }
+
+            email = email.trim().toLowerCase();
+
+            // =========================================================
+            // ⭐ 3. LOGIC CHẶN CHÉO
+            // =========================================================
+
+            // Bước 3.1: Tìm theo google_id
             UserDTO user = userDAO.findByGoogleId(googleId);
 
             if (user == null) {
-                if (email != null) user = userDAO.getByEmail(email);
+                // Bước 3.2: Chưa có google_id → kiểm tra email
+                UserDTO existing = userDAO.getByEmail(email);
 
-                if (user != null) {
-                    userDAO.linkGoogleAccount(user.getId(), googleId, picture);
-                    user = userDAO.getById(user.getId());
+                if (existing != null) {
+                    // ⭐ EMAIL ĐÃ TỒN TẠI
+                    // Kiểm tra: có phải tài khoản LOCAL (đăng ký thường có password) không?
+                    boolean isLocalAccount = existing.isLocalUser()
+                        || "local".equalsIgnoreCase(existing.getAuthProvider())
+                        || (existing.getPassword() != null && !existing.getPassword().isEmpty());
+
+                    if (isLocalAccount) {
+                        // ❌ Tài khoản LOCAL → CHẶN, KHÔNG link Google
+                        System.out.println("⛔ [OAuth] Email đã đăng ký bằng tài khoản thường: " + email);
+                        response.sendRedirect(request.getContextPath()
+                            + "/login?error=email_is_local");
+                        return;
+                    }
+
+                    // ⭐ Tài khoản Google đã tồn tại nhưng chưa link google_id (hiếm)
+                    // → link vào tài khoản đó
+                    userDAO.linkGoogleAccount(existing.getId(), googleId, picture);
+                    user = userDAO.getById(existing.getId());
+                    System.out.println("✅ [OAuth] Link Google vào tài khoản cũ: " + email);
                 } else {
+                    // ⭐ Email CHƯA tồn tại → tạo user mới
                     UserDTO newUser = new UserDTO();
                     newUser.setUsername(generateUsername(email, name));
                     newUser.setEmail(email);
                     newUser.setFullName(name);
                     newUser.setAvatarUrl(picture);
                     newUser.setGoogleId(googleId);
+                    newUser.setAuthProvider("google");
+                    newUser.setEmailVerified(true);
                     newUser.setRole("customer");
                     newUser.setActive(true);
 
                     int newId = userDAO.insertGoogleUser(newUser);
-                    if (newId > 0) user = userDAO.getById(newId);
+                    if (newId > 0) {
+                        user = userDAO.getById(newId);
+                        System.out.println("✅ [OAuth] Tạo user Google mới: " + email);
+                    }
                 }
+            } else {
+                System.out.println("✅ [OAuth] User Google đã tồn tại: " + email);
             }
 
             if (user == null) {
@@ -80,10 +123,30 @@ public class GoogleCallbackServlet extends HttpServlet {
                 return;
             }
 
+            // Kiểm tra tài khoản có bị khóa không
+            if (!user.isActive()) {
+                response.sendRedirect(request.getContextPath() + "/login?error=account_locked");
+                return;
+            }
+
+            // ===== 4. Đăng nhập =====
             session.setAttribute("user", user);
             session.setMaxInactiveInterval(30 * 60);
 
-            response.sendRedirect(request.getContextPath() + "/home");
+            System.out.println("==========================================");
+            System.out.println("✅ [OAuth] Đăng nhập Google thành công");
+            System.out.println("   - Email: " + email);
+            System.out.println("   - Role: " + user.getRole());
+            System.out.println("==========================================");
+
+            // ===== 5. Redirect =====
+            Object redirectUrl = session.getAttribute("redirectAfterLogin");
+            if (redirectUrl != null) {
+                session.removeAttribute("redirectAfterLogin");
+                response.sendRedirect((String) redirectUrl);
+            } else {
+                response.sendRedirect(request.getContextPath() + "/dashboard");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,6 +154,9 @@ public class GoogleCallbackServlet extends HttpServlet {
         }
     }
 
+    // =========================================================
+    // Đổi code → access_token
+    // =========================================================
     private JsonObject exchangeCodeForToken(String code) throws IOException {
         String url = "https://oauth2.googleapis.com/token";
         String params = "code=" + URLEncoder.encode(code, "UTF-8")
@@ -101,12 +167,18 @@ public class GoogleCallbackServlet extends HttpServlet {
         return postJson(url, params);
     }
 
+    // =========================================================
+    // Lấy user info từ Google
+    // =========================================================
     private JsonObject getUserInfo(String accessToken) throws IOException {
         String url = "https://www.googleapis.com/oauth2/v3/userinfo?access_token="
                 + URLEncoder.encode(accessToken, "UTF-8");
         return getJson(url);
     }
 
+    // =========================================================
+    // HTTP helpers
+    // =========================================================
     private JsonObject postJson(String urlStr, String postData) throws IOException {
         URL url = new URL(urlStr);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -139,13 +211,15 @@ public class GoogleCallbackServlet extends HttpServlet {
         return sb.toString();
     }
 
+    // =========================================================
+    // Sinh username duy nhất từ email
+    // =========================================================
     private String generateUsername(String email, String name) {
         if (email != null && email.contains("@")) {
             String base = email.substring(0, email.indexOf("@"));
-            UserDAO dao = new UserDAO();
             String uname = base;
             int i = 1;
-            while (dao.getByUsername(uname) != null) {
+            while (userDAO.getByUsername(uname) != null) {
                 uname = base + i++;
             }
             return uname;

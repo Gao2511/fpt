@@ -1,6 +1,21 @@
-/* =========================================================
-   ADMIN CUSTOMER - DANH SÁCH KHÁCH HÀNG + FORM EDIT
-   ========================================================= */
+/* ==========================================================================
+   ADMIN CUSTOMER MANAGEMENT STYLESHEET (DARK PREMIUM)
+   ==========================================================================
+   MỤC LỤC / TABLE OF CONTENTS:
+   01. PAGE HEADER & ACTIONS     - Tiêu đề trang, breadcrumb & nút thao tác chính
+   02. ALERTS & NOTIFICATIONS    - Khung thông báo hệ thống (success, error)
+   03. FILTER & SEARCH BAR       - Bộ lọc trạng thái, tìm kiếm từ khóa, ngày tháng
+   04. QUICK STATS SUMMARY       - Thẻ thống kê số lượng đơn (Mới, Đang xử lý, v.v.)
+   05. CUSTOMER DATA TABLE       - Bảng danh sách khách hàng & hover effects
+   06. BULK ACTIONS BAR          - Thanh công cụ thao tác hàng loạt
+   07. TABLE FOOTER & PAGINATION - Phân trang dữ liệu và số lượng bản ghi
+   08. CUSTOMER DETAIL VIEW      - Trang thông tin chi tiết khách hàng & đơn hàng
+   09. TIMELINE & EMAIL LOGS     - Dòng thời gian gửi email và tương tác
+   10. STATUS EDIT RADIO         - Radio buttons chọn trạng thái xử lý
+   11. READONLY INFO & WARNINGS  - Khối thông tin cố định & cảnh báo hệ thống
+   12. FORM ACTIONS & CONTROLS   - Nút Lưu thay đổi, Quay lại, Hủy đơn
+   13. RESPONSIVE DESIGN         - Tương thích Tablet và Mobile
+   ========================================================================== */
 
 /* ===== PAGE HEADER ===== */
 .page-header-flex {

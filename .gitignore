@@ -19,3 +19,7 @@ desktop.ini
 # ===== Logs =====
 *.log
 src/java/oauth.properties
+
+sources.txt
+node_modules/
+**/node_modules/

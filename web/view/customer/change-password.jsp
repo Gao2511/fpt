@@ -1,6 +1,15 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
+<%-- =========================================================================
+     TRANG ĐỔI MẬT KHẨU KHÁCH HÀNG - CHANGE-PASSWORD.JSP
+     =========================================================================
+     MỤC LỤC / TABLE OF CONTENTS:
+     01. META & STYLESHEETS        - Imports CSS giao diện & theme toggle
+     02. SHARED WIDGETS            - Runner Loader, Nav Slider, Theme Toggle
+     03. TOP NAVIGATION HEADER     - Header dùng chung (/view/customer/customer-header.jsp)
+     04. CHANGE PASSWORD FORM      - Khung nhập Mật khẩu hiện tại & Mật khẩu mới
+     05. FORM VALIDATION SCRIPT    - Kiểm tra độ dài và trùng khớp mật khẩu
+     ========================================================================= --%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -17,25 +26,10 @@
 <jsp:include page="/view/loading-runner.jsp" />
 <jsp:include page="/view/nav-slider.jsp" />
  <jsp:include page="/view/theme-toggle.jsp" />
-<!-- TOP NAV -->
-<header class="top-nav">
-    <div class="container">
-        <a href="${pageContext.request.contextPath}/home" class="logo">
-            <span class="fpt-logo-text">FPT</span>
-            <span class="fpt-logo-sub">Telecom</span>
-        </a>
-        <nav class="menu">
-            <a href="${pageContext.request.contextPath}/home">Trang chủ</a>
-            <a href="${pageContext.request.contextPath}/home#packages">Bảng giá</a>
-            <a href="${pageContext.request.contextPath}/my-orders">Xem đơn</a>
-        </nav>
-        <div class="right">
-            <a href="${pageContext.request.contextPath}/profile" class="btn-login-small">
-                ← Về hồ sơ
-            </a>
-        </div>
-    </div>
-</header>
+<!-- ============ TOP NAV ============ -->
+<jsp:include page="/view/customer/customer-header.jsp">
+    <jsp:param name="activeMenu" value="profile" />
+</jsp:include>
 
 <!-- MAIN -->
 <main class="profile-container" style="max-width: 560px;">

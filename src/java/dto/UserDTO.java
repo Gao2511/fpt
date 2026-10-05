@@ -91,6 +91,16 @@ public class UserDTO {
         return authProvider != null && !"local".equals(authProvider);
     }
 
+    public boolean isGoogleUser() {
+        return "google".equalsIgnoreCase(authProvider)
+            || (googleId != null && !googleId.trim().isEmpty());
+    }
+
+    public boolean isLocalUser() {
+        return "local".equalsIgnoreCase(authProvider)
+            || (password != null && !password.trim().isEmpty());
+    }
+
     // ===== HELPER METHODS =====
     public String getInitial() {
         String source = (fullName != null && !fullName.trim().isEmpty())
