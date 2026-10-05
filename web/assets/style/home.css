@@ -8,7 +8,7 @@
    04. SCROLL REVEAL & ANIMATIONS - Hiệu ứng cuộn trang xuất hiện nội dung
    05. TOP NAV & MAIN HEADER      - Thanh điều hướng chính, logo, hotline, menu links
    06. HERO SECTION & SLIDESHOW   - Banner giới thiệu, slide ảnh và thông điệp chính
-   07. HERO TYPOGRAPHY & BADGES   - Tiêu đề chính, huy hiệu WiFi 6 và mô tả
+   07. TECH TEXT & INTERACTIVE    - Chữ tương tác 3D Canvas và SVG text-hover
    08. STATS & COUNTER SECTION    - Số liệu thống kê ấn tượng (khách hàng, phủ sóng)
    09. PACKAGES GRID & CARDS      - Bảng giá gói cước Internet & Combo FPT
    10. WHY CHOOSE FPT / FEATURES  - Lợi thế dịch vụ, công nghệ WiFi 6
@@ -694,50 +694,100 @@ ul { list-style: none; }
 }
 
 /* =========================================================
-   HERO TYPOGRAPHY — TIÊU ĐỀ CHÍNH & MÔ TẢ (TỐI ƯU NHẸ 60FPS)
+   TECH TEXT — Hiệu ứng chữ canvas "FPT WIFI 6"
    ========================================================= */
-.hero .badge-top {
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    padding: 6px 16px;
-    border-radius: 20px;
-    margin-bottom: 18px;
-    text-transform: uppercase;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+.tech-text-wrap {
+    width: 100%;
+    max-width: 760px;
+    height: 140px;
+    margin: 0 auto;
+    padding: 0;
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    overflow: visible;
+    pointer-events: auto;
+    z-index: 10;
+    font-family: var(--font-tech);
+    filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.35));
+    transition: filter 0.3s ease;
 }
 
-.hero h1 {
-    font-family: 'Be Vietnam Pro', sans-serif;
-    font-size: 50px;
-    font-weight: 900;
-    line-height: 1.18;
-    margin-bottom: 16px;
-    letter-spacing: -0.5px;
-    color: #ffffff;
-    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+.tech-text-wrap:hover {
+    filter: drop-shadow(0 6px 24px rgba(0, 0, 0, 0.5));
 }
 
-.hero h1 .highlight {
-    background: linear-gradient(90deg, #ffb26b, #ff8c42, #ffa54f);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    display: inline-block;
+.tech-text-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
-.hero .desc {
-    font-size: 15px;
-    line-height: 1.7;
-    opacity: 0.92;
-    margin-bottom: 24px;
-    max-width: 620px;
-    color: rgba(255, 255, 255, 0.9);
+/* =========================================================
+   TEXT EFFECT — Hiệu ứng vẽ stroke rồi phát sáng cam
+   ========================================================= */
+.text-hover-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 720px;
+    height: 220px;
+    margin: 0 auto;
+    user-select: none;
+    pointer-events: none;
+}
+
+.text-hover-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+}
+
+/* Layer 1: Vẽ nét stroke (4.8s - nhanh hơn một chút, giữ độ mượt) */
+.th-draw {
+    stroke-dasharray: 1500;
+    stroke-dashoffset: 1500;
+    animation:
+        textDrawIn 4.8s ease-in-out forwards,
+        textFadeOut 0.6s ease-out 4.8s forwards;
+}
+
+@keyframes textDrawIn {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes textFadeOut {
+    to { opacity: 0.3; }
+}
+
+/* Layer 2: Chữ cam phát sáng neon nổi bật & rõ nét */
+.th-main {
+    fill: url(#textGradientOrange);
+    opacity: 0;
+    filter: drop-shadow(0 0 10px rgba(255, 138, 48, 0.6))
+            drop-shadow(0 0 20px rgba(255, 110, 24, 0.35))
+            drop-shadow(0 3px 6px rgba(0, 0, 0, 0.45));
+    animation: textGlowIn 1.2s ease-out 4.8s forwards;
+}
+
+@keyframes textGlowIn {
+    0% {
+        opacity: 0;
+        filter: drop-shadow(0 0 4px rgba(255, 138, 48, 0.2))
+                drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+    50% {
+        opacity: 0.85;
+        filter: drop-shadow(0 0 12px rgba(255, 138, 48, 0.7))
+                drop-shadow(0 0 24px rgba(255, 110, 24, 0.4))
+                drop-shadow(0 3px 6px rgba(0, 0, 0, 0.4));
+    }
+    100% {
+        opacity: 1;
+        filter: drop-shadow(0 0 10px rgba(255, 138, 48, 0.6))
+                drop-shadow(0 0 20px rgba(255, 110, 24, 0.35))
+                drop-shadow(0 3px 6px rgba(0, 0, 0, 0.45));
+    }
 }
 
 .hero .badges {
@@ -2006,6 +2056,8 @@ a[href*="/home"][style*="border: 2px solid #f37021"]:hover,
     .devices { grid-template-columns: repeat(2, 1fr); }
     .hero .container { grid-template-columns: 1fr; }
     .hero-slideshow { max-width: 600px; height: 460px; }
+    .tech-text-wrap { height: 110px; }
+    .text-hover-wrap { height: 175px; }
 }
 
 /* Mobile: 1 cột */
@@ -2025,6 +2077,8 @@ a[href*="/home"][style*="border: 2px solid #f37021"]:hover,
     .devices { grid-template-columns: 1fr; }
     .contact-form { grid-template-columns: 1fr; }
     .hero-slideshow { max-width: 100%; height: 320px; }
+    .tech-text-wrap { height: 80px; }
+    .text-hover-wrap { height: 140px; }
     .top-nav .menu { display: none; }
 
     .contact-hero { padding: 100px 0 40px 0; }
@@ -2752,6 +2806,16 @@ footer {
         height: 8px !important;
         padding: 6px !important;
         box-sizing: content-box !important;
+    }
+
+    /* ---- TEXT HOVER & TECH TEXT ---- */
+    .text-hover-wrap {
+        height: 120px !important;
+        overflow: hidden !important;
+    }
+    .tech-text-wrap {
+        height: 70px !important;
+        overflow: hidden !important;
     }
 
     /* ---- HERO ---- */
