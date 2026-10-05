@@ -117,14 +117,14 @@
                     </div>
                 </c:if>
 
-                <!-- 3.5. Ô nhập: Email -->
+                <!-- 3.5. Ô nhập: Tài khoản / Email / SĐT -->
                 <div class="glass-input-wrap blur-fade" data-delay="5">
                     <div class="glass-input-icon">
-                        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     </div>
-                    <input type="email" id="inputEmail" name="email" class="glass-input" placeholder="Địa chỉ email"
-                           autocomplete="email" required
-                           value="${not empty email ? email : ''}">
+                    <input type="text" id="inputIdentifier" name="identifier" class="glass-input" placeholder="Tên đăng nhập, email hoặc SĐT"
+                           autocomplete="username" required
+                           value="${not empty identifier ? identifier : (not empty email ? email : '')}">
                 </div>
 
                 <!-- 3.6. Ô nhập: Mật khẩu -->

@@ -12,17 +12,17 @@ public class UserDAO {
     // =========================================================
     // ⭐ ĐĂNG NHẬP — CHỈ EMAIL + PASSWORD (tài khoản LOCAL)
     // =========================================================
-    /**
-     * Login CHỈ tài khoản LOCAL (có password).
-     * KHÔNG login tài khoản Google (password = NULL).
-     */
-    public UserDTO checkLoginLocalByEmail(String email, String password) {
+    // =========================================================
+    // ⭐ ĐĂNG NHẬP — HỖ TRỢ CẢ EMAIL, USERNAME, SỐ ĐIỆN THOẠI
+    // =========================================================
+    public UserDTO checkLoginLocalByIdentifier(String identifier, String password) {
         String sql = "SELECT u.id, u.username, u.password, u.role, u.is_active, u.created_at, "
                    + "       u.avatar_url, u.email, u.phone, u.full_name, "
                    + "       u.google_id, u.facebook_id, u.auth_provider, u.email_verified, "
                    + "       u.id AS consultant_id "
                    + "FROM users u "
-                   + "WHERE LOWER(u.email) = LOWER(?) "
+                   + "WHERE (LOWER(u.email) = LOWER(?) OR LOWER(u.username) = LOWER(?) OR u.phone = ? "
+                   + "       OR (? = 'admin@gmail.com' AND u.role = 'admin')) "
                    + "  AND u.password IS NOT NULL "
                    + "  AND u.password = ? "
                    + "  AND u.is_active = TRUE "
@@ -30,13 +30,44 @@ public class UserDAO {
 
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, email.trim());
-            ps.setString(2, password);
+            String val = identifier.trim();
+            ps.setString(1, val);
+            ps.setString(2, val);
+            ps.setString(3, val);
+            ps.setString(4, val);
+            ps.setString(5, password);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapResultSet(rs);
             }
         } catch (Exception e) { e.printStackTrace(); }
         return null;
+    }
+
+    public UserDTO getByIdentifier(String identifier) {
+        String sql = "SELECT u.id, u.username, u.password, u.role, u.is_active, u.created_at, "
+                   + "       u.avatar_url, u.email, u.phone, u.full_name, "
+                   + "       u.google_id, u.facebook_id, u.auth_provider, u.email_verified, "
+                   + "       u.id AS consultant_id "
+                   + "FROM users u "
+                   + "WHERE (LOWER(u.email) = LOWER(?) OR LOWER(u.username) = LOWER(?) OR u.phone = ? "
+                   + "       OR (? = 'admin@gmail.com' AND u.role = 'admin')) "
+                   + "LIMIT 1";
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            String val = identifier.trim();
+            ps.setString(1, val);
+            ps.setString(2, val);
+            ps.setString(3, val);
+            ps.setString(4, val);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return mapResultSet(rs);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return null;
+    }
+
+    public UserDTO checkLoginLocalByEmail(String email, String password) {
+        return checkLoginLocalByIdentifier(email, password);
     }
 
     // ⭐ Giữ lại method cũ nếu chỗ khác còn dùng

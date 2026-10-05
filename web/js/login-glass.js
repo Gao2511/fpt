@@ -72,16 +72,16 @@
     // 3. LOGIN FORM VALIDATION & SUBMISSION
     const loginForm = $('#loginForm');
     if (loginForm) {
-        const inputEmail = $('#inputEmail');
+        const inputAccount = $('#inputIdentifier') || $('#inputEmail');
         const inputPassword = $('#inputPassword');
 
         loginForm.addEventListener('submit', (e) => {
-            const email = (inputEmail?.value || '').trim();
+            const account = (inputAccount?.value || '').trim();
             const password = (inputPassword?.value || '').trim();
 
-            if (!/^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/.test(email)) {
+            if (account.length < 1) {
                 e.preventDefault();
-                window.showGlassModal('error', 'Vui lòng nhập địa chỉ email hợp lệ!');
+                window.showGlassModal('error', 'Vui lòng nhập tên đăng nhập, email hoặc SĐT!');
                 return;
             }
 
@@ -98,7 +98,7 @@
         const linkForgot = $('#linkForgotPassword');
         if (linkForgot) {
             linkForgot.addEventListener('click', (e) => {
-                const emailVal = (inputEmail?.value || '').trim();
+                const emailVal = (inputAccount?.value || '').trim();
                 if (emailVal) {
                     e.preventDefault();
                     const href = linkForgot.getAttribute('href');

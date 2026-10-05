@@ -35,62 +35,62 @@ public class LoginServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
 
-        // ⭐ CHỈ NHẬN EMAIL + PASSWORD
-        String email    = request.getParameter("email");
+        // ⭐ NHẬN IDENTIFIER (EMAIL / TÊN ĐĂNG NHẬP / SĐT) + PASSWORD
+        String identifier = request.getParameter("identifier");
+        if (identifier == null || identifier.trim().isEmpty()) {
+            identifier = request.getParameter("email");
+        }
         String password = request.getParameter("password");
 
         // ===== VALIDATE RỖNG =====
-        if (email == null || email.trim().isEmpty()
+        if (identifier == null || identifier.trim().isEmpty()
                 || password == null || password.trim().isEmpty()) {
-            request.setAttribute("error", "Vui lòng nhập đầy đủ email và mật khẩu.");
-            request.setAttribute("email", email);
+            request.setAttribute("error", "Vui lòng nhập đầy đủ tài khoản và mật khẩu.");
+            request.setAttribute("identifier", identifier);
+            request.setAttribute("email", identifier);
             request.getRequestDispatcher("/view/login.jsp").forward(request, response);
             return;
         }
 
-        email = email.trim().toLowerCase();
+        identifier = identifier.trim();
 
-        // ===== VALIDATE ĐỊNH DẠNG EMAIL =====
-        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-            request.setAttribute("error", "Email không hợp lệ!");
-            request.setAttribute("email", email);
-            request.getRequestDispatcher("/view/login.jsp").forward(request, response);
-            return;
-        }
+        // ===== BƯỚC 1: Kiểm tra tài khoản có tồn tại không =====
+        UserDTO byUser = userDAO.getByIdentifier(identifier);
 
-        // ===== BƯỚC 1: Kiểm tra email có tồn tại không =====
-        UserDTO byEmail = userDAO.getByEmail(email);
-
-        if (byEmail == null) {
-            request.setAttribute("error", "Email không tồn tại trong hệ thống!");
-            request.setAttribute("email", email);
+        if (byUser == null) {
+            request.setAttribute("error", "Tài khoản hoặc email không tồn tại trong hệ thống!");
+            request.setAttribute("identifier", identifier);
+            request.setAttribute("email", identifier);
             request.getRequestDispatcher("/view/login.jsp").forward(request, response);
             return;
         }
 
         // ===== BƯỚC 2: ⭐ CHẶN TÀI KHOẢN GOOGLE =====
-        if (byEmail.isGoogleUser() && (byEmail.getPassword() == null || byEmail.getPassword().trim().isEmpty())) {
+        if (byUser.isGoogleUser() && (byUser.getPassword() == null || byUser.getPassword().trim().isEmpty())) {
             request.setAttribute("error",
                 "Tài khoản này được đăng ký bằng Google. Vui lòng nhấn \"Continue with Google\" để đăng nhập.");
-            request.setAttribute("email", email);
+            request.setAttribute("identifier", identifier);
+            request.setAttribute("email", identifier);
             request.getRequestDispatcher("/view/login.jsp").forward(request, response);
             return;
         }
 
         // Kiểm tra tài khoản bị khóa
-        if (!byEmail.isActive()) {
+        if (!byUser.isActive()) {
             request.setAttribute("error", "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ bộ phận hỗ trợ.");
-            request.setAttribute("email", email);
+            request.setAttribute("identifier", identifier);
+            request.setAttribute("email", identifier);
             request.getRequestDispatcher("/view/login.jsp").forward(request, response);
             return;
         }
 
         // ===== BƯỚC 3: Login tài khoản LOCAL =====
-        UserDTO user = userDAO.checkLoginLocalByEmail(email, password);
+        UserDTO user = userDAO.checkLoginLocalByIdentifier(identifier, password);
 
         if (user == null) {
             request.setAttribute("error", "Mật khẩu không đúng!");
-            request.setAttribute("email", email);
+            request.setAttribute("identifier", identifier);
+            request.setAttribute("email", identifier);
             request.getRequestDispatcher("/view/login.jsp").forward(request, response);
             return;
         }
@@ -102,7 +102,7 @@ public class LoginServlet extends HttpServlet {
 
         System.out.println("==========================================");
         System.out.println("✅ [Login] Đăng nhập thành công: " + user.getUsername());
-        System.out.println("   - Email: " + email);
+        System.out.println("   - Email: " + user.getEmail());
         System.out.println("   - Role: " + user.getRole());
 
         // ===== XỬ LÝ REDIRECT =====
