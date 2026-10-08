@@ -71,13 +71,19 @@
 
                     <!-- 1. CHỌN MODEL AI -->
                     <div class="form-group-dark">
-                        <label class="form-label-dark" for="modelPresetSelect">
-                            <svg viewBox="0 0 24 24">
-                                <rect x="2" y="7" width="20" height="14" rx="2"/>
-                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                            </svg>
-                            Mô hình AI (Model) <span class="req">*</span>
-                        </label>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+                            <label class="form-label-dark" for="modelPresetSelect" style="margin-bottom:0;">
+                                <svg viewBox="0 0 24 24">
+                                    <rect x="2" y="7" width="20" height="14" rx="2"/>
+                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                                </svg>
+                                Mô hình AI (Model) <span class="req">*</span>
+                            </label>
+                            <button type="button" class="btn-prompt-tool" onclick="fetchModelsFromApiKey(event)" title="Tự động truy vấn các model mà API Key của bạn hỗ trợ từ Google">
+                                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                                Đồng bộ từ API Key
+                            </button>
+                        </div>
                         <select id="modelPresetSelect" class="select-dark" onchange="handleModelPresetChange(this.value)">
                             <option value="gemini-1.5-flash" ${settingsMap['gemini_model'] == 'gemini-1.5-flash' || empty settingsMap['gemini_model'] ? 'selected' : ''}>
                                 Gemini 1.5 Flash (Khuyên dùng: Siêu nhanh, thông minh, tối ưu)
@@ -323,6 +329,76 @@
             customWrap.style.display = 'none';
             modelInput.value = val;
         }
+    }
+
+    // 2.1. ĐỒNG BỘ DANH SÁCH MODEL TỪ CHÍNH API KEY
+    function fetchModelsFromApiKey(event) {
+        const apiKey = document.getElementById('gemini_api_key').value.trim();
+        if (!apiKey) {
+            alert('Vui lòng nhập API Key trước khi đồng bộ danh sách Model!');
+            document.getElementById('gemini_api_key').focus();
+            return;
+        }
+
+        const select = document.getElementById('modelPresetSelect');
+        const modelInput = document.getElementById('gemini_model');
+        const currentVal = modelInput.value;
+
+        const btn = event.currentTarget;
+        const oldHtml = btn.innerHTML;
+        btn.innerHTML = '⏳ Đang đồng bộ...';
+        btn.disabled = true;
+
+        const params = new URLSearchParams();
+        params.append('action', 'fetchModels');
+        params.append('gemini_api_key', apiKey);
+
+        fetch(CONTEXT_PATH + '/admin/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+            body: params.toString()
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.innerHTML = oldHtml;
+            btn.disabled = false;
+            if (data.success && data.models && data.models.length > 0) {
+                select.innerHTML = '';
+                let matched = false;
+                data.models.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.id;
+                    opt.textContent = m.displayName + ' (' + m.id + ')';
+                    if (m.id === currentVal) {
+                        opt.selected = true;
+                        matched = true;
+                    }
+                    select.appendChild(opt);
+                });
+
+                const optCustom = document.createElement('option');
+                optCustom.value = 'custom';
+                optCustom.textContent = '✏️ Tùy chỉnh (Nhập model khác)...';
+                select.appendChild(optCustom);
+
+                if (!matched && currentVal) {
+                    optCustom.selected = true;
+                    document.getElementById('customModelWrap').style.display = 'block';
+                } else {
+                    document.getElementById('customModelWrap').style.display = 'none';
+                    modelInput.value = select.value;
+                }
+
+                alert('✓ ' + data.message);
+            } else {
+                alert('✗ ' + data.message);
+            }
+        })
+        .catch(err => {
+            btn.innerHTML = oldHtml;
+            btn.disabled = false;
+            alert('✗ Lỗi khi kết nối lấy danh sách model: ' + err.message);
+        });
     }
 
     // 3. KIỂM TRA KẾT NỐI GEMINI API TRỰC TIẾP (TEST CONNECTION)

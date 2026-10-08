@@ -82,7 +82,22 @@ public class AdminSettingsServlet extends HttpServlet {
             return;
         }
 
-        // ===== 2. LƯU CẤU HÌNH AI TOÀN DIỆN =====
+        // ===== 2. ĐỒNG BỘ DANH SÁCH MODEL TỪ GOOGLE GEMINI (FETCH MODELS) =====
+        if ("fetchModels".equals(action)) {
+            response.setContentType("application/json;charset=UTF-8");
+
+            String apiKey = request.getParameter("gemini_api_key");
+            if (apiKey == null || apiKey.trim().isEmpty()) {
+                apiKey = settingsDAO.getValue("gemini_api_key");
+            }
+            apiKey = (apiKey != null) ? apiKey.trim() : "";
+
+            JsonObject result = fetchGeminiModels(apiKey);
+            response.getWriter().write(result.toString());
+            return;
+        }
+
+        // ===== 3. LƯU CẤU HÌNH AI TOÀN DIỆN =====
         if ("updateAI".equals(action)) {
             String apiKey = request.getParameter("gemini_api_key");
             String model = request.getParameter("gemini_model");
@@ -229,6 +244,86 @@ public class AdminSettingsServlet extends HttpServlet {
         } catch (Exception e) {
             result.addProperty("success", false);
             result.addProperty("message", "Lỗi kết nối mạng: " + e.getMessage());
+        }
+
+        return result;
+    }
+
+    // =========================================================
+    // HELPER: LẤY DANH SÁCH CÁC MODEL KHẢ DỤNG TỪ GOOGLE GEMINI
+    // =========================================================
+    private JsonObject fetchGeminiModels(String apiKey) {
+        JsonObject result = new JsonObject();
+        if (apiKey == null || apiKey.isEmpty()) {
+            result.addProperty("success", false);
+            result.addProperty("message", "Vui lòng nhập API Key trước khi đồng bộ danh sách Model!");
+            return result;
+        }
+
+        try {
+            String urlStr = "https://generativelanguage.googleapis.com/v1beta/models?key=" + apiKey;
+            URL url = new URL(urlStr);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(15000);
+
+            int code = conn.getResponseCode();
+            InputStream stream = (code >= 200 && code < 300) ? conn.getInputStream() : conn.getErrorStream();
+            StringBuilder sb = new StringBuilder();
+            if (stream != null) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) sb.append(line);
+                }
+            }
+
+            if (code >= 200 && code < 300) {
+                JsonObject json = JsonParser.parseString(sb.toString()).getAsJsonObject();
+                JsonArray modelsArray = json.getAsJsonArray("models");
+                JsonArray availableModels = new JsonArray();
+
+                if (modelsArray != null) {
+                    for (int i = 0; i < modelsArray.size(); i++) {
+                        JsonObject m = modelsArray.get(i).getAsJsonObject();
+                        // Chỉ lấy model hỗ trợ sinh văn bản (generateContent)
+                        boolean canGenerate = false;
+                        if (m.has("supportedGenerationMethods")) {
+                            JsonArray methods = m.getAsJsonArray("supportedGenerationMethods");
+                            for (int j = 0; j < methods.size(); j++) {
+                                if ("generateContent".equals(methods.get(j).getAsString())) {
+                                    canGenerate = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (canGenerate) {
+                            String name = m.get("name").getAsString(); // e.g. "models/gemini-1.5-flash"
+                            String id = name.startsWith("models/") ? name.substring(7) : name;
+                            String displayName = m.has("displayName") ? m.get("displayName").getAsString() : id;
+
+                            JsonObject item = new JsonObject();
+                            item.addProperty("id", id);
+                            item.addProperty("displayName", displayName);
+                            if (m.has("description")) {
+                                item.addProperty("description", m.get("description").getAsString());
+                            }
+                            availableModels.add(item);
+                        }
+                    }
+                }
+
+                result.addProperty("success", true);
+                result.addProperty("message", "Đã lấy thành công " + availableModels.size() + " models từ tài khoản Google Gemini!");
+                result.add("models", availableModels);
+            } else {
+                result.addProperty("success", false);
+                result.addProperty("message", "Không thể lấy danh sách model từ Google (HTTP " + code + "). Vui lòng kiểm tra lại API Key.");
+            }
+        } catch (Exception e) {
+            result.addProperty("success", false);
+            result.addProperty("message", "Lỗi kết nối khi lấy model: " + e.getMessage());
         }
 
         return result;
