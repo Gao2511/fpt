@@ -1,13 +1,15 @@
 package controller;
 
-import dao.ApiKeyHistoryDAO;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dao.SettingsDAO;
-import dto.ApiKeyHistoryDTO;
-import dto.SettingsDTO;
 import dto.UserDTO;
 
-import java.io.IOException;
-import java.util.List;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -18,61 +20,19 @@ import javax.servlet.http.*;
 public class AdminSettingsServlet extends HttpServlet {
 
     private final SettingsDAO settingsDAO = new SettingsDAO();
-    private final ApiKeyHistoryDAO historyDAO = new ApiKeyHistoryDAO();
 
     // =========================================================
-    // DO GET
+    // DO GET: Hiển thị trang cài đặt AI
     // =========================================================
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
-        String action = request.getParameter("action");
 
-        // ===== XÓA 1 DÒNG LỊCH SỬ =====
-        if ("deleteHistory".equals(action)) {
-            String idStr = request.getParameter("id");
-            if (idStr != null) {
-                try {
-                    int id = Integer.parseInt(idStr);
-                    boolean ok = historyDAO.delete(id);
-                    if (ok) {
-                        request.getSession().setAttribute("message",
-                            "✓ Đã xóa lịch sử #" + id + " thành công");
-                        request.getSession().setAttribute("messageType", "success");
-                    } else {
-                        request.getSession().setAttribute("message", "✗ Xóa thất bại");
-                        request.getSession().setAttribute("messageType", "error");
-                    }
-                } catch (NumberFormatException ignored) {}
-            }
-            response.sendRedirect(request.getContextPath() + "/admin/settings");
-            return;
-        }
-
-        // ===== XÓA TOÀN BỘ LỊCH SỬ =====
-        if ("deleteAllHistory".equals(action)) {
-            int count = historyDAO.deleteAll();
-            request.getSession().setAttribute("message",
-                "✓ Đã xóa toàn bộ " + count + " dòng lịch sử");
-            request.getSession().setAttribute("messageType", "success");
-            response.sendRedirect(request.getContextPath() + "/admin/settings");
-            return;
-        }
-
-        // ===== LOAD DỮ LIỆU =====
-        List<SettingsDTO> settings = settingsDAO.getAll();
+        // Load tất cả cấu hình từ DB
         Map<String, String> settingsMap = settingsDAO.getAllAsMap();
-
-        // Load lịch sử API key (20 dòng gần nhất)
-        List<ApiKeyHistoryDTO> apiKeyHistory = historyDAO.getAll(20);
-        int totalHistory = historyDAO.countAll();
-
-        request.setAttribute("settings", settings);
         request.setAttribute("settingsMap", settingsMap);
-        request.setAttribute("apiKeyHistory", apiKeyHistory);
-        request.setAttribute("totalHistory", totalHistory);
 
         // Flash message
         HttpSession session = request.getSession();
@@ -88,7 +48,7 @@ public class AdminSettingsServlet extends HttpServlet {
     }
 
     // =========================================================
-    // DO POST
+    // DO POST: Xử lý cập nhật cấu hình hoặc kiểm tra kết nối API
     // =========================================================
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -97,75 +57,180 @@ public class AdminSettingsServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
 
+        // ===== 1. KIỂM TRA KẾT NỐI GEMINI API (AJAX TEST) =====
+        if ("testConnection".equals(action)) {
+            response.setContentType("application/json;charset=UTF-8");
+
+            String apiKey = request.getParameter("gemini_api_key");
+            String model = request.getParameter("gemini_model");
+
+            if (apiKey == null || apiKey.trim().isEmpty()) {
+                apiKey = settingsDAO.getValue("gemini_api_key");
+            }
+            if (model == null || model.trim().isEmpty()) {
+                model = settingsDAO.getValue("gemini_model");
+            }
+            if (model == null || model.trim().isEmpty()) {
+                model = "gemini-1.5-flash";
+            }
+
+            apiKey = (apiKey != null) ? apiKey.trim() : "";
+            model = model.trim();
+
+            JsonObject result = testGeminiApi(apiKey, model);
+            response.getWriter().write(result.toString());
+            return;
+        }
+
+        // ===== 2. LƯU CẤU HÌNH AI TOÀN DIỆN =====
         if ("updateAI".equals(action)) {
             String apiKey = request.getParameter("gemini_api_key");
             String model = request.getParameter("gemini_model");
             String systemPrompt = request.getParameter("gemini_system_prompt");
-            String note = request.getParameter("change_note");
+            String temperature = request.getParameter("gemini_temperature");
+            String maxTokens = request.getParameter("gemini_max_tokens");
+            String chatbotEnabled = request.getParameter("ai_chatbot_enabled");
 
-            // Lấy thông tin admin đang đổi
             HttpSession session = request.getSession();
-            UserDTO currentAdmin = (UserDTO) session.getAttribute("user");
 
-            // Lấy giá trị cũ trước khi update
-            String oldApiKey = settingsDAO.getValue("gemini_api_key");
-            String oldModel = settingsDAO.getValue("gemini_model");
-
-            boolean ok = true;
-            boolean apiKeyChanged = false;
-
-            if (apiKey != null && !apiKey.trim().isEmpty()) {
-                String newApiKey = apiKey.trim();
-                ok &= settingsDAO.update("gemini_api_key", newApiKey);
-
-                // Nếu API Key thực sự đổi → đánh dấu để ghi log
-                if (oldApiKey == null || !newApiKey.equals(oldApiKey)) {
-                    apiKeyChanged = true;
-                }
+            // Cập nhật API Key nếu có nhập
+            if (apiKey != null) {
+                settingsDAO.update("gemini_api_key", apiKey.trim());
             }
 
+            // Cập nhật Model
             if (model != null && !model.trim().isEmpty()) {
-                ok &= settingsDAO.update("gemini_model", model.trim());
+                settingsDAO.update("gemini_model", model.trim());
             }
 
-            if (systemPrompt != null && !systemPrompt.trim().isEmpty()) {
-                ok &= settingsDAO.update("gemini_system_prompt", systemPrompt.trim());
+            // Cập nhật System Prompt (chỉ dẫn persona & kiến thức)
+            if (systemPrompt != null) {
+                settingsDAO.update("gemini_system_prompt", systemPrompt.trim());
             }
 
-            // ===== GHI LOG LỊCH SỬ nếu API Key thay đổi =====
-            if (ok && apiKeyChanged && currentAdmin != null) {
-                String newApiKey = settingsDAO.getValue("gemini_api_key");
-                String newModel = settingsDAO.getValue("gemini_model");
-
-                String logNote = (note != null && !note.trim().isEmpty())
-                               ? note.trim()
-                               : "Đổi API Key từ " + maskKey(oldApiKey) + " → " + maskKey(newApiKey);
-
-                historyDAO.log(
-                    currentAdmin.getId(),
-                    currentAdmin.getDisplayName(),
-                    newApiKey,
-                    newModel,
-                    "UPDATE",
-                    logNote
-                );
-            }
-
-            if (ok) {
-                session.setAttribute("message", "✓ Đã cập nhật cấu hình AI thành công");
-                session.setAttribute("messageType", "success");
+            // Cập nhật Temperature
+            if (temperature != null && !temperature.trim().isEmpty()) {
+                settingsDAO.update("gemini_temperature", temperature.trim());
             } else {
-                session.setAttribute("message", "✗ Cập nhật thất bại");
-                session.setAttribute("messageType", "error");
+                settingsDAO.update("gemini_temperature", "0.7");
             }
+
+            // Cập nhật Max Output Tokens
+            if (maxTokens != null && !maxTokens.trim().isEmpty()) {
+                settingsDAO.update("gemini_max_tokens", maxTokens.trim());
+            } else {
+                settingsDAO.update("gemini_max_tokens", "600");
+            }
+
+            // Cập nhật Trạng thái bật/tắt Chatbot
+            if ("true".equalsIgnoreCase(chatbotEnabled) || "on".equalsIgnoreCase(chatbotEnabled)) {
+                settingsDAO.update("ai_chatbot_enabled", "true");
+            } else {
+                settingsDAO.update("ai_chatbot_enabled", "false");
+            }
+
+            session.setAttribute("message", "✓ Đã lưu toàn bộ cấu hình AI thành công! Thay đổi có hiệu lực ngay lập tức.");
+            session.setAttribute("messageType", "success");
         }
 
         response.sendRedirect(request.getContextPath() + "/admin/settings");
     }
 
-    /** Helper: che API key khi hiện trong note */
-    private String maskKey(String key) {
-        if (key == null || key.length() < 15) return key;
-        return key.substring(0, 10) + "..." + key.substring(key.length() - 5);
+    // =========================================================
+    // HELPER: TEST KẾT NỐI GEMINI API TRỰC TIẾP
+    // =========================================================
+    private JsonObject testGeminiApi(String apiKey, String model) {
+        JsonObject result = new JsonObject();
+
+        if (apiKey == null || apiKey.isEmpty()) {
+            result.addProperty("success", false);
+            result.addProperty("message", "Vui lòng nhập API Key trước khi kiểm tra kết nối!");
+            return result;
+        }
+
+        long startTime = System.currentTimeMillis();
+        try {
+            String fullEndpointUrl = String.format(
+                "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s",
+                model, apiKey
+            );
+
+            URL url = new URL(fullEndpointUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            conn.setDoOutput(true);
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(15000);
+
+            // Gửi ping ngắn
+            JsonObject userPart = new JsonObject();
+            userPart.addProperty("text", "Xin chào FPT Telecom");
+            JsonArray parts = new JsonArray();
+            parts.add(userPart);
+            JsonObject content = new JsonObject();
+            content.addProperty("role", "user");
+            content.add("parts", parts);
+            JsonArray contents = new JsonArray();
+            contents.add(content);
+
+            JsonObject body = new JsonObject();
+            body.add("contents", contents);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(body.toString().getBytes(StandardCharsets.UTF_8));
+            }
+
+            int statusCode = conn.getResponseCode();
+            long latency = System.currentTimeMillis() - startTime;
+
+            InputStream stream = (statusCode >= 200 && statusCode < 300)
+                ? conn.getInputStream()
+                : conn.getErrorStream();
+
+            StringBuilder sb = new StringBuilder();
+            if (stream != null) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                }
+            }
+
+            if (statusCode >= 200 && statusCode < 300) {
+                result.addProperty("success", true);
+                result.addProperty("message", "Kết nối thành công tới model " + model + " (Độ trễ: " + latency + "ms)!");
+                result.addProperty("latencyMs", latency);
+                result.addProperty("model", model);
+            } else {
+                result.addProperty("success", false);
+                String errorDetail = "Mã lỗi HTTP " + statusCode;
+                try {
+                    JsonObject errorJson = JsonParser.parseString(sb.toString()).getAsJsonObject();
+                    if (errorJson.has("error")) {
+                        JsonObject err = errorJson.getAsJsonObject("error");
+                        if (err.has("message")) {
+                            errorDetail = err.get("message").getAsString();
+                        }
+                    }
+                } catch (Exception ignored) {}
+
+                if (statusCode == 400 && errorDetail.toLowerCase().contains("api key")) {
+                    result.addProperty("message", "API Key không hợp lệ! Vui lòng kiểm tra lại key của bạn.");
+                } else if (statusCode == 404) {
+                    result.addProperty("message", "Không tìm thấy model '" + model + "'. Hãy chọn một model khác.");
+                } else if (statusCode == 429) {
+                    result.addProperty("message", "API Key đã vượt quá hạn mức truy vấn (Quota Exceeded).");
+                } else {
+                    result.addProperty("message", "Lỗi từ Google Gemini: " + errorDetail);
+                }
+            }
+        } catch (Exception e) {
+            result.addProperty("success", false);
+            result.addProperty("message", "Lỗi kết nối mạng: " + e.getMessage());
+        }
+
+        return result;
     }
 }

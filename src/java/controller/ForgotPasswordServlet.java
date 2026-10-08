@@ -3,7 +3,7 @@ package controller;
 import dao.UserDAO;
 import dto.UserDTO;
 import utils.TokenUtil;
-import ultis.EmailUtility;
+import utils.EmailUtility;
 
 import java.io.IOException;
 import java.sql.Timestamp;

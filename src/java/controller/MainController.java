@@ -1,188 +1,243 @@
 package controller;
 
-import dao.CustomerDAO;
-import dao.EmailLogDAO;
-import dao.PackageDAO;
-import dao.UserDAO;
-import dto.CustomerDTO;
-import dto.EmailLogDTO;
-import dto.PackageDTO;
-import dto.UserDTO;
-import utils.DBUtils;
-import ultis.EmailUtility;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.List;
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
- * MainController - Chỉ chứa các action để test hệ thống.
+ * MainController - Front Controller chính điều hướng toàn bộ action của hệ thống FPT Sale.
+ * Mọi request kèm theo tham số 'action' sẽ được điều phối tới Servlet hoặc Resource tương ứng.
+ * 
+ * URL Patterns: /MainController, /main
  */
-public class MainController {
+@WebServlet(name = "MainController", urlPatterns = {"/MainController", "/main"})
+public class MainController extends HttpServlet {
 
-    public static void main(String[] args) {
-        // ⭐ Test kết nối Supabase chi tiết
-        testSupabaseConnection();
+    // =========================================================================
+    // CÁC HẰNG SỐ ĐƯỜNG DẪN / ACTION CONTROLLER
+    // =========================================================================
+    private static final String ERROR = "home";
+    private static final String HOME = "home";
 
-        // ⭐ Test lấy dữ liệu (bỏ comment nếu muốn test)
-        // testGetAllPackages();
-        // testGetAllCustomers();
-        // testGetAllUsers();
-        // testGetAllEmailLogs();
-    }
+    // 1. Xác thực & Tài khoản
+    private static final String LOGIN = "login";
+    private static final String LOGOUT = "logout";
+    private static final String REGISTER = "register";
+    private static final String FORGOT_PASSWORD = "forgot-password";
+    private static final String RESET_PASSWORD = "reset-password";
+    private static final String CHANGE_PASSWORD = "change-password";
+    private static final String PROFILE = "profile";
+    private static final String GOOGLE_LOGIN = "google-login";
+    private static final String GOOGLE_CALLBACK = "google-callback";
+
+    // 2. Chức năng Người dùng / Khách hàng
+    private static final String CONTACT_PAGE = "contact";
+    private static final String CONTACT_SUBMIT = "ContactServlet";
+    private static final String PACKAGE_DETAIL = "package-detail";
+    private static final String MY_ORDERS = "my-orders";
+    private static final String AI_CHAT = "ai-chat";
+
+    // 3. Quản trị viên (Admin)
+    private static final String DASHBOARD = "admin/dashboard";
+    private static final String ADMIN_CUSTOMERS = "admin/customers";
+    private static final String ADMIN_CUSTOMER_DETAIL = "admin/customer-detail";
+    private static final String ADMIN_PACKAGES = "admin/packages";
+    private static final String ADMIN_USERS = "admin/users";
+    private static final String ADMIN_SETTINGS = "admin/settings";
+    private static final String ADMIN_EMAIL_LOGS = "admin/email-logs";
 
     /**
-     * ⭐ Test kết nối Supabase chi tiết
+     * Phương thức xử lý chung cho cả GET và POST
      */
-    public static void testSupabaseConnection() {
-        System.out.println("🚀 Bắt đầu test kết nối Supabase...\n");
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
 
-        try (Connection conn = DBUtils.getConnection()) {
-            System.out.println("✅ Kết nối Supabase thành công!");
-            System.out.println("📌 Database: " + conn.getCatalog());
-            System.out.println("📌 User:     " + conn.getMetaData().getUserName());
-            System.out.println("📌 Driver:   " + conn.getMetaData().getDriverName()
-                             + " v" + conn.getMetaData().getDriverVersion());
-            System.out.println("📌 URL:      " + conn.getMetaData().getURL());
-            System.out.println();
+        String url = HOME;
+        try {
+            String action = request.getParameter("action");
 
-            // ⭐ Đếm số lượng trong các bảng
-            Statement stmt = conn.createStatement();
+            if (action == null || action.trim().isEmpty()) {
+                url = HOME;
+            } else {
+                switch (action) {
+                    // ==========================================
+                    // 1. NHÓM ACTION AUTHENTICATION & TÀI KHOẢN
+                    // ==========================================
+                    case "Login":
+                    case "login":
+                    case "SignIn":
+                        url = LOGIN;
+                        break;
 
-            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM users");
-            if (rs.next()) System.out.println("👥 Users:     " + rs.getInt(1));
+                    case "Logout":
+                    case "logout":
+                    case "SignOut":
+                        url = LOGOUT;
+                        break;
 
-            rs = stmt.executeQuery("SELECT COUNT(*) FROM packages");
-            if (rs.next()) System.out.println("📦 Packages:  " + rs.getInt(1));
+                    case "Register":
+                    case "register":
+                    case "SignUp":
+                        url = REGISTER;
+                        break;
 
-            rs = stmt.executeQuery("SELECT COUNT(*) FROM customers");
-            if (rs.next()) System.out.println("👤 Customers: " + rs.getInt(1));
+                    case "ForgotPassword":
+                    case "forgot-password":
+                    case "forgotPassword":
+                        url = FORGOT_PASSWORD;
+                        break;
 
-            rs = stmt.executeQuery("SELECT COUNT(*) FROM email_logs");
-            if (rs.next()) System.out.println("📧 EmailLogs: " + rs.getInt(1));
+                    case "ResetPassword":
+                    case "reset-password":
+                    case "resetPassword":
+                        url = RESET_PASSWORD;
+                        break;
 
-            rs = stmt.executeQuery("SELECT COUNT(*) FROM settings");
-            if (rs.next()) System.out.println("⚙️  Settings:  " + rs.getInt(1));
+                    case "ChangePassword":
+                    case "change-password":
+                    case "changePassword":
+                        url = CHANGE_PASSWORD;
+                        break;
 
-            rs = stmt.executeQuery("SELECT COUNT(*) FROM api_key_history");
-            if (rs.next()) System.out.println("🔑 ApiKey:    " + rs.getInt(1));
+                    case "Profile":
+                    case "profile":
+                        url = PROFILE;
+                        break;
 
-            rs = stmt.executeQuery("SELECT COUNT(*) FROM password_reset_token");
-            if (rs.next()) System.out.println("🔐 ResetToken:" + rs.getInt(1));
+                    case "GoogleLogin":
+                    case "google-login":
+                        url = GOOGLE_LOGIN;
+                        break;
 
-            System.out.println("\n🎉 TEST KẾT NỐI THÀNH CÔNG!");
+                    case "GoogleCallback":
+                    case "google-callback":
+                        url = GOOGLE_CALLBACK;
+                        break;
 
-        } catch (ClassNotFoundException e) {
-            System.out.println("❌ Không tìm thấy driver PostgreSQL!");
-            System.out.println("👉 Kiểm tra: đã add file postgresql-42.7.4.jar vào Libraries chưa?");
-            e.printStackTrace();
+                    // ==========================================
+                    // 2. NHÓM ACTION NGƯỜI DÙNG & TƯ VẤN
+                    // ==========================================
+                    case "Home":
+                    case "home":
+                        url = HOME;
+                        break;
+
+                    case "Contact":
+                    case "contact":
+                    case "ContactPage":
+                        url = CONTACT_PAGE;
+                        break;
+
+                    case "SendContact":
+                    case "send-contact":
+                    case "SubmitContact":
+                    case "submit-contact":
+                    case "ContactServlet":
+                        url = CONTACT_SUBMIT;
+                        break;
+
+                    case "PackageDetail":
+                    case "package-detail":
+                    case "ViewPackage":
+                        url = PACKAGE_DETAIL;
+                        break;
+
+                    case "MyOrders":
+                    case "my-orders":
+                    case "orders":
+                        url = MY_ORDERS;
+                        break;
+
+                    case "AIChat":
+                    case "ai-chat":
+                    case "chat":
+                        url = AI_CHAT;
+                        break;
+
+                    // ==========================================
+                    // 3. NHÓM ACTION QUẢN TRỊ ADMIN
+                    // ==========================================
+                    case "Dashboard":
+                    case "dashboard":
+                    case "AdminDashboard":
+                    case "admin-dashboard":
+                        url = DASHBOARD;
+                        break;
+
+                    case "AdminCustomers":
+                    case "admin-customers":
+                    case "ManageCustomers":
+                    case "CustomerList":
+                        url = ADMIN_CUSTOMERS;
+                        break;
+
+                    case "CustomerDetail":
+                    case "customer-detail":
+                    case "AdminCustomerDetail":
+                        url = ADMIN_CUSTOMER_DETAIL;
+                        break;
+
+                    case "AdminPackages":
+                    case "admin-packages":
+                    case "ManagePackages":
+                    case "PackageList":
+                        url = ADMIN_PACKAGES;
+                        break;
+
+                    case "AdminUsers":
+                    case "admin-users":
+                    case "ManageUsers":
+                    case "UserList":
+                        url = ADMIN_USERS;
+                        break;
+
+                    case "AdminSettings":
+                    case "admin-settings":
+                    case "ManageSettings":
+                        url = ADMIN_SETTINGS;
+                        break;
+
+                    case "AdminEmailLogs":
+                    case "admin-email-logs":
+                    case "ManageEmailLogs":
+                    case "EmailLogs":
+                        url = ADMIN_EMAIL_LOGS;
+                        break;
+
+                    default:
+                        // Action không xác định -> điều hướng về trang chủ
+                        log("[MainController] Unknown action: " + action + ", redirecting to HOME.");
+                        url = HOME;
+                        break;
+                }
+            }
         } catch (Exception e) {
-            System.out.println("❌ Lỗi kết nối: " + e.getMessage());
-            e.printStackTrace();
+            log("[MainController] Error processing request: " + e.getMessage(), e);
+            url = ERROR;
+        } finally {
+            request.getRequestDispatcher(url).forward(request, response);
         }
     }
 
-    /**
-     * Test kết nối DB đơn giản (giữ lại cho tương thích)
-     */
-    public static void testConnection() {
-        try (Connection conn = DBUtils.getConnection()) {
-            System.out.println("✅ Kết nối Supabase PostgreSQL thành công! Database: " + conn.getCatalog());
-        } catch (Exception e) {
-            System.out.println("❌ Kết nối thất bại: " + e.getMessage());
-        }
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
     }
 
-    public static boolean testSendEmail(String to, String subject, String body) {
-        boolean ok = EmailUtility.sendEmail(to, subject, body);
-        System.out.println(ok ? "✅ Gửi mail thành công" : "❌ Gửi mail thất bại");
-        return ok;
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
     }
 
-    public static List<PackageDTO> testGetAllPackages() {
-        List<PackageDTO> list = new PackageDAO().getAll();
-        System.out.println("📦 Tổng số gói cước: " + list.size());
-        for (PackageDTO p : list) {
-            System.out.println("   → " + p.getPackageCode() + " - " + p.getName()
-                             + " - " + p.getPrice() + "đ - " + p.getSpeedMbps() + "Mbps");
-        }
-        return list;
-    }
-
-    public static List<CustomerDTO> testGetAllCustomers() {
-        List<CustomerDTO> list = new CustomerDAO().getAll();
-        System.out.println("👥 Tổng số khách hàng: " + list.size());
-        for (CustomerDTO c : list) {
-            System.out.println("   → #" + c.getId() + " - " + c.getFullName()
-                             + " - " + c.getPhone() + " - " + c.getStatus());
-        }
-        return list;
-    }
-
-    public static List<EmailLogDTO> testGetAllEmailLogs() {
-        List<EmailLogDTO> list = new EmailLogDAO().getAll();
-        System.out.println("📧 Tổng số log email: " + list.size());
-        return list;
-    }
-
-    public static List<UserDTO> testGetAllUsers() {
-        List<UserDTO> list = new UserDAO().getAll();
-        System.out.println("🔑 Tổng số tài khoản: " + list.size());
-        for (UserDTO u : list) {
-            System.out.println("   → #" + u.getId() + " - " + u.getUsername()
-                             + " - " + u.getRole() + " - " + (u.isActive() ? "Active" : "Locked"));
-        }
-        return list;
-    }
-
-    /**
-     * Thêm khách hàng mới
-     */
-    public static int testInsertCustomer(String fullName, String phone, String address,
-                                         String email, String note, Integer consultantId) {
-        CustomerDTO c = new CustomerDTO();
-        c.setFullName(fullName);
-        c.setPhone(phone);
-        c.setAddress(address);
-        c.setEmail(email);
-        c.setNote(note);
-        c.setConsultantId(consultantId);
-        c.setStatus("Mới");
-
-        int id = new CustomerDAO().insert(c);
-        System.out.println(id > 0 ? "✅ Thêm khách hàng thành công, ID = " + id
-                                  : "❌ Thêm khách hàng thất bại");
-        return id;
-    }
-
-    public static boolean testFullFlow(String fullName, String phone, String address,
-                                       String email, String note, Integer consultantId) {
-
-        int customerId = testInsertCustomer(fullName, phone, address, email, note, consultantId);
-        boolean isSaved = customerId > 0;
-
-        String emailTo = email;
-        String subject = "Khách hàng mới: " + fullName;
-        String body = "Họ tên: " + fullName + "\n"
-                    + "SĐT: " + phone + "\n"
-                    + "Địa chỉ: " + address + "\n"
-                    + "Email: " + email + "\n"
-                    + "Ghi chú: " + note;
-
-        boolean isSent = EmailUtility.sendEmail(emailTo, subject, body);
-        System.out.println(isSent ? "✅ Gửi mail thành công" : "❌ Gửi mail thất bại");
-
-        if (isSaved) {
-            EmailLogDAO logDAO = new EmailLogDAO();
-            boolean logOk = isSent
-                    ? logDAO.insertSuccess(customerId, emailTo, subject)
-                    : logDAO.insertFailed(customerId, emailTo, subject, "SMTP error");
-            System.out.println(logOk ? "✅ Ghi log thành công" : "❌ Ghi log thất bại");
-        }
-
-        boolean result = isSaved && isSent;
-        System.out.println(result ? "🎉 FULL FLOW THÀNH CÔNG!" : "⚠️ Có bước bị lỗi");
-        return result;
+    @Override
+    public String getServletInfo() {
+        return "MainController - Front Controller for FPT Sale Website";
     }
 }

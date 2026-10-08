@@ -58,13 +58,16 @@ public class SettingsDAO {
         return list;
     }
 
-    /** Cập nhật giá trị setting */
+    /** Cập nhật hoặc thêm mới giá trị setting (Safe Upsert) */
     public boolean update(String key, String value) {
-        String sql = "UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?";
+        String sql = "INSERT INTO settings (setting_key, setting_value, updated_at) "
+                   + "VALUES (?, ?, NOW()) "
+                   + "ON CONFLICT (setting_key) "
+                   + "DO UPDATE SET setting_value = EXCLUDED.setting_value, updated_at = NOW()";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, value);
-            ps.setString(2, key);
+            ps.setString(1, key);
+            ps.setString(2, value);
             return ps.executeUpdate() > 0;
         } catch (Exception e) { e.printStackTrace(); return false; }
     }
