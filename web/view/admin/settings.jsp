@@ -212,7 +212,7 @@
                         <div id="customModelWrap" style="margin-top: 10px; display: none;">
                             <input type="text" name="ai_active_model" id="activeModelInput"
                                    class="input-dark" style="padding-right:16px;"
-                                   value="${not empty settingsMap['ai_active_model'] ? settingsMap['ai_active_model'] : (not empty settingsMap['gemini_model'] ? settingsMap['gemini_model'] : 'gemini-1.5-flash')}"
+                                   value="${not empty settingsMap['ai_active_model'] ? settingsMap['ai_active_model'] : (not empty settingsMap['gemini_model'] ? settingsMap['gemini_model'] : '')}"
                                    placeholder="Nhập tên mã định danh model (VD: gpt-4o, claude-3-5-haiku...)">
                         </div>
 
@@ -256,7 +256,7 @@
                                 <input type="text" name="ai_fallback_model" id="fallbackModelInput"
                                        class="input-dark" style="padding: 8px 12px; font-size: 13px;"
                                        value="${settingsMap['ai_fallback_model']}"
-                                       placeholder="VD: gemini-1.5-flash-8b hoặc gpt-4o-mini">
+                                       placeholder="Đồng bộ và chọn model đang hoạt động">
                             </div>
                         </div>
                     </div>
@@ -266,16 +266,16 @@
                         <div class="form-group-dark">
                             <label class="form-label-dark" for="ai_temperature">
                                 <svg viewBox="0 0 24 24"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
-                                Temperature: <span id="tempValueDisplay" style="color: #f37021; font-weight: 800;">${not empty settingsMap['ai_temperature'] ? settingsMap['ai_temperature'] : (not empty settingsMap['gemini_temperature'] ? settingsMap['gemini_temperature'] : '0.7')}</span>
+                                Temperature: <span id="tempValueDisplay" style="color: #f37021; font-weight: 800;">${not empty settingsMap['ai_temperature'] ? settingsMap['ai_temperature'] : (not empty settingsMap['gemini_temperature'] ? settingsMap['gemini_temperature'] : '0.3')}</span>
                             </label>
                             <input type="range" name="ai_temperature" id="ai_temperature"
-                                    min="0.0" max="1.0" step="0.1"
-                                    value="${not empty settingsMap['ai_temperature'] ? settingsMap['ai_temperature'] : (not empty settingsMap['gemini_temperature'] ? settingsMap['gemini_temperature'] : '0.7')}"
+                                    min="0.0" max="0.5" step="0.1"
+                                    value="${not empty settingsMap['ai_temperature'] ? settingsMap['ai_temperature'] : (not empty settingsMap['gemini_temperature'] ? settingsMap['gemini_temperature'] : '0.3')}"
                                     class="range-dark"
                                     oninput="document.getElementById('tempValueDisplay').textContent = this.value">
                             <div style="display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-top:4px;">
                                 <span>0.0 (Chính xác)</span>
-                                <span>1.0 (Sáng tạo)</span>
+                                <span>0.5 (Tư vấn)</span>
                             </div>
                         </div>
 
@@ -285,10 +285,10 @@
                                 Max Output Tokens
                             </label>
                             <input type="number" name="ai_max_tokens" id="ai_max_tokens"
-                                    min="100" max="4000" step="50"
+                                    min="1200" max="2400" step="50"
                                     class="input-dark" style="padding-right:16px; font-family:inherit;"
-                                    value="${not empty settingsMap['ai_max_tokens'] ? settingsMap['ai_max_tokens'] : (not empty settingsMap['gemini_max_tokens'] ? settingsMap['gemini_max_tokens'] : '600')}">
-                            <div style="font-size:11px; color:#64748b; margin-top:4px;">Giới hạn token câu trả lời (100 - 4000)</div>
+                                    value="${not empty settingsMap['ai_max_tokens'] ? settingsMap['ai_max_tokens'] : (not empty settingsMap['gemini_max_tokens'] ? settingsMap['gemini_max_tokens'] : '1200')}">
+                            <div style="font-size:11px; color:#64748b; margin-top:4px;">Giới hạn token câu trả lời (1200 - 2400)</div>
                         </div>
                     </div>
 
@@ -319,7 +319,7 @@
                             </div>
                             <div>
                                 <h3>Chỉ Dẫn Hệ Thống (System Prompt)</h3>
-                                <p>Áp dụng thống nhất cho toàn bộ các hãng AI</p>
+                                <p>Prompt tư vấn dùng chung trong mã nguồn; danh mục lấy từ bảng giá. Playground không gửi đăng ký.</p>
                             </div>
                         </div>
                         <div style="display:flex; gap:8px;">
@@ -327,7 +327,7 @@
                                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                                 Nạp mẫu FPT
                             </button>
-                            <button type="button" class="btn-prompt-tool" onclick="clearPrompt()" title="Xóa trắng để tự viết">
+                            <button type="button" class="btn-prompt-tool" disabled onclick="clearPrompt()" title="Xóa trắng để tự viết">
                                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
                                 Xóa
                             </button>
@@ -335,7 +335,7 @@
                     </div>
 
                     <div class="form-group-dark">
-                        <textarea name="ai_system_prompt" id="ai_system_prompt"
+                        <textarea readonly name="ai_system_prompt" id="ai_system_prompt"
                                   class="textarea-dark"
                                   style="min-height: 380px;"
                                   placeholder="Nhập vai trò, persona và hướng dẫn hoạt động cho AI..."
@@ -427,13 +427,7 @@
 
     // Dữ liệu presets được nạp sẵn
     const PRESETS = {
-        gemini: [
-            { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash (Khuyên dùng: Siêu nhanh, thông minh, tối ưu chi phí)' },
-            { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash (Thế hệ mới nhất, phản hồi cực tốc)' },
-            { id: 'gemini-1.5-flash-8b', name: 'Gemini 1.5 Flash-8B (Siêu nhẹ, dung lượng cao, ít nghẽn tải)' },
-            { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro (Lý luận chuyên sâu, ngữ cảnh 2M tokens)' },
-            { id: 'gemini-1.0-pro', name: 'Gemini 1.0 Pro (Bản tiền nhiệm cơ bản)' }
-        ],
+        gemini: [],
         openai: [
             { id: 'gpt-4o-mini', name: 'GPT-4o Mini (Khuyên dùng: Siêu thông minh, phản hồi cực nhanh, rẻ)' },
             { id: 'gpt-4o', name: 'GPT-4o (Flagship đa thể thức thông minh nhất của OpenAI)' },
@@ -727,28 +721,13 @@
             aiDiv.classList.remove('play-loading');
 
             if (data.success) {
-                aiDiv.textContent = data.reply || '';
+                if (typeof data.reply !== 'string' || !data.reply.trim()) throw new Error('Invalid reply');
+                aiDiv.textContent = data.reply;
 
                 // Thêm meta tags thống kê
                 const metaRow = document.createElement('div');
                 metaRow.className = 'play-meta-row';
-                let stateHtml = '';
-                if (data.state) {
-                    const parts = [];
-                    if (data.state.ten) parts.push('👤 ' + data.state.ten);
-                    if (data.state.sdt) parts.push('📞 ' + data.state.sdt);
-                    if (data.state.dia_chi) parts.push('📍 ' + data.state.dia_chi);
-                    if (data.state.goi_de_xuat) parts.push('📦 ' + data.state.goi_de_xuat);
-                    if (parts.length > 0) {
-                        stateHtml = '<span class="play-tag" style="color:#4ade80;border-color:rgba(74,222,128,0.3);" title="Thông tin khách hàng AI ghi nhớ trong sổ tay session">📝 Sổ tay: ' + parts.join(' | ') + '</span>';
-                    }
-                }
-
-                metaRow.innerHTML = 
-                    '<span class="play-tag play-tag-provider">🏷️ ' + (data.provider || currentProvider) + ' / ' + (data.model || model) + '</span>' +
-                    '<span class="play-tag play-tag-latency">⚡ ' + (data.latencyMs || 0) + 'ms</span>' +
-                    '<span class="play-tag play-tag-tokens">🪙 ' + (data.totalTokens ? data.totalTokens + ' tokens' : 'Tokens N/A') + '</span>' +
-                    stateHtml;
+                metaRow.textContent = [data.provider || currentProvider, data.model || '', (data.latencyMs || 0) + 'ms', (data.totalTokens || 0) + ' tokens'].join(' | ');
                 aiDiv.appendChild(metaRow);
             } else {
                 aiDiv.classList.add('play-error');
@@ -803,19 +782,6 @@
 
     // 7. PROMPT TOOLS & STATS
     function loadFptPromptTemplate() {
-        const template = 
-`Bạn là trợ lý ảo AI thông minh và thân thiện của FPT Telecom Gia Lai.
-Nhiệm vụ của bạn là tư vấn các dịch vụ viễn thông của FPT Telecom gồm: Gói cước Internet cáp quang, Truyền hình FPT Play, Camera an ninh FPT, FPT Smart Home.
-
-=== NGUYÊN TẮC TƯ VẤN ===
-- Xưng "em" và gọi khách hàng là "anh/chị".
-- Giọng điệu nhiệt tình, lịch sự, ngắn gọn và dễ hiểu (khoảng 2-4 câu mỗi lần).
-- Giới thiệu các gói cước phổ biến: Gói Giga 150Mbps, Gói Sky 1Gbps, Gói F-Game tối ưu độ trễ, Combo Internet + FPT Play.
-- Cung cấp Hotline tư vấn lắp đặt: 0932 079 469 và Hotline kỹ thuật: 1900 6600.
-- Tuyệt đối không tiết lộ mật khẩu, API key, hoặc thông tin nhạy cảm của hệ thống.
-- Từ chối lịch sự nếu khách hàng hỏi về các chủ đề không liên quan đến dịch vụ FPT.`;
-
-        document.getElementById('ai_system_prompt').value = template;
         updatePromptStats();
     }
 
@@ -842,7 +808,7 @@ Nhiệm vụ của bạn là tư vấn các dịch vụ viễn thông của FPT 
     // INIT
     document.addEventListener('DOMContentLoaded', function() {
         const savedProvider = '${not empty settingsMap["ai_active_provider"] ? settingsMap["ai_active_provider"] : "gemini"}';
-        const savedModel = '${not empty settingsMap["ai_active_model"] ? settingsMap["ai_active_model"] : (not empty settingsMap["gemini_model"] ? settingsMap["gemini_model"] : "gemini-1.5-flash")}';
+        const savedModel = '${not empty settingsMap["ai_active_model"] ? settingsMap["ai_active_model"] : (not empty settingsMap["gemini_model"] ? settingsMap["gemini_model"] : "")}';
         
         const list = PRESETS[savedProvider] || PRESETS['gemini'];
         renderModelDropdown(list, savedModel);

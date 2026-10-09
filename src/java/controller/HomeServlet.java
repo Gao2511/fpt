@@ -17,6 +17,7 @@ public class HomeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        response.setHeader("Cache-Control", "no-store");
 
         HttpSession session = request.getSession(false);
         UserDTO user = (session != null) ? (UserDTO) session.getAttribute("user") : null;
@@ -25,6 +26,7 @@ public class HomeServlet extends HttpServlet {
         // LẤY 4 GÓI TỪ DB
         List<PackageDTO> packages = packageDAO.getAll();
         request.setAttribute("packages", packages);
+        request.setAttribute("registrationToken", utils.RegistrationSubmission.issue(request.getSession(true)));
 
         request.getRequestDispatcher("/view/home.jsp").forward(request, response);
     }

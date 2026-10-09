@@ -43,9 +43,13 @@ public class AdminSettingsServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         // Đảm bảo dữ liệu cũ đã được migrate an toàn sang cấu trúc đa nhà cung cấp
-        AIService.ensureMigration();
+        // GET must not write settings or migrate secrets.
 
         Map<String, String> settingsMap = settingsDAO.getAllAsMap();
+        settingsMap.put("ai_system_prompt", ai.consultation.ConsultationPrompt.SYSTEM);
+        AIService.ConfigCache consultationConfig = AIService.getConfig();
+        settingsMap.put("ai_temperature", Double.toString(consultationConfig.temperature));
+        settingsMap.put("ai_max_tokens", Integer.toString(consultationConfig.maxTokens));
         request.setAttribute("settingsMap", settingsMap);
 
         // Danh sách tất cả các provider đã đăng ký trong hệ thống
@@ -323,7 +327,7 @@ public class AdminSettingsServlet extends HttpServlet {
         String apiKey = request.getParameter("current_api_key");
         String baseUrl = request.getParameter("current_base_url");
 
-        String systemPrompt = request.getParameter("ai_system_prompt");
+        String systemPrompt = ai.consultation.ConsultationPrompt.SYSTEM;
         String temperature = request.getParameter("ai_temperature");
         String maxTokens = request.getParameter("ai_max_tokens");
         String chatbotEnabled = request.getParameter("ai_chatbot_enabled");
@@ -332,6 +336,18 @@ public class AdminSettingsServlet extends HttpServlet {
             activeProvider = "gemini";
         }
         activeProvider = activeProvider.trim().toLowerCase();
+        try {
+            double t = Double.parseDouble(temperature);
+            int limit = Integer.parseInt(maxTokens);
+            if (!Double.isFinite(t) || t < 0 || t > 0.5 || limit < 1200 || limit > 2400 ||
+                !ProviderRegistry.exists(activeProvider) || activeModel == null || !activeModel.matches("[A-Za-z0-9._:/-]{1,160}") ||
+                ("gemini".equals(activeProvider) && activeModel.matches("gemini-(?:1\\..*|2\\.0.*)"))) throw new IllegalArgumentException();
+            if (fallbackProvider != null && !fallbackProvider.trim().isEmpty() &&
+                (!ProviderRegistry.exists(fallbackProvider) || fallbackModel == null || !fallbackModel.matches("[A-Za-z0-9._:/-]{1,160}"))) throw new IllegalArgumentException();
+        } catch (Exception invalid) {
+            session.setAttribute("message", "Kiểm tra model qua Đồng bộ từ API Key; temperature phải từ 0 đến 0.5 và token từ 1200 đến 2400.");
+            session.setAttribute("messageType", "error"); return;
+        }
 
         // 1. Lưu API Key của Provider hiện tại nếu có thay đổi
         if (apiKey != null && !apiKey.trim().isEmpty() && !CryptoUtil.isMasked(apiKey)) {

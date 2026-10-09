@@ -22,6 +22,7 @@ public class PackageDetailServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        response.setHeader("Cache-Control", "no-store");
 
         // ===== LẤY ID GÓI =====
         String idStr = request.getParameter("id");
@@ -71,6 +72,7 @@ public class PackageDetailServlet extends HttpServlet {
         System.out.println("==========================================");
 
         request.setAttribute("pkg", pkg);
+        request.setAttribute("registrationToken", utils.RegistrationSubmission.issue(request.getSession(true)));
         request.setAttribute("currentUser", user);  // Có thể null nếu khách
         request.getRequestDispatcher("/view/customer/package-detail.jsp")
                .forward(request, response);

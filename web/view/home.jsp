@@ -393,6 +393,7 @@
                           action="${pageContext.request.contextPath}/ContactServlet"
                           method="POST"
                           id="contactForm">
+                        <input type="hidden" name="registration_token" value="${registrationToken}">
 
                         <div>
                             <label>Họ tên người cần lắp đặt <span style="color:#f37021;">*</span></label>
@@ -441,6 +442,7 @@
                                 <option value="Lắp đặt ngoài giờ hành chính">
                             </datalist>
                         </div>
+                        <label class="full"><input type="checkbox" name="registration_consent" value="yes" style="width:auto;padding:0;margin-right:6px;" required> Tôi đồng ý gửi thông tin để FPT liên hệ tư vấn gói cước.</label>
                         <button type="submit">Đăng ký tư vấn ngay →</button>
                     </form>
                 </div>
@@ -798,49 +800,8 @@
             </div>
         </div>
 
-        <script>
-            function toggleAIChat() {
-                document.getElementById('aiChatWindow').classList.toggle('active');
-            }
-
-            function sendAIMessage() {
-                const input = document.getElementById('aiChatInput');
-                const body = document.getElementById('aiChatBody');
-                const message = input.value.trim();
-                if (!message)
-                    return;
-
-                body.innerHTML += '<div class="ai-msg ai-msg-user">' + escapeHtml(message) + '</div>';
-                input.value = '';
-                body.scrollTop = body.scrollHeight;
-
-                const loadingId = 'loading-' + Date.now();
-                body.innerHTML += '<div class="ai-msg-loading" id="' + loadingId + '"><span></span><span></span><span></span></div>';
-                body.scrollTop = body.scrollHeight;
-
-                fetch('${pageContext.request.contextPath}/ai-chat', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    body: 'message=' + encodeURIComponent(message)
-                })
-                        .then(res => res.json())
-                        .then(data => {
-                            document.getElementById(loadingId).remove();
-                            body.innerHTML += '<div class="ai-msg ai-msg-bot">' + escapeHtml(data.reply).replace(/\n/g, '<br>') + '</div>';
-                            body.scrollTop = body.scrollHeight;
-                        })
-                        .catch(err => {
-                            document.getElementById(loadingId).remove();
-                            body.innerHTML += '<div class="ai-msg ai-msg-bot">Xin lỗi, có lỗi xảy ra. Vui lòng thử lại.</div>';
-                        });
-            }
-
-            function escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
-        </script>
+        <script src="${pageContext.request.contextPath}/js/ai-chat.js"></script>
+        <script>FptChat.init('${pageContext.request.contextPath}');</script>
 
 
         <script>

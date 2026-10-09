@@ -45,11 +45,7 @@ public class GeminiProvider implements LLMProvider {
     @Override
     public List<ModelInfo> getPresetModels() {
         List<ModelInfo> list = new ArrayList<>();
-        list.add(new ModelInfo("gemini-1.5-flash", "Gemini 1.5 Flash", "Khuyên dùng: Phản hồi siêu nhanh, cân bằng, tối ưu chi phí"));
-        list.add(new ModelInfo("gemini-2.0-flash", "Gemini 2.0 Flash", "Thế hệ mới nhất, tốc độ cực nhanh, hỗ trợ đa nhiệm"));
-        list.add(new ModelInfo("gemini-1.5-flash-8b", "Gemini 1.5 Flash-8B", "Bản tinh gọn 8B tham số, ít nghẽn tải, độ trễ cực thấp"));
-        list.add(new ModelInfo("gemini-1.5-pro", "Gemini 1.5 Pro", "Lý luận chuyên sâu, ngữ cảnh 2 triệu token, độ chính xác cao"));
-        list.add(new ModelInfo("gemini-1.0-pro", "Gemini 1.0 Pro", "Bản tiền nhiệm cơ bản"));
+        // Discover live models with listModels; retired presets are not safe defaults.
         return list;
     }
 
@@ -114,7 +110,7 @@ public class GeminiProvider implements LLMProvider {
     @Override
     public ChatResponse chat(List<ChatMessage> messages, String apiKey, String model,
                              String baseUrl, ChatOptions options) throws AIException {
-        return executeWithRetry(() -> doChatInternal(messages, apiKey, model, baseUrl, options));
+        return executeWithRetry(options, () -> doChatInternal(messages, apiKey, model, baseUrl, options));
     }
 
     private ChatResponse doChatInternal(List<ChatMessage> messages, String apiKey, String model,
@@ -123,17 +119,20 @@ public class GeminiProvider implements LLMProvider {
             throw new AIException(AIException.ErrorType.INVALID_KEY, 401, "Thiếu Gemini API Key.", getDisplayName());
         }
         if (model == null || model.trim().isEmpty()) {
-            model = "gemini-1.5-flash";
+            throw new AIException(AIException.ErrorType.MODEL_NOT_FOUND, "Vui lòng đồng bộ và chọn model Gemini đang hoạt động.", getDisplayName());
         }
 
         String base = (baseUrl != null && !baseUrl.trim().isEmpty()) ? baseUrl.trim() : DEFAULT_BASE_URL;
         String endpoint = base + "/v1beta/models/" + model.trim() + ":generateContent?key=" + apiKey.trim();
 
         long start = System.currentTimeMillis();
+        HttpURLConnection conn = null;
+        java.util.concurrent.ScheduledFuture<?> deadline = null;
         try {
-            JsonObject requestBody = buildRequestBody(messages, options);
+            JsonObject requestBody = buildRequestBody(messages, options, model);
 
-            HttpURLConnection conn = openConnection(endpoint, "POST", 15000, 30000);
+            conn = openConnection(endpoint, "POST", (options == null ? 15000 : options.remainingMillis(10000)), (options == null ? 30000 : options.remainingMillis(20000)));
+            deadline = ProviderDeadline.watch(conn, options);
             conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             conn.setDoOutput(true);
 
@@ -152,7 +151,7 @@ public class GeminiProvider implements LLMProvider {
 
             JsonObject root = parseJsonLenient(responseBody);
             String replyText = "";
-            String finishReason = "STOP";
+            String finishReason = null;
 
             if (root.has("candidates")) {
                 JsonArray candidates = root.getAsJsonArray("candidates");
@@ -165,9 +164,7 @@ public class GeminiProvider implements LLMProvider {
                         JsonObject c = first.getAsJsonObject("content");
                         if (c.has("parts")) {
                             JsonArray parts = c.getAsJsonArray("parts");
-                            if (parts.size() > 0 && parts.get(0).getAsJsonObject().has("text")) {
-                                replyText = parts.get(0).getAsJsonObject().get("text").getAsString();
-                            }
+                            replyText = customerText(parts);
                         }
                     }
                 }
@@ -187,7 +184,10 @@ public class GeminiProvider implements LLMProvider {
         } catch (AIException aie) {
             throw aie;
         } catch (Exception e) {
-            throw new AIException(AIException.ErrorType.NETWORK_ERROR, "Lỗi kết nối gọi Gemini API: " + e.getMessage(), getDisplayName(), e);
+            throw new AIException((e instanceof java.net.SocketTimeoutException || options != null && options.isExpired() ? AIException.ErrorType.TIMEOUT : AIException.ErrorType.NETWORK_ERROR), "Lỗi kết nối gọi Gemini API: " + e.getMessage(), getDisplayName(), e);
+        } finally {
+            if (deadline != null) deadline.cancel(false);
+            if (conn != null) conn.disconnect();
         }
     }
 
@@ -198,7 +198,9 @@ public class GeminiProvider implements LLMProvider {
             callback.onError(new AIException(AIException.ErrorType.INVALID_KEY, 401, "Thiếu Gemini API Key.", getDisplayName()));
             return;
         }
-        if (model == null || model.trim().isEmpty()) model = "gemini-1.5-flash";
+        if (model == null || model.trim().isEmpty()) {
+            callback.onError(new AIException(AIException.ErrorType.MODEL_NOT_FOUND, "Chưa chọn model Gemini.", getDisplayName())); return;
+        }
 
         String base = (baseUrl != null && !baseUrl.trim().isEmpty()) ? baseUrl.trim() : DEFAULT_BASE_URL;
         String endpoint = base + "/v1beta/models/" + model.trim() + ":streamGenerateContent?alt=sse&key=" + apiKey.trim();
@@ -207,7 +209,7 @@ public class GeminiProvider implements LLMProvider {
         StringBuilder accumulated = new StringBuilder();
 
         try {
-            JsonObject requestBody = buildRequestBody(messages, options);
+            JsonObject requestBody = buildRequestBody(messages, options, model);
             HttpURLConnection conn = openConnection(endpoint, "POST", 15000, 45000);
             conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             conn.setRequestProperty("Accept", "text/event-stream");
@@ -240,7 +242,7 @@ public class GeminiProvider implements LLMProvider {
                                     if (cand.has("content")) {
                                         JsonArray parts = cand.getAsJsonObject("content").getAsJsonArray("parts");
                                         if (parts != null && parts.size() > 0) {
-                                            String token = parts.get(0).getAsJsonObject().get("text").getAsString();
+                                            String token = customerText(parts);
                                             accumulated.append(token);
                                             callback.onToken(token);
                                         }
@@ -267,7 +269,7 @@ public class GeminiProvider implements LLMProvider {
         return chat(testMsgs, apiKey, model, baseUrl, opt);
     }
 
-    private JsonObject buildRequestBody(List<ChatMessage> messages, ChatOptions options) {
+    private JsonObject buildRequestBody(List<ChatMessage> messages, ChatOptions options, String model) {
         JsonObject body = new JsonObject();
         JsonArray contents = new JsonArray();
         String systemInstructionText = null;
@@ -301,6 +303,11 @@ public class GeminiProvider implements LLMProvider {
         body.add("contents", contents);
 
         JsonObject genConfig = new JsonObject();
+        if (options != null && options.getResponseSchema() != null && model != null &&
+            (model.startsWith("gemini-2.5-") || model.startsWith("gemini-3"))) {
+            genConfig.addProperty("responseMimeType", "application/json");
+            genConfig.add("responseJsonSchema", options.getResponseSchema());
+        }
         genConfig.addProperty("temperature", options != null ? options.getTemperature() : 0.7);
         genConfig.addProperty("maxOutputTokens", options != null ? options.getMaxTokens() : 600);
         if (options != null && options.getTopP() != null) {
@@ -311,17 +318,28 @@ public class GeminiProvider implements LLMProvider {
         return body;
     }
 
+    static String customerText(JsonArray parts) {
+        StringBuilder text = new StringBuilder();
+        for (JsonElement element : parts) {
+            JsonObject part = element.getAsJsonObject();
+            if (part.has("thought") && part.get("thought").getAsBoolean()) continue;
+            if (part.has("text") && part.get("text").isJsonPrimitive() && part.get("text").getAsJsonPrimitive().isString()) text.append(part.get("text").getAsString());
+        }
+        return text.toString();
+    }
+
     @FunctionalInterface
     private interface SupplierWithAIException<T> {
         T get() throws AIException;
     }
 
-    private <T> T executeWithRetry(SupplierWithAIException<T> action) throws AIException {
-        int maxRetries = 2;
+    private <T> T executeWithRetry(ChatOptions options, SupplierWithAIException<T> action) throws AIException {
+        int maxRetries = options != null && options.getResponseSchema() != null ? 0 : 2;
         long delayMs = 1000;
         AIException lastEx = null;
 
         for (int attempt = 0; attempt <= maxRetries; attempt++) {
+            if (options != null && options.isExpired()) throw new AIException(AIException.ErrorType.TIMEOUT, "Request deadline exceeded", getDisplayName());
             try {
                 return action.get();
             } catch (AIException e) {
@@ -332,7 +350,7 @@ public class GeminiProvider implements LLMProvider {
                     if (attempt < maxRetries) {
                         try {
                             Thread.sleep(delayMs * (attempt + 1));
-                        } catch (InterruptedException ignored) {}
+                        } catch (InterruptedException interrupted) { Thread.currentThread().interrupt(); throw new AIException(AIException.ErrorType.TIMEOUT, "Interrupted", getDisplayName()); }
                         continue;
                     }
                 }

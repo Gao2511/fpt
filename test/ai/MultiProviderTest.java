@@ -207,7 +207,7 @@ public class MultiProviderTest {
             throw new AssertionError("ProviderRegistry thiếu provider bắt buộc!");
         }
 
-        if (gemini.getPresetModels().isEmpty()) throw new AssertionError("Gemini thiếu preset models");
+        if (!gemini.getPresetModels().isEmpty()) throw new AssertionError("Gemini must discover live models rather than offer retired presets");
         if (openai.getPresetModels().isEmpty()) throw new AssertionError("OpenAI thiếu preset models");
         if (deepseek.getPresetModels().isEmpty()) throw new AssertionError("DeepSeek thiếu preset models");
         if (claude.getPresetModels().isEmpty()) throw new AssertionError("Claude thiếu preset models");

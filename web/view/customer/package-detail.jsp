@@ -238,7 +238,9 @@
                         Bạn có thể đăng ký cho chính mình hoặc cho người khác (bố mẹ, người thân, công ty...)
                     </p>
 
-                    <form action="${pageContext.request.contextPath}/ContactServlet" method="POST" class="quick-contact-form">
+                    <form action="${pageContext.request.contextPath}/ContactServlet" method="POST" class="quick-contact-form" id="registration">
+                        <input type="hidden" name="registration_token" value="${registrationToken}">
+                        <input type="hidden" name="user_package_id" value="${pkg.id}">
                         <input type="hidden" name="user_package" value="${pkgName}">
 
                         <div class="form-row">
@@ -274,6 +276,7 @@
                             <option value="Cần lắp cho phòng trọ">
                             <option value="Lắp đặt ngoài giờ hành chính">
                         </datalist>
+                        <label style="display:block;margin:12px 0;"><input type="checkbox" name="registration_consent" value="yes" style="width:auto;padding:0;margin-right:6px;" required> Tôi đồng ý gửi thông tin để FPT liên hệ tư vấn gói cước.</label>
                         <button type="submit">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>

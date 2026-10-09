@@ -156,7 +156,7 @@ public class OpenAICompatibleProvider implements LLMProvider {
     @Override
     public ChatResponse chat(List<ChatMessage> messages, String apiKey, String model,
                              String baseUrl, ChatOptions options) throws AIException {
-        return executeWithRetry(() -> doChatInternal(messages, apiKey, model, baseUrl, options));
+        return executeWithRetry(options, () -> doChatInternal(messages, apiKey, model, baseUrl, options));
     }
 
     private ChatResponse doChatInternal(List<ChatMessage> messages, String apiKey, String model,
@@ -170,11 +170,14 @@ public class OpenAICompatibleProvider implements LLMProvider {
 
         String endpoint = base + "/chat/completions";
         long start = System.currentTimeMillis();
+        HttpURLConnection conn = null;
+        java.util.concurrent.ScheduledFuture<?> deadline = null;
 
         try {
             JsonObject requestBody = buildRequestBody(messages, model, options, false);
 
-            HttpURLConnection conn = openConnection(endpoint, "POST", apiKey, 15000, 35000);
+            conn = openConnection(endpoint, "POST", apiKey, (options == null ? 15000 : options.remainingMillis(10000)), (options == null ? 35000 : options.remainingMillis(20000)));
+            deadline = ProviderDeadline.watch(conn, options);
             conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             conn.setDoOutput(true);
 
@@ -193,7 +196,7 @@ public class OpenAICompatibleProvider implements LLMProvider {
 
             JsonObject root = parseJsonLenient(responseBody);
             String replyText = "";
-            String finishReason = "stop";
+            String finishReason = null;
 
             if (root.has("choices")) {
                 JsonArray choices = root.getAsJsonArray("choices");
@@ -225,7 +228,10 @@ public class OpenAICompatibleProvider implements LLMProvider {
         } catch (AIException aie) {
             throw aie;
         } catch (Exception e) {
-            throw new AIException(AIException.ErrorType.NETWORK_ERROR, "Lỗi khi gọi API " + displayName + ": " + e.getMessage(), getDisplayName(), e);
+            throw new AIException((e instanceof java.net.SocketTimeoutException || options != null && options.isExpired() ? AIException.ErrorType.TIMEOUT : AIException.ErrorType.NETWORK_ERROR), "Lỗi khi gọi API " + displayName + ": " + e.getMessage(), getDisplayName(), e);
+        } finally {
+            if (deadline != null) deadline.cancel(false);
+            if (conn != null) conn.disconnect();
         }
     }
 
@@ -324,6 +330,14 @@ public class OpenAICompatibleProvider implements LLMProvider {
             msgArr.add(item);
         }
         body.add("messages", msgArr);
+        if (options != null && options.getResponseSchema() != null && "openai".equals(id) && model != null &&
+            (model.equals("gpt-4o") || model.equals("gpt-4o-mini") || model.equals("gpt-4o-mini-2024-07-18") ||
+             model.equals("gpt-4o-2024-08-06") || model.equals("gpt-4o-2024-11-20") || model.startsWith("gpt-4.1"))) {
+            JsonObject schema = new JsonObject(); schema.addProperty("name", "fpt_consultation");
+            schema.addProperty("strict", true); schema.add("schema", options.getResponseSchema());
+            JsonObject format = new JsonObject(); format.addProperty("type", "json_schema"); format.add("json_schema", schema);
+            body.add("response_format", format);
+        }
 
         if (options != null) {
             body.addProperty("temperature", options.getTemperature());
@@ -353,12 +367,13 @@ public class OpenAICompatibleProvider implements LLMProvider {
         T get() throws AIException;
     }
 
-    private <T> T executeWithRetry(SupplierWithAIException<T> action) throws AIException {
-        int maxRetries = 2;
+    private <T> T executeWithRetry(ChatOptions options, SupplierWithAIException<T> action) throws AIException {
+        int maxRetries = options != null && options.getResponseSchema() != null ? 0 : 2;
         long delayMs = 1000;
         AIException lastEx = null;
 
         for (int attempt = 0; attempt <= maxRetries; attempt++) {
+            if (options != null && options.isExpired()) throw new AIException(AIException.ErrorType.TIMEOUT, "Request deadline exceeded", getDisplayName());
             try {
                 return action.get();
             } catch (AIException e) {
@@ -369,7 +384,7 @@ public class OpenAICompatibleProvider implements LLMProvider {
                     if (attempt < maxRetries) {
                         try {
                             Thread.sleep(delayMs * (attempt + 1));
-                        } catch (InterruptedException ignored) {}
+                        } catch (InterruptedException interrupted) { Thread.currentThread().interrupt(); throw new AIException(AIException.ErrorType.TIMEOUT, "Interrupted", getDisplayName()); }
                         continue;
                     }
                 }

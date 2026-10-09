@@ -16,6 +16,13 @@ public class ChatResponse implements Serializable {
     private int totalTokens;
     private String finishReason;
     private long latencyMs;
+    private String action = "none";
+    private Integer recommendedPackageId;
+
+    public String getAction() { return action; }
+    public void setAction(String action) { this.action = action; }
+    public Integer getRecommendedPackageId() { return recommendedPackageId; }
+    public void setRecommendedPackageId(Integer id) { recommendedPackageId = id; }
 
     public ChatResponse() {
     }

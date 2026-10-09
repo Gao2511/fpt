@@ -18,6 +18,22 @@ public class ChatSessionData implements Serializable {
     private JsonObject state = new JsonObject();
     private boolean leadCreated = false;
     private long lastActivityTime = System.currentTimeMillis();
+    private final ai.consultation.CustomerRequirements requirements = new ai.consultation.CustomerRequirements();
+    public final java.util.concurrent.locks.ReentrantLock turnLock = new java.util.concurrent.locks.ReentrantLock();
+    public ai.consultation.CustomerRequirements getRequirements() { return requirements; }
+
+    /** Commit one validated turn and trim whole pairs; typed requirements survive. */
+    public synchronized void commitTurn(String user, String assistant) {
+        history.add(ChatMessage.user(user));
+        history.add(ChatMessage.assistant(assistant));
+        int chars = 0;
+        for (ChatMessage m : history) chars += m.getContent().length();
+        while (history.size() > 20 || (chars > 24000 && history.size() > 2)) {
+            chars -= history.remove(0).getContent().length();
+            chars -= history.remove(0).getContent().length();
+        }
+        touch();
+    }
 
     public ChatSessionData(String sessionId) {
         this.sessionId = sessionId;
@@ -45,6 +61,7 @@ public class ChatSessionData implements Serializable {
 
     public synchronized void clearHistory() {
         history.clear();
+        requirements.clear();
         state = new JsonObject();
         state.addProperty("ten", "");
         state.addProperty("sdt", "");
@@ -84,11 +101,11 @@ public class ChatSessionData implements Serializable {
         this.leadCreated = leadCreated;
     }
 
-    public long getLastActivityTime() {
+    public synchronized long getLastActivityTime() {
         return lastActivityTime;
     }
 
-    public void touch() {
+    public synchronized void touch() {
         this.lastActivityTime = System.currentTimeMillis();
     }
 
