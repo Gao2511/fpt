@@ -35,7 +35,7 @@ Read paths no longer automatically migrate/write AI settings. The legacy migrati
 
 ### Existing source
 
-- `src/java/ai/AIService.java`: fixed consultation rules, read-only config loading, bounded generation configuration, cached credential lookup, isolated compatibility calls, orchestration wiring.
+- `src/java/ai/AIService.java`: saved admin consultation prompt, read-only config loading, bounded generation configuration, cached credential lookup, isolated compatibility calls, orchestration wiring.
 - `src/java/ai/dto/ChatOptions.java`: schema/deadline options and updated defaults.
 - `src/java/ai/dto/ChatResponse.java`: validated registration action/package reference separate from text.
 - `src/java/ai/provider/GeminiProvider.java`: live model discovery rather than retired presets, native schema for supported families, multipart/non-thought parsing, finish/timeout handling.
@@ -45,12 +45,12 @@ Read paths no longer automatically migrate/write AI settings. The legacy migrati
 - `src/java/ai/session/ChatSessionManager.java`: private bounded storage, expiry/reset/remove operations; removed the customer-facing tag protocol and model summarization path.
 - `src/java/controller/AIChatServlet.java`: validation/rate errors, no keyword refusal, safe public response contract, no-store header.
 - `src/java/controller/AdminPlaygroundServlet.java`: shared validated engine and buffered SSE; no lead persistence or customer-state display.
-- `src/java/controller/AdminSettingsServlet.java`: read-only GET, fixed consultation prompt, generation/model validation before saving.
+- `src/java/controller/AdminSettingsServlet.java`: read-only GET, editable persisted consultation prompt, generation/model validation before saving.
 - `src/java/controller/ContactServlet.java`: consent/field/package/token validation, confirmed persistence and same-token duplicate protection; retained the existing DAO/email workflow.
 - `src/java/controller/HomeServlet.java`, `src/java/controller/PackageDetailServlet.java`: issue private form tokens and prevent caching personalized forms.
 - `web/view/home.jsp`: load the chat module; add consent/token to the existing form.
 - `web/view/customer/package-detail.jsp`: registration anchor, package ID/token and consent in the existing form.
-- `web/view/admin/settings.jsp`: display the fixed prompt, current parameter limits, remove obsolete Gemini presets and raw-state metadata display.
+- `web/view/admin/settings.jsp`: edit and safely render the saved prompt, current parameter limits, remove obsolete Gemini presets and raw-state metadata display.
 - `test/ai/ContextMemoryTest.java`: replace unsafe canned state/real-lead testing with offline engine memory tests.
 - `test/ai/MultiProviderTest.java`: expect Gemini model discovery rather than retired presets.
 - `test-e2e/package.json`: working chat/browser test scripts.
@@ -74,7 +74,7 @@ Read paths no longer automatically migrate/write AI settings. The legacy migrati
 
 ## Final system prompt and response processing
 
-The exact prompt is `ConsultationPrompt.SYSTEM`, displayed read-only in admin settings and shared with Playground. It instructs the assistant to:
+`ConsultationPrompt.SYSTEM` is the default template. Admin settings now preserves and saves `ai_system_prompt` (with legacy fallback only when absent), including intentionally empty text. Public chat uses the saved value; Playground uses the current unsaved editor value. A separate application protocol supplies the JSON schema and server validation contract. Custom prompts route common consultation questions through the provider; explicit registration and outage fallbacks remain server controlled. The default template instructs the assistant to:
 
 - Speak natural Vietnamese as “em” to “anh/chị”.
 - Use the server catalog and previously provided requirements.
@@ -165,3 +165,11 @@ In an isolated staging instance, verify all seven supplied conversation examples
 4. After separate deployment authorization, release the rebuilt WAR using the existing infrastructure. No automatic deployment was performed here.
 5. Monitor sanitized error classifications, invalid-response counts, request latency, form failures and duplicate handling. Public replies must never include state/schema/provider diagnostics.
 6. To roll back, restore the previous deployment artifact and compatible saved settings. No schema migration or production data rewrite is part of this patch. Existing confirmed leads remain in the database. Rolling back also restores the old chatbot's known defects and automatic lead behavior; disable chatbot generation through the existing setting if that behavior is unacceptable while investigating.
+
+## Editable prompt follow-up (2026-10-09)
+
+Restored editing, clear/template tools, exact text saving, cache invalidation, saved public-chat prompts and unsaved Playground prompts. Escaped textarea content through JSTL to prevent stored text from becoming HTML. Fixed word counting. Failed prompt persistence reports an error rather than claiming success. No schema migration or production database access.
+
+Executed: `test/run-chat-tests.ps1` (42 named cases), `node test-e2e/admin-prompt-browser-test.cjs` (3), `node test-e2e/chatbot-browser-test.cjs` (4): 49 passed. Built `dist/fpt-sale.war` with `build.bat dist`. Browser tests use extracted repository editor markup/functions; database save and live provider behavior still require staging verification. Custom consultation prompts incur provider calls for queries previously answered deterministically; bounded retries, catalog validation and factual outage fallback remain.
+
+After deployment, open admin settings, edit the prompt, preview before saving, save and reload to confirm persistence. Start a fresh customer session to verify persona changes without old assistant history. Use Nạp mẫu FPT to restore the default prompt. Deployment and GitHub publishing are separate actions; this follow-up does not deploy automatically.

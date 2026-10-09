@@ -36,9 +36,11 @@ public class AdminPlaygroundServlet extends HttpServlet {
                 double temperature = Double.parseDouble(value(request, "temperature", Double.toString(cfg.temperature)));
                 int tokens = Integer.parseInt(value(request, "maxTokens", Integer.toString(cfg.maxTokens)));
                 if (!Double.isFinite(temperature) || temperature < 0 || temperature > 0.5 || tokens < 1200 || tokens > 2400) throw new IllegalArgumentException("Invalid generation settings");
+                String prompt = request.getParameter("systemPrompt");
+                if (prompt == null) prompt = cfg.systemPrompt;
                 ProductCatalog catalog = new ProductCatalog(new dao.PackageDAO().getAll());
                 ChatResponse reply = new ConsultationEngine().chat(request.getParameter("message"), ChatSessionManager.getOrCreate(sessionId), catalog,
-                    new ConsultationEngine.Target(provider, key, model, url), null, new ChatOptions(temperature, tokens));
+                    new ConsultationEngine.Target(provider, key, model, url), null, new ChatOptions(temperature, tokens), prompt);
                 json.addProperty("success", true); json.addProperty("reply", reply.getContent());
                 json.addProperty("provider", reply.getProvider()); json.addProperty("model", reply.getModel());
                 json.addProperty("latencyMs", reply.getLatencyMs()); json.addProperty("totalTokens", reply.getTotalTokens());

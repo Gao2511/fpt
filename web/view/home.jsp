@@ -239,6 +239,12 @@
                                 <fmt:formatNumber value="${pkg.price}" pattern="#,###"/>
                                 <span class="unit">đ/tháng</span>
                             </div>
+                            <div class="pkg-speed-badge" style="text-align: center; margin: -2px 0 6px;">
+                                <span style="display: inline-flex; align-items: center; gap: 5px; background: rgba(243, 112, 33, 0.1); color: #f37021; font-weight: 800; font-size: 13px; padding: 3px 12px; border-radius: 999px; border: 1px solid rgba(243, 112, 33, 0.25);">
+                                    <svg style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                    Tốc độ ${pkg.speedMbps} Mbps
+                                </span>
+                            </div>
                             <ul>
                                 <c:choose>
                                     <c:when test="${not empty pkg.longDescription}">
@@ -266,6 +272,109 @@
                         <p>Chưa có gói cước nào. Vui lòng thêm gói trong trang quản trị.</p>
                     </div>
                 </c:if>
+            </div>
+        </div>
+
+        
+        <!-- ============ SECTION MESH WIFI ============ -->
+        <div class="section-title" id="mesh-wifi" style="margin-top: 35px;">
+            <h2>MỞ RỘNG PHỦ SÓNG TOÀN DIỆN VỚI MESH WIFI FPT</h2>
+            <p style="color: #64748b; font-size: 14.5px; max-width: 680px; margin: 10px auto 0; text-align: center; line-height: 1.6;">
+                Giải pháp mở rộng phủ sóng WiFi xuyên tầng cho nhà ống, nhà phố nhiều tầng — loại bỏ hoàn toàn góc chết sóng WiFi.
+            </p>
+        </div>
+
+        <div class="container mesh-section-wrap">
+            <div class="mesh-grid">
+                <!-- CARD MESH F1 -->
+                <div class="mesh-card">
+                    <div class="mesh-card-header">
+                        <div>
+                            <h3>Mesh WiFi F1</h3>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 3px;">Giải pháp phủ sóng cho nhà 2 tầng</div>
+                        </div>
+                        <span class="mesh-tag">Nhà 2 tầng</span>
+                    </div>
+
+                    <div class="mesh-price-box">
+                        <div class="mesh-monthly">
+                            <span class="mesh-plus">+</span>
+                            <span class="mesh-amount">100.000</span>
+                            <span class="mesh-unit">đ/tháng</span>
+                        </div>
+                        <div class="mesh-note-fee">
+                            Phí lắp đặt tham khảo: <strong>500.000 VNĐ</strong>
+                        </div>
+                    </div>
+
+                    <ul class="mesh-specs">
+                        <li>
+                            <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                            <span><strong>Phù hợp không gian:</strong> Nhà 2 tầng, nhà phố diện tích vừa</span>
+                        </li>
+                        <li>
+                            <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                            <span><strong>Thiết bị đi kèm:</strong> 01 Modem WiFi 6 + 01 Access Point</span>
+                        </li>
+                        <li>
+                            <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                            <span>Chuyển vùng thông minh (Seamless Roaming), một tên mạng đồng nhất</span>
+                        </li>
+                        <li>
+                            <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            <span style="color:#f37021; font-size:12.5px;"><em>Lưu ý: Tùy chọn mở rộng phủ sóng cộng thêm vào tiền cước gói Internet hàng tháng.</em></span>
+                        </li>
+                    </ul>
+
+                    <button type="button" class="btn-mesh" onclick="selectMeshOption('Mesh WiFi F1 (Nhà 2 tầng)')">
+                        Đăng ký tư vấn Mesh F1 →
+                    </button>
+                </div>
+
+                <!-- CARD MESH F2 -->
+                <div class="mesh-card mesh-featured">
+                    <div class="mesh-card-header">
+                        <div>
+                            <h3>Mesh WiFi F2</h3>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 3px;">Giải pháp phủ sóng cho nhà 3 tầng</div>
+                        </div>
+                        <span class="mesh-tag">Nhà 3 tầng</span>
+                    </div>
+
+                    <div class="mesh-price-box">
+                        <div class="mesh-monthly">
+                            <span class="mesh-plus">+</span>
+                            <span class="mesh-amount">200.000</span>
+                            <span class="mesh-unit">đ/tháng</span>
+                        </div>
+                        <div class="mesh-note-fee">
+                            Phí lắp đặt tham khảo: <strong>700.000 VNĐ</strong>
+                        </div>
+                    </div>
+
+                    <ul class="mesh-specs">
+                        <li>
+                            <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                            <span><strong>Phù hợp không gian:</strong> Nhà 3 tầng, biệt thự, nhà diện tích rộng</span>
+                        </li>
+                        <li>
+                            <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                            <span><strong>Thiết bị đi kèm:</strong> 01 Modem WiFi 6 + 02 Access Point</span>
+                        </li>
+                        <li>
+                            <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                            <span>Độ phủ xuyên tầng siêu mạnh, ổn định kết nối cho nhiều thiết bị đồng thời</span>
+                        </li>
+                        <li>
+                            <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            <span style="color:#f37021; font-size:12.5px;"><em>Lưu ý: Tùy chọn mở rộng phủ sóng cộng thêm vào tiền cước gói Internet hàng tháng.</em></span>
+                        </li>
+                    </ul>
+
+                    <button type="button" class="btn-mesh" onclick="selectMeshOption('Mesh WiFi F2 (Nhà 3 tầng)')">
+                        Đăng ký tư vấn Mesh F2 →
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -430,6 +539,8 @@
                                    list="noteSuggestionsHome"
                                    autocomplete="off">
                             <datalist id="noteSuggestionsHome">
+                                <option value="Thêm gói Mesh WiFi F1 (nhà 2 tầng - thêm 100K/tháng)">
+                                <option value="Thêm gói Mesh WiFi F2 (nhà 3 tầng - thêm 200K/tháng)">
                                 <option value="Nhà riêng, 1 tầng">
                                 <option value="Nhà riêng, nhiều tầng">
                                 <option value="Căn hộ chung cư">
@@ -929,5 +1040,21 @@ function goHome(event) {
                 }
             });
         </script>
-    </body>
+    <script>
+function selectMeshOption(meshName) {
+    const contactSection = document.getElementById('contact');
+    const noteInput = document.getElementById('user_note');
+    if (noteInput) {
+        if (!noteInput.value.includes(meshName)) {
+            noteInput.value = noteInput.value ? noteInput.value + ' | Đăng ký kèm ' + meshName : 'Đăng ký kèm ' + meshName;
+        }
+    }
+    if (contactSection) {
+        contactSection.scrollIntoView({ behavior: 'smooth' });
+        const nameInput = document.getElementById('user_name');
+        if (nameInput) setTimeout(() => nameInput.focus(), 600);
+    }
+}
+</script>
+</body>
 </html>

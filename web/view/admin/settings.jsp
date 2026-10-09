@@ -319,7 +319,7 @@
                             </div>
                             <div>
                                 <h3>Chỉ Dẫn Hệ Thống (System Prompt)</h3>
-                                <p>Prompt tư vấn dùng chung trong mã nguồn; danh mục lấy từ bảng giá. Playground không gửi đăng ký.</p>
+                                <p>Tự chỉnh sửa hướng dẫn và bấm Lưu để áp dụng cho chatbot. Playground thử nội dung chưa lưu. Danh mục và xác nhận đăng ký vẫn do máy chủ kiểm tra.</p>
                             </div>
                         </div>
                         <div style="display:flex; gap:8px;">
@@ -327,7 +327,7 @@
                                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                                 Nạp mẫu FPT
                             </button>
-                            <button type="button" class="btn-prompt-tool" disabled onclick="clearPrompt()" title="Xóa trắng để tự viết">
+                            <button type="button" class="btn-prompt-tool" onclick="clearPrompt()" title="Xóa trắng để tự viết">
                                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
                                 Xóa
                             </button>
@@ -335,11 +335,12 @@
                     </div>
 
                     <div class="form-group-dark">
-                        <textarea readonly name="ai_system_prompt" id="ai_system_prompt"
+                        <textarea name="ai_system_prompt" id="ai_system_prompt"
                                   class="textarea-dark"
                                   style="min-height: 380px;"
                                   placeholder="Nhập vai trò, persona và hướng dẫn hoạt động cho AI..."
-                                  oninput="updatePromptStats()">${not empty settingsMap['ai_system_prompt'] ? settingsMap['ai_system_prompt'] : settingsMap['gemini_system_prompt']}</textarea>
+                                  oninput="updatePromptStats()"><c:out value="${settingsMap['ai_system_prompt']}"/></textarea>
+                        <textarea id="fptPromptTemplate" hidden><c:out value="${defaultSystemPrompt}"/></textarea>
                         
                         <div class="prompt-footer-stats">
                             <span id="promptCharCount">0 ký tự</span>
@@ -782,6 +783,7 @@
 
     // 7. PROMPT TOOLS & STATS
     function loadFptPromptTemplate() {
+        document.getElementById('ai_system_prompt').value = document.getElementById('fptPromptTemplate').value;
         updatePromptStats();
     }
 
@@ -795,7 +797,7 @@
     function updatePromptStats() {
         const txt = document.getElementById('ai_system_prompt').value || '';
         document.getElementById('promptCharCount').textContent = txt.length + ' ký tự';
-        const words = txt.trim() ? txt.trim().split(/\\s+/).length : 0;
+        const words = txt.trim() ? txt.trim().split(/\s+/).length : 0;
         document.getElementById('promptWordCount').textContent = words + ' từ';
     }
 

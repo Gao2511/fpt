@@ -14,7 +14,7 @@ public class ConsultationBehaviorTest {
     public static final ProductCatalog CATALOG = catalog();
     public static ProductCatalog catalog() {
         List<PackageDTO> rows = new ArrayList<>();
-        int[] prices = {195,205,220,230,239,249}, speeds = {300,300,500,500,1000,1000};
+        int[] prices = {195,205,220,230,239,249}, speeds = {300,300,300,300,1000,1000};
         for (int i=0; i<6; i++) {
             PackageDTO p = new PackageDTO(); p.setId(i+1); p.setName("Gói " + prices[i] + "K"); p.setPackageCode(prices[i] + "K");
             p.setPrice(prices[i]*1000L); p.setSpeedMbps(speeds[i]);
@@ -49,6 +49,31 @@ public class ConsultationBehaviorTest {
     interface Test {void run() throws Exception;}
     static void test(String name,Test test) throws Exception {test.run();passed++;System.out.println("PASS " + name);}
     public static void main(String[] args) throws Exception {
+        test("saved prompt takes precedence including deliberate clearing",()->{
+            Map<String,String> settings=new HashMap<>();
+            check(ConsultationPrompt.SYSTEM.equals(ConsultationPrompt.resolve(settings)),"Missing default");
+            settings.put("gemini_system_prompt","Legacy prompt");
+            check("Legacy prompt".equals(ConsultationPrompt.resolve(settings)),"Legacy lost");
+            String custom="  Xưng tôi, gọi khách là bạn.\nHỏi ngắn gọn.  ";
+            settings.put("ai_system_prompt",custom);
+            check(custom.equals(ConsultationPrompt.resolve(settings)),"Saved text changed");
+            settings.put("ai_system_prompt","");
+            check("".equals(ConsultationPrompt.resolve(settings)),"Cleared prompt restored unexpectedly");
+        });
+        test("custom prompt controls common consultation through provider",()->{
+            MockProvider p=new MockProvider();p.outputs.add(envelope("Tôi có thể tư vấn cho bạn. Bạn cần hỗ trợ thêm không?"));
+            String custom="Xưng tôi, gọi khách là bạn.\nHỏi ngắn gọn.";
+            ChatResponse r=new ConsultationEngine().chat("Có gói cho sinh viên không?",new ChatSessionData("custom"),CATALOG,target(p),null,new ChatOptions(0.3,1200),custom);
+            check(p.calls==1 && r.getContent().startsWith("Tôi có thể"),"Custom prompt bypassed");
+            check("system".equals(p.lastMessages.get(0).getRole()) && p.lastMessages.get(0).getContent().startsWith(custom+"\n"),"Wrong prompt or role");
+        });
+        test("custom prompt retains explicit registration consent and outage fallback",()->{
+            MockProvider p=new MockProvider();
+            ChatResponse r=new ConsultationEngine().chat("Tôi muốn đăng ký gói 220K.",new ChatSessionData("custom-register"),CATALOG,target(p),null,new ChatOptions(0.3,1200),"Xưng tôi.");
+            check(p.calls==0 && "open_registration".equals(r.getAction()),"Registration control lost");
+            r=new ConsultationEngine().chat("Có gói cho sinh viên không?",new ChatSessionData("custom-outage"),CATALOG,null,null,new ChatOptions(0.3,1200),"Xưng tôi.");
+            check(r.getContent().contains("195.000đ/tháng"),"Outage lost factual consultation");
+        });
         test("student consultation selects an existing affordable package",()->{
             ChatResponse r=ask("Hiện tại có gói nào phù hợp với sinh viên không?",new ChatSessionData("student"),new MockProvider(),null);
             check(r.getRecommendedPackageId()==1 && r.getContent().contains("195.000đ/tháng") && !r.getContent().contains("hotline"),r.getContent());
@@ -66,7 +91,7 @@ public class ConsultationBehaviorTest {
         });
         test("pair comparison shows actual difference",()->{
             ChatResponse r=ask("Gói 195K với 220K khác nhau thế nào?",new ChatSessionData("pair"),new MockProvider(),null);
-            check(r.getContent().contains("25.000đ/tháng") && r.getContent().contains("300Mbps và 500Mbps") && r.getContent().contains("TV 180 kênh"),r.getContent());
+            check(r.getContent().contains("25.000đ/tháng") && r.getContent().contains("300Mbps và 300Mbps") && r.getContent().contains("TV 180 kênh"),r.getContent());
         });
         test("household update retains budget and gaming",()->{
             ChatSessionData s=new ChatSessionData("update"); MockProvider p=new MockProvider();
@@ -131,6 +156,32 @@ public class ConsultationBehaviorTest {
         test("model cannot open registration without customer intent",()->{
             MockProvider p=new MockProvider();String bad=envelope("Anh/chị vui lòng kiểm tra thông tin.").getContent().replace("\"consultation\"","\"registration\"").replace("\"recommendedPackageId\":null","\"recommendedPackageId\":3").replace("\"none\"","\"open_registration\"");
             p.outputs.add(raw(bad,"stop"));p.outputs.add(raw(bad,"stop"));check("none".equals(ask("Chào bạn!",new ChatSessionData("no-consent"),p,null).getAction()),"Unsolicited action");
+        });
+        test("package speeds in catalog match official reference table",()->{
+            List<ProductCatalog.Product> all = CATALOG.all();
+            check(all.size() == 6, "Expected 6 packages");
+            check(all.get(0).speed == 300 && all.get(0).price == 195000L, "195K speed must be 300");
+            check(all.get(1).speed == 300 && all.get(1).price == 205000L, "205K speed must be 300");
+            check(all.get(2).speed == 300 && all.get(2).price == 220000L, "220K speed must be 300");
+            check(all.get(3).speed == 300 && all.get(3).price == 230000L, "230K speed must be 300");
+            check(all.get(4).speed == 1000 && all.get(4).price == 239000L, "239K speed must be 1000");
+            check(all.get(5).speed == 1000 && all.get(5).price == 249000L, "249K speed must be 1000");
+        });
+        test("speed question for 239K returns exactly 1000 Mbps (1 Gbps)",()->{
+            ChatResponse r = ask("Gói 239K tốc độ bao nhiêu?", new ChatSessionData("speed-239"), new MockProvider(), null);
+            String c = r.getContent();
+            check(c.contains("1000") && (c.contains("Mbps") || c.contains("1 Gbps")), "Must state 1000 Mbps for 239K: " + c);
+        });
+        test("house 2 floors consultation suggests Mesh WiFi F1 with equipment and pricing",()->{
+            ChatResponse r = ask("Nhà anh 2 tầng nên dùng WiFi nào?", new ChatSessionData("mesh-f1"), new MockProvider(), null);
+            String c = r.getContent();
+            check(c.contains("F1") && c.contains("500.000") && c.contains("100.000") && c.contains("Access Point"), "Must recommend F1 for 2 floors: " + c);
+            check(c.contains("cộng") || c.contains("mở rộng"), "Must clarify add-on fee nature: " + c);
+        });
+        test("house 3 floors with F1 explains limitations and suggests Mesh WiFi F2",()->{
+            ChatResponse r = ask("Nhà anh 3 tầng dùng F1 được không?", new ChatSessionData("mesh-f2"), new MockProvider(), null);
+            String c = r.getContent();
+            check(c.contains("F2") && c.contains("700.000") && c.contains("200.000") && c.contains("Access Point"), "Must recommend F2 for 3 floors: " + c);
         });
         System.out.println("ConsultationBehaviorTest: " + passed + " passed");
     }

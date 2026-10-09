@@ -11,9 +11,73 @@ public final class ConsultationPolicy {
         return q.matches("(?s).*(?:toi|minh|anh|chi|em)\\s+(?:muon|can|xin|se)\\s+(?:dang ky|mua|lap)(?:\\s|$).*") ||
             q.matches("^(?:cho (?:toi|minh|anh|chi|em) )?dang ky\\s+(?:goi|internet|mang).*" );
     }
+    public static com.google.gson.JsonArray meshOptionsJson() {
+        com.google.gson.JsonArray arr = new com.google.gson.JsonArray();
+        com.google.gson.JsonObject f1 = new com.google.gson.JsonObject();
+        f1.addProperty("name", "Mesh WiFi F1");
+        f1.addProperty("floors", "Nhà 2 tầng");
+        f1.addProperty("devices", "01 Modem WiFi 6 + 01 Access Point");
+        f1.addProperty("installationFeeVnd", 500000);
+        f1.addProperty("monthlyAddonVnd", 100000);
+        f1.addProperty("note", "Lựa chọn mở rộng vùng phủ sóng, cộng thêm vào tiền cước Internet hàng tháng");
+        arr.add(f1);
+
+        com.google.gson.JsonObject f2 = new com.google.gson.JsonObject();
+        f2.addProperty("name", "Mesh WiFi F2");
+        f2.addProperty("floors", "Nhà 3 tầng");
+        f2.addProperty("devices", "01 Modem WiFi 6 + 02 Access Point");
+        f2.addProperty("installationFeeVnd", 700000);
+        f2.addProperty("monthlyAddonVnd", 200000);
+        f2.addProperty("note", "Lựa chọn mở rộng vùng phủ sóng, cộng thêm vào tiền cước Internet hàng tháng");
+        arr.add(f2);
+        return arr;
+    }
+
     public static ChatResponse known(String question, CustomerRequirements memory, ProductCatalog catalog) {
         String q = ProductCatalog.normalize(question);
         List<ProductCatalog.Product> mentioned = catalog.mentioned(question);
+
+        // 1. Tốc độ gói cước (đặc biệt gói 239K = 1000 Mbps)
+        boolean askingSpeed = q.contains("toc do") || q.contains("bang thong") || q.contains("mbps") || q.contains("gbps");
+        if (askingSpeed && (q.contains("239") || (mentioned.size() == 1 && mentioned.get(0).price == 239000))) {
+            return reply("Dạ gói 239K có tốc độ chính xác là 1000 Mbps (1 Gbps). Gói đi kèm 01 Modem WiFi 6, tài khoản truyền hình FPT Play 180 kênh và nội dung Ngoại Hạng Anh, giá cước 239.000đ/tháng ạ.");
+        }
+        if (askingSpeed && mentioned.size() == 1) {
+            ProductCatalog.Product p = mentioned.get(0);
+            return reply("Dạ gói " + p.label() + " có tốc độ công bố là " + p.speed + " Mbps" + (p.speed >= 1000 ? " (1 Gbps)" : "") + ", giá cước " + String.format(Locale.US, "%,d", p.price).replace(',', '.') + "đ/tháng.\n" + p.display());
+        }
+
+        // 2. Tư vấn Mesh WiFi theo số tầng
+        if ((q.contains("3 tang") || q.contains("ba tang")) && (q.contains("f1") || q.contains("dung f1") || q.contains("duoc khong") || q.contains("on khong") || q.contains("co duoc khong"))) {
+            return reply("Dạ với nhà 3 tầng, gói Mesh WiFi F1 (gồm 01 Modem WiFi 6 + 01 Access Point) vốn được thiết kế tối ưu cho nhà 2 tầng, nên có thể sẽ bị sóng yếu hoặc không phủ kín các phòng/tầng nếu có vật cản hoặc tường dày.\n"
+                + "Để đảm bảo phủ sóng tốt và ổn định hơn cho nhà 3 tầng, em đề xuất anh/chị tham khảo giải pháp Mesh WiFi F2:\n"
+                + "- Thiết bị đi kèm: 01 Modem WiFi 6 + 02 Access Point.\n"
+                + "- Phí lắp đặt tham khảo: 700.000 VNĐ.\n"
+                + "- Phí cộng thêm hàng tháng: 200.000 VNĐ/tháng (cộng thêm vào tiền cước gói Internet đã chọn).\n"
+                + "Lưu ý: Mesh WiFi F2 là giải pháp mở rộng phủ sóng kết hợp với gói Internet FPT, và không cam kết 100% phủ sóng mọi ngóc ngách nếu chưa kiểm tra vị trí đặt thiết bị và vật cản thực tế. Anh/chị cho em biết thêm diện tích mỗi tầng và nhu cầu sử dụng để em tư vấn gói cước Internet kết hợp tối ưu nhé!");
+        }
+        if (q.contains("2 tang") || q.contains("hai tang") || (q.contains("f1") && !q.contains("f2"))) {
+            return reply("Dạ với nhà 2 tầng, em đề xuất anh/chị tham khảo giải pháp mở rộng vùng phủ sóng Mesh WiFi F1:\n"
+                + "- Phù hợp: Nhà 2 tầng, giúp loại bỏ góc chết WiFi giữa các tầng.\n"
+                + "- Thiết bị đi kèm: 01 Modem WiFi 6 + 01 Access Point.\n"
+                + "- Phí lắp đặt tham khảo: 500.000 VNĐ.\n"
+                + "- Phí cộng thêm hàng tháng: 100.000 VNĐ/tháng (cộng thêm vào tiền cước gói Internet).\n"
+                + "Lưu ý: Mesh WiFi F1 là lựa chọn mở rộng phủ sóng kết hợp cùng gói cước Internet FPT, không phải gói độc lập (Tổng cước = Giá gói Internet + 100.000đ/tháng). Anh/chị cho em biết thêm diện tích nhà, số người dùng và nhu cầu sử dụng Internet để em tư vấn gói cước nền phù hợp nhất nhé!");
+        }
+        if (q.contains("3 tang") || q.contains("ba tang") || q.contains("f2")) {
+            return reply("Dạ với nhà 3 tầng, em đề xuất anh/chị tham khảo giải pháp Mesh WiFi F2 để đảm bảo phủ sóng đều các tầng:\n"
+                + "- Thiết bị đi kèm: 01 Modem WiFi 6 + 02 Access Point.\n"
+                + "- Phí lắp đặt tham khảo: 700.000 VNĐ.\n"
+                + "- Phí cộng thêm hàng tháng: 200.000 VNĐ/tháng (cộng thêm vào tiền cước gói Internet đã chọn).\n"
+                + "Lưu ý: Mesh WiFi F2 là giải pháp mở rộng phủ sóng kết hợp cùng gói cước Internet FPT. Anh/chị cho em biết thêm diện tích mỗi tầng, số lượng thiết bị và nhu cầu để em tư vấn gói Internet nền kết hợp phù hợp nhé!");
+        }
+        if (q.contains("mesh")) {
+            return reply("Dạ FPT hiện có 2 giải pháp mở rộng vùng phủ sóng Mesh WiFi cho nhà nhiều tầng (kết hợp cùng gói cước Internet FPT):\n"
+                + "1. Mesh WiFi F1 (Phù hợp nhà 2 tầng): 01 Modem WiFi 6 + 01 Access Point. Phí lắp đặt tham khảo 500.000đ, phí cộng thêm 100.000đ/tháng.\n"
+                + "2. Mesh WiFi F2 (Phù hợp nhà 3 tầng): 01 Modem WiFi 6 + 02 Access Point. Phí lắp đặt tham khảo 700.000đ, phí cộng thêm 200.000đ/tháng.\n"
+                + "Lưu ý: Phí hàng tháng của Mesh WiFi là phí cộng thêm vào tiền cước gói Internet hàng tháng. Anh/chị cho em biết số tầng và diện tích nhà để em tư vấn chi tiết nhé!");
+        }
+
         if (q.matches("(?s).*(phi (?:lap|hoa)|gia lap|lap dat.*bao nhieu|khuyen mai|uu dai|giam gia|hop dong|vung phu|ha tang|bao lau.*lap).*"))
             return reply("Em chưa có dữ liệu xác nhận về phí lắp đặt, ưu đãi, điều khoản hoặc hạ tầng tại địa chỉ của anh/chị. Anh/chị có thể gửi yêu cầu tư vấn qua biểu mẫu để được kiểm tra; em chưa thể báo chi phí hay cam kết lịch lắp đặt.");
         if (q.contains("ban chay") || q.contains("pho bien nhat"))

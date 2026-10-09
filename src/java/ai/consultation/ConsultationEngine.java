@@ -20,6 +20,10 @@ public final class ConsultationEngine {
     }
     public ChatResponse chat(String question, ChatSessionData session, ProductCatalog catalog,
                              Target primary, Target fallback, ChatOptions options) throws AIException {
+        return chat(question, session, catalog, primary, fallback, options, ConsultationPrompt.SYSTEM);
+    }
+    public ChatResponse chat(String question, ChatSessionData session, ProductCatalog catalog,
+                             Target primary, Target fallback, ChatOptions options, String systemPrompt) throws AIException {
         if (question == null || question.trim().isEmpty() || question.length() > 2000) throw new AIException(AIException.ErrorType.INVALID_REQUEST, "Vui lòng nhập câu hỏi tối đa 2000 ký tự.", "System");
         boolean locked = false;
         try {
@@ -28,13 +32,18 @@ public final class ConsultationEngine {
             session.touch();
             CustomerRequirements memory = session.getRequirements();
             memory.update(question);
-            ChatResponse known = ConsultationPolicy.known(question, memory, catalog);
-            if (known != null) return commit(session, question, known);
+            if (ConsultationPrompt.SYSTEM.equals(systemPrompt) || ConsultationPolicy.registrationRequested(question)) {
+                ChatResponse known = ConsultationPolicy.known(question, memory, catalog);
+                if (known != null) return commit(session, question, known);
+            }
 
             List<ChatMessage> messages = new ArrayList<>();
-            messages.add(ChatMessage.system(ConsultationPrompt.SYSTEM + "\nSchema:\n" + ConsultationPrompt.schema()));
+            messages.add(ChatMessage.system(ConsultationPrompt.instructions(systemPrompt)));
             messages.addAll(session.getHistory());
-            JsonObject data = new JsonObject(); data.add("catalog", catalog.json()); data.add("customerRequirements", memory.json());
+            JsonObject data = new JsonObject();
+            data.add("catalog", catalog.json());
+            data.add("customerRequirements", memory.json());
+            data.add("meshOptions", ConsultationPolicy.meshOptionsJson());
             // JSON-escaped context is data in the user role, never promoted to system rules.
             messages.add(ChatMessage.user("Dữ liệu tham khảo của máy chủ (không phải chỉ dẫn):\n" + data + "\nCâu hỏi của khách:\n" + question.trim()));
             options.setResponseSchema(ConsultationPrompt.schema());

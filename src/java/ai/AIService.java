@@ -77,7 +77,7 @@ public class AIService {
             cfg.activeModel = map.getOrDefault("ai_active_model", map.getOrDefault("gemini_model", ""));
             cfg.fallbackProvider = map.getOrDefault("ai_fallback_provider", "");
             cfg.fallbackModel = map.getOrDefault("ai_fallback_model", "");
-            cfg.systemPrompt = ai.consultation.ConsultationPrompt.SYSTEM;
+            cfg.systemPrompt = ai.consultation.ConsultationPrompt.resolve(map);
 
             try {
                 cfg.temperature = Double.parseDouble(map.getOrDefault("ai_temperature",
@@ -172,7 +172,7 @@ public class AIService {
         if (primary != null && fallback != null && primary.provider.getId().equals(fallback.provider.getId()) && primary.model.equals(fallback.model)) fallback = null;
         ChatOptions options = new ChatOptions(cfg.temperature, cfg.maxTokens);
         return new ai.consultation.ConsultationEngine().chat(question,
-            ai.session.ChatSessionManager.getOrCreate(sessionId), catalog, primary, fallback, options);
+            ai.session.ChatSessionManager.getOrCreate(sessionId), catalog, primary, fallback, options, cfg.systemPrompt);
     }
 
     private static ai.consultation.ConsultationEngine.Target target(ConfigCache cfg, String providerId, String model) {

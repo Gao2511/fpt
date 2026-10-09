@@ -46,7 +46,8 @@ public class AdminSettingsServlet extends HttpServlet {
         // GET must not write settings or migrate secrets.
 
         Map<String, String> settingsMap = settingsDAO.getAllAsMap();
-        settingsMap.put("ai_system_prompt", ai.consultation.ConsultationPrompt.SYSTEM);
+        settingsMap.put("ai_system_prompt", ai.consultation.ConsultationPrompt.resolve(settingsMap));
+        request.setAttribute("defaultSystemPrompt", ai.consultation.ConsultationPrompt.SYSTEM);
         AIService.ConfigCache consultationConfig = AIService.getConfig();
         settingsMap.put("ai_temperature", Double.toString(consultationConfig.temperature));
         settingsMap.put("ai_max_tokens", Integer.toString(consultationConfig.maxTokens));
@@ -327,7 +328,7 @@ public class AdminSettingsServlet extends HttpServlet {
         String apiKey = request.getParameter("current_api_key");
         String baseUrl = request.getParameter("current_base_url");
 
-        String systemPrompt = ai.consultation.ConsultationPrompt.SYSTEM;
+        String systemPrompt = request.getParameter("ai_system_prompt");
         String temperature = request.getParameter("ai_temperature");
         String maxTokens = request.getParameter("ai_max_tokens");
         String chatbotEnabled = request.getParameter("ai_chatbot_enabled");
@@ -393,8 +394,13 @@ public class AdminSettingsServlet extends HttpServlet {
 
         // 4. Cập nhật System Prompt, Temperature, Max Tokens
         if (systemPrompt != null) {
-            settingsDAO.update("ai_system_prompt", systemPrompt.trim());
-            settingsDAO.update("gemini_system_prompt", systemPrompt.trim());
+            if (!settingsDAO.update("ai_system_prompt", systemPrompt)) {
+                AIService.invalidateCache();
+                session.setAttribute("message", "Không thể lưu system prompt. Vui lòng thử lại.");
+                session.setAttribute("messageType", "error");
+                return;
+            }
+            settingsDAO.update("gemini_system_prompt", systemPrompt);
         }
 
         if (temperature != null && !temperature.trim().isEmpty()) {

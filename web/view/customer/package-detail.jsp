@@ -260,11 +260,31 @@
                                value="${not empty sessionScope.user.email ? sessionScope.user.email : ''}">
 
                         <div id="addressPickerDetail" data-address-picker="detail" style="margin-bottom:12px;"></div>
+
+                        <!-- TÙY CHỌN MỞ RỘNG MESH WIFI -->
+                        <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:10px; padding:12px 14px; margin-bottom:14px;">
+                            <div style="font-size:13px; font-weight:700; color:#c2410c; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                                <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                                Tùy chọn mở rộng vùng phủ sóng Mesh WiFi (phí cộng thêm hàng tháng):
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:8px; font-size:13px; color:#374151;">
+                                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:400; margin:0;">
+                                    <input type="checkbox" id="optMeshF1" onchange="toggleMeshOption('Mesh WiFi F1 (Nhà 2 tầng, +100K/tháng)')" style="width:auto; margin:0;">
+                                    <span><strong>Mesh WiFi F1</strong> — Nhà 2 tầng (1 Modem WiFi 6 + 1 AP, phí lắp 500k, <strong>+100.000đ/tháng</strong>)</span>
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:400; margin:0;">
+                                    <input type="checkbox" id="optMeshF2" onchange="toggleMeshOption('Mesh WiFi F2 (Nhà 3 tầng, +200K/tháng)')" style="width:auto; margin:0;">
+                                    <span><strong>Mesh WiFi F2</strong> — Nhà 3 tầng (1 Modem WiFi 6 + 2 AP, phí lắp 700k, <strong>+200.000đ/tháng</strong>)</span>
+                                </label>
+                            </div>
+                        </div>
                         <input type="text" name="user_note" id="user_note_detail"
                                placeholder="Ghi chú (không bắt buộc)"
                                list="noteSuggestionsDetail"
                                autocomplete="off">
                         <datalist id="noteSuggestionsDetail">
+                            <option value="Thêm gói Mesh WiFi F1 (nhà 2 tầng - thêm 100K/tháng)">
+                            <option value="Thêm gói Mesh WiFi F2 (nhà 3 tầng - thêm 200K/tháng)">
                             <option value="Nhà riêng, 1 tầng">
                             <option value="Nhà riêng, nhiều tầng">
                             <option value="Căn hộ chung cư">
@@ -440,5 +460,19 @@
             })();
         </script>
 
-    </body>
+    <script>
+function toggleMeshOption(meshLabel) {
+    var note = document.getElementById('user_note_detail');
+    if (!note) return;
+    var checkbox = event.target;
+    if (checkbox.checked) {
+        if (!note.value.includes(meshLabel)) {
+            note.value = note.value ? note.value + ' | Đăng ký kèm ' + meshLabel : 'Đăng ký kèm ' + meshLabel;
+        }
+    } else {
+        note.value = note.value.replace(' | Đăng ký kèm ' + meshLabel, '').replace('Đăng ký kèm ' + meshLabel, '').trim();
+    }
+}
+</script>
+</body>
 </html>
