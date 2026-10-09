@@ -67,7 +67,7 @@ public class AnthropicProvider implements LLMProvider {
         try {
             HttpURLConnection conn = openConnection(endpoint, "GET", apiKey, 10000, 15000);
             int code = conn.getResponseCode();
-            String responseBody = readStream(code >= 200 && code < 300 ? conn.getInputStream() : conn.getErrorStream());
+            String responseBody = readResponse(conn, code);
 
             if (code < 200 || code >= 300) {
                 // Một số tài khoản Anthropic chưa kích hoạt endpoint /v1/models thì fallback về preset
@@ -77,7 +77,7 @@ public class AnthropicProvider implements LLMProvider {
                 throw AIException.fromHttp(code, responseBody, getDisplayName(), "models");
             }
 
-            JsonObject root = JsonParser.parseString(responseBody).getAsJsonObject();
+            JsonObject root = parseJsonLenient(responseBody);
             JsonArray data = root.getAsJsonArray("data");
             List<ModelInfo> result = new ArrayList<>();
 
@@ -136,13 +136,13 @@ public class AnthropicProvider implements LLMProvider {
             int code = conn.getResponseCode();
             long latency = System.currentTimeMillis() - start;
 
-            String responseBody = readStream(code >= 200 && code < 300 ? conn.getInputStream() : conn.getErrorStream());
+            String responseBody = readResponse(conn, code);
 
             if (code < 200 || code >= 300) {
                 throw AIException.fromHttp(code, responseBody, getDisplayName(), model);
             }
 
-            JsonObject root = JsonParser.parseString(responseBody).getAsJsonObject();
+            JsonObject root = parseJsonLenient(responseBody);
             StringBuilder replyText = new StringBuilder();
             String finishReason = "end_turn";
 
@@ -333,6 +333,38 @@ public class AnthropicProvider implements LLMProvider {
         conn.setRequestProperty("x-api-key", apiKey != null ? apiKey.trim() : "");
         conn.setRequestProperty("anthropic-version", ANTHROPIC_VERSION);
         return conn;
+    }
+
+    private String readResponse(HttpURLConnection conn, int code) throws IOException {
+        InputStream stream = (code >= 200 && code < 300)
+                ? conn.getInputStream()
+                : conn.getErrorStream();
+        if (stream == null) return "";
+
+        String encoding = conn.getContentEncoding();
+        if ("gzip".equalsIgnoreCase(encoding)) {
+            stream = new java.util.zip.GZIPInputStream(stream);
+        } else if ("deflate".equalsIgnoreCase(encoding)) {
+            stream = new java.util.zip.InflaterInputStream(stream);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        }
+        return sb.toString();
+    }
+
+    private JsonObject parseJsonLenient(String jsonStr) {
+        if (jsonStr == null || jsonStr.trim().isEmpty()) {
+            return new JsonObject();
+        }
+        com.google.gson.stream.JsonReader reader = new com.google.gson.stream.JsonReader(new StringReader(jsonStr));
+        reader.setLenient(true);
+        return JsonParser.parseReader(reader).getAsJsonObject();
     }
 
     private String readStream(InputStream stream) throws IOException {

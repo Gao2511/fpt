@@ -67,13 +67,13 @@ public class GeminiProvider implements LLMProvider {
             HttpURLConnection conn = openConnection(endpoint, "GET", 10000, 15000);
             int code = conn.getResponseCode();
 
-            String responseBody = readStream(code >= 200 && code < 300 ? conn.getInputStream() : conn.getErrorStream());
+            String responseBody = readResponse(conn, code);
 
             if (code < 200 || code >= 300) {
                 throw AIException.fromHttp(code, responseBody, getDisplayName(), "models");
             }
 
-            JsonObject root = JsonParser.parseString(responseBody).getAsJsonObject();
+            JsonObject root = parseJsonLenient(responseBody);
             JsonArray models = root.getAsJsonArray("models");
             List<ModelInfo> result = new ArrayList<>();
 
@@ -144,13 +144,13 @@ public class GeminiProvider implements LLMProvider {
             int code = conn.getResponseCode();
             long latency = System.currentTimeMillis() - start;
 
-            String responseBody = readStream(code >= 200 && code < 300 ? conn.getInputStream() : conn.getErrorStream());
+            String responseBody = readResponse(conn, code);
 
             if (code < 200 || code >= 300) {
                 throw AIException.fromHttp(code, responseBody, getDisplayName(), model);
             }
 
-            JsonObject root = JsonParser.parseString(responseBody).getAsJsonObject();
+            JsonObject root = parseJsonLenient(responseBody);
             String replyText = "";
             String finishReason = "STOP";
 
@@ -350,8 +350,39 @@ public class GeminiProvider implements LLMProvider {
         conn.setReadTimeout(readTimeout);
         conn.setUseCaches(false);
         conn.setRequestProperty("Connection", "keep-alive");
-        conn.setRequestProperty("Accept-Encoding", "gzip, deflate");
         return conn;
+    }
+
+    private String readResponse(HttpURLConnection conn, int code) throws IOException {
+        InputStream stream = (code >= 200 && code < 300)
+                ? conn.getInputStream()
+                : conn.getErrorStream();
+        if (stream == null) return "";
+
+        String encoding = conn.getContentEncoding();
+        if ("gzip".equalsIgnoreCase(encoding)) {
+            stream = new java.util.zip.GZIPInputStream(stream);
+        } else if ("deflate".equalsIgnoreCase(encoding)) {
+            stream = new java.util.zip.InflaterInputStream(stream);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        }
+        return sb.toString();
+    }
+
+    private JsonObject parseJsonLenient(String jsonStr) {
+        if (jsonStr == null || jsonStr.trim().isEmpty()) {
+            return new JsonObject();
+        }
+        com.google.gson.stream.JsonReader reader = new com.google.gson.stream.JsonReader(new StringReader(jsonStr));
+        reader.setLenient(true);
+        return JsonParser.parseReader(reader).getAsJsonObject();
     }
 
     private String readStream(InputStream stream) throws IOException {
