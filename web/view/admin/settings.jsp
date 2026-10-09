@@ -732,10 +732,23 @@
                 // Thêm meta tags thống kê
                 const metaRow = document.createElement('div');
                 metaRow.className = 'play-meta-row';
+                let stateHtml = '';
+                if (data.state) {
+                    const parts = [];
+                    if (data.state.ten) parts.push('👤 ' + data.state.ten);
+                    if (data.state.sdt) parts.push('📞 ' + data.state.sdt);
+                    if (data.state.dia_chi) parts.push('📍 ' + data.state.dia_chi);
+                    if (data.state.goi_de_xuat) parts.push('📦 ' + data.state.goi_de_xuat);
+                    if (parts.length > 0) {
+                        stateHtml = '<span class="play-tag" style="color:#4ade80;border-color:rgba(74,222,128,0.3);" title="Thông tin khách hàng AI ghi nhớ trong sổ tay session">📝 Sổ tay: ' + parts.join(' | ') + '</span>';
+                    }
+                }
+
                 metaRow.innerHTML = 
                     '<span class="play-tag play-tag-provider">🏷️ ' + (data.provider || currentProvider) + ' / ' + (data.model || model) + '</span>' +
                     '<span class="play-tag play-tag-latency">⚡ ' + (data.latencyMs || 0) + 'ms</span>' +
-                    '<span class="play-tag play-tag-tokens">🪙 ' + (data.totalTokens ? data.totalTokens + ' tokens' : 'Tokens N/A') + '</span>';
+                    '<span class="play-tag play-tag-tokens">🪙 ' + (data.totalTokens ? data.totalTokens + ' tokens' : 'Tokens N/A') + '</span>' +
+                    stateHtml;
                 aiDiv.appendChild(metaRow);
             } else {
                 aiDiv.classList.add('play-error');
@@ -753,8 +766,26 @@
     }
 
     function clearPlaygroundChat() {
-        const output = document.getElementById('playgroundOutput');
-        output.innerHTML = '<div class="ai-msg-placeholder">Hãy đặt một câu hỏi thử nghiệm để kiểm tra phản hồi từ AI.</div>';
+        if (!confirm('Bạn có chắc muốn xóa lịch sử trò chuyện và làm mới sổ tay khách hàng của Playground?')) {
+            return;
+        }
+        const params = new URLSearchParams();
+        params.append('action', 'clearHistory');
+
+        fetch(CONTEXT_PATH + '/admin/ai-playground', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+            body: params.toString()
+        })
+        .then(res => res.json())
+        .then(data => {
+            const output = document.getElementById('playgroundOutput');
+            output.innerHTML = '<div class="ai-msg-placeholder">✓ ' + (data.message || 'Đã làm mới sổ tay!') + ' Hãy đặt câu hỏi thử nghiệm mới.</div>';
+        })
+        .catch(err => {
+            const output = document.getElementById('playgroundOutput');
+            output.innerHTML = '<div class="ai-msg-placeholder">Hãy đặt một câu hỏi thử nghiệm để kiểm tra phản hồi từ AI.</div>';
+        });
     }
 
     // 6. TOGGLE PASSWORD KEY

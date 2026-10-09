@@ -153,10 +153,27 @@ public class AIService {
         }
     }
 
+    // Chỉ dẫn giao thức Sổ tay khách hàng và cập nhật state JSON
+    private static final String STATE_INSTRUCTION_APPENDIX =
+        "\n\n=== QUY TẮC BỘ NHỚ VÀ SỔ TAY THÔNG TIN KHÁCH HÀNG (BẮT BUỘC) ===\n" +
+        "1. Trong mỗi lượt trò chuyện, bạn sẽ nhận được thông tin khách hàng hiện có trong thẻ <sotay_hientai>{...}</sotay_hientai>.\n" +
+        "2. Hãy ghi nhớ các thông tin khách hàng đã chia sẻ (Tên, Số điện thoại, Địa chỉ lắp đặt, Gói cước quan tâm). TUYỆT ĐỐI KHÔNG HỎI LẠI những thông tin đã có trong sổ tay!\n" +
+        "3. Ở CUỐI CÙNG của mỗi câu trả lời, bạn BẮT BUỘC phải đính kèm khối JSON cập nhật thông tin trong thẻ <state>{...}</state>.\n" +
+        "Định dạng chuẩn:\n" +
+        "<state>{\"ten\":\"...\",\"sdt\":\"...\",\"dia_chi\":\"...\",\"goi_de_xuat\":\"...\"}</state>\n" +
+        "Nếu chưa biết trường nào, hãy để chuỗi rỗng \"\" hoặc giữ nguyên giá trị cũ, tuyệt đối không bịa đặt thông tin.";
+
     /**
-     * Gửi tin nhắn chat đến AI (Tự động kích hoạt Fallback khi model chính gặp sự cố)
+     * Gửi tin nhắn chat đến AI (Tương thích ngược khi không truyền sessionId)
      */
     public static ChatResponse askAI(String userQuestion) throws AIException {
+        return askAI(userQuestion, "guest_default");
+    }
+
+    /**
+     * Gửi tin nhắn chat đến AI duy trì ngữ cảnh hội thoại & sổ tay thông tin theo Session
+     */
+    public static ChatResponse askAI(String userQuestion, String sessionId) throws AIException {
         ConfigCache cfg = getConfig();
 
         if (!cfg.chatbotEnabled) {
@@ -164,15 +181,10 @@ public class AIService {
                     "Chatbot AI hiện đang tạm bảo trì để nâng cấp.", "System");
         }
 
-        List<ChatMessage> messages = new ArrayList<>();
-        if (cfg.systemPrompt != null && !cfg.systemPrompt.trim().isEmpty()) {
-            messages.add(ChatMessage.system(cfg.systemPrompt.trim()));
-        }
-        messages.add(ChatMessage.user(userQuestion));
+        // Lấy session data quản lý lịch sử hội thoại và sổ tay
+        ai.session.ChatSessionData sessionData = ai.session.ChatSessionManager.getOrCreate(sessionId);
 
-        ChatOptions options = new ChatOptions(cfg.temperature, cfg.maxTokens);
-
-        // 1. Thử gọi Provider chính
+        // 1. Xác định Provider & Model chính
         String primaryProviderId = cfg.activeProvider;
         String primaryModel = cfg.activeModel;
         LLMProvider primaryProvider = ProviderRegistry.get(primaryProviderId);
@@ -185,15 +197,40 @@ public class AIService {
         String primaryApiKey = getDecryptedApiKey(primaryProviderId);
         String primaryBaseUrl = getBaseUrl(primaryProviderId);
 
+        // 2. Tóm tắt lịch sử cũ nếu vượt quá 20 lượt
+        ai.session.ChatSessionManager.summarizeAndTrimIfNeeded(
+                sessionData, primaryProvider, primaryApiKey, primaryModel, primaryBaseUrl
+        );
+
+        // 3. Xây dựng danh sách tin nhắn gửi sang LLM (Đúng thứ tự, đúng role)
+        List<ChatMessage> messages = new ArrayList<>();
+
+        // System Instruction kèm quy tắc Sổ tay
+        String fullSystemPrompt = (cfg.systemPrompt != null ? cfg.systemPrompt.trim() : "") + STATE_INSTRUCTION_APPENDIX;
+        messages.add(ChatMessage.system(fullSystemPrompt));
+
+        // Thêm lịch sử hội thoại của session (tối đa 20 lượt gần nhất)
+        List<ChatMessage> history = sessionData.getHistory();
+        for (ChatMessage hMsg : history) {
+            messages.add(new ChatMessage(hMsg.getRole(), hMsg.getContent()));
+        }
+
+        // Tin nhắn mới nhất của người dùng: Chèn <sotay_hientai>{state}</sotay_hientai> vào đầu
+        String wrappedUserMsg = ai.session.ChatSessionManager.wrapUserMessageWithState(sessionData, userQuestion);
+        messages.add(ChatMessage.user(wrappedUserMsg));
+
+        ChatOptions options = new ChatOptions(cfg.temperature, cfg.maxTokens);
+
+        // 4. Gọi LLM chính hoặc tự động Fallback
+        ChatResponse response;
+        String activeApiKeyUsed = primaryApiKey;
+
         try {
-            ChatResponse response = primaryProvider.chat(messages, primaryApiKey, primaryModel, primaryBaseUrl, options);
-            // Áp dụng bộ lọc Guardrail đầu ra
-            response.setContent(applyOutputGuardrails(response.getContent(), primaryApiKey));
-            return response;
+            response = primaryProvider.chat(messages, primaryApiKey, primaryModel, primaryBaseUrl, options);
         } catch (AIException e) {
             System.err.println("⚠️ [AI Fallback Trigger] Lỗi từ Provider chính (" + primaryProviderId + "/" + primaryModel + "): " + e.getMessage());
 
-            // 2. Kiểm tra xem có cấu hình Fallback khả dụng không
+            // Fallback sang Provider dự phòng
             if (cfg.fallbackProvider != null && !cfg.fallbackProvider.trim().isEmpty()
                     && !cfg.fallbackProvider.equalsIgnoreCase(primaryProviderId)) {
 
@@ -210,18 +247,33 @@ public class AIService {
                             + fbProviderId + " (Model: " + fbModel + ")...");
 
                     try {
-                        ChatResponse fbResp = fbProvider.chat(messages, fbApiKey, fbModel, fbBaseUrl, options);
-                        fbResp.setContent(applyOutputGuardrails(fbResp.getContent(), fbApiKey));
-                        return fbResp;
+                        response = fbProvider.chat(messages, fbApiKey, fbModel, fbBaseUrl, options);
+                        activeApiKeyUsed = fbApiKey;
                     } catch (Exception fbEx) {
                         System.err.println("❌ [AI Fallback Failed] Cả model dự phòng cũng gặp lỗi: " + fbEx.getMessage());
+                        throw e;
                     }
+                } else {
+                    throw e;
                 }
+            } else {
+                throw e;
             }
-
-            // Ném ngoại lệ ban đầu nếu không fallback được
-            throw e;
         }
+
+        // 5. Trích xuất <state>, cập nhật sổ tay, kiểm tra tạo Lead, và XÓA thẻ <state> khỏi câu trả lời
+        String rawContent = response.getContent();
+        String cleanContent = ai.session.ChatSessionManager.extractAndUpdateState(sessionData, rawContent);
+
+        // 6. Lưu tin nhắn mới vào lịch sử hội thoại của session
+        sessionData.addMessage(ChatMessage.user(userQuestion));
+        sessionData.addMessage(ChatMessage.assistant(cleanContent));
+
+        // 7. Áp dụng bộ lọc Guardrail đầu ra
+        cleanContent = applyOutputGuardrails(cleanContent, activeApiKeyUsed);
+        response.setContent(cleanContent);
+
+        return response;
     }
 
     /**

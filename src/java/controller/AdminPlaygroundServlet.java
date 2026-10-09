@@ -8,6 +8,8 @@ import ai.dto.ChatResponse;
 import ai.dto.StreamCallback;
 import ai.exception.AIException;
 import ai.security.CryptoUtil;
+import ai.session.ChatSessionData;
+import ai.session.ChatSessionManager;
 import com.google.gson.JsonObject;
 import dao.SettingsDAO;
 
@@ -16,6 +18,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -24,13 +27,21 @@ import java.util.List;
 /**
  * Servlet dành riêng cho Admin thử nghiệm mô hình AI (Live Playground)
  * Được bảo vệ bởi AdminFilter (/admin/*)
- * Cho phép thử nghiệm các thông số nháp (kể cả khi chưa bấm Lưu)
- * Hỗ trợ cả trả lời JSON thường và Server-Sent Events (SSE Streaming)
+ * Duy trì ngữ cảnh hội thoại, sổ tay trạng thái theo session, và hỗ trợ nút Reset hội thoại
  */
 @WebServlet("/admin/ai-playground")
 public class AdminPlaygroundServlet extends HttpServlet {
 
     private final SettingsDAO settingsDAO = new SettingsDAO();
+
+    private static final String STATE_INSTRUCTION_APPENDIX =
+        "\n\n=== QUY TẮC BỘ NHỚ VÀ SỔ TAY THÔNG TIN KHÁCH HÀNG (BẮT BUỘC) ===\n" +
+        "1. Trong mỗi lượt trò chuyện, bạn sẽ nhận được thông tin khách hàng hiện có trong thẻ <sotay_hientai>{...}</sotay_hientai>.\n" +
+        "2. Hãy ghi nhớ các thông tin khách hàng đã chia sẻ (Tên, Số điện thoại, Địa chỉ lắp đặt, Gói cước quan tâm). TUYỆT ĐỐI KHÔNG HỎI LẠI những thông tin đã có trong sổ tay!\n" +
+        "3. Ở CUỐI CÙNG của mỗi câu trả lời, bạn BẮT BUỘC phải đính kèm khối JSON cập nhật thông tin trong thẻ <state>{...}</state>.\n" +
+        "Định dạng chuẩn:\n" +
+        "<state>{\"ten\":\"...\",\"sdt\":\"...\",\"dia_chi\":\"...\",\"goi_de_xuat\":\"...\"}</state>\n" +
+        "Nếu chưa biết trường nào, hãy để chuỗi rỗng \"\" hoặc giữ nguyên giá trị cũ, tuyệt đối không bịa đặt thông tin.";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -40,6 +51,22 @@ public class AdminPlaygroundServlet extends HttpServlet {
         String action = request.getParameter("action");
         if (action == null || action.trim().isEmpty()) {
             action = "chat";
+        }
+
+        HttpSession httpSession = request.getSession(true);
+        String playgroundSessionId = "playground_" + httpSession.getId();
+        ChatSessionData sessionData = ChatSessionManager.getOrCreate(playgroundSessionId);
+
+        // ===== ACTION: XÓA LỊCH SỬ / RESET SỔ TAY PLAYGROUND =====
+        if ("clearHistory".equalsIgnoreCase(action) || "resetSession".equalsIgnoreCase(action)) {
+            response.setContentType("application/json;charset=UTF-8");
+            ChatSessionManager.clearSession(playgroundSessionId);
+            JsonObject res = new JsonObject();
+            res.addProperty("success", true);
+            res.addProperty("message", "Đã xóa toàn bộ lịch sử và làm mới sổ tay hội thoại!");
+            res.add("state", sessionData.getState());
+            response.getWriter().write(res.toString());
+            return;
         }
 
         String userMessage = request.getParameter("message");
@@ -76,7 +103,7 @@ public class AdminPlaygroundServlet extends HttpServlet {
             return;
         }
 
-        // Xử lý API Key: nếu client truyền lên chuỗi masked hoặc rỗng thì đọc từ DB
+        // Xử lý API Key
         if (apiKey == null || apiKey.trim().isEmpty() || CryptoUtil.isMasked(apiKey)) {
             apiKey = ai.AIService.getDecryptedApiKey(providerId);
         } else {
@@ -106,11 +133,24 @@ public class AdminPlaygroundServlet extends HttpServlet {
         int maxTokens = 600;
         try { if (maxTokensStr != null) maxTokens = Integer.parseInt(maxTokensStr.trim()); } catch (Exception ignored) {}
 
+        // Tóm tắt ngữ cảnh cũ nếu vượt quá 20 lượt
+        ChatSessionManager.summarizeAndTrimIfNeeded(sessionData, provider, apiKey, model, baseUrl);
+
+        // Xây dựng danh sách tin nhắn gửi sang LLM (Đúng thứ tự, đúng role)
         List<ChatMessage> messages = new ArrayList<>();
-        if (systemPrompt != null && !systemPrompt.trim().isEmpty()) {
-            messages.add(ChatMessage.system(systemPrompt.trim()));
+
+        // System Instruction kèm quy tắc Sổ tay
+        String fullSystemPrompt = (systemPrompt != null ? systemPrompt.trim() : "") + STATE_INSTRUCTION_APPENDIX;
+        messages.add(ChatMessage.system(fullSystemPrompt));
+
+        // Thêm lịch sử hội thoại của session (tối đa 20 lượt gần nhất)
+        for (ChatMessage hMsg : sessionData.getHistory()) {
+            messages.add(new ChatMessage(hMsg.getRole(), hMsg.getContent()));
         }
-        messages.add(ChatMessage.user(userMessage.trim()));
+
+        // Tin nhắn mới nhất của Admin: Chèn <sotay_hientai>{state}</sotay_hientai> vào đầu
+        String wrappedUserMsg = ChatSessionManager.wrapUserMessageWithState(sessionData, userMessage.trim());
+        messages.add(ChatMessage.user(wrappedUserMsg));
 
         ChatOptions options = new ChatOptions(temp, maxTokens);
 
@@ -124,19 +164,31 @@ public class AdminPlaygroundServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
             final Object lock = new Object();
             final boolean[] completed = {false};
+            final StringBuilder accumulatedFull = new StringBuilder();
 
             provider.chatStream(messages, apiKey, model, baseUrl, options, new StreamCallback() {
                 @Override
                 public void onToken(String token) {
-                    JsonObject data = new JsonObject();
-                    data.addProperty("type", "token");
-                    data.addProperty("content", token);
-                    out.write("data: " + data.toString() + "\n\n");
-                    out.flush();
+                    accumulatedFull.append(token);
+                    // Lọc không bắn trực tiếp thẻ <state> ra giao diện stream
+                    if (!token.contains("<state>") && !token.contains("</state>")) {
+                        JsonObject data = new JsonObject();
+                        data.addProperty("type", "token");
+                        data.addProperty("content", token);
+                        out.write("data: " + data.toString() + "\n\n");
+                        out.flush();
+                    }
                 }
 
                 @Override
                 public void onComplete(ChatResponse resp) {
+                    // Trích xuất state và xóa sạch <state> khỏi câu trả lời
+                    String cleanReply = ChatSessionManager.extractAndUpdateState(sessionData, accumulatedFull.toString());
+
+                    // Lưu vào lịch sử hội thoại
+                    sessionData.addMessage(ChatMessage.user(userMessage.trim()));
+                    sessionData.addMessage(ChatMessage.assistant(cleanReply));
+
                     JsonObject data = new JsonObject();
                     data.addProperty("type", "complete");
                     data.addProperty("provider", resp.getProvider());
@@ -145,9 +197,11 @@ public class AdminPlaygroundServlet extends HttpServlet {
                     data.addProperty("promptTokens", resp.getPromptTokens());
                     data.addProperty("completionTokens", resp.getCompletionTokens());
                     data.addProperty("totalTokens", resp.getTotalTokens());
+                    data.add("state", sessionData.getState());
                     out.write("data: " + data.toString() + "\n\n");
                     out.write("data: [DONE]\n\n");
                     out.flush();
+
                     synchronized (lock) {
                         completed[0] = true;
                         lock.notifyAll();
@@ -182,8 +236,17 @@ public class AdminPlaygroundServlet extends HttpServlet {
         JsonObject json = new JsonObject();
         try {
             ChatResponse chatResp = provider.chat(messages, apiKey, model, baseUrl, options);
+
+            // Trích xuất <state>, cập nhật sổ tay và XÓA thẻ <state> khỏi câu trả lời
+            String rawReply = chatResp.getContent();
+            String cleanReply = ChatSessionManager.extractAndUpdateState(sessionData, rawReply);
+
+            // Lưu vào lịch sử hội thoại
+            sessionData.addMessage(ChatMessage.user(userMessage.trim()));
+            sessionData.addMessage(ChatMessage.assistant(cleanReply));
+
             json.addProperty("success", true);
-            json.addProperty("reply", chatResp.getContent());
+            json.addProperty("reply", cleanReply);
             json.addProperty("provider", chatResp.getProvider());
             json.addProperty("model", chatResp.getModel());
             json.addProperty("latencyMs", chatResp.getLatencyMs());
@@ -191,6 +254,7 @@ public class AdminPlaygroundServlet extends HttpServlet {
             json.addProperty("completionTokens", chatResp.getCompletionTokens());
             json.addProperty("totalTokens", chatResp.getTotalTokens());
             json.addProperty("finishReason", chatResp.getFinishReason());
+            json.add("state", sessionData.getState());
         } catch (AIException e) {
             json.addProperty("success", false);
             json.addProperty("message", e.getMessage());

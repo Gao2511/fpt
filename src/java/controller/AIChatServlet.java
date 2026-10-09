@@ -107,9 +107,10 @@ public class AIChatServlet extends HttpServlet {
             return;
         }
 
-        // ===== 5. GỌI AISERVICE (TỰ ĐỘNG MULTI-PROVIDER & FALLBACK) =====
+        // ===== 5. GỌI AISERVICE (DUY TRÌ NGỮ CẢNH THEO SESSION & TỰ ĐỘNG TẠO LEAD) =====
         try {
-            ChatResponse chatResponse = AIService.askAI(userMessage);
+            String sessionId = session.getId();
+            ChatResponse chatResponse = AIService.askAI(userMessage, sessionId);
             writeJson(response, chatResponse.getContent());
         } catch (AIException aie) {
             System.err.println("⚠️ [AI Chat] " + aie.getProviderName() + " lỗi: " + aie.getMessage());
