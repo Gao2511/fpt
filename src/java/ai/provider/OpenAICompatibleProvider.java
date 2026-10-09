@@ -385,6 +385,8 @@ public class OpenAICompatibleProvider implements LLMProvider {
         conn.setRequestMethod(method);
         conn.setConnectTimeout(connectTimeout);
         conn.setReadTimeout(readTimeout);
+        conn.setUseCaches(false);
+        conn.setRequestProperty("Connection", "keep-alive");
         if (apiKey != null && !apiKey.trim().isEmpty()) {
             conn.setRequestProperty("Authorization", "Bearer " + apiKey.trim());
         }

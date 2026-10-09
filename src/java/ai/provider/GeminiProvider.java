@@ -348,6 +348,9 @@ public class GeminiProvider implements LLMProvider {
         conn.setRequestMethod(method);
         conn.setConnectTimeout(connectTimeout);
         conn.setReadTimeout(readTimeout);
+        conn.setUseCaches(false);
+        conn.setRequestProperty("Connection", "keep-alive");
+        conn.setRequestProperty("Accept-Encoding", "gzip, deflate");
         return conn;
     }
 

@@ -328,6 +328,8 @@ public class AnthropicProvider implements LLMProvider {
         conn.setRequestMethod(method);
         conn.setConnectTimeout(connectTimeout);
         conn.setReadTimeout(readTimeout);
+        conn.setUseCaches(false);
+        conn.setRequestProperty("Connection", "keep-alive");
         conn.setRequestProperty("x-api-key", apiKey != null ? apiKey.trim() : "");
         conn.setRequestProperty("anthropic-version", ANTHROPIC_VERSION);
         return conn;
