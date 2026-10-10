@@ -269,12 +269,12 @@
                             </div>
                             <div style="display:flex; flex-direction:column; gap:8px; font-size:13px; color:#374151;">
                                 <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:400; margin:0;">
-                                    <input type="checkbox" id="optMeshF1" onchange="toggleMeshOption('Mesh WiFi F1 (Nhà 2 tầng, +100K/tháng)')" style="width:auto; margin:0;">
-                                    <span><strong>Mesh WiFi F1</strong> — Nhà 2 tầng (1 Modem WiFi 6 + 1 AP, phí lắp 500k, <strong>+100.000đ/tháng</strong>)</span>
+                                    <input type="checkbox" id="optMeshF1" onchange="toggleMeshOption('Mesh WiFi F1 (Nhà 2 tầng, +10.000đ/tháng)')" style="width:auto; margin:0;">
+                                    <span><strong>Mesh WiFi F1</strong> — Nhà 2 tầng (1 Modem WiFi 6 + 1 Access Point, phí lắp đặt 500.000 VNĐ, <strong>+10.000đ/tháng</strong>)</span>
                                 </label>
                                 <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:400; margin:0;">
-                                    <input type="checkbox" id="optMeshF2" onchange="toggleMeshOption('Mesh WiFi F2 (Nhà 3 tầng, +200K/tháng)')" style="width:auto; margin:0;">
-                                    <span><strong>Mesh WiFi F2</strong> — Nhà 3 tầng (1 Modem WiFi 6 + 2 AP, phí lắp 700k, <strong>+200.000đ/tháng</strong>)</span>
+                                    <input type="checkbox" id="optMeshF2" onchange="toggleMeshOption('Mesh WiFi F2 (Nhà 3 tầng, +10.000đ/tháng)')" style="width:auto; margin:0;">
+                                    <span><strong>Mesh WiFi F2</strong> — Nhà 3 tầng (1 Modem WiFi 6 + 2 Access Point, phí lắp đặt 700.000 VNĐ, <strong>+10.000đ/tháng</strong>)</span>
                                 </label>
                             </div>
                         </div>
@@ -283,8 +283,8 @@
                                list="noteSuggestionsDetail"
                                autocomplete="off">
                         <datalist id="noteSuggestionsDetail">
-                            <option value="Thêm gói Mesh WiFi F1 (nhà 2 tầng - thêm 100K/tháng)">
-                            <option value="Thêm gói Mesh WiFi F2 (nhà 3 tầng - thêm 200K/tháng)">
+                            <option value="Thêm gói Mesh WiFi F1 (nhà 2 tầng - +10.000đ/tháng)">
+                            <option value="Thêm gói Mesh WiFi F2 (nhà 3 tầng - +10.000đ/tháng)">
                             <option value="Nhà riêng, 1 tầng">
                             <option value="Nhà riêng, nhiều tầng">
                             <option value="Căn hộ chung cư">

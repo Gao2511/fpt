@@ -175,13 +175,13 @@ public class ConsultationBehaviorTest {
         test("house 2 floors consultation suggests Mesh WiFi F1 with equipment and pricing",()->{
             ChatResponse r = ask("Nhà anh 2 tầng nên dùng WiFi nào?", new ChatSessionData("mesh-f1"), new MockProvider(), null);
             String c = r.getContent();
-            check(c.contains("F1") && c.contains("500.000") && c.contains("100.000") && c.contains("Access Point"), "Must recommend F1 for 2 floors: " + c);
+            check(c.contains("F1") && c.contains("500.000") && c.contains("10.000") && !c.contains("100.000") && !c.contains("tham khảo") && c.contains("Access Point"), "Must recommend F1 for 2 floors with +10.000d/thang: " + c);
             check(c.contains("cộng") || c.contains("mở rộng"), "Must clarify add-on fee nature: " + c);
         });
         test("house 3 floors with F1 explains limitations and suggests Mesh WiFi F2",()->{
             ChatResponse r = ask("Nhà anh 3 tầng dùng F1 được không?", new ChatSessionData("mesh-f2"), new MockProvider(), null);
             String c = r.getContent();
-            check(c.contains("F2") && c.contains("700.000") && c.contains("200.000") && c.contains("Access Point"), "Must recommend F2 for 3 floors: " + c);
+            check(c.contains("F2") && c.contains("700.000") && c.contains("10.000") && !c.contains("200.000") && !c.contains("tham khảo") && c.contains("Access Point"), "Must recommend F2 for 3 floors with +10.000d/thang: " + c);
         });
         System.out.println("ConsultationBehaviorTest: " + passed + " passed");
     }

@@ -299,26 +299,22 @@
                     <div class="mesh-price-box">
                         <div class="mesh-monthly">
                             <span class="mesh-plus">+</span>
-                            <span class="mesh-amount">100.000</span>
+                            <span class="mesh-amount">10.000</span>
                             <span class="mesh-unit">đ/tháng</span>
                         </div>
                         <div class="mesh-note-fee">
-                            Phí lắp đặt tham khảo: <strong>500.000 VNĐ</strong>
+                            Phí lắp đặt: <strong>500.000 VNĐ</strong>
                         </div>
                     </div>
 
                     <ul class="mesh-specs">
                         <li>
                             <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                            <span><strong>Phù hợp không gian:</strong> Nhà 2 tầng, nhà phố diện tích vừa</span>
+                            <span><strong>Nhà phù hợp:</strong> Nhà 2 tầng</span>
                         </li>
                         <li>
                             <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-                            <span><strong>Thiết bị đi kèm:</strong> 01 Modem WiFi 6 + 01 Access Point</span>
-                        </li>
-                        <li>
-                            <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-                            <span>Chuyển vùng thông minh (Seamless Roaming), một tên mạng đồng nhất</span>
+                            <span><strong>Thiết bị:</strong> 1 Modem WiFi 6 + 1 Access Point</span>
                         </li>
                         <li>
                             <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
@@ -344,26 +340,22 @@
                     <div class="mesh-price-box">
                         <div class="mesh-monthly">
                             <span class="mesh-plus">+</span>
-                            <span class="mesh-amount">200.000</span>
+                            <span class="mesh-amount">10.000</span>
                             <span class="mesh-unit">đ/tháng</span>
                         </div>
                         <div class="mesh-note-fee">
-                            Phí lắp đặt tham khảo: <strong>700.000 VNĐ</strong>
+                            Phí lắp đặt: <strong>700.000 VNĐ</strong>
                         </div>
                     </div>
 
                     <ul class="mesh-specs">
                         <li>
                             <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                            <span><strong>Phù hợp không gian:</strong> Nhà 3 tầng, biệt thự, nhà diện tích rộng</span>
+                            <span><strong>Nhà phù hợp:</strong> Nhà 3 tầng</span>
                         </li>
                         <li>
                             <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-                            <span><strong>Thiết bị đi kèm:</strong> 01 Modem WiFi 6 + 02 Access Point</span>
-                        </li>
-                        <li>
-                            <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-                            <span>Độ phủ xuyên tầng siêu mạnh, ổn định kết nối cho nhiều thiết bị đồng thời</span>
+                            <span><strong>Thiết bị:</strong> 1 Modem WiFi 6 + 2 Access Point</span>
                         </li>
                         <li>
                             <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
@@ -539,8 +531,8 @@
                                    list="noteSuggestionsHome"
                                    autocomplete="off">
                             <datalist id="noteSuggestionsHome">
-                                <option value="Thêm gói Mesh WiFi F1 (nhà 2 tầng - thêm 100K/tháng)">
-                                <option value="Thêm gói Mesh WiFi F2 (nhà 3 tầng - thêm 200K/tháng)">
+                                <option value="Thêm gói Mesh WiFi F1 (nhà 2 tầng - +10.000đ/tháng)">
+                                <option value="Thêm gói Mesh WiFi F2 (nhà 3 tầng - +10.000đ/tháng)">
                                 <option value="Nhà riêng, 1 tầng">
                                 <option value="Nhà riêng, nhiều tầng">
                                 <option value="Căn hộ chung cư">

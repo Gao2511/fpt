@@ -16,19 +16,19 @@ public final class ConsultationPolicy {
         com.google.gson.JsonObject f1 = new com.google.gson.JsonObject();
         f1.addProperty("name", "Mesh WiFi F1");
         f1.addProperty("floors", "Nhà 2 tầng");
-        f1.addProperty("devices", "01 Modem WiFi 6 + 01 Access Point");
+        f1.addProperty("devices", "1 Modem WiFi 6 + 1 Access Point");
         f1.addProperty("installationFeeVnd", 500000);
-        f1.addProperty("monthlyAddonVnd", 100000);
-        f1.addProperty("note", "Lựa chọn mở rộng vùng phủ sóng, cộng thêm vào tiền cước Internet hàng tháng");
+        f1.addProperty("monthlyAddonVnd", 10000);
+        f1.addProperty("note", "Lựa chọn mở rộng vùng phủ sóng, cộng thêm +10.000đ/tháng vào tiền cước Internet hàng tháng");
         arr.add(f1);
 
         com.google.gson.JsonObject f2 = new com.google.gson.JsonObject();
         f2.addProperty("name", "Mesh WiFi F2");
         f2.addProperty("floors", "Nhà 3 tầng");
-        f2.addProperty("devices", "01 Modem WiFi 6 + 02 Access Point");
+        f2.addProperty("devices", "1 Modem WiFi 6 + 2 Access Point");
         f2.addProperty("installationFeeVnd", 700000);
-        f2.addProperty("monthlyAddonVnd", 200000);
-        f2.addProperty("note", "Lựa chọn mở rộng vùng phủ sóng, cộng thêm vào tiền cước Internet hàng tháng");
+        f2.addProperty("monthlyAddonVnd", 10000);
+        f2.addProperty("note", "Lựa chọn mở rộng vùng phủ sóng, cộng thêm +10.000đ/tháng vào tiền cước Internet hàng tháng");
         arr.add(f2);
         return arr;
     }
@@ -49,32 +49,32 @@ public final class ConsultationPolicy {
 
         // 2. Tư vấn Mesh WiFi theo số tầng
         if ((q.contains("3 tang") || q.contains("ba tang")) && (q.contains("f1") || q.contains("dung f1") || q.contains("duoc khong") || q.contains("on khong") || q.contains("co duoc khong"))) {
-            return reply("Dạ với nhà 3 tầng, gói Mesh WiFi F1 (gồm 01 Modem WiFi 6 + 01 Access Point) vốn được thiết kế tối ưu cho nhà 2 tầng, nên có thể sẽ bị sóng yếu hoặc không phủ kín các phòng/tầng nếu có vật cản hoặc tường dày.\n"
-                + "Để đảm bảo phủ sóng tốt và ổn định hơn cho nhà 3 tầng, em đề xuất anh/chị tham khảo giải pháp Mesh WiFi F2:\n"
-                + "- Thiết bị đi kèm: 01 Modem WiFi 6 + 02 Access Point.\n"
-                + "- Phí lắp đặt tham khảo: 700.000 VNĐ.\n"
-                + "- Phí cộng thêm hàng tháng: 200.000 VNĐ/tháng (cộng thêm vào tiền cước gói Internet đã chọn).\n"
+            return reply("Dạ với nhà 3 tầng, gói Mesh WiFi F1 (gồm 1 Modem WiFi 6 + 1 Access Point) vốn được thiết kế tối ưu cho nhà 2 tầng, nên có thể sẽ bị sóng yếu hoặc không phủ kín các phòng/tầng nếu có vật cản hoặc tường dày.\n"
+                + "Để đảm bảo phủ sóng tốt và ổn định hơn cho nhà 3 tầng, em đề xuất anh/chị lựa chọn giải pháp Mesh WiFi F2:\n"
+                + "- Thiết bị: 1 Modem WiFi 6 + 2 Access Point.\n"
+                + "- Phí lắp đặt: 700.000 VNĐ.\n"
+                + "- Phí cộng thêm hàng tháng: +10.000đ/tháng (cộng thêm vào tiền cước gói Internet đã chọn).\n"
                 + "Lưu ý: Mesh WiFi F2 là giải pháp mở rộng phủ sóng kết hợp với gói Internet FPT, và không cam kết 100% phủ sóng mọi ngóc ngách nếu chưa kiểm tra vị trí đặt thiết bị và vật cản thực tế. Anh/chị cho em biết thêm diện tích mỗi tầng và nhu cầu sử dụng để em tư vấn gói cước Internet kết hợp tối ưu nhé!");
         }
         if (q.contains("2 tang") || q.contains("hai tang") || (q.contains("f1") && !q.contains("f2"))) {
-            return reply("Dạ với nhà 2 tầng, em đề xuất anh/chị tham khảo giải pháp mở rộng vùng phủ sóng Mesh WiFi F1:\n"
+            return reply("Dạ với nhà 2 tầng, em đề xuất anh/chị lựa chọn giải pháp mở rộng vùng phủ sóng Mesh WiFi F1:\n"
                 + "- Phù hợp: Nhà 2 tầng, giúp loại bỏ góc chết WiFi giữa các tầng.\n"
-                + "- Thiết bị đi kèm: 01 Modem WiFi 6 + 01 Access Point.\n"
-                + "- Phí lắp đặt tham khảo: 500.000 VNĐ.\n"
-                + "- Phí cộng thêm hàng tháng: 100.000 VNĐ/tháng (cộng thêm vào tiền cước gói Internet).\n"
-                + "Lưu ý: Mesh WiFi F1 là lựa chọn mở rộng phủ sóng kết hợp cùng gói cước Internet FPT, không phải gói độc lập (Tổng cước = Giá gói Internet + 100.000đ/tháng). Anh/chị cho em biết thêm diện tích nhà, số người dùng và nhu cầu sử dụng Internet để em tư vấn gói cước nền phù hợp nhất nhé!");
+                + "- Thiết bị: 1 Modem WiFi 6 + 1 Access Point.\n"
+                + "- Phí lắp đặt: 500.000 VNĐ.\n"
+                + "- Phí cộng thêm hàng tháng: +10.000đ/tháng (cộng thêm vào tiền cước gói Internet).\n"
+                + "Lưu ý: Mesh WiFi F1 là lựa chọn mở rộng phủ sóng kết hợp cùng gói cước Internet FPT, không phải gói độc lập (Tổng cước = Giá gói Internet + 10.000đ/tháng). Anh/chị cho em biết thêm diện tích nhà, số người dùng và nhu cầu sử dụng Internet để em tư vấn gói cước nền phù hợp nhất nhé!");
         }
         if (q.contains("3 tang") || q.contains("ba tang") || q.contains("f2")) {
-            return reply("Dạ với nhà 3 tầng, em đề xuất anh/chị tham khảo giải pháp Mesh WiFi F2 để đảm bảo phủ sóng đều các tầng:\n"
-                + "- Thiết bị đi kèm: 01 Modem WiFi 6 + 02 Access Point.\n"
-                + "- Phí lắp đặt tham khảo: 700.000 VNĐ.\n"
-                + "- Phí cộng thêm hàng tháng: 200.000 VNĐ/tháng (cộng thêm vào tiền cước gói Internet đã chọn).\n"
+            return reply("Dạ với nhà 3 tầng, em đề xuất anh/chị lựa chọn giải pháp Mesh WiFi F2 để đảm bảo phủ sóng đều các tầng:\n"
+                + "- Thiết bị: 1 Modem WiFi 6 + 2 Access Point.\n"
+                + "- Phí lắp đặt: 700.000 VNĐ.\n"
+                + "- Phí cộng thêm hàng tháng: +10.000đ/tháng (cộng thêm vào tiền cước gói Internet đã chọn).\n"
                 + "Lưu ý: Mesh WiFi F2 là giải pháp mở rộng phủ sóng kết hợp cùng gói cước Internet FPT. Anh/chị cho em biết thêm diện tích mỗi tầng, số lượng thiết bị và nhu cầu để em tư vấn gói Internet nền kết hợp phù hợp nhé!");
         }
         if (q.contains("mesh")) {
             return reply("Dạ FPT hiện có 2 giải pháp mở rộng vùng phủ sóng Mesh WiFi cho nhà nhiều tầng (kết hợp cùng gói cước Internet FPT):\n"
-                + "1. Mesh WiFi F1 (Phù hợp nhà 2 tầng): 01 Modem WiFi 6 + 01 Access Point. Phí lắp đặt tham khảo 500.000đ, phí cộng thêm 100.000đ/tháng.\n"
-                + "2. Mesh WiFi F2 (Phù hợp nhà 3 tầng): 01 Modem WiFi 6 + 02 Access Point. Phí lắp đặt tham khảo 700.000đ, phí cộng thêm 200.000đ/tháng.\n"
+                + "1. Mesh WiFi F1 (Phù hợp nhà 2 tầng): 1 Modem WiFi 6 + 1 Access Point. Phí lắp đặt 500.000 VNĐ, phí cộng thêm +10.000đ/tháng.\n"
+                + "2. Mesh WiFi F2 (Phù hợp nhà 3 tầng): 1 Modem WiFi 6 + 2 Access Point. Phí lắp đặt 700.000 VNĐ, phí cộng thêm +10.000đ/tháng.\n"
                 + "Lưu ý: Phí hàng tháng của Mesh WiFi là phí cộng thêm vào tiền cước gói Internet hàng tháng. Anh/chị cho em biết số tầng và diện tích nhà để em tư vấn chi tiết nhé!");
         }
 
