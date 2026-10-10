@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
@@ -44,17 +45,17 @@
         <!-- FLASH MESSAGE -->
         <c:if test="${not empty message}">
             <div class="alert alert-${messageType}">
-                <span>${message}</span>
+                <span><c:out value="${message}"/></span>
                 <button onclick="this.parentElement.remove()" class="alert-close">×</button>
             </div>
         </c:if>
 
         <!-- FORM CẤU HÌNH CHÍNH -->
-        <form method="post" action="${pageContext.request.contextPath}/admin/settings" id="settingsForm">
+        <form method="post" action="${pageContext.request.contextPath}/admin/settings" id="settingsForm"><input type="hidden" name="csrf_token" value="<c:out value='${csrfToken}'/>">
             <input type="hidden" name="action" value="updateAI">
             <!-- Provider đang chọn kích hoạt -->
             <input type="hidden" name="ai_active_provider" id="activeProviderInput" 
-                   value="${not empty settingsMap['ai_active_provider'] ? settingsMap['ai_active_provider'] : 'gemini'}">
+                   value="${fn:escapeXml(not empty settingsMap['ai_active_provider'] ? settingsMap['ai_active_provider'] : 'gemini')}">
 
             <div class="settings-grid">
 
@@ -79,7 +80,7 @@
                             Chọn Nền Tảng AI (Provider) <span class="req">*</span>
                         </label>
                         <div class="provider-grid">
-                            <c:set var="curProv" value="${not empty settingsMap['ai_active_provider'] ? settingsMap['ai_active_provider'] : 'gemini'}" />
+                            <c:set var="curProv" value="${fn:escapeXml(not empty settingsMap['ai_active_provider'] ? settingsMap['ai_active_provider'] : 'gemini')}" />
                             
                             <div class="provider-card-btn ${curProv == 'gemini' ? 'active' : ''}" onclick="selectProvider('gemini')">
                                 <div class="p-icon" style="color: #60a5fa;">✨</div>
@@ -147,7 +148,7 @@
                         </label>
                         <input type="text" name="current_base_url" id="providerBaseUrlInput"
                                class="input-dark" style="padding-right:16px;"
-                               value="${baseUrls[curProv]}"
+                               value="${fn:escapeXml(baseUrls[curProv])}"
                                placeholder="VD: http://localhost:11434/v1 hoặc https://api.together.xyz/v1">
                         <small class="hint-dark">
                             Đường dẫn gốc tương thích OpenAI. Có SSRF protection chặn truy cập trái phép mạng nội bộ trừ khi cho phép local.
@@ -168,7 +169,7 @@
                         <div class="input-dark-wrap">
                             <input type="password" name="current_api_key" id="providerApiKeyInput"
                                    class="input-dark"
-                                   value="${maskedKeys[curProv]}"
+                                   value="${fn:escapeXml(maskedKeys[curProv])}"
                                    placeholder="Nhập API Key...">
                             <button type="button" onclick="toggleApiKeyVisibility()" class="input-btn" title="Hiện/Ẩn">
                                 <svg id="eyeIcon" viewBox="0 0 24 24">
@@ -212,7 +213,7 @@
                         <div id="customModelWrap" style="margin-top: 10px; display: none;">
                             <input type="text" name="ai_active_model" id="activeModelInput"
                                    class="input-dark" style="padding-right:16px;"
-                                   value="${not empty settingsMap['ai_active_model'] ? settingsMap['ai_active_model'] : (not empty settingsMap['gemini_model'] ? settingsMap['gemini_model'] : '')}"
+                                   value="${fn:escapeXml(not empty settingsMap['ai_active_model'] ? settingsMap['ai_active_model'] : (not empty settingsMap['gemini_model'] ? settingsMap['gemini_model'] : ''))}"
                                    placeholder="Nhập tên mã định danh model (VD: gpt-4o, claude-3-5-haiku...)">
                         </div>
 
@@ -255,7 +256,7 @@
                                 <label class="form-label-dark" style="font-size: 11.5px; margin-bottom: 4px;">Model dự phòng:</label>
                                 <input type="text" name="ai_fallback_model" id="fallbackModelInput"
                                        class="input-dark" style="padding: 8px 12px; font-size: 13px;"
-                                       value="${settingsMap['ai_fallback_model']}"
+                                       value="${fn:escapeXml(settingsMap['ai_fallback_model'])}"
                                        placeholder="Đồng bộ và chọn model đang hoạt động">
                             </div>
                         </div>
@@ -270,7 +271,7 @@
                             </label>
                             <input type="range" name="ai_temperature" id="ai_temperature"
                                     min="0.0" max="0.5" step="0.1"
-                                    value="${not empty settingsMap['ai_temperature'] ? settingsMap['ai_temperature'] : (not empty settingsMap['gemini_temperature'] ? settingsMap['gemini_temperature'] : '0.3')}"
+                                    value="${fn:escapeXml(not empty settingsMap['ai_temperature'] ? settingsMap['ai_temperature'] : (not empty settingsMap['gemini_temperature'] ? settingsMap['gemini_temperature'] : '0.3'))}"
                                     class="range-dark"
                                     oninput="document.getElementById('tempValueDisplay').textContent = this.value">
                             <div style="display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-top:4px;">
@@ -287,7 +288,7 @@
                             <input type="number" name="ai_max_tokens" id="ai_max_tokens"
                                     min="1200" max="2400" step="50"
                                     class="input-dark" style="padding-right:16px; font-family:inherit;"
-                                    value="${not empty settingsMap['ai_max_tokens'] ? settingsMap['ai_max_tokens'] : (not empty settingsMap['gemini_max_tokens'] ? settingsMap['gemini_max_tokens'] : '1200')}">
+                                    value="${fn:escapeXml(not empty settingsMap['ai_max_tokens'] ? settingsMap['ai_max_tokens'] : (not empty settingsMap['gemini_max_tokens'] ? settingsMap['gemini_max_tokens'] : '1200'))}">
                             <div style="font-size:11px; color:#64748b; margin-top:4px;">Giới hạn token câu trả lời (1200 - 2400)</div>
                         </div>
                     </div>
@@ -420,6 +421,36 @@
             </div>
         </div>
 
+        <!-- CARD: LỊCH SỬ PHIÊN BẢN PROMPT -->
+        <div class="ai-card ai-card-full" style="margin-top: 20px;">
+            <div class="playground-header">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </div>
+                <div style="flex: 1;">
+                    <h3>Phiên bản Prompt đã lưu</h3>
+                    <p>Khôi phục nhanh cấu hình System Prompt gần nhất (API Key được bảo mật tách biệt, không lưu trong lịch sử)</p>
+                </div>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px;">
+                <c:forEach items="${promptRevisions}" var="revision">
+                    <form method="post" style="display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); padding: 8px 14px; border-radius: 10px;">
+                        <input type="hidden" name="csrf_token" value="<c:out value='${csrfToken}'/>">
+                        <input type="hidden" name="action" value="rollbackPrompt">
+                        <input type="hidden" name="revisionId" value="${revision.id}">
+                        <span style="font-size: 12.5px; color: #cbd5e1;"><c:out value="${revision.time}"/></span>
+                        <button type="submit" class="btn-prompt-tool" style="margin:0;">Khôi phục prompt #${revision.id}</button>
+                    </form>
+                </c:forEach>
+                <c:if test="${empty promptRevisions}">
+                    <span style="font-size: 13px; color: #94a3b8;">Chưa có lịch sử chỉnh sửa prompt nào được ghi nhận.</span>
+                </c:if>
+            </div>
+        </div>
+
     </div>
 </main>
 
@@ -459,7 +490,7 @@
         ]
     };
 
-    let currentProvider = '${not empty settingsMap["ai_active_provider"] ? settingsMap["ai_active_provider"] : "gemini"}';
+    let currentProvider = document.getElementById('activeProviderInput').value;
     let currentModelList = [];
 
     // 1. CHỌN NHÀ CUNG CẤP AI
@@ -809,8 +840,8 @@
 
     // INIT
     document.addEventListener('DOMContentLoaded', function() {
-        const savedProvider = '${not empty settingsMap["ai_active_provider"] ? settingsMap["ai_active_provider"] : "gemini"}';
-        const savedModel = '${not empty settingsMap["ai_active_model"] ? settingsMap["ai_active_model"] : (not empty settingsMap["gemini_model"] ? settingsMap["gemini_model"] : "")}';
+        const savedProvider = document.getElementById('activeProviderInput').value;
+        const savedModel = document.getElementById('activeModelInput').value;
         
         const list = PRESETS[savedProvider] || PRESETS['gemini'];
         renderModelDropdown(list, savedModel);

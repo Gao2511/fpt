@@ -1,3 +1,4 @@
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -37,7 +38,9 @@
             <div class="stat-info">
                 <div class="stat-label">TỔNG SỐ KHÁCH HÀNG</div>
                 <div class="stat-value">${totalCustomers}</div>
-                <div class="stat-note up">↑ ${countNew} khách mới</div>
+                <div class="stat-note up">
+                    ↑ ${countNew} mới · ${not empty countContacted ? countContacted : 0} đã LH · ${not empty countSigned ? countSigned : 0} ký HĐ
+                </div>
             </div>
             <div class="stat-icon icon-orange">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -50,7 +53,7 @@
         <!-- ⭐ Card 2: Gói FPT → /admin/packages — HOVER XANH DƯƠNG -->
         <a href="${pageContext.request.contextPath}/admin/packages" class="stat-card stat-card-link stat-link-blue">
             <div class="stat-info">
-                <div class="stat-label">TỔNG SỐ GÓI FPT</div>
+                <div class="stat-label">GÓI CƯỚC & MESH WIFI</div>
                 <div class="stat-value">${totalPackages}</div>
                 <div class="stat-note hot">
                     <span class="note-pill note-pill-hot">
@@ -78,7 +81,7 @@
         <!-- ⭐ Card 3: Tài khoản → /admin/users — HOVER XANH LÁ -->
         <a href="${pageContext.request.contextPath}/admin/users" class="stat-card stat-card-link stat-link-green">
             <div class="stat-info">
-                <div class="stat-label">TÀI KHOẢN NGƯỜI DÙNG</div>
+                <div class="stat-label">TÀI KHOẢN QUẢN TRỊ</div>
                 <div class="stat-value">${totalUsers}</div>
                 <div class="stat-note up">✓ ${countActiveUsers} đang hoạt động</div>
             </div>
@@ -95,9 +98,9 @@
         <!-- ⭐ Card 4: Thông báo → /admin/email-logs — HOVER TÍM -->
         <a href="${pageContext.request.contextPath}/admin/email-logs" class="stat-card stat-card-link stat-link-purple">
             <div class="stat-info">
-                <div class="stat-label">THÔNG BÁO</div>
+                <div class="stat-label">NHẬT KÝ THÔNG BÁO</div>
                 <div class="stat-value">${totalEmails}</div>
-                <div class="stat-note down">↑ ${totalEmails} email đã gửi</div>
+                <div class="stat-note down">↑ ${totalEmails} email hệ thống</div>
             </div>
             <div class="stat-icon icon-purple">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -123,60 +126,84 @@
             </div>
         </div>
 
-        <!-- CHART 2: DANH SÁCH GÓI CƯỚC -->
+        <!-- CHART 2: DANH SÁCH GÓI CƯỚC & MESH WIFI -->
         <div class="card chart-card">
             <div class="card-header">
-                <h3>Danh sách gói cước</h3>
-                <span class="badge-orange">${totalPackages} gói</span>
+                <h3>Gói cước Internet & Mesh WiFi</h3>
+                <span class="badge-orange">${totalPackages} gói · 2 Mesh</span>
             </div>
             <div class="package-summary">
-                <div class="pkg-total">${totalPackages} <span>gói</span></div>
-                <div class="pkg-desc">Tổng số gói cước Internet & FPT Play đang hoạt động</div>
+                <div class="pkg-summary-head">
+                    <div>
+                        <div class="pkg-total">${totalPackages} <span>gói Internet</span></div>
+                        <div class="pkg-desc">Phí hòa mạng chuẩn: <strong><fmt:formatNumber value="${not empty cmsValues['business.standardFee'] ? cmsValues['business.standardFee'] : 300000}" pattern="#,###"/>đ</strong></div>
+                    </div>
+                </div>
 
                 <!-- Danh sách gói -->
-              <div class="pkg-list">
-    <c:forEach items="${packages}" var="p" varStatus="loop">
-        <div class="pkg-item">
-            <span class="pkg-dot"
-                  style="background: ${loop.index == 0 ? '#f37021' :
-                                     loop.index == 1 ? '#1a4b8c' :
-                                     loop.index == 2 ? '#0284c7' :
-                                     loop.index == 3 ? '#16a34a' : '#7c3aed'};">
-            </span>
-            <span class="pkg-name">${p.name}</span>
-            <span class="pkg-price">
-                <fmt:formatNumber value="${p.price}" pattern="#,###"/>đ
-            </span>
-            <span class="pkg-badge-col">
-                <c:choose>
-                    <c:when test="${p.badgeType == 'hot'}">
-                        <span class="pkg-badge pkg-badge-hot pkg-badge-sm">
-                            <svg viewBox="0 0 24 24">
-                            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
-                            </svg>
-                            HOT
-                        </span>
-                    </c:when>
-                    <c:when test="${p.badgeType == 'featured'}">
-                        <span class="pkg-badge pkg-badge-featured pkg-badge-sm">
-                            <svg viewBox="0 0 24 24">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                            </svg>
-                            NỔI BẬT
-                        </span>
-                    </c:when>
-                    <c:otherwise>
-                        <span class="pkg-count" style="color:#94a3b8;">Bình thường</span>
-                    </c:otherwise>
-                </c:choose>
-            </span>
-        </div>
-    </c:forEach>
-              </div>
+                <div class="pkg-list">
+                    <c:forEach items="${packages}" var="p" varStatus="loop">
+                        <div class="pkg-item">
+                            <span class="pkg-dot"
+                                  style="background: ${loop.index == 0 ? '#f37021' :
+                                                     loop.index == 1 ? '#38bdf8' :
+                                                     loop.index == 2 ? '#4ade80' :
+                                                     loop.index == 3 ? '#facc15' : '#c084fc'};">
+                            </span>
+                            <span class="pkg-name">
+                                ${fn:escapeXml(p.name)}
+                                <c:if test="${p.speedMbps > 0}">
+                                    <small class="dash-pkg-speed">${p.speedMbps} Mbps</small>
+                                </c:if>
+                            </span>
+                            <span class="pkg-price">
+                                <fmt:formatNumber value="${p.price}" pattern="#,###"/>đ/th
+                            </span>
+                            <span class="pkg-badge-col">
+                                <c:choose>
+                                    <c:when test="${p.badgeType == 'hot'}">
+                                        <span class="pkg-badge pkg-badge-hot pkg-badge-sm">
+                                            <svg viewBox="0 0 24 24">
+                                            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+                                            </svg>
+                                            HOT
+                                        </span>
+                                    </c:when>
+                                    <c:when test="${p.badgeType == 'featured'}">
+                                        <span class="pkg-badge pkg-badge-featured pkg-badge-sm">
+                                            <svg viewBox="0 0 24 24">
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                            </svg>
+                                            NỔI BẬT
+                                        </span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="pkg-count" style="color:#94a3b8;">Đang bán</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </span>
+                        </div>
+                    </c:forEach>
+                </div>
 
-                <div class="pkg-footer">
+                <!-- Tóm tắt Mesh WiFi F1 & F2 ngay trên Dashboard -->
+                <div class="dash-mesh-box">
+                    <div class="dash-mesh-item">
+                        <span class="dash-mesh-tag">Mesh WiFi F1</span>
+                        <span class="dash-mesh-val">+<fmt:formatNumber value="${not empty cmsValues['business.meshF1Monthly'] ? cmsValues['business.meshF1Monthly'] : 10000}" pattern="#,###"/>đ/th · Lắp đặt <fmt:formatNumber value="${not empty cmsValues['business.meshF1Fee'] ? cmsValues['business.meshF1Fee'] : 500000}" pattern="#,###"/>đ</span>
+                    </div>
+                    <div class="dash-mesh-item">
+                        <span class="dash-mesh-tag tag-f2">Mesh WiFi F2</span>
+                        <span class="dash-mesh-val">+<fmt:formatNumber value="${not empty cmsValues['business.meshF2Monthly'] ? cmsValues['business.meshF2Monthly'] : 20000}" pattern="#,###"/>đ/th · Lắp đặt <fmt:formatNumber value="${not empty cmsValues['business.meshF2Fee'] ? cmsValues['business.meshF2Fee'] : 700000}" pattern="#,###"/>đ</span>
+                    </div>
+                </div>
+
+                <div class="pkg-footer dash-pkg-footer">
                     <a href="${pageContext.request.contextPath}/admin/packages" class="link-detail">
-                        Chi tiết danh sách gói →
+                        Quản lý gói cước →
+                    </a>
+                    <a href="${pageContext.request.contextPath}/admin/packages#mesh-settings-section" class="link-detail link-mesh">
+                        Cấu hình Mesh WiFi →
                     </a>
                 </div>
             </div>
@@ -204,18 +231,37 @@
                             <th>Mã KH</th>
                             <th>Họ và tên</th>
                             <th>Số điện thoại</th>
-                            <th>Gmail</th>
+                            <th>Gói quan tâm</th>
+                            <th>Địa chỉ / Email</th>
                             <th>Trạng thái</th>
                             <th>Ngày đăng ký</th>
+                            <th style="text-align:center;">Chi tiết</th>
                         </tr>
                     </thead>
                     <tbody>
                         <c:forEach items="${recentCustomers}" var="c">
                             <tr>
                                 <td class="text-muted">#KH-${c.id}</td>
-                                <td><strong>${c.fullName}</strong></td>
-                                <td>${c.phone}</td>
-                                <td class="text-muted">${c.email}</td>
+                                <td><strong>${fn:escapeXml(c.fullName)}</strong></td>
+                                <td>${fn:escapeXml(c.phone)}</td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${not empty c.packageInterest}">
+                                            <span class="dash-interest-pill">${fn:escapeXml(c.packageInterest)}</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="text-muted">Chưa chọn</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td class="text-muted">
+                                    <div class="dash-addr-cell">
+                                        <span>${not empty c.address ? fn:escapeXml(c.address) : '—'}</span>
+                                        <c:if test="${not empty c.email}">
+                                            <small>${fn:escapeXml(c.email)}</small>
+                                        </c:if>
+                                    </div>
+                                </td>
                                 <td>
                                     <span class="status-badge status-${c.status}">
                                         ${c.status}
@@ -223,6 +269,11 @@
                                 </td>
                                 <td class="text-muted">
                                     <fmt:formatDate value="${c.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+                                </td>
+                                <td style="text-align:center;">
+                                    <a href="${pageContext.request.contextPath}/admin/customer-detail?id=${c.id}" class="dash-view-btn" title="Xem chi tiết">
+                                        Xem →
+                                    </a>
                                 </td>
                             </tr>
                         </c:forEach>

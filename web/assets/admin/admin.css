@@ -1049,3 +1049,123 @@ img.avatar {
     text-align: right !important;
     white-space: nowrap !important;
 }
+
+/* =========================================================
+   DASHBOARD ENHANCEMENTS: MESH SUMMARY & RECENT CUSTOMERS
+   ========================================================= */
+.dash-pkg-speed {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-size: 10.5px;
+    font-weight: 700;
+    background: rgba(34, 197, 94, 0.14);
+    color: #86efac;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.dash-mesh-box {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(243, 112, 33, 0.08);
+    border: 1px solid rgba(243, 112, 33, 0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dash-mesh-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.dash-mesh-tag {
+    font-weight: 800;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(56, 189, 248, 0.18);
+    color: #7dd3fc;
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    white-space: nowrap;
+}
+
+.dash-mesh-tag.tag-f2 {
+    background: rgba(243, 112, 33, 0.2);
+    color: #fdba74;
+    border-color: rgba(243, 112, 33, 0.4);
+}
+
+.dash-mesh-val {
+    color: #e2e8f0;
+    font-weight: 600;
+    text-align: right;
+}
+
+.dash-pkg-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.dash-pkg-footer .link-mesh {
+    color: #fdba74 !important;
+}
+
+.dash-interest-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+    background: rgba(56, 189, 248, 0.14);
+    color: #7dd3fc;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.dash-addr-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-width: 240px;
+}
+
+.dash-addr-cell span {
+    color: #cbd5e1;
+    font-size: 12.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dash-addr-cell small {
+    color: #64748b;
+    font-size: 11px;
+}
+
+.dash-view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #7dd3fc;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.dash-view-btn:hover {
+    background: rgba(56, 189, 248, 0.25);
+    color: #ffffff;
+}

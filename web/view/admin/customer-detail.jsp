@@ -1,4 +1,5 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
@@ -27,8 +28,11 @@
                 ← Quay lại danh sách
             </a>
             <h1>Chi tiết khách hàng</h1>
-            <p>#KH-${customer.id} • ${customer.fullName}</p>
+            <p>#KH-${customer.id} • ${fn:escapeXml(customer.fullName)}</p>
         </div>
+        <a href="${pageContext.request.contextPath}/admin/customers?action=edit&id=${customer.id}" class="btn-primary">
+            Chỉnh sửa hồ sơ
+        </a>
     </div>
 
     <div class="detail-grid">
@@ -42,21 +46,25 @@
 
             <div class="detail-row">
                 <label>Họ và tên:</label>
-                <span><strong>${customer.fullName}</strong></span>
+                <span><strong>${fn:escapeXml(customer.fullName)}</strong></span>
             </div>
             <div class="detail-row">
                 <label>Số điện thoại:</label>
-                <span><a href="tel:${customer.phone}" class="phone-link">${customer.phone}</a></span>
+                <span><a href="tel:${fn:escapeXml(customer.phone)}" class="phone-link">${fn:escapeXml(customer.phone)}</a></span>
             </div>
             <div class="detail-row">
                 <label>Gmail:</label>
                 <span>
-                    <a href="mailto:${customer.email}" class="phone-link">${customer.email}</a>
+                    <a href="mailto:${fn:escapeXml(customer.email)}" class="phone-link">${fn:escapeXml(customer.email)}</a>
                 </span>
             </div>
             <div class="detail-row">
+                <label>Gói quan tâm:</label>
+                <span><strong>${not empty customer.packageInterest ? fn:escapeXml(customer.packageInterest) : 'Chưa chọn'}</strong></span>
+            </div>
+            <div class="detail-row">
                 <label>Địa chỉ:</label>
-                <span>${not empty customer.address ? customer.address : '—'}</span>
+                <span>${not empty customer.address ? fn:escapeXml(customer.address) : '—'}</span>
             </div>
             <div class="detail-row">
                 <label>Ngày đăng ký:</label>
@@ -64,15 +72,15 @@
             </div>
             <div class="detail-row">
                 <label>Ghi chú:</label>
-                <span>${customer.note != null ? customer.note : '—'}</span>
+                <span>${customer.note != null ? fn:escapeXml(customer.note) : '—'}</span>
             </div>
 
             <!-- ĐỔI TRẠNG THÁI -->
             <div class="status-update">
                 <label>Cập nhật trạng thái:</label>
-                <form method="post" action="${pageContext.request.contextPath}/admin/customers" class="status-form">
+                <form method="post" action="${pageContext.request.contextPath}/admin/customers" class="status-form"><input type="hidden" name="csrf_token" value="<c:out value='${csrfToken}'/>">
                     <input type="hidden" name="action" value="updateStatus">
-                    <input type="hidden" name="id" value="${customer.id}">
+                    <input type="hidden" name="id" value="${fn:escapeXml(customer.id)}">
                     <select name="status" class="status-select">
                         <option value="Mới" ${customer.status == 'Mới' ? 'selected' : ''}>Mới</option>
                         <option value="Đã liên hệ" ${customer.status == 'Đã liên hệ' ? 'selected' : ''}>Đã liên hệ</option>

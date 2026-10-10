@@ -8,19 +8,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PackageDAO {
+    /** Package + presentation metadata + audit commit together, preserving existing IDs. */
+    public boolean saveManaged(PackageDTO p,boolean insert,int actor){
+        try(Connection c=DBUtils.getConnection()){
+            c.setAutoCommit(false);try{
+                try(PreparedStatement lock=c.prepareStatement("SELECT pg_advisory_xact_lock(73119421)")){lock.execute();}
+                String before="{}";
+                if(!insert)try(PreparedStatement q=c.prepareStatement("SELECT to_jsonb(packages)::text FROM packages WHERE id=? FOR UPDATE")){q.setInt(1,p.getId());try(ResultSet r=q.executeQuery()){if(!r.next())throw new SQLException("Missing package");before=r.getString(1);}}
+                String sql=insert?"INSERT INTO packages(package_code,name,price,speed_mbps,description,long_description,is_hot,badge_type) VALUES(?,?,?,?,?,?,?,?)":"UPDATE packages SET package_code=?,name=?,price=?,speed_mbps=?,description=?,long_description=?,is_hot=?,badge_type=? WHERE id=?";
+                try(PreparedStatement q=c.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)){q.setString(1,p.getPackageCode());q.setString(2,p.getName());q.setLong(3,p.getPrice());q.setInt(4,p.getSpeedMbps());q.setString(5,p.getDescription());q.setString(6,p.getLongDescription());q.setBoolean(7,p.isHot());q.setString(8,p.getBadgeType());if(!insert)q.setInt(9,p.getId());if(q.executeUpdate()!=1)throw new SQLException("Package save failed");if(insert)try(ResultSet keys=q.getGeneratedKeys()){if(!keys.next())throw new SQLException("Missing ID");p.setId(keys.getInt(1));}}
+                String prefix="cms.package."+p.getId()+".";java.util.Map<String,String> values=new java.util.LinkedHashMap<>();values.put(prefix+"active",Boolean.toString(p.isActive()));values.put(prefix+"order",Integer.toString(p.getDisplayOrder()));values.put(prefix+"fee",Long.toString(p.getStandardInstallationFee()));
+                if(p.isInstallationFeeInherited()){values.remove(prefix+"fee");values.put(prefix+"standard","true");try(PreparedStatement q=c.prepareStatement("DELETE FROM settings WHERE setting_key=?")){q.setString(1,prefix+"fee");q.executeUpdate();}}
+                for(java.util.Map.Entry<String,String> entry:values.entrySet())try(PreparedStatement q=c.prepareStatement("INSERT INTO settings(setting_key,setting_value,updated_at) VALUES(?,?,NOW()) ON CONFLICT(setting_key) DO UPDATE SET setting_value=EXCLUDED.setting_value,updated_at=NOW()")){q.setString(1,entry.getKey());q.setString(2,entry.getValue());q.executeUpdate();}
+                com.google.gson.JsonObject after=new com.google.gson.JsonObject();after.addProperty("id",p.getId());after.addProperty("price",p.getPrice());after.addProperty("speedMbps",p.getSpeedMbps());after.addProperty("active",p.isActive());after.addProperty("installationFee",p.getStandardInstallationFee());
+                try(PreparedStatement q=c.prepareStatement("INSERT INTO cms_revisions(actor_id,change_type,before_data,after_data) VALUES(?,?,CAST(? AS jsonb),CAST(? AS jsonb))")){q.setInt(1,actor);q.setString(2,"package");q.setString(3,before);q.setString(4,after.toString());q.executeUpdate();}c.commit();return true;
+            }catch(Exception e){c.rollback();System.err.println("[Admin package] Save rolled back");return false;}
+        }catch(Exception e){return false;}
+    }
 
     // ===== UPDATE BADGE TYPE =====
     public boolean updateBadgeType(int id, String badgeType) {
-        String sql = "UPDATE packages SET badge_type = ? WHERE id = ?";
+        String sql = "UPDATE packages SET badge_type = ?, is_hot = ? WHERE id = ?";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             if (badgeType == null || badgeType.trim().isEmpty()) {
                 ps.setNull(1, Types.VARCHAR);
+                ps.setBoolean(2, false);
             } else {
                 ps.setString(1, badgeType);
+                ps.setBoolean(2, "hot".equals(badgeType));
             }
-            ps.setInt(2, id);
+            ps.setInt(3, id);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();

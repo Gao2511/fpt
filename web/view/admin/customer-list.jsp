@@ -1,4 +1,4 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -92,9 +92,25 @@
     <!-- ============ THỐNG KÊ NHANH ============ -->
     <div class="quick-stats">
         <div class="qs-item">
-            <span class="qs-label">Tổng:</span>
+            <span class="qs-label">Tổng hồ sơ:</span>
             <strong class="qs-value">${countAll}</strong>
-        </div>        
+        </div>
+        <div class="qs-item">
+            <span class="qs-label">Mới:</span>
+            <strong class="qs-value" style="color:#fb923c;">${not empty countNew ? countNew : 0}</strong>
+        </div>
+        <div class="qs-item">
+            <span class="qs-label">Đã liên hệ:</span>
+            <strong class="qs-value" style="color:#38bdf8;">${not empty countContacted ? countContacted : 0}</strong>
+        </div>
+        <div class="qs-item">
+            <span class="qs-label">Đã ký HĐ:</span>
+            <strong class="qs-value" style="color:#4ade80;">${not empty countSigned ? countSigned : 0}</strong>
+        </div>
+        <div class="qs-item">
+            <span class="qs-label">Đã hủy:</span>
+            <strong class="qs-value" style="color:#f87171;">${not empty countCancelled ? countCancelled : 0}</strong>
+        </div>
     </div>
 
     <!-- ============ BẢNG KHÁCH HÀNG ============ -->
@@ -106,7 +122,7 @@
             </div>
         </div>
 
-        <form method="post" action="${pageContext.request.contextPath}/admin/customers" id="bulkForm">
+        <form method="post" action="${pageContext.request.contextPath}/admin/customers" id="bulkForm"><input type="hidden" name="csrf_token" value="<c:out value='${csrfToken}'/>">
             <input type="hidden" name="action" value="deleteMultiple">
 
             <table class="customer-table">
@@ -128,15 +144,15 @@
                     <c:forEach items="${customers}" var="c">
                         <tr>
                             <td class="col-check">
-                                <input type="checkbox" name="ids" value="${c.id}" class="rowCheck">
+                                <input type="checkbox" name="ids" value="${fn:escapeXml(c.id)}" class="rowCheck">
                             </td>
                             <td class="col-id">#KH-${c.id}</td>
                             <td>
                                 <div class="customer-info">
-                                    <strong>${c.fullName}</strong>
-                                    <span class="phone">${c.phone}</span>
+                                    <strong>${fn:escapeXml(c.fullName)}</strong>
+                                    <span class="phone">${fn:escapeXml(c.phone)}</span>
                                     <c:if test="${not empty c.address}">
-                                        <small style="color:#64748b;font-size:12px;display:block;" title="${c.address}">📍 ${c.address}</small>
+                                        <small style="color:#64748b;font-size:12px;display:block;" title="${fn:escapeXml(c.address)}">📍 ${fn:escapeXml(c.address)}</small>
                                     </c:if>
                                 </div>
                             </td>
@@ -145,7 +161,7 @@
                                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                                 <polyline points="22,6 12,13 2,6"/>
                                 </svg>
-                                ${c.email}
+                                ${fn:escapeXml(c.email)}
                             </td>
                             <td class="col-package">
                                 <c:choose>
@@ -156,7 +172,7 @@
                                                 <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
                                                 <line x1="12" y1="22.08" x2="12" y2="12"/>
                                             </svg>
-                                            ${c.packageInterest}
+                                            ${fn:escapeXml(c.packageInterest)}
                                         </span>
                                     </c:when>
                                     <c:otherwise>
@@ -197,7 +213,7 @@
                                 </a>
                                 <a href="${pageContext.request.contextPath}/admin/customers?action=delete&id=${c.id}"
                                    class="action-btn btn-delete" title="Xóa"
-                                   onclick="return confirm('Bạn có chắc muốn xóa khách hàng ${c.fullName}?');">
+                                   onclick="return confirm('Xác nhận thao tác này?');">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <polyline points="3 6 5 6 21 6"/>
                                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>

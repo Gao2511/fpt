@@ -33,7 +33,9 @@ public class AdminDashboardServlet extends HttpServlet {
 
         // ===== 1. LẤY DỮ LIỆU =====
         List<CustomerDTO> customers = customerDAO.getAll();
-        List<PackageDTO> packages = packageDAO.getAll();
+        java.util.Map<String, String> rawCms = new dao.SettingsDAO().getCms();
+        java.util.Map<String, String> cmsValues = cms.SiteContent.from(rawCms);
+        List<PackageDTO> packages = cms.SiteContent.products(packageDAO.getAll(), rawCms, cmsValues, false);
         List<UserDTO> users = userDAO.getAll();
 
         // ===== 2. THỐNG KÊ CHUNG =====
@@ -42,9 +44,18 @@ public class AdminDashboardServlet extends HttpServlet {
         int totalUsers = users.size();
         int totalEmails = emailLogDAO.getAll().size();
 
-        // Đếm khách hàng mới (status = "Mới")
+        // Đếm khách hàng theo trạng thái
         long countNew = customers.stream()
                 .filter(c -> "Mới".equals(c.getStatus()))
+                .count();
+        long countContacted = customers.stream()
+                .filter(c -> "Đã liên hệ".equals(c.getStatus()))
+                .count();
+        long countSigned = customers.stream()
+                .filter(c -> "Đã ký HĐ".equals(c.getStatus()))
+                .count();
+        long countCancelled = customers.stream()
+                .filter(c -> "Hủy".equals(c.getStatus()))
                 .count();
 
         // Đếm gói HOT (badge_type = 'hot')
@@ -104,6 +115,9 @@ public class AdminDashboardServlet extends HttpServlet {
         request.setAttribute("totalUsers", totalUsers);
         request.setAttribute("totalEmails", totalEmails);
         request.setAttribute("countNew", countNew);
+        request.setAttribute("countContacted", countContacted);
+        request.setAttribute("countSigned", countSigned);
+        request.setAttribute("countCancelled", countCancelled);
         request.setAttribute("countHot", countHot);
         request.setAttribute("countFeatured", countFeatured);
         request.setAttribute("countActiveUsers", countActiveUsers);
@@ -112,6 +126,7 @@ public class AdminDashboardServlet extends HttpServlet {
         request.setAttribute("chartData", chartData);
 
         request.setAttribute("packages", packages);
+        request.setAttribute("cmsValues", cmsValues);
         request.setAttribute("recentCustomers", recentCustomers);
 
         request.getRequestDispatcher("/view/admin/dashboard.jsp")

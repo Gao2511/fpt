@@ -859,3 +859,545 @@
     stroke: currentColor !important;
     stroke-width: 2 !important;
 }
+
+/* =========================================================
+   HEADER ACTION GROUP & MESH JUMP BUTTON
+   ========================================================= */
+.header-action-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-mesh-jump {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #fdba74;
+    background: rgba(243, 112, 33, 0.14);
+    border: 1.5px solid rgba(243, 112, 33, 0.45);
+    text-decoration: none;
+    transition: all 0.25s ease;
+    box-shadow: 0 0 12px rgba(243, 112, 33, 0.2);
+}
+
+.btn-mesh-jump:hover {
+    background: rgba(243, 112, 33, 0.28);
+    color: #ffffff;
+    border-color: #f37021;
+    transform: translateY(-2px);
+    box-shadow: 0 0 18px rgba(243, 112, 33, 0.45);
+}
+
+.btn-mesh-jump svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+}
+
+/* =========================================================
+   PACKAGE & MESH KPI SUMMARY GRID
+   ========================================================= */
+.pkg-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.pkg-kpi-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.pkg-kpi-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(243, 112, 33, 0.35);
+}
+
+.pkg-kpi-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pkg-kpi-icon svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+}
+
+.pkg-kpi-blue {
+    background: rgba(56, 189, 248, 0.15);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.pkg-kpi-orange {
+    background: rgba(243, 112, 33, 0.15);
+    color: #fb923c;
+    border: 1px solid rgba(243, 112, 33, 0.35);
+}
+
+.pkg-kpi-green {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+.pkg-kpi-purple {
+    background: rgba(168, 85, 247, 0.15);
+    color: #c084fc;
+    border: 1px solid rgba(168, 85, 247, 0.35);
+}
+
+.pkg-kpi-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.pkg-kpi-label {
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #94a3b8;
+}
+
+.pkg-kpi-value {
+    font-size: 17px;
+    font-weight: 800;
+    color: #f8fafc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pkg-kpi-sub {
+    font-size: 12px;
+    color: #cbd5e1;
+    opacity: 0.85;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* =========================================================
+   ENHANCED TABLE CELLS (ORDER, SALE STATUS, INSTALL FEE, NORMAL PILL)
+   ========================================================= */
+.pkg-row-inactive {
+    opacity: 0.62;
+}
+
+.pkg-order-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.pkg-name-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.pkg-name-cell strong {
+    color: #f8fafc;
+    font-size: 14px;
+}
+
+.pkg-sale-status {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    letter-spacing: 0.2px;
+}
+
+.pkg-sale-status.sale-on {
+    background: rgba(34, 197, 94, 0.16);
+    color: #86efac;
+    border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+.pkg-sale-status.sale-off {
+    background: rgba(239, 68, 68, 0.16);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.pkg-fee-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.pkg-fee-val {
+    font-size: 13px;
+    font-weight: 700;
+    color: #e2e8f0;
+    white-space: nowrap;
+}
+
+.pkg-fee-hint {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+.pkg-fee-hint.custom {
+    color: #fbbf24;
+}
+
+.pkg-sub-lines {
+    display: block;
+    color: #94a3b8;
+    font-size: 11px;
+    margin-top: 3px;
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* NORMAL PILL IN LIST TABLE */
+.page-package-list .badge-pill.pill-normal {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #94a3b8 !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: none !important;
+}
+
+.page-package-list .badge-pill.pill-normal:hover {
+    background: rgba(148, 163, 184, 0.18) !important;
+    color: #e2e8f0 !important;
+    border-color: rgba(148, 163, 184, 0.4) !important;
+}
+
+.page-package-list .badge-pill.pill-normal.active {
+    background: rgba(148, 163, 184, 0.22) !important;
+    color: #f8fafc !important;
+    border: 1px solid rgba(148, 163, 184, 0.55) !important;
+    box-shadow: 0 0 10px rgba(148, 163, 184, 0.25) !important;
+}
+
+/* =========================================================
+   MESH WIFI & INSTALLATION FEE SECTION IN PACKAGE LIST
+   ========================================================= */
+.mesh-admin-section {
+    margin-top: 28px;
+    background: rgba(15, 23, 42, 0.72);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(243, 112, 33, 0.28);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow:
+        0 14px 36px rgba(0, 0, 0, 0.35),
+        0 0 28px rgba(243, 112, 33, 0.08);
+    scroll-margin-top: 90px;
+}
+
+.mesh-section-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 18px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-wrap: wrap;
+}
+
+.mesh-title-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.mesh-header-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(243, 112, 33, 0.25), rgba(255, 140, 66, 0.15));
+    border: 1px solid rgba(243, 112, 33, 0.45);
+    color: #fb923c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 16px rgba(243, 112, 33, 0.25);
+}
+
+.mesh-header-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.mesh-title-group h2 {
+    margin: 0 0 4px 0;
+    font-size: 19px;
+    font-weight: 800;
+    color: #f8fafc;
+}
+
+.mesh-title-group p {
+    margin: 0;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.mesh-status-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    background: rgba(34, 197, 94, 0.16);
+    color: #86efac;
+    border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+.mesh-status-chip.chip-off {
+    background: rgba(148, 163, 184, 0.16);
+    color: #cbd5e1;
+    border-color: rgba(148, 163, 184, 0.3);
+}
+
+.mesh-config-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.mesh-general-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+}
+
+.mesh-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.mesh-config-card {
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mesh-config-card:hover {
+    border-color: rgba(56, 189, 248, 0.35);
+}
+
+.mesh-card-featured {
+    background: linear-gradient(160deg, rgba(243, 112, 33, 0.09), rgba(15, 23, 42, 0.5));
+    border-color: rgba(243, 112, 33, 0.35);
+}
+
+.mesh-card-featured:hover {
+    border-color: rgba(243, 112, 33, 0.6);
+}
+
+.mesh-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.mesh-card-badge {
+    font-size: 13px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 8px;
+    background: rgba(56, 189, 248, 0.18);
+    color: #7dd3fc;
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    letter-spacing: 0.4px;
+}
+
+.mesh-card-badge.badge-f2 {
+    background: rgba(243, 112, 33, 0.22);
+    color: #fdba74;
+    border-color: rgba(243, 112, 33, 0.45);
+}
+
+.mesh-card-target {
+    font-size: 12px;
+    font-weight: 600;
+    color: #cbd5e1;
+}
+
+.mesh-field-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.mesh-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mesh-field label {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #cbd5e1;
+}
+
+.mesh-field input,
+.mesh-field select {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    color: #f8fafc;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13.5px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.mesh-field input:focus,
+.mesh-field select:focus {
+    border-color: #f37021;
+    box-shadow: 0 0 0 3px rgba(243, 112, 33, 0.18);
+    outline: none;
+}
+
+.mesh-actions-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    flex-wrap: wrap;
+}
+
+.mesh-sync-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: #94a3b8;
+}
+
+.mesh-sync-note svg {
+    width: 16px;
+    height: 16px;
+    stroke: #38bdf8;
+    flex-shrink: 0;
+}
+
+.mesh-sync-note strong {
+    color: #e2e8f0;
+}
+
+.btn-save-mesh {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 22px;
+    font-size: 13.5px;
+    cursor: pointer;
+}
+
+.btn-save-mesh svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* =========================================================
+   PACKAGE FORM — 2 COLUMN ROWS & INHERIT TOGGLE
+   ========================================================= */
+.page-package-form .form-row-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.page-package-form .pkg-inherit-toggle {
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    padding: 10px 12px !important;
+}
+
+.page-package-form .pkg-inherit-toggle .toggle-label {
+    color: #cbd5e1 !important;
+    font-size: 12.5px !important;
+}
+
+.page-package-form .pkg-inherit-toggle input[type="checkbox"]:checked ~ .toggle-label {
+    color: #fdba74 !important;
+}
+
+@media (max-width: 1024px) {
+    .pkg-kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .mesh-general-grid {
+        grid-template-columns: 1fr;
+    }
+    .mesh-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .pkg-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+    .mesh-field-row,
+    .page-package-form .form-row-2 {
+        grid-template-columns: 1fr;
+    }
+}

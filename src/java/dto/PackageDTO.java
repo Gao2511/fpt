@@ -3,7 +3,30 @@ package dto;
 import java.util.Date;
 
 public class PackageDTO {
+    public static final long STANDARD_INSTALLATION_FEE = 300000L;
+
+    /** One-time fee before confirmed promotions, for the six normal public plans.
+     * Public plan labels follow monthly prices; other services do not inherit it.
+     */
+    public long getStandardInstallationFee() {
+        if(standardInstallationFee!=null)return standardInstallationFee;
+        if (speedMbps <= 0) return 0;
+        if (price == 195000 || price == 205000 || price == 220000 || price == 230000 || price == 239000 || price == 249000)
+            return STANDARD_INSTALLATION_FEE;
+        return 0;
+    }
     private int id;
+    private Long standardInstallationFee;
+    private boolean installationFeeInherited=true;
+    private boolean active=true;
+    private int displayOrder;
+    public void setStandardInstallationFee(long fee){standardInstallationFee=fee;installationFeeInherited=false;}
+    public boolean isInstallationFeeInherited(){return installationFeeInherited;}
+    public void setInstallationFeeInherited(boolean value){installationFeeInherited=value;}
+    public boolean isActive(){return active;}
+    public void setActive(boolean value){active=value;}
+    public int getDisplayOrder(){return displayOrder;}
+    public void setDisplayOrder(int value){displayOrder=value;}
     private String packageCode;
     private String name;
     private long price;

@@ -28,7 +28,12 @@ public class AdminPackageServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
+        if (security.AdminSecurity.mutation(action) && !"POST".equals(request.getMethod())) { response.sendError(405); return; }
         System.out.println("🔵 [GET] action = " + action);
+
+        java.util.Map<String, String> rawCms = new dao.SettingsDAO().getCms();
+        java.util.Map<String, String> cmsValues = cms.SiteContent.from(rawCms);
+        request.setAttribute("cmsValues", cmsValues);
 
         // ===== SỬA GÓI CƯỚC =====
         if ("edit".equals(action)) {
@@ -38,6 +43,7 @@ public class AdminPackageServlet extends HttpServlet {
                     int id = Integer.parseInt(idStr);
                     PackageDTO pkg = packageDAO.getById(id);
                     if (pkg != null) {
+                        cms.SiteContent.products(java.util.Arrays.asList(pkg), rawCms, cmsValues, false);
                         request.setAttribute("pkg", pkg);
                         request.setAttribute("mode", "edit");
                         request.getRequestDispatcher("/view/admin/package-form.jsp")
@@ -66,9 +72,11 @@ public class AdminPackageServlet extends HttpServlet {
                     if (badgeType == null || badgeType.trim().isEmpty()) {
                         badgeType = null;
                     }
+                    if(!(badgeType==null || badgeType.equals("hot") || badgeType.equals("featured"))){response.sendError(400);return;}
                     boolean ok = packageDAO.updateBadgeType(id, badgeType);
 
                     if (ok) {
+                        ai.AIService.invalidateCache();
                         String label = badgeType == null ? "Bình thường"
                                 : badgeType.equals("hot") ? "HOT"
                                 : badgeType.equals("featured") ? "NỔI BẬT"
@@ -102,6 +110,7 @@ public class AdminPackageServlet extends HttpServlet {
                     int id = Integer.parseInt(idStr);
                     boolean ok = packageDAO.delete(id);
                     if (ok) {
+                        ai.AIService.invalidateCache();
                         request.getSession().setAttribute("message",
                             "✓ Đã xóa gói cước #" + id + " thành công");
                         request.getSession().setAttribute("messageType", "success");
@@ -128,12 +137,17 @@ public class AdminPackageServlet extends HttpServlet {
         if (page < 1) page = 1;
 
         List<PackageDTO> packages = packageDAO.search(keyword, sortBy, page, PAGE_SIZE);
+        cms.SiteContent.products(packages, rawCms, cmsValues, false);
+
         int total = packageDAO.countSearch(keyword);
         int totalPages = (int) Math.ceil((double) total / PAGE_SIZE);
         if (totalPages < 1) totalPages = 1;
 
-        int totalAll = packageDAO.getAll().size();
-        int totalHot = packageDAO.countHot();
+        List<PackageDTO> allPackages = cms.SiteContent.products(packageDAO.getAll(), rawCms, cmsValues, false);
+        int totalAll = allPackages.size();
+        long totalActive = allPackages.stream().filter(PackageDTO::isActive).count();
+        long totalHot = allPackages.stream().filter(p -> "hot".equals(p.getBadgeType())).count();
+        long totalFeatured = allPackages.stream().filter(p -> "featured".equals(p.getBadgeType())).count();
 
         request.setAttribute("packages", packages);
         request.setAttribute("currentPage", page);
@@ -143,7 +157,9 @@ public class AdminPackageServlet extends HttpServlet {
         request.setAttribute("keyword", keyword);
         request.setAttribute("sortBy", sortBy);
         request.setAttribute("totalAll", totalAll);
+        request.setAttribute("totalActive", totalActive);
         request.setAttribute("totalHot", totalHot);
+        request.setAttribute("totalFeatured", totalFeatured);
 
         HttpSession session = request.getSession();
         if (session.getAttribute("message") != null) {
@@ -166,6 +182,7 @@ public class AdminPackageServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
+        if (security.AdminSecurity.mutation(action)) { doGet(request,response); return; }
         
         System.out.println("🟢 [POST] action = " + action);
         System.out.println("🟢 [POST] badgeType = " + request.getParameter("badgeType"));
@@ -191,10 +208,13 @@ public class AdminPackageServlet extends HttpServlet {
             }
 
             try {
+                validateText(packageCode,name,description,longDescription);
                 long price = Long.parseLong(priceStr.trim());
+                if(price<=0 || price>100000000)throw new NumberFormatException();
                 int speed = speedStr != null && !speedStr.trim().isEmpty()
                             ? Integer.parseInt(speedStr.trim()) : 0;
 
+                if(speed<=0 || speed>100000 || !(badgeType==null || badgeType.isEmpty() || badgeType.equals("hot") || badgeType.equals("featured")))throw new NumberFormatException();
                 if (packageDAO.isCodeExists(packageCode.trim(), 0)) {
                     request.getSession().setAttribute("message", "✗ Mã gói '" + packageCode + "' đã tồn tại");
                     request.getSession().setAttribute("messageType", "error");
@@ -218,8 +238,10 @@ public class AdminPackageServlet extends HttpServlet {
                     p.setHot("hot".equals(badgeType));
                 }
 
-                boolean ok = packageDAO.insert(p);
+                applyMetadata(request,p);
+                boolean ok = packageDAO.saveManaged(p,true,((dto.UserDTO)request.getSession().getAttribute("user")).getId());
                 if (ok) {
+                    ai.AIService.invalidateCache();
                     request.getSession().setAttribute("message",
                         "✓ Đã thêm gói cước '" + name + "' thành công");
                     request.getSession().setAttribute("messageType", "success");
@@ -230,7 +252,7 @@ public class AdminPackageServlet extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/admin/packages?action=add");
                 }
             } catch (NumberFormatException e) {
-                request.getSession().setAttribute("message", "✗ Giá và tốc độ phải là số");
+                request.getSession().setAttribute("message", "✗ Kiểm tra độ dài nội dung, giá, tốc độ và phí lắp đặt hợp lệ");
                 request.getSession().setAttribute("messageType", "error");
                 response.sendRedirect(request.getContextPath() + "/admin/packages?action=add");
             }
@@ -259,10 +281,14 @@ public class AdminPackageServlet extends HttpServlet {
 
             try {
                 int id = Integer.parseInt(idStr);
+                if(id<=0)throw new NumberFormatException();
+                validateText(packageCode,name,description,longDescription);
                 long price = Long.parseLong(priceStr.trim());
+                if(price<=0 || price>100000000)throw new NumberFormatException();
                 int speed = speedStr != null && !speedStr.trim().isEmpty()
                             ? Integer.parseInt(speedStr.trim()) : 0;
 
+                if(speed<=0 || speed>100000 || !(badgeType==null || badgeType.isEmpty() || badgeType.equals("hot") || badgeType.equals("featured")))throw new NumberFormatException();
                 if (packageDAO.isCodeExists(packageCode.trim(), id)) {
                     request.getSession().setAttribute("message", "✗ Mã gói '" + packageCode + "' đã tồn tại");
                     request.getSession().setAttribute("messageType", "error");
@@ -289,8 +315,10 @@ public class AdminPackageServlet extends HttpServlet {
 
                 System.out.println("🟢 [UPDATE] id=" + id + ", badgeType=" + badgeType);
 
-                boolean ok = packageDAO.update(p);
+                applyMetadata(request,p);
+                boolean ok = packageDAO.saveManaged(p,false,((dto.UserDTO)request.getSession().getAttribute("user")).getId());
                 if (ok) {
+                    ai.AIService.invalidateCache();
                     request.getSession().setAttribute("message",
                         "✓ Đã cập nhật gói cước '" + name + "' thành công");
                     request.getSession().setAttribute("messageType", "success");
@@ -301,13 +329,54 @@ public class AdminPackageServlet extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/admin/packages?action=edit&id=" + id);
                 }
             } catch (NumberFormatException e) {
-                request.getSession().setAttribute("message", "✗ Giá và tốc độ phải là số");
+                request.getSession().setAttribute("message", "✗ Kiểm tra độ dài nội dung, giá, tốc độ và phí lắp đặt hợp lệ");
                 request.getSession().setAttribute("messageType", "error");
                 response.sendRedirect(request.getContextPath() + "/admin/packages");
             }
             return;
         }
 
+        // ===== CẬP NHẬT CẤU HÌNH MESH WIFI & PHÍ HÒA MẠNG CHUẨN =====
+        if ("updateMesh".equals(action)) {
+            dto.UserDTO u = (dto.UserDTO) request.getSession().getAttribute("user");
+            if (!security.AdminSecurity.admin(u) || !security.AdminSecurity.csrf(request)) {
+                response.sendError(403);
+                return;
+            }
+            try {
+                dao.SettingsDAO store = new dao.SettingsDAO();
+                java.util.Map<String, String> current = cms.SiteContent.from(store.getCms());
+                java.util.Map<String, String> updates = new java.util.LinkedHashMap<>();
+                for (cms.SiteContent.Field f : cms.SiteContent.fields(true)) {
+                    String rawParam = request.getParameter(f.getKey());
+                    String val = (rawParam != null) ? cms.SiteContent.validate(f, rawParam) : current.get(f.getKey());
+                    updates.put("cms." + f.getKey(), val);
+                }
+                boolean ok = store.saveVersioned(updates, u.getId(), "business");
+                if (!ok) {
+                    throw new IllegalArgumentException("Không thể lưu cấu hình Mesh WiFi. Vui lòng thử lại.");
+                }
+                ai.AIService.invalidateCache();
+                request.getSession().setAttribute("message", "✓ Đã lưu cấu hình Mesh WiFi F1/F2 & Phí lắp đặt chuẩn thành công!");
+                request.getSession().setAttribute("messageType", "success");
+            } catch (Exception e) {
+                request.getSession().setAttribute("message", "✗ " + (e instanceof IllegalArgumentException ? e.getMessage() : "Không thể lưu cấu hình Mesh WiFi."));
+                request.getSession().setAttribute("messageType", "error");
+            }
+            response.sendRedirect(request.getContextPath() + "/admin/packages#mesh-settings-section");
+            return;
+        }
+
         response.sendRedirect(request.getContextPath() + "/admin/packages");
     }
+    private static void validateText(String code,String name,String description,String detail) {
+        if(code.length()>64 || name.length()>200 || (description!=null && description.length()>4000) || (detail!=null && detail.length()>12000))throw new NumberFormatException();
+    }
+    private static void applyMetadata(HttpServletRequest request,PackageDTO p) {
+        p.setActive(!"false".equals(request.getParameter("active")));
+        int order=Integer.parseInt(request.getParameter("displayOrder"));long fee=Long.parseLong(request.getParameter("installationFee"));
+        if(order<0 || order>10000 || fee<0 || fee>100000000)throw new NumberFormatException();p.setDisplayOrder(order);p.setStandardInstallationFee(fee);
+        p.setInstallationFeeInherited("true".equals(request.getParameter("inheritInstallationFee")));
+    }
+
 }
