@@ -38,11 +38,11 @@ public class AIChatServlet extends HttpServlet {
         } catch (AIException e) {
             response.setStatus(e.getErrorType() == AIException.ErrorType.HIGH_DEMAND ? 429 : 503);
             System.err.println("[AI chat] error=" + e.getErrorType());
-            write(response, "Em chưa xử lý được yêu cầu lúc này. Anh/chị vui lòng thử lại hoặc gửi biểu mẫu tư vấn trên trang.");
+            write(response, e.getErrorType() == AIException.ErrorType.HIGH_DEMAND ? "Anh/chị vui lòng chờ câu trả lời trước hoàn tất rồi thử lại." : ai.consultation.ConsultationPolicy.TECHNICAL_FAILURE);
         } catch (Exception e) {
             response.setStatus(503);
             System.err.println("[AI chat] error=" + e.getClass().getSimpleName());
-            write(response, "Hệ thống tư vấn đang bận. Anh/chị vui lòng thử lại hoặc dùng biểu mẫu tư vấn trên trang.");
+            write(response, ai.consultation.ConsultationPolicy.TECHNICAL_FAILURE);
         }
     }
     protected ChatResponse consult(String message, String sessionId) throws AIException { return AIService.askAI(message, sessionId); }

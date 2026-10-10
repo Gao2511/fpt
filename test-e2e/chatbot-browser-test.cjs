@@ -48,6 +48,7 @@ const path = require('node:path');
         assert.equal(requests, 2); console.log('PASS browser offers a local registration link without submitting');
         await ask('Chào bạn!', 4);
         assert.match(await page.locator('.ai-msg-bot').last().textContent(), /chưa nhận được câu trả lời đầy đủ/);
+        assert.match(await page.locator('.ai-msg-bot').last().textContent(), /0932 079 469/);
         assert.equal(await page.locator('#aiChatBody').textContent().then(t => t.includes('DO_NOT_DISPLAY_RAW_JSON')), false);
         console.log('PASS browser handles malformed response without displaying raw JSON');
         await page.setViewportSize({width: 390, height: 844});

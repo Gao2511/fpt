@@ -47,5 +47,14 @@ test('response markup remains literal customer text rather than executable HTML'
     input.value = 'Câu hỏi tiếp theo';await window.sendAIMessage();assert.equal(requests, 1);assert.equal(input.disabled, true);
     finish();await first;assert.equal(input.disabled, false);assert.equal(body.children.at(-1).textContent, 'Em chào anh/chị.');
     passed++;console.log('PASS in-flight guard prevents reordered concurrent UI requests');
+    for (const failure of ['network', 'malformed']) {
+        window.fetch = async () => { if (failure === 'network') throw new Error('offline'); return {json: async () => ({reply: {state: 'SECRET'}, action: 'none'})}; };
+        input.value = 'Có truyền hình và camera.'; await window.sendAIMessage();
+        assert.match(body.children.at(-1).textContent, /0932 079 469/);
+        assert(!body.children.at(-1).textContent.includes('SECRET'));
+        assert(!body.children.at(-1).textContent.includes('ngoài phạm vi'));
+        assert.equal(input.disabled, false);
+    }
+    passed++;console.log('PASS network and malformed failures offer human contact and allow retry');
     console.log('Chat frontend: ' + passed + ' passed');
 })().catch(error => {console.error(error);process.exitCode = 1;});

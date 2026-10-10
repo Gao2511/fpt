@@ -14,7 +14,7 @@ public class ConsultationBehaviorTest {
     public static final ProductCatalog CATALOG = catalog();
     public static ProductCatalog catalog() {
         List<PackageDTO> rows = new ArrayList<>();
-        int[] prices = {195,205,220,230,239,249}, speeds = {300,300,300,300,1000,1000};
+        int[] prices = {195,205,220,230,239,249}, speeds = {300,300,500,500,1000,1000};
         for (int i=0; i<6; i++) {
             PackageDTO p = new PackageDTO(); p.setId(i+1); p.setName("Gói " + prices[i] + "K"); p.setPackageCode(prices[i] + "K");
             p.setPrice(prices[i]*1000L); p.setSpeedMbps(speeds[i]);
@@ -91,7 +91,7 @@ public class ConsultationBehaviorTest {
         });
         test("pair comparison shows actual difference",()->{
             ChatResponse r=ask("Gói 195K với 220K khác nhau thế nào?",new ChatSessionData("pair"),new MockProvider(),null);
-            check(r.getContent().contains("25.000đ/tháng") && r.getContent().contains("300Mbps và 300Mbps") && r.getContent().contains("TV 180 kênh"),r.getContent());
+            check(r.getContent().contains("25.000đ/tháng") && r.getContent().contains("300Mbps và 500Mbps") && r.getContent().contains("TV 180 kênh"),r.getContent());
         });
         test("household update retains budget and gaming",()->{
             ChatSessionData s=new ChatSessionData("update"); MockProvider p=new MockProvider();
@@ -123,12 +123,12 @@ public class ConsultationBehaviorTest {
         });
         test("malformed response gets one repair and preserves legitimate answer",()->{
             MockProvider p=new MockProvider();p.outputs.add(raw("not JSON","stop"));p.outputs.add(envelope("Em chào anh/chị. Anh/chị cần tìm hiểu dịch vụ nào?"));
-            ChatResponse r=ask("Chào bạn!",new ChatSessionData("repair"),p,null);
+            ChatResponse r=ask("Bạn hỗ trợ được những gì vậy?",new ChatSessionData("repair"),p,null);
             check(p.calls==2 && r.getContent().startsWith("Em chào") && !r.getContent().contains("hotline"),r.getContent());
         });
         test("empty and truncated responses never escape",()->{
             for(ChatResponse bad:Arrays.asList(raw("","stop"),raw("{\"message\":\"I will","length"),raw(envelope("Em chào anh/chị.").getContent(),"MAX_TOKENS"),raw(envelope("Em chào anh/chị.").getContent(),null))){
-                MockProvider p=new MockProvider();p.outputs.add(bad);p.outputs.add(bad);ChatResponse r=ask("Chào bạn!",new ChatSessionData(UUID.randomUUID().toString()),p,null);
+                MockProvider p=new MockProvider();p.outputs.add(bad);p.outputs.add(bad);ChatResponse r=ask("Bạn hỗ trợ được những gì vậy?",new ChatSessionData(UUID.randomUUID().toString()),p,null);
                 check(!r.getContent().isEmpty() && !r.getContent().contains("I will") && "safe-fallback".equals(r.getProvider()),r.getContent());
             }
         });
@@ -141,12 +141,12 @@ public class ConsultationBehaviorTest {
         test("rate limit and outage use configured fallback including same provider",()->{
             for(AIException.ErrorType kind:Arrays.asList(AIException.ErrorType.QUOTA_EXCEEDED,AIException.ErrorType.HIGH_DEMAND,AIException.ErrorType.TIMEOUT,AIException.ErrorType.NETWORK_ERROR)){
                 MockProvider a=new MockProvider(),b=new MockProvider();a.outputs.add(new AIException(kind,"failure","Mock"));b.outputs.add(envelope("Em chào anh/chị. Em có thể hỗ trợ tư vấn Internet."));
-                ChatResponse r=ask("Chào bạn!",new ChatSessionData(UUID.randomUUID().toString()),a,b);check(a.calls==1 && b.calls==1 && r.getContent().startsWith("Em chào"),"Fallback failed " + kind);
+                ChatResponse r=ask("Bạn hỗ trợ được những gì vậy?",new ChatSessionData(UUID.randomUUID().toString()),a,b);check(a.calls==1 && b.calls==1 && r.getContent().startsWith("Em chào"),"Fallback failed " + kind);
             }
         });
         test("outage remains transparent when both providers fail",()->{
             MockProvider a=new MockProvider(),b=new MockProvider();a.outputs.add(new AIException(AIException.ErrorType.TIMEOUT,"failure","Mock"));b.outputs.add(new AIException(AIException.ErrorType.TIMEOUT,"failure","Mock"));
-            ChatResponse r=ask("Chào bạn!",new ChatSessionData("outage"),a,b);check("safe-fallback".equals(r.getProvider()) && r.getContent().contains("chưa xử lý"),r.getContent());
+            ChatResponse r=ask("Bạn hỗ trợ được những gì vậy?",new ChatSessionData("outage"),a,b);check("safe-fallback".equals(r.getProvider()) && r.getContent().contains("trục trặc") && r.getContent().contains("0932 079 469"),r.getContent());
         });
         memoryTests();
         test("unknown catalog never fabricates reference packages",()->{
@@ -155,15 +155,15 @@ public class ConsultationBehaviorTest {
         });
         test("model cannot open registration without customer intent",()->{
             MockProvider p=new MockProvider();String bad=envelope("Anh/chị vui lòng kiểm tra thông tin.").getContent().replace("\"consultation\"","\"registration\"").replace("\"recommendedPackageId\":null","\"recommendedPackageId\":3").replace("\"none\"","\"open_registration\"");
-            p.outputs.add(raw(bad,"stop"));p.outputs.add(raw(bad,"stop"));check("none".equals(ask("Chào bạn!",new ChatSessionData("no-consent"),p,null).getAction()),"Unsolicited action");
+            p.outputs.add(raw(bad,"stop"));p.outputs.add(raw(bad,"stop"));check("none".equals(ask("Bạn hỗ trợ được những gì vậy?",new ChatSessionData("no-consent"),p,null).getAction()),"Unsolicited action");
         });
         test("package speeds in catalog match official reference table",()->{
             List<ProductCatalog.Product> all = CATALOG.all();
             check(all.size() == 6, "Expected 6 packages");
             check(all.get(0).speed == 300 && all.get(0).price == 195000L, "195K speed must be 300");
             check(all.get(1).speed == 300 && all.get(1).price == 205000L, "205K speed must be 300");
-            check(all.get(2).speed == 300 && all.get(2).price == 220000L, "220K speed must be 300");
-            check(all.get(3).speed == 300 && all.get(3).price == 230000L, "230K speed must be 300");
+            check(all.get(2).speed == 500 && all.get(2).price == 220000L, "220K speed must be 500");
+            check(all.get(3).speed == 500 && all.get(3).price == 230000L, "230K speed must be 500");
             check(all.get(4).speed == 1000 && all.get(4).price == 239000L, "239K speed must be 1000");
             check(all.get(5).speed == 1000 && all.get(5).price == 249000L, "249K speed must be 1000");
         });
@@ -188,14 +188,14 @@ public class ConsultationBehaviorTest {
     public static void memoryTests() throws Exception {
         test("memory survives trim and history stores exactly one pair per turn",()->{
             ChatSessionData s=new ChatSessionData("trim");MockProvider p=new MockProvider();ask("Tôi có 200 nghìn, 2 người, chơi game.",s,p,null);
-            for(int i=0;i<15;i++)ask("Chào bạn!",s,p,null);
+            for(int i=0;i<15;i++)ask("Bạn hỗ trợ được những gì vậy?",s,p,null);
             check(s.getHistory().size()==20 && s.getRequirements().budget==200000L && s.getRequirements().gaming,"Lost memory");
             check(p.lastMessages.get(p.lastMessages.size()-1).getContent().contains("\"budgetVnd\":200000"),"Trimmed requirements not sent");
             for(int i=0;i<s.getHistory().size();i++)check(s.getHistory().get(i).getRole().equals(i%2==0?"user":"assistant"),"History order wrong");
         });
         test("sessions are isolated and missing IDs cannot share guest memory",()->{
             ChatSessionData a=ChatSessionManager.getOrCreate("isolated-a"),b=ChatSessionManager.getOrCreate("isolated-b");
-            ask("Tôi có 200 nghìn, 4 người, chơi game.",a,new MockProvider(),null);ask("Chào bạn!",b,new MockProvider(),null);
+            ask("Tôi có 200 nghìn, 4 người, chơi game.",a,new MockProvider(),null);ask("Bạn hỗ trợ được những gì vậy?",b,new MockProvider(),null);
             check(b.getRequirements().budget==null && b.getHistory().size()==2,"Cross-session leak");
             boolean rejected=false;try{ChatSessionManager.getOrCreate(null);}catch(IllegalArgumentException expected){rejected=true;}check(rejected,"Shared guest accepted");
             ChatSessionManager.clearSession("isolated-a");check(a.getHistory().isEmpty() && a.getRequirements().budget==null,"Reset incomplete");
@@ -203,8 +203,8 @@ public class ConsultationBehaviorTest {
         test("concurrent turns preserve pair ordering",()->{
             ChatSessionData s=new ChatSessionData("concurrent");MockProvider p=new MockProvider();p.entered=new CountDownLatch(1);p.release=new CountDownLatch(1);
             ExecutorService executor=Executors.newFixedThreadPool(2);
-            try {Future<ChatResponse> first=executor.submit(()->ask("Chào bạn!",s,p,null));check(p.entered.await(2,TimeUnit.SECONDS),"First turn did not start");
-                Future<ChatResponse> second=executor.submit(()->ask("Chào bạn lần nữa!",s,p,null));p.release.countDown();first.get(5,TimeUnit.SECONDS);second.get(5,TimeUnit.SECONDS);
+            try {Future<ChatResponse> first=executor.submit(()->ask("Bạn hỗ trợ được những gì vậy?",s,p,null));check(p.entered.await(2,TimeUnit.SECONDS),"First turn did not start");
+                Future<ChatResponse> second=executor.submit(()->ask("Bạn giải thích thêm được không?",s,p,null));p.release.countDown();first.get(5,TimeUnit.SECONDS);second.get(5,TimeUnit.SECONDS);
                 check(s.getHistory().size()==4 && "assistant".equals(s.getHistory().get(1).getRole()) && "user".equals(s.getHistory().get(2).getRole()),"Interleaved turns");
             } finally {p.release.countDown();executor.shutdownNow();}
         });

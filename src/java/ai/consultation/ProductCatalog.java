@@ -47,7 +47,8 @@ public final class ProductCatalog {
         for (Product p : products) {
             String k = Long.toString(p.price / 1000);
             if (q.matches("(?s).*(?<![0-9])" + k + "\\s*(?:k|nghin|ngan)(?![a-z0-9]).*") ||
-                q.matches("(?s).*goi\\s+" + k + "(?![0-9]).*")) found.add(p);
+                q.matches("(?s).*goi\\s+" + k + "(?![0-9]).*") ||
+                (q.contains("so sanh") && q.matches("(?s).*(?<![0-9])" + k + "(?![0-9]).*"))) found.add(p);
         }
         return found;
     }

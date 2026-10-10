@@ -32,7 +32,7 @@ public final class ConsultationEngine {
             session.touch();
             CustomerRequirements memory = session.getRequirements();
             memory.update(question);
-            if (ConsultationPrompt.SYSTEM.equals(systemPrompt) || ConsultationPolicy.registrationRequested(question)) {
+            if (ConsultationPrompt.SYSTEM.equals(systemPrompt) || ConsultationPolicy.registrationRequested(question) || ConversationSignals.handoff(question)) {
                 ChatResponse known = ConsultationPolicy.known(question, memory, catalog);
                 if (known != null) return commit(session, question, known);
             }
@@ -79,6 +79,8 @@ public final class ConsultationEngine {
         } finally { if (locked) session.turnLock.unlock(); }
     }
     private ChatResponse commit(ChatSessionData session, String question, ChatResponse response) {
+        if ("open_registration".equals(response.getAction())) session.getRequirements().registrationFormOpened = true;
+        if (session.getRequirements().address != null) response.setContent(response.getContent().replace("anh/chị", session.getRequirements().address).replace("Anh/chị", session.getRequirements().address));
         session.commitTurn(question.trim(), response.getContent()); return response;
     }
 }

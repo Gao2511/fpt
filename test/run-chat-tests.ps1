@@ -9,7 +9,7 @@ $dependencies = (Join-Path $repoRoot 'build/web/WEB-INF/lib/*') + ';' + $servlet
 $sources = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot 'src/java'),(Join-Path $repoRoot 'test') -Recurse -Filter '*.java' | ForEach-Object FullName)
 & javac -encoding UTF-8 --release 8 -cp $dependencies -d $testClasses $sources
 if ($LASTEXITCODE -ne 0) { throw 'Java compilation failed' }
-foreach ($suite in @('ai.ConsultationBehaviorTest','controller.ChatRegistrationTest','ai.provider.ProviderResponseTest')) {
+foreach ($suite in @('ai.ConsultationBehaviorTest','ai.AdaptiveConversationTest','controller.ChatRegistrationTest','ai.provider.ProviderResponseTest')) {
     & java '-Dfile.encoding=UTF-8' -cp "$testClasses;$dependencies" $suite
     if ($LASTEXITCODE -ne 0) { throw "Test suite failed: $suite" }
 }

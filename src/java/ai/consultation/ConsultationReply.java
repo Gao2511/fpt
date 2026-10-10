@@ -70,7 +70,13 @@ public final class ConsultationReply {
             !message.matches("(?s).*[àáảãạăâèéẻẽẹêìíỉĩịòóỏõọôơùúủũụưỳýỷỹỵđÀÁĐ].*")) throw new IllegalArgumentException("Expected Vietnamese text");
         String q = ProductCatalog.normalize(message);
         // Product facts are rendered separately by the server. Prose cannot assert them.
-        if (message.matches("(?s).*[0-9<>{}`].*") || q.matches("(?s).*\\b(?:state tracking|tag constraint|system|instruction|chi dan he thong|suy luan noi bo|trang thai noi bo|sotay|reasoning|analysis|api.?key|password|token|https?://|mbps|gbps|wifi|wi-fi|modem|camera|kenh|ngoai hang|mien phi|uu dai|giam gia|cam ket|hop dong|lap dat trong|da dang ky|dang ky thanh cong|da luu|da gui|da tiep nhan|da chot|ky thuat vien se|bao hanh|phi lap|phi hoa|coverage|i will|i can|let me)\\b.*")) throw new IllegalArgumentException("Unverified prose");
+        if (message.matches("(?s).*[0-9<>{}`].*") || q.matches("(?s).*\\b(?:state tracking|tag constraint|system|instruction|chi dan he thong|suy luan noi bo|trang thai noi bo|sotay|reasoning|analysis|api.?key|password|token|https?://|mbps|gbps|mien phi|uu dai|giam gia|cam ket|hop dong|lap dat trong|da dang ky|dang ky thanh cong|da luu|da gui|da tiep nhan|da chot|ky thuat vien se|bao hanh|phi lap|phi hoa|coverage|i will|i can|let me)\\b.*")) throw new IllegalArgumentException("Unverified prose");
+        // Benefit questions are legitimate consultation, but model benefit assertions remain forbidden.
+        for (String sentence : message.split("(?<=[.!?])")) {
+            String normalized = ProductCatalog.normalize(sentence);
+            if (normalized.matches("(?s).*\\b(?:wifi|wi-fi|modem|camera|truyen hinh|kenh|ngoai hang)\\b.*") &&
+                (!sentence.trim().endsWith("?") || normalized.matches("(?s).*\\b(?:goi nay|di kem|bao gom|tang kem)\\b.*"))) throw new IllegalArgumentException("Unverified benefit assertion");
+        }
         if (apiKey != null && apiKey.length() > 6 && message.contains(apiKey)) throw new IllegalArgumentException("Secret in response");
         if (!message.matches("(?s).*[.!?…。]$")) throw new IllegalArgumentException("Unfinished sentence");
     }

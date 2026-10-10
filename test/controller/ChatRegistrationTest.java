@@ -57,6 +57,15 @@ public class ChatRegistrationTest {
     interface Test{void run()throws Exception;}
     static void test(String label,Test test)throws Exception{test.run();passed++;System.out.println("PASS " + label);}
     public static void main(String[]args)throws Exception{
+        test("HTTP provider failures return technical contact with error status",()->{
+            AIChatServlet servlet=new AIChatServlet() {
+                protected ChatResponse consult(String message,String id) throws ai.exception.AIException {
+                    throw new ai.exception.AIException(ai.exception.AIException.ErrorType.TIMEOUT,"offline","Mock");
+                }
+            };
+            Exchange e=new Exchange(new Session());e.params.put("message","Xin hỗ trợ.");servlet.doPost(e.request,e.response);
+            check(e.status==503 && e.output.toString().contains("0932 079 469") && e.output.toString().contains("trục trặc") && !e.output.toString().contains("ngoài phạm vi"),e.output.toString());
+        });
         test("HTTP gaming consultation is not rejected by substring middleware",()->{
             Exchange e=new Exchange(new Session());e.params.put("message","Tôi có 200 nghìn, ở trọ 2 người, chủ yếu chơi game.");new Chat().doPost(e.request,e.response);
             check(e.status==200 && e.output.toString().contains("195.000") && !e.output.toString().contains("Xin lỗi"),e.output.toString());

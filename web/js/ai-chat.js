@@ -50,7 +50,7 @@
                 // Errors use the same validated display contract; status is not hidden.
                 appendReply(body, data, contextPath);
             } catch (error) {
-                appendReply(body, {reply: 'Em chưa nhận được câu trả lời đầy đủ. Anh/chị vui lòng thử lại hoặc gửi biểu mẫu tư vấn trên trang.', action: 'none'}, contextPath);
+                appendReply(body, {reply: 'Em chưa nhận được câu trả lời đầy đủ lúc này. Anh/chị có thể thử lại hoặc liên hệ tư vấn viên qua điện thoại/Zalo 0932 079 469.', action: 'none'}, contextPath);
             } finally {
                 root.clearTimeout(timer); loading.remove(); pending = false; input.disabled = false; input.focus(); body.scrollTop = body.scrollHeight;
             }
