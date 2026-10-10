@@ -563,7 +563,7 @@ body.dark-mode .pkg-body {
 }
 
 /* =========================================================
-   MESH WIFI SHOWCASE SECTION
+   MESH WIFI SHOWCASE SECTION — UIVERSE CARD EFFECT
    ========================================================= */
 .mesh-section-wrap {
     margin-top: 35px;
@@ -578,32 +578,126 @@ body.dark-mode .pkg-body {
     margin: 0 auto;
     box-sizing: border-box;
     padding: 0 15px;
+    align-items: stretch;
 }
 
-.mesh-card {
+/* ⭐ Wrapper chứa viền xoay phát sáng Uiverse */
+.mesh-card-wrap {
     position: relative;
-    background: #ffffff;
-    border: 1px solid rgba(243, 112, 33, 0.2);
-    border-radius: 1.25rem;
-    padding: 28px 24px 24px;
+    border-radius: 1.15rem;
+    padding: 1.5px;
+    background: linear-gradient(0deg, rgba(243, 112, 33, 0.35) -50%, rgba(243, 112, 33, 0.12) 100%);
+    overflow: hidden;
+    isolation: isolate;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
+    box-shadow: 0 10px 30px rgba(243, 112, 33, 0.08);
 }
 
-.mesh-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 16px 36px rgba(243, 112, 33, 0.15);
-    border-color: rgba(243, 112, 33, 0.45);
+.mesh-card-wrap:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 40px rgba(243, 112, 33, 0.22);
+}
+
+/* ⭐ Viền xoay Uiverse (card__border + ::before rotate) */
+.mesh-card-wrap .mesh-card__border {
+    overflow: hidden;
+    pointer-events: none;
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    border-radius: 1.15rem;
+}
+
+.mesh-card-wrap .mesh-card__border::before {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 240%;
+    aspect-ratio: 1 / 1;
+    transform: translate(-50%, -50%) rotate(0deg);
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        transparent 210deg,
+        rgba(243, 112, 33, 0.95) 265deg,
+        #ffb26b 305deg,
+        #ff7a18 335deg,
+        rgba(243, 112, 33, 0.95) 360deg
+    );
+    animation: meshBorderRotate 8s linear infinite;
+    opacity: 0.85;
+    transition: opacity 0.35s ease;
+    will-change: transform;
+}
+
+.mesh-card-wrap:hover .mesh-card__border::before {
+    opacity: 1;
+}
+
+@keyframes meshBorderRotate {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* ⭐ Thẻ Card bên trong với hiệu ứng Radial Gradient + Inset Glow Uiverse */
+.mesh-card {
+    --white: #1e293b;
+    --paragraph: #64748b;
+    --line: rgba(243, 112, 33, 0.18);
+    --primary: #f37021;
+
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    border-radius: calc(1.15rem - 1.5px);
+    padding: 26px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    background-color: #ffffff;
+    background-image:
+        radial-gradient(at 88% 40%, rgba(255, 255, 255, 0.96) 0px, transparent 85%),
+        radial-gradient(at 49% 30%, rgba(255, 255, 255, 0.96) 0px, transparent 85%),
+        radial-gradient(at 14% 26%, rgba(255, 255, 255, 0.96) 0px, transparent 85%),
+        radial-gradient(at 0% 64%, rgba(243, 112, 33, 0.14) 0px, transparent 80%),
+        radial-gradient(at 41% 94%, rgba(255, 178, 107, 0.26) 0px, transparent 80%),
+        radial-gradient(at 100% 99%, rgba(255, 122, 24, 0.22) 0px, transparent 80%);
+
+    box-shadow:
+        inset 0px -16px 24px 0px rgba(243, 112, 33, 0.22),
+        inset 0px 1px 0px 0px rgba(255, 255, 255, 0.9);
+    border: none;
+    overflow: hidden;
+    transition: box-shadow 0.35s ease;
+}
+
+.mesh-card-wrap:hover .mesh-card {
+    box-shadow:
+        inset 0px -18px 28px 0px rgba(243, 112, 33, 0.35),
+        inset 0px 1px 0px 0px rgba(255, 255, 255, 1);
 }
 
 .mesh-card.mesh-featured {
-    border-color: rgba(243, 112, 33, 0.45);
-    background: linear-gradient(180deg, #ffffff 0%, #fffaf5 100%);
-    box-shadow: 0 12px 32px rgba(243, 112, 33, 0.12);
+    background-image:
+        radial-gradient(at 88% 40%, rgba(255, 255, 255, 0.95) 0px, transparent 85%),
+        radial-gradient(at 49% 30%, rgba(255, 255, 255, 0.95) 0px, transparent 85%),
+        radial-gradient(at 14% 26%, rgba(255, 255, 255, 0.95) 0px, transparent 85%),
+        radial-gradient(at 0% 64%, rgba(243, 112, 33, 0.18) 0px, transparent 80%),
+        radial-gradient(at 41% 94%, rgba(255, 178, 107, 0.32) 0px, transparent 80%),
+        radial-gradient(at 100% 99%, rgba(255, 122, 24, 0.26) 0px, transparent 80%);
+}
+
+.mesh-card > * {
+    position: relative;
+    z-index: 2;
 }
 
 .mesh-card-header {
@@ -611,8 +705,8 @@ body.dark-mode .pkg-body {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    padding-bottom: 2px;
+    border-bottom: none;
 }
 
 .mesh-card-header h3 {
@@ -620,27 +714,45 @@ body.dark-mode .pkg-body {
     font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
     font-size: 1.35rem;
     font-weight: 900;
-    color: #1e293b;
+    color: var(--white);
     letter-spacing: -0.5px;
+}
+
+.mesh-subtitle {
+    font-size: 0.78rem;
+    color: var(--paragraph);
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.mesh-line {
+    width: 100%;
+    height: 1.5px;
+    background: linear-gradient(90deg, rgba(243, 112, 33, 0.35) 0%, rgba(243, 112, 33, 0.12) 65%, transparent 100%);
+    border: none;
+    margin: -4px 0 0;
 }
 
 .mesh-tag {
     display: inline-block;
-    padding: 4px 10px;
+    padding: 5px 12px;
     border-radius: 999px;
     font-size: 0.75rem;
     font-weight: 800;
     text-transform: uppercase;
-    background: rgba(243, 112, 33, 0.12);
-    color: #f37021;
+    background: linear-gradient(135deg, rgba(243, 112, 33, 0.16) 0%, rgba(255, 178, 107, 0.25) 100%);
+    color: #e65100;
+    border: 1px solid rgba(243, 112, 33, 0.3);
     letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(243, 112, 33, 0.12);
 }
 
 .mesh-price-box {
-    background: rgba(243, 112, 33, 0.06);
+    background: rgba(255, 247, 237, 0.75);
     border-radius: 12px;
     padding: 14px 18px;
-    border: 1px dashed rgba(243, 112, 33, 0.3);
+    border: 1px dashed rgba(243, 112, 33, 0.38);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .mesh-monthly {
@@ -650,17 +762,27 @@ body.dark-mode .pkg-body {
 }
 
 .mesh-plus {
-    font-size: 1.4rem;
+    font-size: 1.45rem;
     font-weight: 900;
     color: #f37021;
 }
 
 .mesh-amount {
-    font-size: 2rem;
+    font-size: 2.05rem;
     font-weight: 900;
     font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
-    color: #f37021;
     letter-spacing: -1px;
+    background: linear-gradient(180deg,
+        #ff8c42 0%,
+        #f37021 35%,
+        #d95810 55%,
+        #f37021 75%,
+        #e65100 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0 2px 8px rgba(243, 112, 33, 0.3));
 }
 
 .mesh-unit {
@@ -686,7 +808,7 @@ body.dark-mode .pkg-body {
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 11px;
     flex: 1;
 }
 
@@ -695,40 +817,93 @@ body.dark-mode .pkg-body {
     align-items: flex-start;
     gap: 10px;
     font-size: 0.88rem;
-    color: #334155;
+    color: #1e293b;
     line-height: 1.5;
 }
 
-.mesh-specs .mesh-icon {
-    width: 18px;
-    height: 18px;
-    stroke: #f37021;
+/* ⭐ Icon tròn phát sáng kiểu Uiverse (.check) */
+.mesh-specs .mesh-check {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     flex-shrink: 0;
-    margin-top: 2px;
+    width: 1.45rem;
+    height: 1.45rem;
+    background-color: var(--primary);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(243, 112, 33, 0.5);
+    margin-top: 1px;
 }
 
+.mesh-specs .mesh-icon {
+    width: 0.85rem;
+    height: 0.85rem;
+    stroke: #ffffff;
+    flex-shrink: 0;
+    margin-top: 0;
+}
+
+.mesh-note-inline {
+    color: #d95810;
+    font-size: 12.5px;
+}
+
+/* ⭐ Nút bấm Uiverse (.button với inset glow + shine) */
 .btn-mesh {
+    cursor: pointer;
     display: block;
     width: 100%;
-    padding: 12px 18px;
-    border-radius: 9999px;
-    background: linear-gradient(135deg, #f37021 0%, #ff8c42 100%);
-    color: #ffffff;
+    padding: 0.78rem 1.1rem;
+    margin-top: auto;
+    box-sizing: border-box;
+
+    background-image: linear-gradient(
+        0deg,
+        #d95810 0%,
+        #ffb26b 100%
+    );
+
     font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
     font-weight: 800;
-    font-size: 0.9rem;
-    border: none;
-    cursor: pointer;
+    font-size: 0.88rem;
+    letter-spacing: 0.3px;
+    color: #ffffff;
     text-align: center;
-    transition: all 0.25s ease;
-    box-shadow: 0 4px 14px rgba(243, 112, 33, 0.35);
-    margin-top: 8px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+
+    border: 0;
+    border-radius: 9999px;
+    box-shadow:
+        inset 0 -2px 25px -4px rgba(255, 255, 255, 0.75),
+        0 4px 14px rgba(217, 88, 16, 0.32);
+
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-mesh::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.38), transparent);
+    transition: left 0.6s ease;
+}
+
+.btn-mesh:hover::before {
+    left: 100%;
 }
 
 .btn-mesh:hover {
-    background: linear-gradient(135deg, #e65100 0%, #f37021 100%);
+    background-image: linear-gradient(0deg, #ff8c42 0%, #ffd4a8 100%);
+    color: #1a1a1a;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(243, 112, 33, 0.45);
+    box-shadow:
+        inset 0 -2px 25px -4px rgba(255, 255, 255, 0.92),
+        0 8px 25px rgba(243, 112, 33, 0.5);
 }
 
 @media (max-width: 768px) {
@@ -736,40 +911,76 @@ body.dark-mode .pkg-body {
         grid-template-columns: 1fr;
         gap: 18px;
     }
+    .mesh-card-wrap .mesh-card__border::before {
+        animation: none !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        transform: none !important;
+        background: linear-gradient(135deg, #f37021, #ffb26b) !important;
+        opacity: 0.45 !important;
+    }
 }
 
-/* Dark mode for Mesh */
-body.dark-mode .mesh-card {
+/* =========================================================
+   DARK MODE — Mesh WiFi Uiverse Card
+   ========================================================= */
+body.dark-mode .mesh-card-wrap {
     background: #1f2937;
-    border-color: rgba(243, 112, 33, 0.25);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
 
-body.dark-mode .mesh-card.mesh-featured {
-    background: linear-gradient(180deg, #1f2937 0%, #292f3d 100%);
+body.dark-mode .mesh-card {
+    --white: #f8fafc;
+    --paragraph: #cbd5e1;
+    background-color: hsla(240, 15%, 9%, 1);
+    background-image:
+        radial-gradient(at 88% 40%, hsla(240, 15%, 9%, 1) 0px, transparent 85%),
+        radial-gradient(at 49% 30%, hsla(240, 15%, 9%, 1) 0px, transparent 85%),
+        radial-gradient(at 14% 26%, hsla(240, 15%, 9%, 1) 0px, transparent 85%),
+        radial-gradient(at 0% 64%, rgba(243, 112, 33, 0.35) 0px, transparent 85%),
+        radial-gradient(at 41% 94%, rgba(255, 178, 107, 0.28) 0px, transparent 85%),
+        radial-gradient(at 100% 99%, rgba(230, 81, 0, 0.38) 0px, transparent 85%);
+    box-shadow: 0px -16px 24px 0px rgba(255, 255, 255, 0.14) inset;
 }
 
 body.dark-mode .mesh-card-header h3 {
-    color: #f1f5f9;
+    color: #ffffff;
 }
 
-body.dark-mode .mesh-card-header {
-    border-bottom-color: rgba(255, 255, 255, 0.08);
+body.dark-mode .mesh-subtitle {
+    color: #cbd5e1;
+}
+
+body.dark-mode .mesh-tag {
+    background: rgba(243, 112, 33, 0.22);
+    color: #ffb26b;
+    border-color: rgba(255, 178, 107, 0.35);
 }
 
 body.dark-mode .mesh-price-box {
-    background: rgba(243, 112, 33, 0.1);
-    border-color: rgba(243, 112, 33, 0.4);
+    background: rgba(243, 112, 33, 0.12);
+    border-color: rgba(243, 112, 33, 0.45);
+    box-shadow: none;
+}
+
+body.dark-mode .mesh-unit {
+    color: #cbd5e1;
 }
 
 body.dark-mode .mesh-note-fee {
-    color: #94a3b8;
+    color: #cbd5e1;
 }
 
 body.dark-mode .mesh-note-fee strong {
-    color: #f1f5f9;
+    color: #ffffff;
 }
 
 body.dark-mode .mesh-specs li {
-    color: #cbd5e1;
+    color: #f1f5f9;
+}
+
+body.dark-mode .mesh-note-inline {
+    color: #ffb26b;
 }

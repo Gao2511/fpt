@@ -287,85 +287,105 @@
         <div class="container mesh-section-wrap">
             <div class="mesh-grid">
                 <!-- CARD MESH F1 -->
-                <div class="mesh-card">
-                    <div class="mesh-card-header">
-                        <div>
-                            <h3>Mesh WiFi F1</h3>
-                            <div style="font-size: 12px; color: #64748b; margin-top: 3px;">Giải pháp phủ sóng cho nhà 2 tầng</div>
+                <div class="mesh-card-wrap">
+                    <div class="mesh-card__border"></div>
+                    <div class="mesh-card">
+                        <div class="mesh-card-header">
+                            <div>
+                                <h3>Mesh WiFi F1</h3>
+                                <div class="mesh-subtitle">Giải pháp phủ sóng cho nhà 2 tầng</div>
+                            </div>
+                            <span class="mesh-tag">Nhà 2 tầng</span>
                         </div>
-                        <span class="mesh-tag">Nhà 2 tầng</span>
+                        <hr class="mesh-line" />
+
+                        <div class="mesh-price-box">
+                            <div class="mesh-monthly">
+                                <span class="mesh-plus">+</span>
+                                <span class="mesh-amount">10.000</span>
+                                <span class="mesh-unit">đ/tháng</span>
+                            </div>
+                            <div class="mesh-note-fee">
+                                Phí lắp đặt: <strong>500.000 VNĐ</strong>
+                            </div>
+                        </div>
+
+                        <ul class="mesh-specs">
+                            <li>
+                                <span class="mesh-check">
+                                    <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                </span>
+                                <span><strong>Nhà phù hợp:</strong> Nhà 2 tầng</span>
+                            </li>
+                            <li>
+                                <span class="mesh-check">
+                                    <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                                </span>
+                                <span><strong>Thiết bị:</strong> 1 Modem WiFi 6 + 1 Access Point</span>
+                            </li>
+                            <li>
+                                <span class="mesh-check">
+                                    <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                                </span>
+                                <span class="mesh-note-inline"><em>Lưu ý: Tùy chọn mở rộng phủ sóng cộng thêm vào tiền cước gói Internet hàng tháng.</em></span>
+                            </li>
+                        </ul>
+
+                        <button type="button" class="btn-mesh" onclick="selectMeshOption('Mesh WiFi F1 (Nhà 2 tầng)')">
+                            Đăng ký tư vấn Mesh F1 →
+                        </button>
                     </div>
-
-                    <div class="mesh-price-box">
-                        <div class="mesh-monthly">
-                            <span class="mesh-plus">+</span>
-                            <span class="mesh-amount">10.000</span>
-                            <span class="mesh-unit">đ/tháng</span>
-                        </div>
-                        <div class="mesh-note-fee">
-                            Phí lắp đặt: <strong>500.000 VNĐ</strong>
-                        </div>
-                    </div>
-
-                    <ul class="mesh-specs">
-                        <li>
-                            <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                            <span><strong>Nhà phù hợp:</strong> Nhà 2 tầng</span>
-                        </li>
-                        <li>
-                            <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-                            <span><strong>Thiết bị:</strong> 1 Modem WiFi 6 + 1 Access Point</span>
-                        </li>
-                        <li>
-                            <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                            <span style="color:#f37021; font-size:12.5px;"><em>Lưu ý: Tùy chọn mở rộng phủ sóng cộng thêm vào tiền cước gói Internet hàng tháng.</em></span>
-                        </li>
-                    </ul>
-
-                    <button type="button" class="btn-mesh" onclick="selectMeshOption('Mesh WiFi F1 (Nhà 2 tầng)')">
-                        Đăng ký tư vấn Mesh F1 →
-                    </button>
                 </div>
 
                 <!-- CARD MESH F2 -->
-                <div class="mesh-card mesh-featured">
-                    <div class="mesh-card-header">
-                        <div>
-                            <h3>Mesh WiFi F2</h3>
-                            <div style="font-size: 12px; color: #64748b; margin-top: 3px;">Giải pháp phủ sóng cho nhà 3 tầng</div>
+                <div class="mesh-card-wrap mesh-featured-wrap">
+                    <div class="mesh-card__border"></div>
+                    <div class="mesh-card mesh-featured">
+                        <div class="mesh-card-header">
+                            <div>
+                                <h3>Mesh WiFi F2</h3>
+                                <div class="mesh-subtitle">Giải pháp phủ sóng cho nhà 3 tầng</div>
+                            </div>
+                            <span class="mesh-tag">Nhà 3 tầng</span>
                         </div>
-                        <span class="mesh-tag">Nhà 3 tầng</span>
+                        <hr class="mesh-line" />
+
+                        <div class="mesh-price-box">
+                            <div class="mesh-monthly">
+                                <span class="mesh-plus">+</span>
+                                <span class="mesh-amount">20.000</span>
+                                <span class="mesh-unit">đ/tháng</span>
+                            </div>
+                            <div class="mesh-note-fee">
+                                Phí lắp đặt: <strong>700.000 VNĐ</strong>
+                            </div>
+                        </div>
+
+                        <ul class="mesh-specs">
+                            <li>
+                                <span class="mesh-check">
+                                    <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                </span>
+                                <span><strong>Nhà phù hợp:</strong> Nhà 3 tầng</span>
+                            </li>
+                            <li>
+                                <span class="mesh-check">
+                                    <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                                </span>
+                                <span><strong>Thiết bị:</strong> 1 Modem WiFi 6 + 2 Access Point</span>
+                            </li>
+                            <li>
+                                <span class="mesh-check">
+                                    <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                                </span>
+                                <span class="mesh-note-inline"><em>Lưu ý: Tùy chọn mở rộng phủ sóng cộng thêm vào tiền cước gói Internet hàng tháng.</em></span>
+                            </li>
+                        </ul>
+
+                        <button type="button" class="btn-mesh" onclick="selectMeshOption('Mesh WiFi F2 (Nhà 3 tầng)')">
+                            Đăng ký tư vấn Mesh F2 →
+                        </button>
                     </div>
-
-                    <div class="mesh-price-box">
-                        <div class="mesh-monthly">
-                            <span class="mesh-plus">+</span>
-                            <span class="mesh-amount">20.000</span>
-                            <span class="mesh-unit">đ/tháng</span>
-                        </div>
-                        <div class="mesh-note-fee">
-                            Phí lắp đặt: <strong>700.000 VNĐ</strong>
-                        </div>
-                    </div>
-
-                    <ul class="mesh-specs">
-                        <li>
-                            <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                            <span><strong>Nhà phù hợp:</strong> Nhà 3 tầng</span>
-                        </li>
-                        <li>
-                            <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-                            <span><strong>Thiết bị:</strong> 1 Modem WiFi 6 + 2 Access Point</span>
-                        </li>
-                        <li>
-                            <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                            <span style="color:#f37021; font-size:12.5px;"><em>Lưu ý: Tùy chọn mở rộng phủ sóng cộng thêm vào tiền cước gói Internet hàng tháng.</em></span>
-                        </li>
-                    </ul>
-
-                    <button type="button" class="btn-mesh" onclick="selectMeshOption('Mesh WiFi F2 (Nhà 3 tầng)')">
-                        Đăng ký tư vấn Mesh F2 →
-                    </button>
                 </div>
             </div>
         </div>
@@ -657,7 +677,7 @@
         <script>
             // ===== SCROLL REVEAL =====
             const revealElements = document.querySelectorAll(
-                    '.section-title, .pkg, .feature, .device, .contact-wrapper'
+                    '.section-title, .pkg, .mesh-card, .feature, .device, .contact-wrapper'
                     );
             revealElements.forEach(el => el.classList.add('reveal'));
 
@@ -690,7 +710,7 @@
             });
 
             // ===== CLICK RIPPLE EFFECT CHO NÚT =====
-            document.querySelectorAll('.btn-pkg, .btn-device, .btn-hero-primary, .contact-form button').forEach(btn => {
+            document.querySelectorAll('.btn-pkg, .btn-mesh, .btn-device, .btn-hero-primary, .contact-form button').forEach(btn => {
                 btn.addEventListener('click', function (e) {
                     const rect = this.getBoundingClientRect();
                     const x = e.clientX - rect.left;
