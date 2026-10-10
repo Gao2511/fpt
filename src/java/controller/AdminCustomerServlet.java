@@ -25,6 +25,7 @@ public class AdminCustomerServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
+        if (security.AdminSecurity.mutation(action) && !"POST".equals(request.getMethod())) { response.sendError(405); return; }
 
         // ===== XÓA KHÁCH HÀNG =====
         if ("delete".equals(action)) {
@@ -140,6 +141,7 @@ public class AdminCustomerServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
+        if (security.AdminSecurity.mutation(action)) { doGet(request,response); return; }
 
         // ===== CẬP NHẬT TOÀN BỘ THÔNG TIN KHÁCH HÀNG =====
         if ("update".equals(action)) {
@@ -161,14 +163,17 @@ public class AdminCustomerServlet extends HttpServlet {
 
             try {
                 int id = Integer.parseInt(idStr);
-                CustomerDTO c = new CustomerDTO();
+                CustomerDTO c = customerDAO.getById(id);
+                if(c==null){response.sendError(404);return;}
                 c.setId(id);
                 c.setFullName(fullName.trim());
                 c.setPhone(phone.trim());
                 c.setAddress(address != null ? address.trim() : "");
                 c.setEmail(email != null ? email.trim() : "");
                 c.setNote(note);
-                c.setStatus(status != null ? status : "Mới");
+                if(!java.util.Arrays.asList("Mới","Đã liên hệ","Đã ký HĐ","Hủy").contains(status)){response.sendError(400);return;}
+                if(!utils.RegistrationSubmission.normalizedPhone(phone).matches("0[0-9]{9}")){response.sendError(400);return;}
+                c.setStatus(status);
 
                 boolean ok = customerDAO.update(c);
                 if (ok) {
@@ -194,6 +199,7 @@ public class AdminCustomerServlet extends HttpServlet {
             if (idStr != null && status != null) {
                 try {
                     int id = Integer.parseInt(idStr);
+                    if(!java.util.Arrays.asList("Mới","Đã liên hệ","Đã ký HĐ","Hủy").contains(status)){response.sendError(400);return;}
                     boolean ok = customerDAO.updateStatus(id, status);
                     if (ok) {
                         request.getSession().setAttribute("message",
@@ -223,7 +229,7 @@ public class AdminCustomerServlet extends HttpServlet {
 
         String referer = request.getHeader("Referer");
         if (referer != null && referer.contains("/admin/customers")) {
-            response.sendRedirect(referer);
+            response.sendRedirect(security.AdminSecurity.redirect(referer,request.getContextPath(),request.getContextPath()+"/admin/customers"));
         } else {
             response.sendRedirect(request.getContextPath() + "/admin/customers");
         }

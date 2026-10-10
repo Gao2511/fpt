@@ -105,9 +105,9 @@ public class ConsultationBehaviorTest {
             check("open_registration".equals(r.getAction()) && r.getRecommendedPackageId()==3 && !r.getContent().contains("thành công"),r.getContent());
             r=ask("Tôi muốn đăng ký gói 999K.",s,p,null);check("none".equals(r.getAction()),"Unknown package used previous selection");
         });
-        test("fees and popularity stay explicitly unknown",()->{
+        test("standard fee is known while popularity stays unknown",()->{
             ChatResponse r=ask("Phí lắp đặt bao nhiêu?",new ChatSessionData("fee"),new MockProvider(),null);
-            check(r.getContent().contains("chưa có dữ liệu") && !r.getContent().contains("299") && !r.getContent().contains("miễn phí"),r.getContent());
+            check(r.getContent().contains("300.000đ/lần") && !r.getContent().contains("miễn phí"),r.getContent());
             r=ask("Gói nào đang bán chạy nhất?",new ChatSessionData("popular"),new MockProvider(),null);check(r.getContent().contains("chưa có số liệu"),r.getContent());
         });
         test("out-of-scope response stays Vietnamese and has no package action",()->{

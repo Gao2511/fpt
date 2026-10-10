@@ -166,7 +166,7 @@ public class AIService {
         ConfigCache cfg = getConfig();
         if (!cfg.chatbotEnabled) throw new AIException(AIException.ErrorType.SERVER_ERROR,
             "Chatbot đang bảo trì. Anh/chị có thể gửi biểu mẫu tư vấn trên trang.", "System");
-        ai.consultation.ProductCatalog catalog = new ai.consultation.ProductCatalog(new dao.PackageDAO().getAll());
+        ai.consultation.ProductCatalog catalog = cms.SiteContent.publicCatalog();
         ai.consultation.ConsultationEngine.Target primary = target(cfg, cfg.activeProvider, cfg.activeModel);
         ai.consultation.ConsultationEngine.Target fallback = target(cfg, cfg.fallbackProvider, cfg.fallbackModel);
         if (primary != null && fallback != null && primary.provider.getId().equals(fallback.provider.getId()) && primary.model.equals(fallback.model)) fallback = null;

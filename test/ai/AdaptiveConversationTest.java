@@ -97,7 +97,7 @@ public class AdaptiveConversationTest {
         test("human and missing data handoffs never claim a callback was sent",()->{
             ChatResponse r=ask("Tôi muốn nói chuyện với người thật.",new ChatSessionData("human"),new MockProvider(),null);
             check(r.getContent().contains("0932 079 469") && r.getContent().contains("chưa gửi") && "none".equals(r.getAction()),r.getContent());
-            r=ask("Giá lắp mạng bao nhiêu?",new ChatSessionData("missing-fee"),new MockProvider(),null);
+            r=ask("Ưu đãi lắp mạng hiện tại thế nào?",new ChatSessionData("missing-promotion"),new MockProvider(),null);
             check(r.getContent().contains("chưa có dữ liệu") && !r.getContent().contains("miễn phí"),r.getContent());
         });
         test("substantive unrelated request remains distinct from social conversation",()->{

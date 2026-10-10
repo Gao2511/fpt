@@ -38,11 +38,11 @@ public class AIChatServlet extends HttpServlet {
         } catch (AIException e) {
             response.setStatus(e.getErrorType() == AIException.ErrorType.HIGH_DEMAND ? 429 : 503);
             System.err.println("[AI chat] error=" + e.getErrorType());
-            write(response, e.getErrorType() == AIException.ErrorType.HIGH_DEMAND ? "Anh/chị vui lòng chờ câu trả lời trước hoàn tất rồi thử lại." : ai.consultation.ConsultationPolicy.TECHNICAL_FAILURE);
+            write(response, e.getErrorType() == AIException.ErrorType.HIGH_DEMAND ? "Anh/chị vui lòng chờ câu trả lời trước hoàn tất rồi thử lại." : ai.consultation.ConsultationPolicy.facts(ai.consultation.ConsultationPolicy.TECHNICAL_FAILURE,business(request)));
         } catch (Exception e) {
             response.setStatus(503);
             System.err.println("[AI chat] error=" + e.getClass().getSimpleName());
-            write(response, ai.consultation.ConsultationPolicy.TECHNICAL_FAILURE);
+            write(response, ai.consultation.ConsultationPolicy.facts(ai.consultation.ConsultationPolicy.TECHNICAL_FAILURE,business(request)));
         }
     }
     protected ChatResponse consult(String message, String sessionId) throws AIException { return AIService.askAI(message, sessionId); }
@@ -57,4 +57,6 @@ public class AIChatServlet extends HttpServlet {
         JsonObject json = new JsonObject(); json.addProperty("reply", message); json.addProperty("action", "none");
         response.getWriter().write(json.toString());
     }
+    @SuppressWarnings("unchecked") private java.util.Map<String,String> business(HttpServletRequest r){Object v=r.getAttribute("cms");return v instanceof java.util.Map?(java.util.Map<String,String>)v:cms.SiteContent.defaults();}
+
 }

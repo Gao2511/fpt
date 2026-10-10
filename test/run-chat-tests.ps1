@@ -6,10 +6,10 @@ New-Item -ItemType Directory -Path $testClasses | Out-Null
 $servletJar = Join-Path $TomcatHome 'lib/servlet-api.jar'
 if (!(Test-Path -LiteralPath $servletJar)) { throw 'Specify -TomcatHome for your Tomcat 9 installation.' }
 $dependencies = (Join-Path $repoRoot 'build/web/WEB-INF/lib/*') + ';' + $servletJar
-$sources = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot 'src/java'),(Join-Path $repoRoot 'test') -Recurse -Filter '*.java' | ForEach-Object FullName)
+$sources = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot 'src/java'),(Join-Path $repoRoot 'test/ai'),(Join-Path $repoRoot 'test/controller') -Recurse -Filter '*.java' | ForEach-Object FullName)
 & javac -encoding UTF-8 --release 8 -cp $dependencies -d $testClasses $sources
 if ($LASTEXITCODE -ne 0) { throw 'Java compilation failed' }
-foreach ($suite in @('ai.ConsultationBehaviorTest','ai.AdaptiveConversationTest','controller.ChatRegistrationTest','ai.provider.ProviderResponseTest')) {
+foreach ($suite in @('ai.ConsultationBehaviorTest','ai.AdaptiveConversationTest','ai.InstallationFeeTest','controller.ChatRegistrationTest','ai.provider.ProviderResponseTest')) {
     & java '-Dfile.encoding=UTF-8' -cp "$testClasses;$dependencies" $suite
     if ($LASTEXITCODE -ne 0) { throw "Test suite failed: $suite" }
 }

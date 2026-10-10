@@ -1,4 +1,5 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
@@ -156,7 +157,7 @@
                 <c:if test="${totalAll > 0}">
                     <a href="${pageContext.request.contextPath}/admin/email-logs?action=deleteAll"
                        class="btn-clear-all"
-                       onclick="return confirm('Bạn có chắc muốn xóa TOÀN BỘ ${totalAll} log email? Hành động này không thể hoàn tác!');">
+                       onclick="return confirm('Xác nhận thao tác này?');">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="3 6 5 6 21 6"/>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -241,7 +242,7 @@
                         <td class="col-actions">
                             <a href="${pageContext.request.contextPath}/admin/email-logs?action=delete&id=${log.id}"
                                class="action-btn btn-delete" title="Xóa log"
-                               onclick="return confirm('Bạn có chắc muốn xóa log #${log.id}?');">
+                               onclick="return confirm('Xác nhận thao tác này?');">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polyline points="3 6 5 6 21 6"/>
                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>

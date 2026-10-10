@@ -1,27 +1,29 @@
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fees" tagdir="/WEB-INF/tags" %>
 
 <%-- ⭐ FALLBACK NẾU DATA NULL --%>
 <c:if test="${empty pkg.name}">
     <c:set var="pkgName" value="Gói cước FPT"/>
 </c:if>
 <c:if test="${not empty pkg.name}">
-    <c:set var="pkgName" value="${pkg.name}"/>
+    <c:set var="pkgName" value="${fn:escapeXml(pkg.name)}"/>
 </c:if>
 
 <c:if test="${empty pkg.description}">
     <c:set var="pkgDesc" value="Gói cước Internet tốc độ cao FPT Telecom"/>
 </c:if>
 <c:if test="${not empty pkg.description}">
-    <c:set var="pkgDesc" value="${pkg.description}"/>
+    <c:set var="pkgDesc" value="${fn:escapeXml(pkg.description)}"/>
 </c:if>
 
 <c:if test="${empty pkg.packageCode}">
     <c:set var="pkgCode" value="FPT"/>
 </c:if>
 <c:if test="${not empty pkg.packageCode}">
-    <c:set var="pkgCode" value="${pkg.packageCode}"/>
+    <c:set var="pkgCode" value="${fn:escapeXml(pkg.packageCode)}"/>
 </c:if>
 
 <!DOCTYPE html>
@@ -121,8 +123,12 @@
                                 <span class="price-unit">đ/tháng</span>
                             </div>
 
+                            <fees:installation-fee plan="${pkg}"/>
+                            <c:if test="${pkg.standardInstallationFee > 0}">
+                                <p style="font-size:13px;line-height:1.6;">Phí trả một lần, tách biệt với cước hàng tháng. Phí thực tế áp dụng theo chính sách ưu đãi hiện hành được xác nhận.</p>
+                            </c:if>
                             <div class="pkg-hero-actions">
-                                <a href="tel:0932079469" class="btn-glow-primary">
+                                <a href="tel:${fn:escapeXml(cms['business.phone'])}" class="btn-glow-primary">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                                     </svg>
@@ -172,7 +178,7 @@
                             <c:choose>
                                 <c:when test="${not empty pkg.longDescription}">
                                     <c:forEach items="${pkg.longDescriptionLines}" var="line">
-                                        <li>${line}</li>
+                                        <li>${fn:escapeXml(line)}</li>
                                         </c:forEach>
                                     </c:when>
                                     <c:otherwise>
@@ -269,12 +275,12 @@
                             </div>
                             <div style="display:flex; flex-direction:column; gap:8px; font-size:13px; color:#374151;">
                                 <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:400; margin:0;">
-                                    <input type="checkbox" id="optMeshF1" onchange="toggleMeshOption('Mesh WiFi F1 (Nhà 2 tầng, +10.000đ/tháng)')" style="width:auto; margin:0;">
-                                    <span><strong>Mesh WiFi F1</strong> — Nhà 2 tầng (1 Modem WiFi 6 + 1 Access Point, phí lắp đặt 500.000 VNĐ, <strong>+10.000đ/tháng</strong>)</span>
+                                    <input type="checkbox" id="optMeshF1" onchange="toggleMeshOption('Mesh WiFi F1 (Nhà 2 tầng, +${fn:escapeXml(cms['business.meshF1MonthlyDisplay'])}đ/tháng)')" style="width:auto; margin:0;">
+                                    <span><strong>Mesh WiFi F1</strong> — Nhà 2 tầng (<c:out value="${cms['business.meshF1Equipment']}"/>, phí lắp đặt <fmt:formatNumber value="${cms['business.meshF1Fee']}" pattern="#,###"/> VNĐ, <strong>+${fn:escapeXml(cms['business.meshF1MonthlyDisplay'])}đ/tháng</strong>)</span>
                                 </label>
                                 <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:400; margin:0;">
-                                    <input type="checkbox" id="optMeshF2" onchange="toggleMeshOption('Mesh WiFi F2 (Nhà 3 tầng, +20.000đ/tháng)')" style="width:auto; margin:0;">
-                                    <span><strong>Mesh WiFi F2</strong> — Nhà 3 tầng (1 Modem WiFi 6 + 2 Access Point, phí lắp đặt 700.000 VNĐ, <strong>+20.000đ/tháng</strong>)</span>
+                                    <input type="checkbox" id="optMeshF2" onchange="toggleMeshOption('Mesh WiFi F2 (Nhà 3 tầng, +${fn:escapeXml(cms['business.meshF2MonthlyDisplay'])}đ/tháng)')" style="width:auto; margin:0;">
+                                    <span><strong>Mesh WiFi F2</strong> — Nhà 3 tầng (<c:out value="${cms['business.meshF2Equipment']}"/>, phí lắp đặt <fmt:formatNumber value="${cms['business.meshF2Fee']}" pattern="#,###"/> VNĐ, <strong>+${fn:escapeXml(cms['business.meshF2MonthlyDisplay'])}đ/tháng</strong>)</span>
                                 </label>
                             </div>
                         </div>
@@ -283,8 +289,8 @@
                                list="noteSuggestionsDetail"
                                autocomplete="off">
                         <datalist id="noteSuggestionsDetail">
-                            <option value="Thêm gói Mesh WiFi F1 (nhà 2 tầng - +10.000đ/tháng)">
-                            <option value="Thêm gói Mesh WiFi F2 (nhà 3 tầng - +20.000đ/tháng)">
+                            <option value="Thêm gói Mesh WiFi F1 (nhà 2 tầng - +${fn:escapeXml(cms['business.meshF1MonthlyDisplay'])}đ/tháng)">
+                            <option value="Thêm gói Mesh WiFi F2 (nhà 3 tầng - +${fn:escapeXml(cms['business.meshF2MonthlyDisplay'])}đ/tháng)">
                             <option value="Nhà riêng, 1 tầng">
                             <option value="Nhà riêng, nhiều tầng">
                             <option value="Căn hộ chung cư">
@@ -320,7 +326,7 @@
 
                     <div>
                         <div class="brand-footer">
-                            <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
+                            <img src="${fn:startsWith(cms['header.logo'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['header.logo'])}"
                                  alt="FPT Telecom"
                                  style="height: 55px; width: auto; object-fit: contain; margin-right: 12px;">
                             <div class="brand-text">
@@ -356,7 +362,7 @@
                                 </span>
                                 <div>
                                     <strong>Hotline đăng ký</strong>
-                                    <span class="value">0932 079 469</span>
+                                    <span class="value">${fn:escapeXml(cms['business.phone'])}</span>
                                 </div>
                             </li>
                             <li>
@@ -380,7 +386,7 @@
                                 </span>
                                 <div>
                                     <strong>Email</strong>
-                                    <a href="mailto:PhucBN2@fpt.com">PhucBN2@fpt.com</a>
+                                    <a href="mailto:<c:out value="${cms['business.email']}"/>"><c:out value="${cms['business.email']}"/></a>
                                 </div>
                             </li>
                         </ul>
@@ -398,7 +404,7 @@
                         </div>
                         <div class="phone-info">
                             <small>Hotline hỗ trợ 24/7</small>
-                            <strong>0932 079 469</strong>
+                            <strong>${fn:escapeXml(cms['business.phone'])}</strong>
                         </div>
                     </div>
 

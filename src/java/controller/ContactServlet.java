@@ -157,7 +157,7 @@ if (currentUser != null) {
     }
 
     protected int saveCustomer(CustomerDTO customer) { return customerDAO.insert(customer); }
-    protected PackageDTO findPackage(int id) { return new PackageDAO().getById(id); }
+    protected PackageDTO findPackage(int id) { for(PackageDTO p:cms.SiteContent.publicPackages())if(p.getId()==id)return p;return null; }
     protected boolean sendNotification(String recipient, String subject, String body) { return EmailUtility.sendEmail(recipient, subject, body); }
     protected void logNotification(boolean sent, int customerId, String subject) {
         if (sent) emailLogDAO.insertSuccess(customerId, ADMIN_EMAIL, subject);

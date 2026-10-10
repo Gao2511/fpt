@@ -1,3 +1,4 @@
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -41,7 +42,7 @@
     </c:if>
 
     <form method="post" action="${pageContext.request.contextPath}/admin/users"
-          class="edit-form" id="pwdForm">
+          class="edit-form" id="pwdForm"><input type="hidden" name="csrf_token" value="<c:out value='${csrfToken}'/>">
 
         <input type="hidden" name="action" value="update-password">
         <input type="hidden" name="id" value="${targetUser.id}">

@@ -1,3 +1,5 @@
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%-- =========================================================================
@@ -93,7 +95,7 @@
                 <div class="contact-info-content">
                     <div class="contact-info-label">SỐ ĐIỆN THOẠI / ZALO</div>
                     <div class="contact-info-value">
-                        <a href="tel:0932079469">0932 079 469</a>
+                        <a href="tel:${fn:escapeXml(cms['business.phone'])}">${fn:escapeXml(cms['business.phone'])}</a>
                     </div>
                     <p class="contact-info-desc">
                         Nhận cuộc gọi và tin nhắn Zalo trong giờ hành chính,
@@ -171,7 +173,7 @@
                 </div>
                 <div class="phone-info">
                     <small>Hotline hỗ trợ 24/7</small>
-                    <strong>0932 079 469</strong>
+                    <strong>${fn:escapeXml(cms['business.phone'])}</strong>
                 </div>
             </div>
             <div class="copyright">

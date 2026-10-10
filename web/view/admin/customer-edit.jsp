@@ -1,4 +1,5 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
@@ -43,10 +44,10 @@
 
     <!-- FORM EDIT -->
     <form method="post" action="${pageContext.request.contextPath}/admin/customers"
-          class="edit-form" id="editForm">
+          class="edit-form" id="editForm"><input type="hidden" name="csrf_token" value="<c:out value='${csrfToken}'/>">
 
         <input type="hidden" name="action" value="update">
-        <input type="hidden" name="id" value="${customer.id}">
+        <input type="hidden" name="id" value="${fn:escapeXml(customer.id)}">
 
         <div class="edit-grid">
 
@@ -59,21 +60,21 @@
                 <div class="form-group">
                     <label>Họ và tên <span class="req">*</span></label>
                     <input type="text" name="fullName" id="fullName"
-                           value="${customer.fullName}" required
+                           value="${fn:escapeXml(customer.fullName)}" required
                            placeholder="VD: Nguyễn Văn An">
                 </div>
 
                 <div class="form-group">
                     <label>Số điện thoại <span class="req">*</span></label>
                     <input type="tel" name="phone" id="phone"
-                           value="${customer.phone}" required
+                           value="${fn:escapeXml(customer.phone)}" required
                            placeholder="0912 345 678">
                 </div>
 
                 <div class="form-group">
                     <label>Gmail khách hàng</label>
                     <input type="email" name="email" id="email"
-                           value="${customer.email}"
+                           value="${fn:escapeXml(customer.email)}"
                            placeholder="khachhang@gmail.com">
                     <small class="field-hint">📧 Dùng để gửi thông báo và hóa đơn điện tử</small>
                 </div>
@@ -81,14 +82,14 @@
                 <div class="form-group">
                     <label>Địa chỉ lắp đặt</label>
                     <input type="text" name="address" id="address"
-                           value="${customer.address}"
+                           value="${fn:escapeXml(customer.address)}"
                            placeholder="Ví dụ: 123 Lê Lợi, Phường Bến Nghé, Quận 1, TP. HCM">
                 </div>
 
                 <div class="form-group">
                     <label>Ghi chú nội bộ</label>
                     <textarea name="note" id="note" rows="4"
-                              placeholder="VD: Khách gọi buổi tối, quan tâm camera...">${customer.note}</textarea>
+                              placeholder="VD: Khách gọi buổi tối, quan tâm camera...">${fn:escapeXml(customer.note)}</textarea>
                 </div>
             </div>
 
@@ -170,7 +171,7 @@
             </a>
             <a href="${pageContext.request.contextPath}/admin/customers?action=delete&id=${customer.id}"
                class="btn-danger"
-               onclick="return confirm('Bạn có chắc muốn xóa khách hàng ${customer.fullName}?');">
+               onclick="return confirm('Xác nhận thao tác này?');">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6"/>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>

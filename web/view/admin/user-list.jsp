@@ -1,3 +1,4 @@
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -133,7 +134,7 @@
                                     </c:choose>
                                 </div>
                                 <div class="user-cell-info">
-                                    <strong>${u.username}</strong>
+                                    <strong>${fn:escapeXml(u.username)}</strong>
                                     <small>
                                         <c:choose>
                                             <c:when test="${u.admin}">
@@ -160,9 +161,9 @@
                         </td>
                         <td>
                             <div class="customer-info">
-                                <strong>${u.displayName}</strong>
+                                <strong>${fn:escapeXml(u.displayName)}</strong>
                                 <c:if test="${not empty u.fullName and u.fullName != u.username}">
-                                    <span class="phone">${u.fullName}</span>
+                                    <span class="phone">${fn:escapeXml(u.fullName)}</span>
                                 </c:if>
                             </div>
                         </td>
@@ -173,7 +174,7 @@
                                         <svg class="contact-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                                         </svg>
-                                        <span>${u.phone}</span>
+                                        <span>${fn:escapeXml(u.phone)}</span>
                                     </div>
                                 </c:if>
                                 <c:if test="${not empty u.email}">
@@ -182,7 +183,7 @@
                                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                                         <polyline points="22,6 12,13 2,6"/>
                                         </svg>
-                                        <span>${u.email}</span>
+                                        <span>${fn:escapeXml(u.email)}</span>
                                     </div>
                                 </c:if>
                                 <c:if test="${empty u.phone && empty u.email}">
@@ -230,7 +231,7 @@
                                 <c:when test="${u.active}">
                                     <a href="${pageContext.request.contextPath}/admin/users?action=lock&id=${u.id}"
                                        class="action-btn btn-lock" title="Khóa tài khoản"
-                                       onclick="return confirm('Bạn có chắc muốn khóa tài khoản ${u.username}?');">
+                                       onclick="return confirm('Xác nhận thao tác này?');">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                                             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
@@ -240,7 +241,7 @@
                                 <c:otherwise>
                                     <a href="${pageContext.request.contextPath}/admin/users?action=unlock&id=${u.id}"
                                        class="action-btn btn-unlock" title="Mở lại tài khoản"
-                                       onclick="return confirm('Bạn có chắc muốn mở lại tài khoản ${u.username}?');">
+                                       onclick="return confirm('Xác nhận thao tác này?');">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                                             <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
@@ -252,7 +253,7 @@
                             <%-- Xóa --%>
                             <a href="${pageContext.request.contextPath}/admin/users?action=delete&id=${u.id}"
                                class="action-btn btn-delete" title="Xóa tài khoản"
-                               onclick="return confirm('Bạn có chắc muốn xóa tài khoản ${u.username}? Hành động này KHÔNG thể hoàn tác!');">
+                               onclick="return confirm('Xác nhận thao tác này?');">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polyline points="3 6 5 6 21 6"/>
                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>

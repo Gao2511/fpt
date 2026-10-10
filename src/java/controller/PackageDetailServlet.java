@@ -58,7 +58,7 @@ public class PackageDetailServlet extends HttpServlet {
         // ⭐ ĐÃ BỎ CHECK LOGIN — Khách vẫn vào được
 
         // ===== LẤY GÓI CƯỚC =====
-        PackageDTO pkg = packageDAO.getById(pkgId);
+        PackageDTO pkg=null;for(PackageDTO candidate:cms.SiteContent.publicPackages())if(candidate.getId()==pkgId){pkg=candidate;break;}
         
         System.out.println("   - pkg = " + (pkg != null ? pkg.getName() : "null"));
 

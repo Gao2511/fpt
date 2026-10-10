@@ -10,10 +10,11 @@ import java.util.*;
 public final class ProductCatalog {
     public static final class Product {
         public final int id, speed;
-        public final long price;
+        public final long price, standardInstallationFee;
         public final boolean wifi6, camera, tv180, premierLeague;
         Product(PackageDTO p) {
             id = p.getId(); price = p.getPrice(); speed = p.getSpeedMbps();
+            standardInstallationFee = p.getStandardInstallationFee();
             String details = normalize(p.getDescription() + " " + p.getLongDescription());
             wifi6 = details.matches("(?s).*wi[ -]?fi\\s*6.*");
             camera = details.matches("(?s).*(?:1|mot)\\s+camera.*");
@@ -31,10 +32,15 @@ public final class ProductCatalog {
         }
     }
     private final List<Product> products = new ArrayList<>();
+    public final Map<String,String> business;
     public ProductCatalog(List<PackageDTO> rows) {
+        this(rows,cms.SiteContent.defaults());
+    }
+    public ProductCatalog(List<PackageDTO> rows,Map<String,String> values) {
+        business=Collections.unmodifiableMap(new LinkedHashMap<>(values));
         Set<Integer> seen = new HashSet<>();
         if (rows != null) for (PackageDTO p : rows) {
-            if (p != null && p.getId() > 0 && p.getPrice() > 0 && p.getSpeedMbps() > 0 && seen.add(p.getId())) products.add(new Product(p));
+            if (p != null && p.isActive() && p.getId() > 0 && p.getPrice() > 0 && p.getSpeedMbps() > 0 && seen.add(p.getId())) products.add(new Product(p));
         }
         products.sort(Comparator.comparingLong(p -> p.price));
         if (products.size() > 100) throw new IllegalArgumentException("Catalog too large");
@@ -57,6 +63,10 @@ public final class ProductCatalog {
         for (Product p : products) {
             JsonObject o = new JsonObject(); o.addProperty("id", p.id); o.addProperty("priceVnd", p.price);
             o.addProperty("speedMbps", p.speed); o.addProperty("wifi6", p.wifi6); o.addProperty("oneCamera", p.camera);
+            if (p.standardInstallationFee > 0) {
+                o.addProperty("standardInstallationFeeVnd", p.standardInstallationFee);
+                o.addProperty("installationFeeFrequency", "once_per_installation_before_confirmed_promotions");
+            }
             o.addProperty("tv180", p.tv180); o.addProperty("premierLeague", p.premierLeague); a.add(o);
         }
         return a;

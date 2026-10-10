@@ -48,6 +48,7 @@ public class ProfileServlet extends HttpServlet {
         // Reload từ DB để lấy data mới nhất
         UserDTO freshUser = userDAO.getById(user.getId());
         if (freshUser != null) {
+            freshUser.setPassword(null);
             session.setAttribute("user", freshUser);
         }
 
@@ -59,6 +60,7 @@ public class ProfileServlet extends HttpServlet {
             session.removeAttribute("messageType");
         }
 
+        request.setAttribute("csrfToken",security.AdminSecurity.token(session));
         request.getRequestDispatcher("/view/customer/profile.jsp")
                .forward(request, response);
     }
@@ -79,6 +81,7 @@ public class ProfileServlet extends HttpServlet {
             return;
         }
 
+        if(!security.AdminSecurity.csrf(request)){response.sendError(403);return;}
         // ===== LẤY PARAMS =====
         String newUsername = request.getParameter("username");
         String fullName    = request.getParameter("fullName");
@@ -113,37 +116,8 @@ public class ProfileServlet extends HttpServlet {
         Part filePart = request.getPart("avatar");
 
         if (filePart != null && filePart.getSize() > 0) {
-            String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-            String ext = "";
-            int dotIdx = fileName.lastIndexOf('.');
-            if (dotIdx > 0) ext = fileName.substring(dotIdx).toLowerCase();
-
-            // Chỉ cho phép ảnh
-            if (!ext.matches("\\.(jpg|jpeg|png|gif|webp)$")) {
-                session.setAttribute("message", "✗ Chỉ chấp nhận file ảnh (jpg, png, gif, webp)");
-                session.setAttribute("messageType", "error");
-                response.sendRedirect(request.getContextPath() + "/profile");
-                return;
-            }
-
-            String newFileName = "avatar_" + user.getId() + "_" + UUID.randomUUID() + ext;
-
-            String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIR;
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) uploadDir.mkdirs();
-
-            File saveFile = new File(uploadDir, newFileName);
-            filePart.write(saveFile.getAbsolutePath());
-
-            // Xóa avatar cũ
-            if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
-                String oldPath = getServletContext().getRealPath("") + File.separator
-                               + user.getAvatarUrl().replace("/", File.separator);
-                File oldFile = new File(oldPath);
-                if (oldFile.exists()) oldFile.delete();
-            }
-
-            avatarUrl = UPLOAD_DIR + "/" + newFileName;
+            try(java.io.InputStream input=filePart.getInputStream()) {avatarUrl=new cms.MediaStore().save(cms.MediaStore.validate(input),user.getId()).substring(1);}
+            catch(Exception invalid){session.setAttribute("message","Không thể lưu ảnh. Chọn PNG/JPEG tối đa 2 MB và kiểm tra kho ảnh.");response.sendRedirect(request.getContextPath()+"/profile");return;}
         }
 
         // ===== UPDATE DB =====
@@ -158,6 +132,7 @@ public class ProfileServlet extends HttpServlet {
 
         if (ok) {
             UserDTO updated = userDAO.getById(user.getId());
+            if(updated!=null)updated.setPassword(null);
             session.setAttribute("user", updated);
             session.setAttribute("message", "✓ Cập nhật hồ sơ thành công!");
             session.setAttribute("messageType", "success");

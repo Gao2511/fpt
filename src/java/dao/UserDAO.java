@@ -16,31 +16,7 @@ public class UserDAO {
     // ⭐ ĐĂNG NHẬP — HỖ TRỢ CẢ EMAIL, USERNAME, SỐ ĐIỆN THOẠI
     // =========================================================
     public UserDTO checkLoginLocalByIdentifier(String identifier, String password) {
-        String sql = "SELECT u.id, u.username, u.password, u.role, u.is_active, u.created_at, "
-                   + "       u.avatar_url, u.email, u.phone, u.full_name, "
-                   + "       u.google_id, u.facebook_id, u.auth_provider, u.email_verified, "
-                   + "       u.id AS consultant_id "
-                   + "FROM users u "
-                   + "WHERE (LOWER(u.email) = LOWER(?) OR LOWER(u.username) = LOWER(?) OR u.phone = ? "
-                   + "       OR (? = 'admin@gmail.com' AND u.role = 'admin')) "
-                   + "  AND u.password IS NOT NULL "
-                   + "  AND u.password = ? "
-                   + "  AND u.is_active = TRUE "
-                   + "LIMIT 1";
-
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            String val = identifier.trim();
-            ps.setString(1, val);
-            ps.setString(2, val);
-            ps.setString(3, val);
-            ps.setString(4, val);
-            ps.setString(5, password);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapResultSet(rs);
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-        return null;
+        UserDTO u=getByIdentifier(identifier);if(u==null||!u.isActive()||!security.Passwords.verify(password,u.getPassword()))return null;if(!u.getPassword().startsWith("pbkdf2$")){if(changePassword(u.getId(),password))u.setPassword(null);}return u;
     }
 
     public UserDTO getByIdentifier(String identifier) {
@@ -72,48 +48,11 @@ public class UserDAO {
 
     // ⭐ Giữ lại method cũ nếu chỗ khác còn dùng
     public UserDTO checkLoginByPhoneOrEmail(String input, String password) {
-        String sql = "SELECT u.id, u.username, u.password, u.role, u.is_active, u.created_at, "
-                   + "       u.avatar_url, u.email, u.phone, u.full_name, "
-                   + "       u.google_id, u.facebook_id, u.auth_provider, u.email_verified, "
-                   + "       u.id AS consultant_id "
-                   + "FROM users u "
-                   + "WHERE (u.username = ? OR u.phone = ? OR u.email = ?) "
-                   + "  AND u.password = ? "
-                   + "  AND u.is_active = TRUE";
-
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            String cleaned = input.trim();
-            ps.setString(1, cleaned);
-            ps.setString(2, cleaned);
-            ps.setString(3, cleaned);
-            ps.setString(4, password);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapResultSet(rs);
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-        return null;
+        return checkLoginLocalByIdentifier(input,password);
     }
 
     public UserDTO checkLogin(String username, String password) {
-        String sql = "SELECT u.id, u.username, u.password, u.role, u.is_active, u.created_at, "
-                   + "       u.avatar_url, u.email, u.phone, u.full_name, "
-                   + "       u.google_id, u.facebook_id, u.auth_provider, u.email_verified, "
-                   + "       u.id AS consultant_id "
-                   + "FROM users u "
-                   + "WHERE u.username = ? AND u.password = ? AND u.is_active = TRUE";
-
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, username);
-            ps.setString(2, password);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapResultSet(rs);
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-        return null;
+        return checkLoginLocalByIdentifier(username,password);
     }
 
     // =========================================================
@@ -207,7 +146,7 @@ public class UserDAO {
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, u.getUsername());
-            ps.setString(2, u.getPassword());
+            ps.setString(2, security.Passwords.hash(u.getPassword()));
             String role = u.getRole() != null ? u.getRole() : "customer";
             if (!"admin".equals(role) && !"customer".equals(role)) role = "customer";
             ps.setString(3, role);
@@ -220,7 +159,7 @@ public class UserDAO {
         String sql = "UPDATE users SET password = ? WHERE id = ?";
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, newPassword);
+            ps.setString(1, security.Passwords.hash(newPassword));
             ps.setInt(2, userId);
             return ps.executeUpdate() > 0;
         } catch (Exception e) { e.printStackTrace(); return false; }
@@ -259,16 +198,7 @@ public class UserDAO {
     }
 
     public boolean checkPassword(int userId, String currentPassword) {
-        String sql = "SELECT COUNT(*) FROM users WHERE id = ? AND password = ?";
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ps.setString(2, currentPassword);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return rs.getInt(1) > 0;
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-        return false;
+        UserDTO u=getById(userId);return u!=null && security.Passwords.verify(currentPassword,u.getPassword());
     }
 
     // =========================================================
@@ -309,7 +239,7 @@ public class UserDAO {
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, username);
-            ps.setString(2, password);
+            ps.setString(2, security.Passwords.hash(password));
             int rows = ps.executeUpdate();
             if (rows > 0) {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -329,7 +259,7 @@ public class UserDAO {
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, username);
-            ps.setString(2, password);
+            ps.setString(2, security.Passwords.hash(password));
             ps.setString(3, fullName);
 
             if (phone == null || phone.trim().isEmpty()) {

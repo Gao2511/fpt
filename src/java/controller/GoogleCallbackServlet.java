@@ -130,6 +130,8 @@ public class GoogleCallbackServlet extends HttpServlet {
             }
 
             // ===== 4. Đăng nhập =====
+            request.changeSessionId();
+            user.setPassword(null);
             session.setAttribute("user", user);
             session.setMaxInactiveInterval(30 * 60);
 
@@ -143,7 +145,7 @@ public class GoogleCallbackServlet extends HttpServlet {
             Object redirectUrl = session.getAttribute("redirectAfterLogin");
             if (redirectUrl != null) {
                 session.removeAttribute("redirectAfterLogin");
-                response.sendRedirect((String) redirectUrl);
+                response.sendRedirect(security.AdminSecurity.redirect((String)redirectUrl,request.getContextPath(),request.getContextPath()+"/home"));
             } else {
                 response.sendRedirect(request.getContextPath() + "/dashboard");
             }

@@ -22,7 +22,7 @@ public class DashboardRouterServlet extends HttpServlet {
         }
 
         // Admin → vào dashboard admin
-        if ("admin".equals(user.getRole())) {
+        if ("admin".equals(user.getRole()) || security.AdminSecurity.demo(user)) {
             response.sendRedirect(request.getContextPath() + "/admin/dashboard");
         }
         // Customer → về trang chủ (nhưng đã có session → hiển thị banner chào mừng)

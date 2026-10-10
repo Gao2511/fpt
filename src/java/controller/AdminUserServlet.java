@@ -35,6 +35,7 @@ public class AdminUserServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
+        if (security.AdminSecurity.mutation(action) && !"POST".equals(request.getMethod())) { response.sendError(405); return; }
 
         // ⭐ KHÓA
         if ("lock".equals(action)) {
@@ -73,6 +74,7 @@ public class AdminUserServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
+        if (security.AdminSecurity.mutation(action)) { doGet(request,response); return; }
 
         // ⭐ XỬ LÝ ĐỔI MẬT KHẨU
         if ("update-password".equals(action)) {
@@ -95,6 +97,7 @@ public class AdminUserServlet extends HttpServlet {
             try {
                 int id = Integer.parseInt(idStr);
                 UserDTO target = userDAO.getById(id);
+                if(target==null){response.sendError(404);return;}
 
                 UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
                 if (currentUser != null && currentUser.getId() == id) {
@@ -117,6 +120,7 @@ public class AdminUserServlet extends HttpServlet {
             try {
                 int id = Integer.parseInt(idStr);
                 UserDTO target = userDAO.getById(id);
+                if(target==null){response.sendError(404);return;}
                 if (userDAO.unlockAccount(id)) {
                     setMessage(request, "✓ Đã mở lại tài khoản #" + id + " (" + target.getDisplayName() + ")", "success");
                 } else {
@@ -135,6 +139,7 @@ public class AdminUserServlet extends HttpServlet {
             try {
                 int id = Integer.parseInt(idStr);
                 UserDTO target = userDAO.getById(id);
+                if(target==null){response.sendError(404);return;}
 
                 UserDTO currentUser = (UserDTO) request.getSession().getAttribute("user");
                 if (currentUser != null && currentUser.getId() == id) {
@@ -163,6 +168,7 @@ public class AdminUserServlet extends HttpServlet {
         try {
             int id = Integer.parseInt(idStr);
             UserDTO target = userDAO.getById(id);
+                if(target==null){response.sendError(404);return;}
             if (target == null) {
                 setMessage(request, "✗ Không tìm thấy tài khoản", "error");
                 response.sendRedirect(request.getContextPath() + "/admin/users");
@@ -218,6 +224,7 @@ public class AdminUserServlet extends HttpServlet {
         try {
             int id = Integer.parseInt(idStr);
             UserDTO target = userDAO.getById(id);
+                if(target==null){response.sendError(404);return;}
             if (target == null) {
                 setMessage(request, "✗ Không tìm thấy tài khoản", "error");
                 response.sendRedirect(request.getContextPath() + "/admin/users");

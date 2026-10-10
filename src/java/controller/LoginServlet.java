@@ -23,7 +23,7 @@ public class LoginServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("user") != null) {
             UserDTO user = (UserDTO) session.getAttribute("user");
-            if ("admin".equals(user.getRole())) {
+            if ("admin".equals(user.getRole()) || security.AdminSecurity.demo(user)) {
                 response.sendRedirect(request.getContextPath() + "/admin/dashboard");
             } else {
                 response.sendRedirect(request.getContextPath() + "/home");
@@ -58,6 +58,9 @@ public class LoginServlet extends HttpServlet {
         }
 
         identifier = identifier.trim();
+        UserDTO demo=security.DemoAccount.authenticate(identifier,password);
+        if(demo!=null){request.getSession(true);request.changeSessionId();HttpSession demoSession=request.getSession();demoSession.setAttribute("user",demo);demoSession.setMaxInactiveInterval(30*60);response.sendRedirect(request.getContextPath()+"/admin/dashboard");return;}
+
 
         // ===== BƯỚC 1: Kiểm tra tài khoản có tồn tại không =====
         UserDTO byUser = userDAO.getByIdentifier(identifier);
@@ -102,6 +105,8 @@ public class LoginServlet extends HttpServlet {
 
         // ===== ĐĂNG NHẬP THÀNH CÔNG =====
         HttpSession session = request.getSession(true);
+        request.changeSessionId();
+        user.setPassword(null);
         session.setAttribute("user", user);
         session.setMaxInactiveInterval(30 * 60);
 
@@ -124,7 +129,7 @@ public class LoginServlet extends HttpServlet {
             finalRedirect = (String) redirectUrl;
             session.removeAttribute("redirectAfterLogin");
             System.out.println("   → Dùng redirectAfterLogin session: " + finalRedirect);
-        } else if ("admin".equals(user.getRole())) {
+        } else if ("admin".equals(user.getRole()) || security.AdminSecurity.demo(user)) {
             finalRedirect = request.getContextPath() + "/admin/dashboard";
             System.out.println("   → Dùng mặc định admin /admin/dashboard");
         } else {
@@ -135,6 +140,6 @@ public class LoginServlet extends HttpServlet {
         System.out.println("   ➡️ FINAL REDIRECT: " + finalRedirect);
         System.out.println("==========================================");
 
-        response.sendRedirect(finalRedirect);
+        response.sendRedirect(security.AdminSecurity.redirect(finalRedirect,request.getContextPath(),request.getContextPath()+("admin".equals(user.getRole())?"/admin/dashboard":"/home")));
     }
 }

@@ -1,3 +1,5 @@
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!-- =========================================================
@@ -8,7 +10,7 @@
     <div class="container">
         <!-- LOGO FPT TELECOM -->
         <a href="${pageContext.request.contextPath}/home" class="logo" title="FPT Telecom">
-            <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
+            <img src="${fn:startsWith(cms['header.logo'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['header.logo'])}"
                  alt="FPT Telecom"
                  style="height: 50px; width: auto; object-fit: contain; display: block;">
         </a>
@@ -17,20 +19,20 @@
         <nav class="menu">
             <c:choose>
                 <c:when test="${param.isHomePage == 'true'}">
-                    <a href="${pageContext.request.contextPath}/home" onclick="goHome(event)" class="active">Trang chủ</a>
-                    <a href="#packages" onclick="scrollToSection(event, 'packages')">Bảng giá</a>
-                    <a href="#contact" onclick="scrollToSection(event, 'contact')">Tư vấn</a>
-                    <a href="${pageContext.request.contextPath}/contact">Liên hệ</a>
+                    <c:if test="${cms['nav.home.visible']=='true'}"><a style="order:${cms['nav.home.order']};" href="${fn:startsWith(cms['nav.home.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.home.url'])}" class="active"><c:out value="${cms['nav.home.label']}"/></a></c:if>
+                    <c:if test="${cms['nav.packages.visible']=='true'}"><a style="order:${cms['nav.packages.order']};" href="${fn:startsWith(cms['nav.packages.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.packages.url'])}"><c:out value="${cms['nav.packages.label']}"/></a></c:if>
+                    <c:if test="${cms['nav.consultation.visible']=='true'}"><a style="order:${cms['nav.consultation.order']};" href="${fn:startsWith(cms['nav.consultation.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.consultation.url'])}"><c:out value="${cms['nav.consultation.label']}"/></a></c:if>
+                    <c:if test="${cms['nav.contact.visible']=='true'}"><a style="order:${cms['nav.contact.order']};" href="${fn:startsWith(cms['nav.contact.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.contact.url'])}"><c:out value="${cms['nav.contact.label']}"/></a></c:if>
                 </c:when>
                 <c:otherwise>
-                    <a href="${pageContext.request.contextPath}/home"
-                       class="${param.activeMenu == 'home' ? 'active' : ''}">Trang chủ</a>
-                    <a href="${pageContext.request.contextPath}/home#packages"
-                       class="${param.activeMenu == 'packages' ? 'active' : ''}">Bảng giá</a>
+                    <c:if test="${cms['nav.home.visible']=='true'}"><a style="order:${cms['nav.home.order']};" href="${fn:startsWith(cms['nav.home.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.home.url'])}"
+                       class="${param.activeMenu == 'home' ? 'active' : ''}"><c:out value="${cms['nav.home.label']}"/></a></c:if>
+                    <c:if test="${cms['nav.packages.visible']=='true'}"><a style="order:${cms['nav.packages.order']};" href="${fn:startsWith(cms['nav.packages.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.packages.url'])}"
+                       class="${param.activeMenu == 'packages' ? 'active' : ''}"><c:out value="${cms['nav.packages.label']}"/></a></c:if>
                     <a href="${pageContext.request.contextPath}/my-orders"
                        class="${param.activeMenu == 'orders' ? 'active' : ''}">Xem đơn</a>
-                    <a href="${pageContext.request.contextPath}/contact"
-                       class="${param.activeMenu == 'contact' ? 'active' : ''}">Liên hệ</a>
+                    <c:if test="${cms['nav.contact.visible']=='true'}"><a style="order:${cms['nav.contact.order']};" href="${fn:startsWith(cms['nav.contact.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.contact.url'])}"
+                       class="${param.activeMenu == 'contact' ? 'active' : ''}"><c:out value="${cms['nav.contact.label']}"/></a></c:if>
                 </c:otherwise>
             </c:choose>
         </nav>
@@ -38,7 +40,7 @@
         <!-- KHU VỰC BÊN PHẢI (HOTLINE & TÀI KHOẢN) -->
         <div class="right">
             <!-- Khối Hotline liên hệ nhanh -->
-            <a href="tel:0932079469" class="hotline-box" title="Gọi Hotline 0932 079 469" style="text-decoration: none; color: inherit;">
+            <a href="tel:${fn:escapeXml(cms['business.phone'])}" class="hotline-box" title="Gọi Hotline ${fn:escapeXml(cms['business.phone'])}" style="text-decoration: none; color: inherit;">
                 <div class="icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
@@ -46,7 +48,7 @@
                 </div>
                 <div class="text">
                     <small>Hotline</small>
-                    <strong>0932 079 469</strong>
+                    <strong>${fn:escapeXml(cms['business.phone'])}</strong>
                 </div>
             </a>
 
@@ -59,7 +61,7 @@
                 </c:when>
 
                 <%-- 2. Quản trị viên (Admin) --%>
-                <c:when test="${sessionScope.user.role == 'admin'}">
+                <c:when test="${sessionScope.user.role == 'admin' || sessionScope.user.role == 'demo_admin'}">
                     <a href="${pageContext.request.contextPath}/admin/dashboard" class="btn-login-small">Trang quản trị</a>
                     <a href="${pageContext.request.contextPath}/logout" class="btn-register-small">Đăng xuất</a>
                 </c:when>
@@ -163,10 +165,10 @@
 <!-- ⭐ MOBILE MENU OVERLAY & DRAWER -->
 <div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
 <div class="mobile-menu" id="mobileMenu">
-    <a href="${pageContext.request.contextPath}/home" onclick="handleMobileNav(event, this)">Trang chủ</a>
-    <a href="${pageContext.request.contextPath}/home#packages" onclick="handleMobileNav(event, this)">Bảng giá</a>
-    <a href="${pageContext.request.contextPath}/home#contact" onclick="handleMobileNav(event, this)">Tư vấn</a>
-    <a href="${pageContext.request.contextPath}/contact" onclick="handleMobileNav(event, this)">Liên hệ</a>
+    <c:if test="${cms['nav.home.visible']=='true'}"><a style="order:${cms['nav.home.order']};" href="${fn:startsWith(cms['nav.home.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.home.url'])}"><c:out value="${cms['nav.home.label']}"/></a></c:if>
+    <c:if test="${cms['nav.packages.visible']=='true'}"><a style="order:${cms['nav.packages.order']};" href="${fn:startsWith(cms['nav.packages.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.packages.url'])}"><c:out value="${cms['nav.packages.label']}"/></a></c:if>
+    <c:if test="${cms['nav.consultation.visible']=='true'}"><a style="order:${cms['nav.consultation.order']};" href="${fn:startsWith(cms['nav.consultation.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.consultation.url'])}"><c:out value="${cms['nav.consultation.label']}"/></a></c:if>
+    <c:if test="${cms['nav.contact.visible']=='true'}"><a style="order:${cms['nav.contact.order']};" href="${fn:startsWith(cms['nav.contact.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.contact.url'])}"><c:out value="${cms['nav.contact.label']}"/></a></c:if>
     <c:choose>
         <c:when test="${not empty sessionScope.user}">
             <a href="${pageContext.request.contextPath}/profile" onclick="handleMobileNav(event, this)">Hồ sơ cá nhân</a>

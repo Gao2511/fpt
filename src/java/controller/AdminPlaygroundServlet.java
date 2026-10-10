@@ -33,6 +33,7 @@ public class AdminPlaygroundServlet extends HttpServlet {
                 String key = request.getParameter("apiKey");
                 if (key == null || key.trim().isEmpty() || CryptoUtil.isMasked(key)) key = AIService.getDecryptedApiKey(providerId);
                 String url = value(request, "baseUrl", AIService.getBaseUrl(providerId));
+                if(url!=null && !url.isEmpty())ai.security.SSRFValidator.validateBaseUrl(url,ai.security.SSRFValidator.localAllowed(url));
                 double temperature = Double.parseDouble(value(request, "temperature", Double.toString(cfg.temperature)));
                 int tokens = Integer.parseInt(value(request, "maxTokens", Integer.toString(cfg.maxTokens)));
                 if (!Double.isFinite(temperature) || temperature < 0 || temperature > 0.5 || tokens < 1200 || tokens > 2400) throw new IllegalArgumentException("Invalid generation settings");

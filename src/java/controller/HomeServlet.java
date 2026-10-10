@@ -24,7 +24,7 @@ public class HomeServlet extends HttpServlet {
         request.setAttribute("currentUser", user);
 
         // LẤY 4 GÓI TỪ DB
-        List<PackageDTO> packages = packageDAO.getAll();
+        List<PackageDTO> packages = cms.SiteContent.publicPackages();
         request.setAttribute("packages", packages);
         request.setAttribute("registrationToken", utils.RegistrationSubmission.issue(request.getSession(true)));
 

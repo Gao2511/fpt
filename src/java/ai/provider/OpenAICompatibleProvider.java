@@ -355,7 +355,7 @@ public class OpenAICompatibleProvider implements LLMProvider {
 
     private void validateUrlSafety(String url) throws AIException {
         try {
-            boolean allowLocal = "custom".equals(id) || url.contains("localhost") || url.contains("127.0.0.1") || url.contains("11434");
+            boolean allowLocal = SSRFValidator.localAllowed(url);
             SSRFValidator.validateBaseUrl(url, allowLocal);
         } catch (IllegalArgumentException iae) {
             throw new AIException(AIException.ErrorType.INVALID_REQUEST, iae.getMessage(), getDisplayName());

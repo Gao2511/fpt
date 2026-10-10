@@ -37,7 +37,37 @@ public final class ConsultationPolicy {
         return arr;
     }
 
+    public static ChatResponse installationFee(String question, CustomerRequirements memory, ProductCatalog catalog) {
+        String q = ProductCatalog.normalize(question);
+        if (registrationRequested(question) || ConversationSignals.handoff(question)
+                || q.matches("(?s).*(mesh|\\bf1\\b|\\bf2\\b|camera|truyen hinh|fpt play).*") ) return null;
+        boolean monthly = q.matches("(?s).*300\\s*(k|nghin|ngan|[.,]000).*" )
+                && (q.contains("thang") || q.contains("mot lan") || q.contains("1 lan"));
+        boolean fee = q.matches("(?s).*(phi (lap|hoa mang)|gia lap|lap.*(bao nhieu|mat.*tien|ton.*tien|mat phi)).*");
+        if (!fee && !monthly) return null;
+        List<ProductCatalog.Product> mentioned = catalog.mentioned(question);
+        if (mentioned.isEmpty() && q.matches("(?s).*goi\\s+[0-9]+.*")) return null;
+        List<ProductCatalog.Product> plans = mentioned.isEmpty() ? catalog.all() : mentioned;
+        if (plans.isEmpty()) return unavailable();
+        if(!mentioned.isEmpty())for(ProductCatalog.Product p:mentioned)if(p.standardInstallationFee<=0)return reply("Dạ phí lắp đặt của gói đang hỏi chưa được xác nhận. Anh/chị vui lòng liên hệ tư vấn viên để kiểm tra chính sách áp dụng.");
+        if(mentioned.size()>1){StringBuilder fees=new StringBuilder("Dạ phí lắp đặt trả một lần, cước hàng tháng tính riêng:\n");for(ProductCatalog.Product p:mentioned)fees.append("Gói ").append(p.label()).append(": ").append(String.format(Locale.US,"%,d",p.standardInstallationFee).replace(',','.')).append("đ/lần; cước ").append(String.format(Locale.US,"%,d",p.price).replace(',','.')).append("đ/tháng.\n");return reply(fees.append("Phí thực tế áp dụng theo chính sách được xác nhận cho từng trường hợp.").toString());}
+        long feeAmount=mentioned.isEmpty()?Long.parseLong(catalog.business.get("business.standardFee")):mentioned.get(0).standardInstallationFee;
+        String amount = String.format(Locale.US, "%,d", feeAmount).replace(',', '.');
+        StringBuilder text = new StringBuilder(monthly ? "Dạ không ạ, " + amount + "đ là phí lắp đặt Internet thông thường trả một lần, không phải cước hàng tháng. " : "Dạ phí lắp đặt Internet FPT thông thường là " + amount + "đ/lần lắp đặt. ");
+        for (ProductCatalog.Product p : mentioned) text.append("Gói ").append(p.label()).append(" có cước ")
+                .append(String.format(Locale.US, "%,d", p.price).replace(',', '.')).append("đ/tháng. ");
+        if (mentioned.isEmpty()) text.append("Cước hàng tháng tính riêng theo gói Internet mình chọn. ");
+        text.append("Phí thực tế áp dụng theo chính sách ưu đãi được xác nhận; em chưa có dữ liệu xác nhận miễn giảm cho trường hợp của anh/chị.");
+        return reply(text.toString());
+    }
+
     public static ChatResponse known(String question, CustomerRequirements memory, ProductCatalog catalog) {
+        ChatResponse result=knownOriginal(question,memory,catalog);
+        if(result!=null)result.setContent(facts(result.getContent(),catalog.business));return result;
+    }
+    private static ChatResponse knownOriginal(String question, CustomerRequirements memory, ProductCatalog catalog) {
+        ChatResponse installation = installationFee(question, memory, catalog);
+        if (installation != null) return installation;
         String q = ProductCatalog.normalize(question);
         List<ProductCatalog.Product> mentioned = catalog.mentioned(question);
         if (registrationRequested(question)) return registration(question, memory, catalog, mentioned);
@@ -102,8 +132,14 @@ public final class ConsultationPolicy {
                 + "Lưu ý: Phí hàng tháng của Mesh WiFi là phí cộng thêm vào tiền cước gói Internet hàng tháng. Anh/chị cho em biết số tầng và diện tích nhà để em tư vấn chi tiết nhé!");
         }
 
+        if ((q.contains("uu dai")||q.contains("khuyen mai")) && cms.SiteContent.promotionVisible(catalog.business)) {
+            String ids=catalog.business.get("business.promotionPackageIds");
+            boolean applies=mentioned.isEmpty()||ids.isEmpty();
+            for(ProductCatalog.Product p:mentioned)if(java.util.Arrays.asList(ids.split(",")).contains(Integer.toString(p.id)))applies=true;
+            if(applies)return reply(catalog.business.get("business.promotionTitle")+"\n"+catalog.business.get("business.promotionDescription")+"\nĐiều kiện áp dụng theo thông tin trên; phí thực tế cần được xác nhận, không tự động tính miễn giảm.");
+        }
         if (q.matches("(?s).*(phi (?:lap|hoa)|gia lap|lap dat.*bao nhieu|khuyen mai|uu dai|giam gia|hop dong|vung phu|ha tang|bao lau.*lap).*"))
-            return reply("Em chưa có dữ liệu xác nhận về phí lắp đặt, ưu đãi, điều khoản hoặc hạ tầng tại địa chỉ của anh/chị. Anh/chị có thể gửi biểu mẫu tư vấn hoặc liên hệ " + CONTACT + " để được kiểm tra; em chưa thể báo chi phí hay cam kết lịch lắp đặt.");
+            return reply("Em chưa có dữ liệu xác nhận về phí sau ưu đãi, điều khoản hoặc hạ tầng tại địa chỉ của anh/chị. Anh/chị có thể gửi biểu mẫu tư vấn hoặc liên hệ " + CONTACT + " để được kiểm tra; em chưa thể báo chi phí thực tế hay cam kết lịch lắp đặt.");
         if (q.contains("ban chay") || q.contains("pho bien nhat"))
             return reply("Em chưa có số liệu bán hàng để xác định gói bán chạy nhất. Anh/chị cho em biết ngân sách, số người sử dụng và nhu cầu chính để em chọn gói phù hợp nhé.");
         if (q.contains("so sanh") || mentioned.size() >= 2 || q.contains("khac nhau") || q.contains("tat ca") || q.contains("6 goi")) {
@@ -183,10 +219,22 @@ public final class ConsultationPolicy {
     public static ChatResponse fallback(String question, CustomerRequirements memory, ProductCatalog catalog) {
         ChatResponse known = known(question, memory, catalog);
         if (known != null) return known;
-        return reply(TECHNICAL_FAILURE);
+        return reply(facts(TECHNICAL_FAILURE,catalog.business));
     }
     private static ChatResponse unavailable() { return reply("Em chưa tải được danh mục gói cước hiện tại nên chưa thể xác nhận giá và quyền lợi. Anh/chị vui lòng thử lại hoặc gửi biểu mẫu tư vấn trên trang để được hỗ trợ."); }
     public static ChatResponse reply(String message) {
         ChatResponse r = new ChatResponse(message, "catalog", "", 0); r.setFinishReason("stop"); return r;
     }
+    public static String facts(String message,Map<String,String> v){
+        Map<String,String> replacements=new LinkedHashMap<>();
+        String phone=v.get("business.phone"),zalo=v.get("business.zalo");
+        String contact="https://zalo.me/".concat(phone).equals(zalo)?"điện thoại/Zalo ":"điện thoại ";
+        contact+=phone.replaceFirst("([0-9]{4})([0-9]{3})([0-9]+)","$1 $2 $3");
+        if(zalo!=null&&!zalo.isEmpty()&&!zalo.equals("https://zalo.me/"+phone))contact+=" hoặc Zalo "+zalo;
+        replacements.put(CONTACT,contact);
+        for(int i=1;i<=2;i++){replacements.put((i==1?"500.000":"700.000")+" VNĐ",cms.SiteContent.amount(v,"business.meshF"+i+"Fee")+" VNĐ");replacements.put((i==1?"10.000":"20.000")+"đ/tháng",cms.SiteContent.amount(v,"business.meshF"+i+"Monthly")+"đ/tháng");replacements.put("1 Modem WiFi 6 + "+i+" Access Point",v.get("business.meshF"+i+"Equipment"));}
+        StringBuilder pattern=new StringBuilder("(?<![0-9])(?:");for(String key:replacements.keySet()){if(pattern.charAt(pattern.length()-1)!=':')pattern.append('|');pattern.append(java.util.regex.Pattern.quote(key));}pattern.append(")(?![0-9])");
+        java.util.regex.Matcher match=java.util.regex.Pattern.compile(pattern.toString()).matcher(message);StringBuffer out=new StringBuffer();while(match.find())match.appendReplacement(out,java.util.regex.Matcher.quoteReplacement(replacements.get(match.group())));match.appendTail(out);return out.toString();
+    }
+    public static com.google.gson.JsonArray meshOptionsJson(Map<String,String> v){com.google.gson.JsonArray a=meshOptionsJson();for(int i=0;i<2;i++){com.google.gson.JsonObject o=a.get(i).getAsJsonObject();String k="business.meshF"+(i+1);o.addProperty("devices",v.get(k+"Equipment"));o.addProperty("installationFeeVnd",Long.parseLong(v.get(k+"Fee")));o.addProperty("monthlyAddonVnd",Long.parseLong(v.get(k+"Monthly")));o.addProperty("note",facts(o.get("note").getAsString(),v));}return a;}
 }

@@ -107,7 +107,7 @@
 
             <!-- ============ FORM UPDATE ============ -->
             <form method="post" action="${pageContext.request.contextPath}/profile"
-                  enctype="multipart/form-data" id="profileForm">
+                  enctype="multipart/form-data" id="profileForm"><input type="hidden" name="csrf_token" value="<c:out value='${csrfToken}'/>">
 
                 <input type="file" id="avatarInput" name="avatar"
                        accept="image/*" style="display:none;"

@@ -52,6 +52,7 @@ public class AdminSettingsServlet extends HttpServlet {
         settingsMap.put("ai_temperature", Double.toString(consultationConfig.temperature));
         settingsMap.put("ai_max_tokens", Integer.toString(consultationConfig.maxTokens));
         request.setAttribute("settingsMap", settingsMap);
+        request.setAttribute("promptRevisions",settingsDAO.revisions("prompt"));
 
         // Danh sách tất cả các provider đã đăng ký trong hệ thống
         List<LLMProvider> providers = ProviderRegistry.getAll();
@@ -99,6 +100,11 @@ public class AdminSettingsServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
+        if("rollbackPrompt".equals(action)) {
+            try {UserDTO u=(UserDTO)request.getSession().getAttribute("user");boolean ok=settingsDAO.rollbackLatest(Integer.parseInt(request.getParameter("revisionId")),u.getId(),"prompt");if(ok)AIService.invalidateCache();request.getSession().setAttribute("message",ok?"Đã khôi phục prompt":"Không thể khôi phục bản này");}catch(Exception e){request.getSession().setAttribute("message","Không thể khôi phục prompt");}
+            response.sendRedirect(request.getContextPath()+"/admin/settings");return;
+        }
+
 
         // ===== 1. KIỂM TRA KẾT NỐI API TRỰC TIẾP (TEST CONNECTION) =====
         if ("testConnection".equals(action)) {
@@ -184,6 +190,7 @@ public class AdminSettingsServlet extends HttpServlet {
         }
 
         try {
+            SSRFValidator.validateBaseUrl(baseUrl,SSRFValidator.localAllowed(baseUrl));
             ChatResponse chatResp = provider.testConnection(apiKey, model, baseUrl);
             result.addProperty("success", true);
             result.addProperty("message", "Kết nối thành công tới " + provider.getDisplayName()
@@ -236,6 +243,7 @@ public class AdminSettingsServlet extends HttpServlet {
         }
 
         try {
+            SSRFValidator.validateBaseUrl(baseUrl,SSRFValidator.localAllowed(baseUrl));
             List<ModelInfo> models = provider.listModels(apiKey, baseUrl);
             JsonArray modelArr = new JsonArray();
             for (ModelInfo m : models) {
@@ -315,121 +323,21 @@ public class AdminSettingsServlet extends HttpServlet {
     // HELPER: LƯU CẤU HÌNH VÀ GHI AUDIT LOG
     // =========================================================
     private void handleSaveSettings(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        UserDTO currentUser = (UserDTO) session.getAttribute("user");
-        String adminName = (currentUser != null && currentUser.getFullName() != null)
-                ? currentUser.getFullName() : "Admin";
-
-        String activeProvider = request.getParameter("ai_active_provider");
-        String activeModel = request.getParameter("ai_active_model");
-        String fallbackProvider = request.getParameter("ai_fallback_provider");
-        String fallbackModel = request.getParameter("ai_fallback_model");
-
-        String apiKey = request.getParameter("current_api_key");
-        String baseUrl = request.getParameter("current_base_url");
-
-        String systemPrompt = request.getParameter("ai_system_prompt");
-        String temperature = request.getParameter("ai_temperature");
-        String maxTokens = request.getParameter("ai_max_tokens");
-        String chatbotEnabled = request.getParameter("ai_chatbot_enabled");
-
-        if (activeProvider == null || activeProvider.trim().isEmpty()) {
-            activeProvider = "gemini";
-        }
-        activeProvider = activeProvider.trim().toLowerCase();
+        HttpSession session=request.getSession();UserDTO user=(UserDTO)session.getAttribute("user");
         try {
-            double t = Double.parseDouble(temperature);
-            int limit = Integer.parseInt(maxTokens);
-            if (!Double.isFinite(t) || t < 0 || t > 0.5 || limit < 1200 || limit > 2400 ||
-                !ProviderRegistry.exists(activeProvider) || activeModel == null || !activeModel.matches("[A-Za-z0-9._:/-]{1,160}") ||
-                ("gemini".equals(activeProvider) && activeModel.matches("gemini-(?:1\\..*|2\\.0.*)"))) throw new IllegalArgumentException();
-            if (fallbackProvider != null && !fallbackProvider.trim().isEmpty() &&
-                (!ProviderRegistry.exists(fallbackProvider) || fallbackModel == null || !fallbackModel.matches("[A-Za-z0-9._:/-]{1,160}"))) throw new IllegalArgumentException();
-        } catch (Exception invalid) {
-            session.setAttribute("message", "Kiểm tra model qua Đồng bộ từ API Key; temperature phải từ 0 đến 0.5 và token từ 1200 đến 2400.");
-            session.setAttribute("messageType", "error"); return;
-        }
-
-        // 1. Lưu API Key của Provider hiện tại nếu có thay đổi
-        if (apiKey != null && !apiKey.trim().isEmpty() && !CryptoUtil.isMasked(apiKey)) {
-            AIService.saveProviderApiKey(activeProvider, apiKey.trim());
-        }
-
-        // 2. Lưu Base URL (có SSRF Validation)
-        if (baseUrl != null) {
-            String trimmedUrl = baseUrl.trim();
-            if (!trimmedUrl.isEmpty() && !"gemini".equals(activeProvider) && !"claude".equals(activeProvider)) {
-                try {
-                    boolean allowLocal = "custom".equals(activeProvider) || trimmedUrl.contains("localhost") || trimmedUrl.contains("127.0.0.1");
-                    SSRFValidator.validateBaseUrl(trimmedUrl, allowLocal);
-                    settingsDAO.update("ai_provider_" + activeProvider + "_base_url", trimmedUrl);
-                } catch (IllegalArgumentException iae) {
-                    session.setAttribute("message", "⚠️ Cảnh báo: Base URL không hợp lệ: " + iae.getMessage());
-                    session.setAttribute("messageType", "warning");
-                    return;
-                }
-            } else if (trimmedUrl.isEmpty()) {
-                settingsDAO.update("ai_provider_" + activeProvider + "_base_url", "");
-            }
-        }
-
-        // 3. Cập nhật Active & Fallback Provider / Model
-        String oldActiveProvider = settingsDAO.getValue("ai_active_provider");
-        String oldActiveModel = settingsDAO.getValue("ai_active_model");
-
-        settingsDAO.update("ai_active_provider", activeProvider);
-        if (activeModel != null && !activeModel.trim().isEmpty()) {
-            settingsDAO.update("ai_active_model", activeModel.trim());
-            if ("gemini".equals(activeProvider)) {
-                settingsDAO.update("gemini_model", activeModel.trim());
-            }
-        }
-
-        if (fallbackProvider != null) {
-            settingsDAO.update("ai_fallback_provider", fallbackProvider.trim().toLowerCase());
-        }
-        if (fallbackModel != null) {
-            settingsDAO.update("ai_fallback_model", fallbackModel.trim());
-        }
-
-        // 4. Cập nhật System Prompt, Temperature, Max Tokens
-        if (systemPrompt != null) {
-            if (!settingsDAO.update("ai_system_prompt", systemPrompt)) {
-                AIService.invalidateCache();
-                session.setAttribute("message", "Không thể lưu system prompt. Vui lòng thử lại.");
-                session.setAttribute("messageType", "error");
-                return;
-            }
-            settingsDAO.update("gemini_system_prompt", systemPrompt);
-        }
-
-        if (temperature != null && !temperature.trim().isEmpty()) {
-            settingsDAO.update("ai_temperature", temperature.trim());
-            settingsDAO.update("gemini_temperature", temperature.trim());
-        }
-
-        if (maxTokens != null && !maxTokens.trim().isEmpty()) {
-            settingsDAO.update("ai_max_tokens", maxTokens.trim());
-            settingsDAO.update("gemini_max_tokens", maxTokens.trim());
-        }
-
-        // 5. Trạng thái Chatbot Enabled
-        if ("true".equalsIgnoreCase(chatbotEnabled) || "on".equalsIgnoreCase(chatbotEnabled)) {
-            settingsDAO.update("ai_chatbot_enabled", "true");
-        } else {
-            settingsDAO.update("ai_chatbot_enabled", "false");
-        }
-
-        // 6. Ghi Audit Log an toàn (không ghi API key)
-        System.out.println(String.format(
-                "📋 [AI Audit Log] Admin '%s' đã cập nhật cấu hình AI: Provider [%s -> %s], Model [%s -> %s], Fallback [%s/%s]",
-                adminName, oldActiveProvider, activeProvider, oldActiveModel, activeModel, fallbackProvider, fallbackModel
-        ));
-
-        // 7. Làm mới Cache in-memory
-        AIService.invalidateCache();
-
-        session.setAttribute("message", "✓ Đã lưu thành công cấu hình AI Đa Nhà Cung Cấp! Thay đổi áp dụng ngay lập tức.");
-        session.setAttribute("messageType", "success");
+            if(!security.AdminSecurity.admin(user)||!security.AdminSecurity.csrf(request))throw new IllegalArgumentException("Không có quyền lưu");
+            String provider=request.getParameter("ai_active_provider"),model=request.getParameter("ai_active_model"),fallback=request.getParameter("ai_fallback_provider"),fallbackModel=request.getParameter("ai_fallback_model");
+            double temperature=Double.parseDouble(request.getParameter("ai_temperature"));int tokens=Integer.parseInt(request.getParameter("ai_max_tokens"));
+            if(!ProviderRegistry.exists(provider)||model==null||!model.matches("[A-Za-z0-9._:/-]{1,160}")||!Double.isFinite(temperature)||temperature<0||temperature>0.5||tokens<1200||tokens>2400)throw new IllegalArgumentException("Kiểm tra provider, model, temperature và token");
+            if(fallback!=null&&!fallback.isEmpty()&&(!ProviderRegistry.exists(fallback)||fallbackModel==null||!fallbackModel.matches("[A-Za-z0-9._:/-]{1,160}")))throw new IllegalArgumentException("Provider dự phòng không hợp lệ");
+            String prompt=request.getParameter("ai_system_prompt");if(prompt==null||prompt.length()>12000||prompt.indexOf((char)0)>=0)throw new IllegalArgumentException("Prompt tối đa 12000 ký tự");
+            String url=request.getParameter("current_base_url");if(url!=null&&!url.trim().isEmpty())SSRFValidator.validateBaseUrl(url.trim(),SSRFValidator.localAllowed(url.trim()));
+            Map<String,String> updates=new java.util.LinkedHashMap<>();updates.put("ai_active_provider",provider);updates.put("ai_active_model",model);updates.put("ai_fallback_provider",fallback==null?"":fallback);updates.put("ai_fallback_model",fallbackModel==null?"":fallbackModel);
+            updates.put("ai_system_prompt",prompt);updates.put("gemini_system_prompt",prompt);updates.put("ai_temperature",Double.toString(temperature));updates.put("gemini_temperature",Double.toString(temperature));updates.put("ai_max_tokens",Integer.toString(tokens));updates.put("gemini_max_tokens",Integer.toString(tokens));updates.put("ai_chatbot_enabled","true".equals(request.getParameter("ai_chatbot_enabled"))||"on".equals(request.getParameter("ai_chatbot_enabled"))?"true":"false");
+            if("gemini".equals(provider))updates.put("gemini_model",model);if(url!=null)updates.put("ai_provider_"+provider+"_base_url",url.trim());
+            String key=request.getParameter("current_api_key");if(key!=null&&!key.trim().isEmpty()&&!CryptoUtil.isMasked(key)){String encrypted=CryptoUtil.encrypt(key.trim());updates.put("ai_provider_"+provider+"_key",encrypted);if("gemini".equals(provider))updates.put("gemini_api_key",encrypted);}
+            if(!settingsDAO.saveVersioned(updates,user.getId(),"prompt"))throw new IllegalArgumentException("Không thể lưu. Kiểm tra migration; cấu hình cũ được giữ nguyên.");
+            AIService.invalidateCache();session.setAttribute("message","Đã lưu cấu hình và phiên bản prompt.");session.setAttribute("messageType","success");
+        }catch(Exception e){session.setAttribute("message",e instanceof IllegalArgumentException?e.getMessage():"Cấu hình không hợp lệ.");session.setAttribute("messageType","error");}
     }
 }

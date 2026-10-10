@@ -27,6 +27,7 @@ public class ProviderResponseTest {
             exchange.getResponseBody().write(output);exchange.close();
         });
         server.start();String base="http://127.0.0.1:"+server.getAddress().getPort();
+        System.setProperty("AI_LOCAL_BASE_URL",base); // Explicit server-owned allowlist for this fixture only.
         try {
             ChatOptions options=new ChatOptions(0.3,1200);options.setResponseSchema(ConsultationPrompt.schema());
             List<ChatMessage> messages=Arrays.asList(ChatMessage.system(ConsultationPrompt.SYSTEM),ChatMessage.user("Chào bạn!"));
@@ -76,7 +77,7 @@ public class ProviderResponseTest {
             try{openai.chat(messages,"fake-test-key","gpt-4o-mini",base,options);}catch(AIException e){timedOut=e.getErrorType()==AIException.ErrorType.TIMEOUT;}
             check(timedOut && System.currentTimeMillis()-began<1500,"Stalled response not bounded/classified as timeout");
             passed++;System.out.println("PASS stalled provider response times out within bounded deadline");
-        } finally {server.stop(0);}
+        } finally {System.clearProperty("AI_LOCAL_BASE_URL");server.stop(0);}
         System.out.println("ProviderResponseTest: "+passed+" passed");
     }
 }

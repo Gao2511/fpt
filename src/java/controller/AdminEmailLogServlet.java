@@ -25,6 +25,7 @@ public class AdminEmailLogServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
+        if (security.AdminSecurity.mutation(action) && !"POST".equals(request.getMethod())) { response.sendError(405); return; }
 
         // ===== XÓA 1 LOG =====
         if ("delete".equals(action)) {
@@ -126,4 +127,6 @@ public class AdminEmailLogServlet extends HttpServlet {
         } catch (Exception ignored) {}
         return null;
     }
+    @Override protected void doPost(HttpServletRequest request,HttpServletResponse response) throws IOException,ServletException { doGet(request,response); }
+
 }

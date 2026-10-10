@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fees" tagdir="/WEB-INF/tags" %>
 
 <%-- =========================================================================
      TRANG CHỦ FPT TELECOM - HOME.JSP
@@ -24,7 +25,11 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>FPT Telecom - Internet, Truyền hình, Camera</title>
+        <title><c:out value="${cms['seo.title']}"/></title>
+<meta name="description" content="${fn:escapeXml(cms['seo.description'])}">
+<meta property="og:title" content="${fn:escapeXml(cms['seo.socialTitle'])}">
+<meta property="og:description" content="${fn:escapeXml(cms['seo.socialDescription'])}">
+<meta property="og:image" content="${fn:startsWith(cms['seo.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['seo.image'])}">
         <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
         <link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/home.css?v=images-fit-20261010-2">
@@ -32,6 +37,7 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/pkg-card.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/fonts.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/hero-stars.css">
+<style>.hero{position:relative}.cms-hero-background{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.18;pointer-events:none}.hero>.container{position:relative}</style>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/theme-toggle.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/performance-optimize.css">
         <script src="${pageContext.request.contextPath}/js/address-data.js"></script>
@@ -51,7 +57,8 @@
         </jsp:include>
 
         <!-- ============ HERO ============ -->
-        <section class="hero">
+        <c:if test="${cms['hero.visible']=='true'}"><section class="hero">
+<c:if test="${not empty cms['hero.background']}"><img class="cms-hero-background" src="${fn:startsWith(cms['hero.background'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.background'])}" alt=""></c:if>
             <!-- ⭐ BẦU TRỜI SAO — chỉ hiện khi dark mode -->
             <div class="hero-stars">
                 <div class="stars stars-1"></div>
@@ -64,7 +71,7 @@
             </div>
 
             <div class="container">
-                <div class="hero-text">
+                <div class="hero-text"><c:if test="${not empty cms['hero.label']}"><p><c:out value="${cms['hero.label']}"/></p></c:if>
                     <c:if test="${not empty sessionScope.user && sessionScope.user.role == 'customer'}">
                         <div class="welcome-banner">
                             <span class="welcome-line-1">Chào mừng trở lại,</span>
@@ -91,7 +98,7 @@
                                   stroke-width="1.2" stroke="#ffffff" fill="none"
                                   font-family="'Be Vietnam Pro', sans-serif" font-size="105" font-weight="900"
                                   class="th-draw">
-                                TỐC ĐỘ CAO
+                                <c:out value="${cms['hero.title']}"/>
                             </text>
                             <text x="50%" y="75" text-anchor="middle" dominant-baseline="central"
                                   fill="url(#textGradientOrange)"
@@ -100,7 +107,7 @@
                                   paint-order="stroke fill"
                                   font-family="'Be Vietnam Pro', sans-serif" font-size="105" font-weight="900"
                                   class="th-main">
-                                TỐC ĐỘ CAO
+                                <c:out value="${cms['hero.title']}"/>
                             </text>
 
                             <!-- ⭐ DÒNG 2: "HỖ TRỢ 24/7" (Tách xa dòng 1 tránh cấn dấu ngã/mũ) -->
@@ -108,7 +115,7 @@
                                   stroke-width="1.2" stroke="#ffffff" fill="none"
                                   font-family="'Be Vietnam Pro', sans-serif" font-size="105" font-weight="900"
                                   class="th-draw">
-                                HỖ TRỢ 24/7
+                                <c:out value="${cms['hero.subtitle']}"/>
                             </text>
                             <text x="50%" y="215" text-anchor="middle" dominant-baseline="central"
                                   fill="url(#textGradientOrange)"
@@ -117,10 +124,11 @@
                                   paint-order="stroke fill"
                                   font-family="'Be Vietnam Pro', sans-serif" font-size="105" font-weight="900"
                                   class="th-main">
-                                HỖ TRỢ 24/7
+                                <c:out value="${cms['hero.subtitle']}"/>
                             </text>
                         </svg>
                     </div>  
+                    <c:if test="${not empty cms['hero.description']}"><p><c:out value="${cms['hero.description']}"/></p></c:if>
                     <div class="badges">
                         <span>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -142,33 +150,33 @@
                         </span>
                     </div>
                     <div class="cta-buttons">
-                        <a href="#packages" class="btn-hero-primary">
-                            Xem bảng giá ngay →
+                        <a href="${fn:startsWith(cms['hero.ctaUrl'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.ctaUrl'])}" class="btn-hero-primary">
+                            <c:out value="${cms['hero.cta']}"/>
                         </a>
-                        <a href="#contact" class="btn-hero-secondary">
+                        <a href="${fn:startsWith(cms['hero.contactUrl'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.contactUrl'])}" class="btn-hero-secondary">
                             <svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24">
                             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                             </svg>
-                            Tư vấn miễn phí
+                            <c:out value="${cms['hero.contactCta']}"/>
                         </a>
                     </div>
                 </div>
                 <div class="hero-image">
                     <div class="hero-carousel">
                     <div class="hero-slideshow">
-                        <img src="${pageContext.request.contextPath}/assets/images/Hero1.png"
+                        <img src="${fn:startsWith(cms['hero.image1'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.image1'])}"
                              alt="FPT Internet" class="hero-slide active">
-                        <img src="${pageContext.request.contextPath}/assets/images/Hero2.png?v=fit-20261010"
+                        <img src="${fn:startsWith(cms['hero.image2'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.image2'])}"
                              alt="Lắp đặt Internet WiFi 6 — kết nối cho gia đình" class="hero-slide">
-                        <img src="${pageContext.request.contextPath}/assets/images/Hero3.png?v=fit-20261010"
+                        <img src="${fn:startsWith(cms['hero.image3'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.image3'])}"
                              alt="FPT Telecom Gia Lai — mạng nhanh, giá tốt" class="hero-slide">
-                        <img src="${pageContext.request.contextPath}/assets/images/Hero4.png"
+                        <img src="${fn:startsWith(cms['hero.image4'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.image4'])}"
                              alt="FPT Camera" class="hero-slide">
-                        <img src="${pageContext.request.contextPath}/assets/images/Hero5.png"
+                        <img src="${fn:startsWith(cms['hero.image5'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.image5'])}"
                              alt="FPT Camera" class="hero-slide">
-                        <img src="${pageContext.request.contextPath}/assets/images/Hero6.png"
+                        <img src="${fn:startsWith(cms['hero.image6'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.image6'])}"
                              alt="FPT Camera" class="hero-slide">
-                        <img src="${pageContext.request.contextPath}/assets/images/Hero7.png"
+                        <img src="${fn:startsWith(cms['hero.image7'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.image7'])}"
                              alt="FPT Camera" class="hero-slide">
                     </div>
 
@@ -201,9 +209,10 @@
             </div>
         </section>
 
+        </c:if>
         <!-- ============ SECTION TITLE: PACKAGES ============ -->
         <div class="section-title">           
-            <h2>${packages.size()} GÓI CƯỚC WIFI FPT TỐC ĐỘ CAO BÁN CHẠY NHẤT</h2>           
+            <h2>${packages.size()} <c:out value="${cms['packages.title']}"/></h2>
         </div>
 
         <!-- ============ GÓI CƯỚC — LOAD ĐỘNG TỪ DB ============ -->
@@ -234,8 +243,8 @@
                         </c:if>
 
                         <div class="pkg-header">
-                            ${pkg.name}
-                            <small>${pkg.description}</small>
+                            ${fn:escapeXml(pkg.name)}
+                            <small>${fn:escapeXml(pkg.description)}</small>
                         </div>
 
                         <div class="pkg-body">
@@ -253,7 +262,7 @@
                                 <c:choose>
                                     <c:when test="${not empty pkg.longDescription}">
                                         <c:forEach items="${pkg.longDescriptionLines}" var="line">
-                                            <li>${line}</li>
+                                            <li>${fn:escapeXml(line)}</li>
                                             </c:forEach>
                                         </c:when>
                                         <c:otherwise>
@@ -264,6 +273,7 @@
                                         </c:otherwise>
                                     </c:choose>
                             </ul>
+                            <fees:installation-fee plan="${pkg}"/>
                             <a href="${pageContext.request.contextPath}/package-detail?id=${pkg.id}"
                                class="btn-pkg">Mua ngay →</a>
                         </div>
@@ -280,9 +290,10 @@
         </div>
 
         
-        <!-- ============ SECTION MESH WIFI ============ -->
+
+        <c:if test="${cms['business.meshVisible']=='true'}"><!-- ============ SECTION MESH WIFI ============ -->
         <div class="section-title" id="mesh-wifi" style="margin-top: 35px;">
-            <h2>MỞ RỘNG PHỦ SÓNG TOÀN DIỆN VỚI MESH WIFI FPT</h2>
+            <h2><c:out value="${cms['business.meshTitle']}"/></h2>
             <p style="color: #64748b; font-size: 14.5px; max-width: 680px; margin: 10px auto 0; text-align: center; line-height: 1.6;">
                 Giải pháp mở rộng phủ sóng WiFi xuyên tầng cho nhà ống, nhà phố nhiều tầng — loại bỏ hoàn toàn góc chết sóng WiFi.
             </p>
@@ -306,11 +317,11 @@
                         <div class="mesh-price-box">
                             <div class="mesh-monthly">
                                 <span class="mesh-plus">+</span>
-                                <span class="mesh-amount">10.000</span>
+                                <span class="mesh-amount">${fn:escapeXml(cms['business.meshF1MonthlyDisplay'])}</span>
                                 <span class="mesh-unit">đ/tháng</span>
                             </div>
                             <div class="mesh-note-fee">
-                                Phí lắp đặt: <strong>500.000 VNĐ</strong>
+                                Phí lắp đặt: <strong><fmt:formatNumber value="${cms['business.meshF1Fee']}" pattern="#,###"/> VNĐ</strong>
                             </div>
                         </div>
 
@@ -325,7 +336,7 @@
                                 <span class="mesh-check">
                                     <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
                                 </span>
-                                <span><strong>Thiết bị:</strong> 1 Modem WiFi 6 + 1 Access Point</span>
+                                <span><strong>Thiết bị:</strong> <c:out value="${cms['business.meshF1Equipment']}"/></span>
                             </li>
                             <li>
                                 <span class="mesh-check">
@@ -357,11 +368,11 @@
                         <div class="mesh-price-box">
                             <div class="mesh-monthly">
                                 <span class="mesh-plus">+</span>
-                                <span class="mesh-amount">20.000</span>
+                                <span class="mesh-amount">${fn:escapeXml(cms['business.meshF2MonthlyDisplay'])}</span>
                                 <span class="mesh-unit">đ/tháng</span>
                             </div>
                             <div class="mesh-note-fee">
-                                Phí lắp đặt: <strong>700.000 VNĐ</strong>
+                                Phí lắp đặt: <strong><fmt:formatNumber value="${cms['business.meshF2Fee']}" pattern="#,###"/> VNĐ</strong>
                             </div>
                         </div>
 
@@ -376,7 +387,7 @@
                                 <span class="mesh-check">
                                     <svg class="mesh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
                                 </span>
-                                <span><strong>Thiết bị:</strong> 1 Modem WiFi 6 + 2 Access Point</span>
+                                <span><strong>Thiết bị:</strong> <c:out value="${cms['business.meshF2Equipment']}"/></span>
                             </li>
                             <li>
                                 <span class="mesh-check">
@@ -394,116 +405,120 @@
             </div>
         </div>
 
-        <!-- ============ FEATURES ============ -->
+        </c:if>
+<c:if test="${cms['benefits.visible']=='true'}"><!-- ============ FEATURES ============ -->
         <div class="section-title">
-            <h2>Cam Kết Chất Lượng Dịch Vụ Hàng Đầu FPT</h2>            
+            <h2><c:out value="${cms['benefits.title']}"/></h2>
         </div>
 
         <div class="container">
             <div class="features">
-                <div class="feature">
+                <c:if test="${cms['benefit1.visible']=='true'}"><div class="feature" style="order:${cms['benefit1.order']};">
                     <div class="icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <c:if test="${empty cms['benefit1.image']}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
                         <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
                         <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
                         <line x1="12" y1="20" x2="12.01" y2="20"/>
                         </svg>
-                    </div>
-                    <h4>CÔNG NGHỆ WIFI 6</h4>
-                    <p>Kết nối không giới hạn, cho phép nhiều thiết bị cùng lúc mà không bị giật lag.</p>
+                    </c:if><c:if test="${not empty cms['benefit1.image']}"><img style="width:48px;height:48px;object-fit:contain;" src="${fn:startsWith(cms['benefit1.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['benefit1.image'])}" alt=""></c:if></div>
+                    <h4><c:out value="${cms['benefit1.title']}"/></h4>
+                    <p><c:choose><c:when test="${not empty cms['benefit1.description']}"><c:out value="${cms['benefit1.description']}"/></c:when><c:otherwise>Kết nối không giới hạn, cho phép nhiều thiết bị cùng lúc mà không bị giật lag.</c:otherwise></c:choose></p>
                 </div>
-                <div class="feature">
+                </c:if><c:if test="${cms['benefit2.visible']=='true'}"><div class="feature" style="order:${cms['benefit2.order']};">
                     <div class="icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <c:if test="${empty cms['benefit2.image']}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
                         <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
                         <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
                         <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
                         </svg>
-                    </div>
-                    <h4>TỐC ĐỘ CAO 1GBPS</h4>
-                    <p>Đường truyền siêu tốc, đáp ứng mọi nhu cầu giải trí, làm việc và học tập online.</p>
+                    </c:if><c:if test="${not empty cms['benefit2.image']}"><img style="width:48px;height:48px;object-fit:contain;" src="${fn:startsWith(cms['benefit2.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['benefit2.image'])}" alt=""></c:if></div>
+                    <h4><c:out value="${cms['benefit2.title']}"/></h4>
+                    <p><c:choose><c:when test="${not empty cms['benefit2.description']}"><c:out value="${cms['benefit2.description']}"/></c:when><c:otherwise>Đường truyền siêu tốc, đáp ứng mọi nhu cầu giải trí, làm việc và học tập online.</c:otherwise></c:choose></p>
                 </div>
-                <div class="feature">
+                </c:if><c:if test="${cms['benefit3.visible']=='true'}"><div class="feature" style="order:${cms['benefit3.order']};">
                     <div class="icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <c:if test="${empty cms['benefit3.image']}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
                         </svg>
-                    </div>
-                    <h4>LẮP ĐẶT TRONG 24H</h4>
-                    <p>Kỹ thuật viên có mặt nhanh chóng, lắp đặt và kích hoạt dịch vụ trong ngày.</p>
+                    </c:if><c:if test="${not empty cms['benefit3.image']}"><img style="width:48px;height:48px;object-fit:contain;" src="${fn:startsWith(cms['benefit3.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['benefit3.image'])}" alt=""></c:if></div>
+                    <h4><c:out value="${cms['benefit3.title']}"/></h4>
+                    <p><c:choose><c:when test="${not empty cms['benefit3.description']}"><c:out value="${cms['benefit3.description']}"/></c:when><c:otherwise>Kỹ thuật viên có mặt nhanh chóng, lắp đặt và kích hoạt dịch vụ trong ngày.</c:otherwise></c:choose></p>
                 </div>
-                <div class="feature">
+                </c:if><c:if test="${cms['benefit4.visible']=='true'}"><div class="feature" style="order:${cms['benefit4.order']};">
                     <div class="icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <c:if test="${empty cms['benefit4.image']}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
                         <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
                         </svg>
-                    </div>
-                    <h4>HỖ TRỢ 24/7 TẬN TÂM</h4>
-                    <p>Tổng đài hỗ trợ hoạt động 24/7, giải đáp mọi thắc mắc của bạn mọi lúc mọi nơi.</p>
+                    </c:if><c:if test="${not empty cms['benefit4.image']}"><img style="width:48px;height:48px;object-fit:contain;" src="${fn:startsWith(cms['benefit4.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['benefit4.image'])}" alt=""></c:if></div>
+                    <h4><c:out value="${cms['benefit4.title']}"/></h4>
+                    <p><c:choose><c:when test="${not empty cms['benefit4.description']}"><c:out value="${cms['benefit4.description']}"/></c:when><c:otherwise>Tổng đài hỗ trợ hoạt động 24/7, giải đáp mọi thắc mắc của bạn mọi lúc mọi nơi.</c:otherwise></c:choose></p>
                 </div>
-            </div>
+            </c:if></div>
         </div>
 
-        <!-- ============ DEVICES ============ -->
+        </c:if>
+<c:if test="${cms['devices.visible']=='true'}"><!-- ============ DEVICES ============ -->
         <div class="section-title">
-            <h2>Thiết Bị Đi Kèm Chính Hãng FPT</h2>
+            <h2><c:out value="${cms['devices.title']}"/></h2>
         </div>
 
         <div class="container">
             <div class="devices">
 
-                <div class="device">
+                <c:if test="${cms['device1.visible']=='true'}"><div class="device" style="order:${cms['device1.order']};">
                     <div class="img-wrap">
-                        <img src="${pageContext.request.contextPath}/assets/images/Wifi_6.png"
+                        <img src="${fn:startsWith(cms['device1.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['device1.image'])}"
                              alt="Modem WiFi 6">
                     </div>
                     <div class="info">
-                        <h4>Modem WiFi 6 </h4>
-                        <p>Modem WiFi 6 tốc độ cao, hỗ trợ nhiều thiết bị cùng lúc không giật lag.</p>
+                        <h4><c:out value="${cms['device1.title']}"/></h4>
+                        <p><c:choose><c:when test="${not empty cms['device1.description']}"><c:out value="${cms['device1.description']}"/></c:when><c:otherwise>Modem WiFi 6 tốc độ cao, hỗ trợ nhiều thiết bị cùng lúc không giật lag.</c:otherwise></c:choose></p>
                     </div>
-                </div>
+                </div></c:if>
 
-                <div class="device">
+                <c:if test="${cms['device2.visible']=='true'}"><div class="device" style="order:${cms['device2.order']};">
                     <div class="img-wrap">
-                        <img src="${pageContext.request.contextPath}/assets/images/FPT-Play-Box.png"
+                        <img src="${fn:startsWith(cms['device2.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['device2.image'])}"
                              alt="FPT Play Box">
                     </div>
                     <div class="info">
-                        <h4>FPT Play Box 4K Voice</h4>
-                        <p>Đầu thu FPT Play 4K, điều khiển bằng giọng nói, xem hàng trăm kênh truyền hình.</p>
+                        <h4><c:out value="${cms['device2.title']}"/></h4>
+                        <p><c:choose><c:when test="${not empty cms['device2.description']}"><c:out value="${cms['device2.description']}"/></c:when><c:otherwise>Đầu thu FPT Play 4K, điều khiển bằng giọng nói, xem hàng trăm kênh truyền hình.</c:otherwise></c:choose></p>
                     </div>
-                </div>
+                </div></c:if>
 
-                <div class="device">
+                <c:if test="${cms['device3.visible']=='true'}"><div class="device" style="order:${cms['device3.order']};">
                     <div class="img-wrap">
-                        <img src="${pageContext.request.contextPath}/assets/images/Camera-FPT-Play.png"
+                        <img src="${fn:startsWith(cms['device3.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['device3.image'])}"
                              alt="Camera AI">
                     </div>
                     <div class="info">
-                        <h4>Camera AI Giám Sát 24/7</h4>
-                        <p>Camera AI thông minh, giám sát an ninh 24/7, xem mọi lúc mọi nơi qua điện thoại.</p>
+                        <h4><c:out value="${cms['device3.title']}"/></h4>
+                        <p><c:choose><c:when test="${not empty cms['device3.description']}"><c:out value="${cms['device3.description']}"/></c:when><c:otherwise>Camera AI thông minh, giám sát an ninh 24/7, xem mọi lúc mọi nơi qua điện thoại.</c:otherwise></c:choose></p>
                     </div>
-                </div>
+                </div></c:if>
 
-                <div class="device">
+                <c:if test="${cms['device4.visible']=='true'}"><div class="device" style="order:${cms['device4.order']};">
                     <div class="img-wrap">
-                        <img src="${pageContext.request.contextPath}/assets/images/Ngoai_Hang_Anh.png"
+                        <img src="${fn:startsWith(cms['device4.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['device4.image'])}"
                              alt="Box Ngoại Hạng Anh">
                     </div>
                     <div class="info">
-                        <h4>Tài Khoản FPT Play Vip</h4>
-                        <p>Xem trọn vẹn Ngoại hạng Anh và nhiều giải đấu hấp dẫn khác với chất lượng 4K.</p>
+                        <h4><c:out value="${cms['device4.title']}"/></h4>
+                        <p><c:choose><c:when test="${not empty cms['device4.description']}"><c:out value="${cms['device4.description']}"/></c:when><c:otherwise>Xem trọn vẹn Ngoại hạng Anh và nhiều giải đấu hấp dẫn khác với chất lượng 4K.</c:otherwise></c:choose></p>
                     </div>
-                </div>
+                </div></c:if>
 
             </div>
         </div>
 
 
-        <!-- ============ CONTACT FORM ============ -->
+        </c:if>
+<!-- ============ CONTACT FORM ============ -->
+        <c:if test="${cmsPromotionVisible}"><aside class="container" style="padding:16px;"><h3><c:out value="${cms['business.promotionTitle']}"/></h3><p><c:out value="${cms['business.promotionDescription']}"/></p><p>Điều kiện áp dụng theo nội dung trên; không tự động tính giảm tiền.</p></aside></c:if>
         <section class="contact-section" id="contact">
             <div class="container">
                 <div class="contact-wrapper">
@@ -512,7 +527,7 @@
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                         </svg>
                     </div>
-                    <h2><span>Liên hệ tư vấn khảo sát và nhận ưu đãi có hạn </span></h2>                 
+                    <h2><span><c:out value="${cms['contact.title']}"/> </span></h2>
 
                     <form class="contact-form"
                           action="${pageContext.request.contextPath}/ContactServlet"
@@ -555,8 +570,8 @@
                                    list="noteSuggestionsHome"
                                    autocomplete="off">
                             <datalist id="noteSuggestionsHome">
-                                <option value="Thêm gói Mesh WiFi F1 (nhà 2 tầng - +10.000đ/tháng)">
-                                <option value="Thêm gói Mesh WiFi F2 (nhà 3 tầng - +20.000đ/tháng)">
+                                <option value="Thêm gói Mesh WiFi F1 (nhà 2 tầng - +${fn:escapeXml(cms['business.meshF1MonthlyDisplay'])}đ/tháng)">
+                                <option value="Thêm gói Mesh WiFi F2 (nhà 3 tầng - +${fn:escapeXml(cms['business.meshF2MonthlyDisplay'])}đ/tháng)">
                                 <option value="Nhà riêng, 1 tầng">
                                 <option value="Nhà riêng, nhiều tầng">
                                 <option value="Căn hộ chung cư">
@@ -585,7 +600,7 @@
                     <!-- Cột 1: Logo + Mô tả -->
                     <div>
                         <div class="brand-footer">
-                            <img src="${pageContext.request.contextPath}/assets/images/fpt-logo.jpg"
+                            <img src="${fn:startsWith(cms['header.logo'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['header.logo'])}"
                                  alt="FPT Telecom"
                                  style="height: 55px; width: auto; object-fit: contain; margin-right: 12px;">
                             <div class="brand-text">
@@ -594,14 +609,14 @@
                             </div>
                         </div>
                         <p class="company-desc">
-                            Công ty Cổ phần Viễn thông FPT — Nhà cung cấp dịch vụ Internet tốc độ cao.                           
+                            <c:choose><c:when test="${not empty cms['footer.description']}"><c:out value="${cms['footer.description']}"/></c:when><c:otherwise>Công ty Cổ phần Viễn thông FPT — Nhà cung cấp dịch vụ Internet tốc độ cao.</c:otherwise></c:choose>
                         </p>
                     </div>
 
                     <!-- Cột 2: Liên hệ -->
                     <div>
                         <h4>Liên hệ với chúng tôi</h4>
-                        <ul class="contact-list">
+                        <ul class="contact-list"><c:if test="${not empty cms['business.social']}"><li><a href="${fn:escapeXml(cms['business.social'])}" rel="noopener noreferrer">Mạng xã hội FPT</a></li></c:if>
                             <li>
                                 <span class="contact-icon">
                                     <svg viewBox="0 0 24 24">
@@ -611,7 +626,7 @@
                                 </span>
                                 <div>
                                     <strong>Trụ sở chính</strong>
-                                    94 Phạm Hùng, Quy Nhơn, Gia Lai.
+                                    <c:choose><c:when test="${not empty cms['business.address']}"><c:out value="${cms['business.address']}"/></c:when><c:otherwise>94 Phạm Hùng, Quy Nhơn, Gia Lai.</c:otherwise></c:choose>
                                 </div>
                             </li>
                             <li>
@@ -622,7 +637,7 @@
                                 </span>
                                 <div>
                                     <strong>Hotline đăng ký</strong>
-                                    <span class="value">0932 079 469</span>
+                                    <span class="value">${fn:escapeXml(cms['business.phone'])}</span>
                                 </div>
                             </li>
                             <li>
@@ -645,7 +660,7 @@
                                 </span>
                                 <div>
                                     <strong>Email</strong>
-                                    <a href="mailto:hieulv20@fpt.com">PhucBN2@fpt.com</a>
+                                    <a href="mailto:${fn:escapeXml(cms['business.email'])}"><c:out value="${cms['business.email']}"/></a>
                                 </div>
                             </li>
                         </ul>
@@ -663,7 +678,7 @@
                         </div>
                         <div class="phone-info">
                             <small>Hotline hỗ trợ 24/7</small>
-                            <strong>0932 079 469</strong>
+                            <strong>${fn:escapeXml(cms['business.phone'])}</strong>
                         </div>
                     </div>
 
@@ -907,7 +922,7 @@
                 <button class="ai-chat-close" onclick="toggleAIChat()">×</button>
             </div>
 
-            <div class="ai-chat-body" id="aiChatBody">
+            <div class="ai-chat-body" id="aiChatBody" data-contact="${fn:escapeXml(cms['business.phone'])}">
                 <div class="ai-msg ai-msg-bot">
                     Xin chào anh/chị! Em là tư vấn viên AI của FPT Telecom.
                     Anh/chị cần tư vấn gói cước nào ạ? 😊

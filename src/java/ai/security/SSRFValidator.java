@@ -8,6 +8,12 @@ import java.net.URL;
  * Xác thực Base URL chống tấn công SSRF (Server-Side Request Forgery)
  */
 public class SSRFValidator {
+    public static boolean localAllowed(String url) {
+        String configured=System.getenv("AI_LOCAL_BASE_URL");
+        if(configured==null)configured=System.getProperty("AI_LOCAL_BASE_URL");
+        return configured!=null && !configured.isEmpty() && configured.equals(url);
+    }
+
 
     /**
      * Kiểm tra tính hợp lệ của Base URL
@@ -29,6 +35,7 @@ public class SSRFValidator {
         }
 
         String scheme = uri.getScheme();
+        if(uri.getUserInfo()!=null || uri.getFragment()!=null)throw new IllegalArgumentException("Base URL không được chứa tài khoản hoặc fragment.");
         if (scheme == null || (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme))) {
             throw new IllegalArgumentException("Base URL chỉ chấp nhận giao thức http:// hoặc https://.");
         }
@@ -39,14 +46,14 @@ public class SSRFValidator {
         }
 
         // Nếu admin chủ đích cho phép local (Ollama / LM Studio)
-        if (allowLocal) {
+        if (allowLocal && localAllowed(trimmed)) {
             return;
         }
 
         // Chặn các hostname localhost thông dụng
         String hostLower = host.toLowerCase();
         if ("localhost".equals(hostLower) || hostLower.endsWith(".local") || hostLower.endsWith(".internal")) {
-            throw new IllegalArgumentException("Không cho phép Base URL trỏ vào localhost hoặc mạng nội bộ (SSRF Protection). Bật tùy chọn 'Cho phép Local (Ollama)' nếu bạn muốn dùng server nội bộ.");
+            throw new IllegalArgumentException("Địa chỉ nội bộ chỉ được phép khi quản trị máy chủ cấu hình AI_LOCAL_BASE_URL.");
         }
 
         // Phân giải DNS và kiểm tra IP

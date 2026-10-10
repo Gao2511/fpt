@@ -32,11 +32,17 @@ public class DBUtils {
         // ⭐ JDBC URL cho Supabase (Session pooler)
         // sslmode=require: Supabase yêu cầu SSL
         String url = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME
-                   + "?sslmode=require"
+                   + "?sslmode=" + sslMode(DB_HOST, System.getenv("DB_SSLMODE"))
                    + "&connectTimeout=10"
                    + "&socketTimeout=30";
 
-        System.out.println("🔌 Connecting to Supabase: " + DB_HOST + ":" + DB_PORT + "/" + DB_NAME);
+        System.out.println("Connecting to PostgreSQL: " + DB_HOST + ":" + DB_PORT + "/" + DB_NAME);
         return DriverManager.getConnection(url, DB_USER, DB_PASSWORD);
+    }
+
+    public static String sslMode(String host, String requested) {
+        if (requested == null || requested.isEmpty() || "require".equals(requested)) return "require";
+        if ("disable".equals(requested) && ("127.0.0.1".equals(host) || "localhost".equals(host) || "::1".equals(host))) return "disable";
+        throw new IllegalArgumentException("DB_SSLMODE=disable is permitted only for a loopback database");
     }
 }
