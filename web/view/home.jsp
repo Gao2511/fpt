@@ -340,7 +340,7 @@
                     <div class="mesh-price-box">
                         <div class="mesh-monthly">
                             <span class="mesh-plus">+</span>
-                            <span class="mesh-amount">10.000</span>
+                            <span class="mesh-amount">20.000</span>
                             <span class="mesh-unit">đ/tháng</span>
                         </div>
                         <div class="mesh-note-fee">
@@ -532,7 +532,7 @@
                                    autocomplete="off">
                             <datalist id="noteSuggestionsHome">
                                 <option value="Thêm gói Mesh WiFi F1 (nhà 2 tầng - +10.000đ/tháng)">
-                                <option value="Thêm gói Mesh WiFi F2 (nhà 3 tầng - +10.000đ/tháng)">
+                                <option value="Thêm gói Mesh WiFi F2 (nhà 3 tầng - +20.000đ/tháng)">
                                 <option value="Nhà riêng, 1 tầng">
                                 <option value="Nhà riêng, nhiều tầng">
                                 <option value="Căn hộ chung cư">

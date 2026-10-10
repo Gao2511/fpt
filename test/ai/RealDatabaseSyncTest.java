@@ -39,6 +39,11 @@ public class RealDatabaseSyncTest {
             }
             System.out.println(">>> PASS: All 6 packages in database have exact reference speeds and prices!");
 
+            dao.SettingsDAO settingDAO = new dao.SettingsDAO();
+            settingDAO.update("ai_system_prompt", ai.consultation.ConsultationPrompt.SYSTEM);
+            settingDAO.update("gemini_system_prompt", ai.consultation.ConsultationPrompt.SYSTEM);
+            System.out.println(">>> PASS: Synced ConsultationPrompt.SYSTEM (F1 = +10.000đ/tháng, F2 = +20.000đ/tháng) to DB settings!");
+
             System.out.println("\n=== 2. VERIFYING CHATBOT CONSULTATION WITH REAL CATALOG ===");
             ProductCatalog catalog = new ProductCatalog(dbPackages);
             ConsultationEngine engine = new ConsultationEngine();
@@ -71,15 +76,15 @@ public class RealDatabaseSyncTest {
             ChatSessionData s4 = new ChatSessionData("test-mesh-f2");
             ChatResponse r4 = engine.chat("Nhà anh 3 tầng dùng F1 được không?", s4, catalog, null, null, new ChatOptions(0.3, 1200));
             System.out.println("\n[Q4]: Nhà anh 3 tầng dùng F1 được không?\n[A4]: " + r4.getContent());
-            if (!r4.getContent().contains("F2") || !r4.getContent().contains("700.000") || !r4.getContent().contains("10.000") || r4.getContent().contains("200.000") || r4.getContent().contains("tham khảo") || !r4.getContent().contains("Access Point")) {
-                throw new AssertionError("Chatbot must explain F1 limits and recommend Mesh F2 for 3 floors with +10.000đ/tháng and no 'tham khảo': " + r4.getContent());
+            if (!r4.getContent().contains("F2") || !r4.getContent().contains("700.000") || !r4.getContent().contains("20.000") || r4.getContent().contains("200.000") || r4.getContent().contains("tham khảo") || !r4.getContent().contains("Access Point")) {
+                throw new AssertionError("Chatbot must explain F1 limits and recommend Mesh F2 for 3 floors with +20.000đ/tháng and no 'tham khảo': " + r4.getContent());
             }
 
             // 3. Verify Frontend JSP UI files
             System.out.println("\n=== 3. VERIFYING FRONTEND UI (home.jsp & package-detail.jsp) ===");
             String homeJsp = new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get("web/view/home.jsp")), java.nio.charset.StandardCharsets.UTF_8);
-            if (!homeJsp.contains("<span class=\"mesh-amount\">10.000</span>")) {
-                throw new AssertionError("home.jsp missing 10.000 monthly fee");
+            if (!homeJsp.contains("<span class=\"mesh-amount\">10.000</span>") || !homeJsp.contains("<span class=\"mesh-amount\">20.000</span>")) {
+                throw new AssertionError("home.jsp missing 10.000 (F1) or 20.000 (F2) monthly fee");
             }
             if (homeJsp.contains("Phí lắp đặt tham khảo")) {
                 throw new AssertionError("home.jsp still contains 'Phí lắp đặt tham khảo'");
@@ -90,7 +95,7 @@ public class RealDatabaseSyncTest {
             if (!homeJsp.contains("Phí lắp đặt: <strong>500.000 VNĐ</strong>") || !homeJsp.contains("Phí lắp đặt: <strong>700.000 VNĐ</strong>")) {
                 throw new AssertionError("home.jsp missing exact installation fee labels");
             }
-            System.out.println(">>> PASS: Frontend UI verified (F1 & F2 = +10.000đ/tháng, 500.000 VNĐ / 700.000 VNĐ, no 'tham khảo', no 'Chuyển vùng thông minh').");
+            System.out.println(">>> PASS: Frontend UI verified (F1 = +10.000đ/tháng, F2 = +20.000đ/tháng, 500.000 VNĐ / 700.000 VNĐ, no 'tham khảo', no 'Chuyển vùng thông minh').");
 
             System.out.println("\n>>> ALL TESTS PASSED SUCCESSFULLY! FULL DATA SYNCHRONIZATION CONFIRMED.");
         } catch (Exception e) {

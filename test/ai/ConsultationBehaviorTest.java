@@ -181,7 +181,7 @@ public class ConsultationBehaviorTest {
         test("house 3 floors with F1 explains limitations and suggests Mesh WiFi F2",()->{
             ChatResponse r = ask("Nhà anh 3 tầng dùng F1 được không?", new ChatSessionData("mesh-f2"), new MockProvider(), null);
             String c = r.getContent();
-            check(c.contains("F2") && c.contains("700.000") && c.contains("10.000") && !c.contains("200.000") && !c.contains("tham khảo") && c.contains("Access Point"), "Must recommend F2 for 3 floors with +10.000d/thang: " + c);
+            check(c.contains("F2") && c.contains("700.000") && c.contains("20.000") && !c.contains("200.000") && !c.contains("tham khảo") && c.contains("Access Point"), "Must recommend F2 for 3 floors with +20.000d/thang: " + c);
         });
         System.out.println("ConsultationBehaviorTest: " + passed + " passed");
     }
