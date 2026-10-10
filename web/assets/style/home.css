@@ -900,10 +900,9 @@ ul { list-style: none; }
 /* HERO SLIDESHOW — Kích thước lớn nổi bật, bao quát cả màn hình */
 .hero-slideshow {
     position: relative;
-    width: 94%;
-    max-width: 810px;
-    height: auto;
-    aspect-ratio: 16 / 9;
+    width: 100%;
+    max-width: 900px;
+    height: 580px;
     margin: 0 auto;
     border-radius: 24px;
     overflow: hidden;
@@ -924,13 +923,6 @@ ul { list-style: none; }
         0 0 34px rgba(243, 112, 33, 0.68),
         0 0 72px rgba(255, 140, 66, 0.48),
         0 16px 42px rgba(243, 112, 33, 0.34);
-}
-
-/* Intrinsic spacer also works when aspect-ratio is unsupported or disabled. */
-.hero-slideshow::before {
-    content: "";
-    display: block;
-    padding-top: 56.25%;
 }
 
 .hero-slide {
@@ -2078,7 +2070,7 @@ a[href*="/home"][style*="border: 2px solid #f37021"]:hover,
     .features { grid-template-columns: repeat(2, 1fr); }
     .devices { grid-template-columns: repeat(2, 1fr); }
     .hero .container { grid-template-columns: 1fr; }
-    .hero-slideshow { max-width: 600px; height: auto; }
+    .hero-slideshow { max-width: 680px; height: 460px; }
     .tech-text-wrap { height: 110px; }
     .text-hover-wrap { height: 175px; }
 }
@@ -2099,7 +2091,7 @@ a[href*="/home"][style*="border: 2px solid #f37021"]:hover,
     .features { grid-template-columns: 1fr; }
     .devices { grid-template-columns: 1fr; }
     .contact-form { grid-template-columns: 1fr; }
-    .hero-slideshow { max-width: 100%; height: auto; }
+    .hero-slideshow { max-width: 100%; height: 320px; }
     .tech-text-wrap { height: 80px; }
     .text-hover-wrap { height: 140px; }
     .top-nav .menu { display: none; }
@@ -2741,7 +2733,7 @@ footer {
     .footer .copyright { text-align: center; max-width: 100%; }
 
     .hero-image { margin-right: 0; }
-    .hero-slideshow { max-width: 650px; height: auto; }
+    .hero-slideshow { max-width: 720px; height: 480px; }
 
     .packages {
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
@@ -2762,7 +2754,7 @@ footer {
 
     .hero-slideshow {
         max-width: 100%;
-        height: auto;
+        height: 380px;
     }
 
     .hero h1 { font-size: 32px; }
@@ -2860,7 +2852,7 @@ footer {
     .hero-image { margin-right: 0; }
     .hero-slideshow {
         max-width: 100%;
-        height: auto;
+        height: 250px;
         border-radius: 12px;
     }
     .hero-slide { border-radius: 12px; }
