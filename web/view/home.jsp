@@ -27,7 +27,7 @@
         <title>FPT Telecom - Internet, Truyền hình, Camera</title>
         <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
         <link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/home.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/home.css?v=images-fit-20261010-2">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/ai-chat.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/pkg-card.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/fonts.css">
@@ -154,13 +154,14 @@
                     </div>
                 </div>
                 <div class="hero-image">
+                    <div class="hero-carousel">
                     <div class="hero-slideshow">
                         <img src="${pageContext.request.contextPath}/assets/images/Hero1.png"
                              alt="FPT Internet" class="hero-slide active">
-                        <img src="${pageContext.request.contextPath}/assets/images/Hero2.png"
-                             alt="FPT WiFi 6" class="hero-slide">
-                        <img src="${pageContext.request.contextPath}/assets/images/Hero3.png"
-                             alt="FPT Camera" class="hero-slide">
+                        <img src="${pageContext.request.contextPath}/assets/images/Hero2.png?v=fit-20261010"
+                             alt="Lắp đặt Internet WiFi 6 — kết nối cho gia đình" class="hero-slide">
+                        <img src="${pageContext.request.contextPath}/assets/images/Hero3.png?v=fit-20261010"
+                             alt="FPT Telecom Gia Lai — mạng nhanh, giá tốt" class="hero-slide">
                         <img src="${pageContext.request.contextPath}/assets/images/Hero4.png"
                              alt="FPT Camera" class="hero-slide">
                         <img src="${pageContext.request.contextPath}/assets/images/Hero5.png"
@@ -169,7 +170,9 @@
                              alt="FPT Camera" class="hero-slide">
                         <img src="${pageContext.request.contextPath}/assets/images/Hero7.png"
                              alt="FPT Camera" class="hero-slide">
+                    </div>
 
+                    <div class="hero-carousel-controls">
                         <%-- ⭐ NÚT CHUYỂN SLIDE --%>
                         <button class="hero-nav hero-nav-prev" onclick="prevSlide()" aria-label="Previous">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -192,6 +195,7 @@
                             <button class="dot-slide" onclick="goToSlide(5)" aria-label="Slide 6"></button>
                             <button class="dot-slide" onclick="goToSlide(6)" aria-label="Slide 7"></button>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>

@@ -902,14 +902,35 @@ ul { list-style: none; }
     position: relative;
     width: 100%;
     max-width: 880px;
-    height: 640px;
+    height: auto;
+    aspect-ratio: 16 / 9;
     margin: 0 auto;
     border-radius: 24px;
     overflow: hidden;
     background: #0a1f44;
+    border: 1.5px solid rgba(255, 165, 79, 0.45);
     box-shadow:
-        0 12px 35px rgba(0, 0, 0, 0.25),
-        0 0 25px rgba(243, 112, 33, 0.35);
+        0 0 0 1px rgba(243, 112, 33, 0.22),
+        0 0 28px rgba(243, 112, 33, 0.55),
+        0 0 60px rgba(255, 140, 66, 0.38),
+        0 14px 36px rgba(243, 112, 33, 0.26);
+    transition: box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.hero-slideshow:hover {
+    border-color: rgba(255, 178, 107, 0.7);
+    box-shadow:
+        0 0 0 1px rgba(243, 112, 33, 0.32),
+        0 0 34px rgba(243, 112, 33, 0.68),
+        0 0 72px rgba(255, 140, 66, 0.48),
+        0 16px 42px rgba(243, 112, 33, 0.34);
+}
+
+/* Intrinsic spacer also works when aspect-ratio is unsupported or disabled. */
+.hero-slideshow::before {
+    content: "";
+    display: block;
+    padding-top: 56.25%;
 }
 
 .hero-slide {
@@ -918,7 +939,7 @@ ul { list-style: none; }
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: fill;
+    object-fit: contain;
     object-position: center;
     opacity: 0;
     transition: opacity 1.2s ease-in-out;
@@ -1167,7 +1188,8 @@ ul { list-style: none; }
 
 .device .img-wrap {
     background: linear-gradient(135deg, #f8fafc, #eef2f7);
-    height: 220px;
+    height: auto;
+    aspect-ratio: 1;
     padding: 10px;
     display: flex;
     align-items: center;
@@ -1194,7 +1216,7 @@ ul { list-style: none; }
 }
 
 .device:hover .img-wrap img {
-    transform: scale(1.03);
+    transform: none;
 }
 
 .device .info {
@@ -2056,7 +2078,7 @@ a[href*="/home"][style*="border: 2px solid #f37021"]:hover,
     .features { grid-template-columns: repeat(2, 1fr); }
     .devices { grid-template-columns: repeat(2, 1fr); }
     .hero .container { grid-template-columns: 1fr; }
-    .hero-slideshow { max-width: 600px; height: 460px; }
+    .hero-slideshow { max-width: 600px; height: auto; }
     .tech-text-wrap { height: 110px; }
     .text-hover-wrap { height: 175px; }
 }
@@ -2077,7 +2099,7 @@ a[href*="/home"][style*="border: 2px solid #f37021"]:hover,
     .features { grid-template-columns: 1fr; }
     .devices { grid-template-columns: 1fr; }
     .contact-form { grid-template-columns: 1fr; }
-    .hero-slideshow { max-width: 100%; height: 320px; }
+    .hero-slideshow { max-width: 100%; height: auto; }
     .tech-text-wrap { height: 80px; }
     .text-hover-wrap { height: 140px; }
     .top-nav .menu { display: none; }
@@ -2719,7 +2741,7 @@ footer {
     .footer .copyright { text-align: center; max-width: 100%; }
 
     .hero-image { margin-right: 0; }
-    .hero-slideshow { max-width: 650px; height: 480px; }
+    .hero-slideshow { max-width: 650px; height: auto; }
 
     .packages {
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
@@ -2740,7 +2762,7 @@ footer {
 
     .hero-slideshow {
         max-width: 100%;
-        height: 340px;
+        height: auto;
     }
 
     .hero h1 { font-size: 32px; }
@@ -2838,7 +2860,7 @@ footer {
     .hero-image { margin-right: 0; }
     .hero-slideshow {
         max-width: 100%;
-        height: 240px;
+        height: auto;
         border-radius: 12px;
     }
     .hero-slide { border-radius: 12px; }
@@ -2882,7 +2904,7 @@ footer {
         gap: 16px;
     }
 
-    .device .img-wrap { height: 200px; }
+    .device .img-wrap { height: auto; }
 
     /* ---- CONTACT FORM ---- */
     .contact-section { padding: 40px 0 60px 0; }
@@ -3017,7 +3039,7 @@ footer {
 /* ===== MOBILE NHỎ (≤400px) ===== */
 @media (max-width: 400px) {
     .hero h1 { font-size: 22px; }
-    .hero-slideshow { height: 200px; }
+    .hero-slideshow { height: auto; }
     .section-title h2 { font-size: 18px; }
     .contact-wrapper { padding: 20px 14px; }
     .contact-wrapper h2 { font-size: 18px; }
@@ -3353,3 +3375,12 @@ footer {
 .top-nav .menu a.active {
     color: #ffffff;
 }
+
+
+/* Keep carousel controls outside artwork so they never cover embedded text. */
+.hero-carousel { width: 100%; }
+.hero-carousel-controls { display: flex; justify-content: center; align-items: center; gap: 12px; margin: 12px auto 0; }
+.hero-carousel-controls .hero-nav { position: static; transform: none; opacity: 1; pointer-events: auto; flex-shrink: 0; width: 36px; height: 36px; }
+.hero-carousel-controls .hero-nav:hover { transform: scale(1.05); }
+.hero-carousel-controls .hero-dots { position: static; transform: none; padding: 6px 8px; gap: 7px; order: 1; }
+.hero-carousel-controls .hero-nav-next { order: 2; }
