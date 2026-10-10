@@ -466,10 +466,10 @@ html {
     }
 }
 
-/* ⭐ Tránh layout shift cho img */
+/* ⭐ Giữ tỷ lệ tự nhiên của ảnh trong khung cố định */
 .device .img-wrap img,
 .hero-slide {
-    aspect-ratio: 16 / 9;
+    aspect-ratio: auto;
 }
 
 /* ⭐ Tắt animation khi user scroll nhanh */
