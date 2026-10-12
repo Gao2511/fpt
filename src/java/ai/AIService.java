@@ -217,7 +217,7 @@ public class AIService {
     }
 
     public static ChatResponse askAI(String question, String sessionId) throws AIException {
-        if(rag.runtime.GeminiRuntimeConfig.activeRequested(System.getenv())){
+        if(rag.runtime.GeminiRuntimeConfig.smokePlanConfigured(System.getenv())){
             try{
                 rag.runtime.GeminiRuntime runtime=rag.runtime.GeminiRuntime.active();
                 ConfigCache local=getConfig();
@@ -234,7 +234,8 @@ public class AIService {
         ai.consultation.ConsultationEngine.Target fallback = buildFallbackTarget(cfg);
         ChatOptions options = new ChatOptions(cfg.temperature, cfg.maxTokens);
         options.setThinkingLevel(cfg.thinkingLevel);
-        return new ai.consultation.ConsultationEngine(rag.KnowledgeRetrievalService.disabled()).chat(question,
+        String geminiKey = getDecryptedApiKey("gemini");
+        return new ai.consultation.ConsultationEngine(rag.RagFactory.consultation(geminiKey, cfg.rawSettings)).chat(question,
             ai.session.ChatSessionManager.getOrCreate(sessionId), catalog, primary, fallback, options, cfg.systemPrompt);
     }
 
@@ -262,8 +263,7 @@ public class AIService {
         String key = cfg.rawSettings.get("ai_provider_" + provider.getId() + "_key");
         if ((key == null || key.isEmpty()) && "gemini".equals(provider.getId())) key = cfg.rawSettings.get("gemini_api_key");
         String decrypted = (key != null && !key.isEmpty()) ? CryptoUtil.decrypt(key) : "";
-        if (decrypted.isEmpty() && "gemini".equals(provider.getId())
-                && rag.runtime.GeminiRuntimeConfig.onlineRequested(System.getenv())) {
+        if (decrypted.isEmpty() && "gemini".equals(provider.getId())) {
             String envKey = System.getenv("GEMINI_API_KEY");
             if (envKey != null && !envKey.trim().isEmpty()) {
                 decrypted = envKey.trim();

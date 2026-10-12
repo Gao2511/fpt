@@ -26,6 +26,12 @@ public final class GeminiRuntimeConfig {
     public static boolean requested(Map<String,String> env){return mode(env)==Mode.LOCAL_GEMINI;}
     public static boolean onlineRequested(Map<String,String> env){Mode m=mode(env);return m==Mode.STAGING||m==Mode.PRODUCTION;}
     public static boolean activeRequested(Map<String,String> env){return requested(env)||onlineRequested(env);}
+    public static boolean smokePlanConfigured(Map<String,String> env){
+        if(!activeRequested(env)||env==null)return false;
+        String path=env.get("RAG_LIVE_PLAN_PATH");
+        String json=env.get("RAG_ONLINE_PLAN_JSON");
+        return (path!=null&&!path.trim().isEmpty())||(json!=null&&!json.trim().isEmpty());
+    }
     public static GeminiRuntimeConfig load(Map<String,String> env)throws Exception{
         if(!requested(env))throw new IllegalArgumentException("LOCAL_GEMINI required; staging/production activation is disabled");
         String name=env.get("RAG_LIVE_PLAN_PATH");if(name==null)throw new IllegalArgumentException("RAG_LIVE_PLAN_PATH missing");

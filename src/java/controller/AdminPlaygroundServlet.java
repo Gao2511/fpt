@@ -40,7 +40,9 @@ public class AdminPlaygroundServlet extends HttpServlet {
                 String prompt = request.getParameter("systemPrompt");
                 if (prompt == null) prompt = cfg.systemPrompt;
                 ProductCatalog catalog = new ProductCatalog(new dao.PackageDAO().getAll());
-                ChatResponse reply = new ConsultationEngine().chat(request.getParameter("message"), ChatSessionManager.getOrCreate(sessionId), catalog,
+                String geminiKey = "gemini".equalsIgnoreCase(providerId) ? key : AIService.getDecryptedApiKey("gemini");
+                ChatResponse reply = new ConsultationEngine(rag.RagFactory.consultationForPlayground(geminiKey, cfg.rawSettings)).chat(
+                    request.getParameter("message"), ChatSessionManager.getOrCreate(sessionId), catalog,
                     new ConsultationEngine.Target(provider, key, model, url), null, new ChatOptions(temperature, tokens), prompt);
                 json.addProperty("success", true); json.addProperty("reply", reply.getContent());
                 json.addProperty("provider", reply.getProvider()); json.addProperty("model", reply.getModel());

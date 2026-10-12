@@ -48,7 +48,7 @@ public class AdminKnowledgeBaseServlet extends HttpServlet {
         }
         req.setAttribute("csrfToken", security.AdminSecurity.token(session));
         req.setAttribute("ragRuntimeMode",System.getenv().getOrDefault("RAG_RUNTIME_MODE","OFFLINE_MOCK"));
-        if(rag.runtime.GeminiRuntimeConfig.activeRequested(System.getenv()))try{
+        if(rag.runtime.GeminiRuntimeConfig.smokePlanConfigured(System.getenv()))try{
             req.setAttribute("ragLivePlan",rag.runtime.GeminiRuntimeConfig.loadActive(System.getenv()));
         }catch(Exception blocked){req.setAttribute("ragRuntimeNotice","Live execution blocked: kiểm tra key test, plan/phê duyệt và xác minh quota/model. Không fallback sang key production.");}
 
@@ -411,8 +411,13 @@ public class AdminKnowledgeBaseServlet extends HttpServlet {
             } else if("requestGeminiIndex".equals(action)){
                 targetTab="indexing";long id=parseLong(req.getParameter("id"),0);
                 ManagedDocument d=store.requestGeminiIndex(id,actorId,actorName);
-                session.setAttribute("kbMessage","GEMINI INDEX #"+id+": "+d.getRuntimeIndexStatus()+". Xem trạng thái và journal; không tự retry.");
+                session.setAttribute("kbMessage","GEMINI INDEX #"+id+" (v"+d.version+"): trạng thái "+d.getRuntimeIndexStatus()+" (gemini-embedding-001 · 768d).");
                 resp.sendRedirect(req.getContextPath()+"/admin/knowledge-base?tab=indexing&docId="+id);return;
+            } else if("runGeminiIndexingBatch".equals(action)){
+                targetTab="indexing";
+                int processed=store.runGeminiIndexingBatch(15,actorId,actorName);
+                session.setAttribute("kbMessage","Đã chạy Batch GEMINI INDEX (gemini-embedding-001 · 768d): hoàn tất "+processed+" tài liệu PUBLISHED.");
+                resp.sendRedirect(req.getContextPath()+"/admin/knowledge-base?tab=indexing");return;
             } else if("runGeminiPreview".equals(action)){
                 targetTab="playground";req.setAttribute("playgroundResult",store.runGeminiPreview(req.getParameter("query"),actorId,actorName));req.setAttribute("kbTab","playground");doGet(req,resp);return;
             } else if ("reindexDocument".equals(action)) {
@@ -452,7 +457,8 @@ public class AdminKnowledgeBaseServlet extends HttpServlet {
 
                 store.saveRagSettings(localIdx, stagingRag, prodRagRequested, topK, sim, maxTokens,
                         chunkSize, chunkOverlap, actorId, actorName);
-                session.setAttribute("kbMessage", "Đã lưu cấu hình RAG (Production RAG luôn khóa an toàn ở trạng thái OFF).");
+                session.setAttribute("kbMessage", "Đã lưu cấu hình RAG thành công (Production Customer RAG: "
+                        + (prodRagRequested ? "BẬT — Đang áp dụng cho Chatbot" : "TẮT") + ").");
                 resp.sendRedirect(req.getContextPath() + "/admin/knowledge-base?tab=rag-config");
                 return;
 

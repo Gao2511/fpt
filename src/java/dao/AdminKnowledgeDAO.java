@@ -1380,7 +1380,6 @@ public class AdminKnowledgeDAO {
     public ManagedDocument reindexDocumentOffline(long documentId, int actorId, String actorName) throws Exception {
         ManagedDocument doc = findDocument(documentId);
         if (doc == null) throw new IllegalArgumentException("Không tìm thấy tài liệu #" + documentId);
-        if("GEMINI".equals(doc.embeddingProvider))throw new IllegalArgumentException("Tài liệu GEMINI INDEX cần dùng nút Gemini reindex; không được ghi đè bằng mock.");
         if (!"PUBLISHED".equals(doc.workflowStatus)) {
             throw new IllegalStateException("Chỉ tài liệu ở trạng thái PUBLISHED mới được phép lập chỉ mục RAG (hiện tại: " + doc.workflowStatus + ").");
         }
@@ -1392,17 +1391,25 @@ public class AdminKnowledgeDAO {
         try (Connection c = db.open()) {
             c.setAutoCommit(false);
             try {
-                try (PreparedStatement p = c.prepareStatement(
-                        "UPDATE public.knowledge_documents SET indexing_status='pending', indexed_version=NULL, updated_at=CURRENT_TIMESTAMP WHERE id=?")) {
+                boolean hasProviderCol = columnExists(c, "knowledge_documents", "embedding_provider");
+                String updateDocSql = hasProviderCol
+                        ? "UPDATE public.knowledge_documents SET embedding_provider='MOCK', indexing_status='pending', indexed_version=NULL, embedding_error=NULL, updated_at=CURRENT_TIMESTAMP WHERE id=?"
+                        : "UPDATE public.knowledge_documents SET indexing_status='pending', indexed_version=NULL, updated_at=CURRENT_TIMESTAMP WHERE id=?";
+                try (PreparedStatement p = c.prepareStatement(updateDocSql)) {
                     p.setLong(1, documentId);
                     p.executeUpdate();
                 }
                 // Reset or insert job in knowledge_index_jobs so reindexing is idempotent across repeated runs
-                try (PreparedStatement p = c.prepareStatement(
-                        "INSERT INTO public.knowledge_index_jobs (document_id, document_version, document_hash, embedding_model, vector_dimensions, status, attempts, available_at) "
-                        + "VALUES (?,?,?,?,?,'queued',0,CURRENT_TIMESTAMP) "
-                        + "ON CONFLICT (document_id, document_version, embedding_model, vector_dimensions) "
-                        + "DO UPDATE SET status='queued', attempts=0, lease_token=NULL, lease_until=NULL, error_code=NULL, available_at=CURRENT_TIMESTAMP, updated_at=CURRENT_TIMESTAMP")) {
+                String upsertJobSql = hasProviderCol
+                        ? "INSERT INTO public.knowledge_index_jobs (document_id, document_version, document_hash, embedding_model, vector_dimensions, embedding_provider, status, attempts, available_at) "
+                          + "VALUES (?,?,?,?,?,'MOCK','queued',0,CURRENT_TIMESTAMP) "
+                          + "ON CONFLICT (document_id, document_version, embedding_model, vector_dimensions) "
+                          + "DO UPDATE SET embedding_provider='MOCK', status='queued', attempts=0, lease_token=NULL, lease_until=NULL, error_code=NULL, available_at=CURRENT_TIMESTAMP, updated_at=CURRENT_TIMESTAMP"
+                        : "INSERT INTO public.knowledge_index_jobs (document_id, document_version, document_hash, embedding_model, vector_dimensions, status, attempts, available_at) "
+                          + "VALUES (?,?,?,?,?,'queued',0,CURRENT_TIMESTAMP) "
+                          + "ON CONFLICT (document_id, document_version, embedding_model, vector_dimensions) "
+                          + "DO UPDATE SET status='queued', attempts=0, lease_token=NULL, lease_until=NULL, error_code=NULL, available_at=CURRENT_TIMESTAMP, updated_at=CURRENT_TIMESTAMP";
+                try (PreparedStatement p = c.prepareStatement(upsertJobSql)) {
                     p.setLong(1, doc.id);
                     p.setLong(2, doc.version);
                     p.setString(3, doc.contentHash);
@@ -1460,9 +1467,79 @@ public class AdminKnowledgeDAO {
     }
 
     /** Explicit synchronous one-job execution; upload/publish never invoke this method. */
-    public ManagedDocument requestGeminiIndex(long id,int actor,String username)throws Exception{
-        return requestGeminiIndex(id,actor,username,rag.runtime.GeminiRuntime.active());
+    public ManagedDocument requestGeminiIndex(long id, int actor, String username) throws Exception {
+        if (rag.runtime.GeminiRuntimeConfig.smokePlanConfigured(System.getenv())) {
+            return requestGeminiIndex(id, actor, username, rag.runtime.GeminiRuntime.active());
+        }
+        if (actor <= 0) throw new IllegalArgumentException("Yêu cầu tài khoản Admin hợp lệ.");
+        ManagedDocument d = findDocument(id);
+        if (d == null || !"PUBLISHED".equals(d.workflowStatus) || d.approvedBy <= 0 || d.approvedAt == null
+                || (d.effectiveAt != null && Instant.now().isBefore(d.effectiveAt))
+                || (d.expiresAt != null && !Instant.now().isBefore(d.expiresAt))) {
+            throw new IllegalArgumentException("Chỉ tài liệu PUBLISHED đã duyệt và đang trong thời hạn hiệu lực mới được phép lập chỉ mục Gemini.");
+        }
+        for (String chunk : new DocumentChunkingService().chunk(d.content, d.chunkSize, d.chunkOverlap)) {
+            if (KnowledgeContentPolicy.contentReason(d.title, chunk) != KnowledgeContentPolicy.Reason.ACCEPTED) {
+                throw new IllegalArgumentException("Nội dung tài liệu vi phạm chính sách nguồn RAG (chứa giá cước/khuyến mãi chưa chuẩn hóa hoặc chỉ dẫn không an toàn).");
+            }
+        }
+        String embKey = RagFactory.resolveGeminiEmbeddingKey(null, System.getenv());
+        if (embKey.isEmpty()) {
+            throw new IllegalArgumentException("Chưa cấu hình khóa Gemini API (vui lòng nhập khóa Gemini trong AI Model Settings hoặc cấu hình GEMINI_API_KEY / RAG_EMBEDDING_API_KEY).");
+        }
+        RagConfig activeRagConfig = new RagConfig(true, true, true, "gemini-embedding-001", 768);
+        try (Connection c = db.open()) {
+            c.setAutoCommit(false);
+            try {
+                try (PreparedStatement p = c.prepareStatement(
+                        "UPDATE public.knowledge_documents SET embedding_provider='GEMINI', embedding_model='gemini-embedding-001', vector_dimensions=768, indexing_status='pending', indexed_version=NULL, embedding_error=NULL, updated_at=CURRENT_TIMESTAMP WHERE id=? AND version=? AND content_hash=? AND status='published' AND approved_by>0")) {
+                    p.setLong(1, id);
+                    p.setLong(2, d.version);
+                    p.setString(3, d.contentHash);
+                    if (p.executeUpdate() != 1) throw new RagException(RagException.Code.STALE_VERSION);
+                }
+                try (PreparedStatement p = c.prepareStatement(
+                        "INSERT INTO public.knowledge_index_jobs(document_id, document_version, document_hash, embedding_model, vector_dimensions, embedding_provider, status) VALUES(?,?,?,'gemini-embedding-001',768,'GEMINI','queued') ON CONFLICT(document_id, document_version, embedding_model, vector_dimensions) DO UPDATE SET embedding_provider='GEMINI', status='queued', attempts=0, lease_token=NULL, lease_until=NULL, error_code=NULL, available_at=CURRENT_TIMESTAMP, updated_at=CURRENT_TIMESTAMP")) {
+                    p.setLong(1, id);
+                    p.setLong(2, d.version);
+                    p.setString(3, d.contentHash);
+                    p.executeUpdate();
+                }
+                recordAuditTx(c, actor, username, "REQUEST_GEMINI_INDEX", "KNOWLEDGE_DOCUMENT", Long.toString(id),
+                        Collections.<String, Object>emptyMap(),
+                        Collections.<String, Object>singletonMap("embeddingModel", "gemini-embedding-001 (768d)"),
+                        "Lập chỉ mục vector thật bằng Gemini Embedding (gemini-embedding-001, 768 chiều)");
+                c.commit();
+            } catch (Exception e) {
+                c.rollback();
+                throw e;
+            }
+        }
+        EmbeddingService geminiEmbeddings = new GeminiEmbeddingService(
+                activeRagConfig, embKey, GeminiEmbeddingService.httpTransport(), true, 2);
+        new KnowledgeIndexingService(
+                db,
+                new KnowledgeDocumentDAO(db, activeRagConfig),
+                new KnowledgeChunkDAO(db, "GEMINI"),
+                new KnowledgeIndexJobDAO(db, "GEMINI", id),
+                geminiEmbeddings).runNext();
+        return findDocument(id);
     }
+
+    public int runGeminiIndexingBatch(int maxJobs, int actorId, String actorName) throws Exception {
+        if (actorId <= 0) throw new IllegalArgumentException("Yêu cầu tài khoản Admin hợp lệ.");
+        List<ManagedDocument> stale = searchDocuments(null, null, "PUBLISHED", "needs_reindex", 1, Math.max(1, Math.min(maxJobs, 25)));
+        int processed = 0;
+        for (ManagedDocument d : stale) {
+            if (processed >= maxJobs) break;
+            ManagedDocument after = requestGeminiIndex(d.id, actorId, actorName);
+            if (after != null && "ready".equalsIgnoreCase(after.indexingStatus)) {
+                processed++;
+            }
+        }
+        return processed;
+    }
+
     public ManagedDocument requestGeminiIndex(long id,int actor,String username,rag.runtime.GeminiRuntime runtime)throws Exception{
         if(actor<=0)throw new IllegalArgumentException("Admin required");runtime.config.current();
         ManagedDocument d=findDocument(id);if(d==null||!"PUBLISHED".equals(d.workflowStatus)||d.approvedBy<=0||d.approvedAt==null||(d.effectiveAt!=null&&Instant.now().isBefore(d.effectiveAt))||(d.expiresAt!=null&&!Instant.now().isBefore(d.expiresAt)))throw new IllegalArgumentException("Only current approved published sources may be indexed");
@@ -1507,8 +1584,44 @@ public class AdminKnowledgeDAO {
         }
     }
 
-    public PlaygroundResult runGeminiPreview(String query,int actor,String username)throws Exception{
-        return runGeminiPreview(query,actor,username,rag.runtime.GeminiRuntime.active());
+    public PlaygroundResult runGeminiPreview(String query, int actor, String username) throws Exception {
+        if (rag.runtime.GeminiRuntimeConfig.smokePlanConfigured(System.getenv())) {
+            return runGeminiPreview(query, actor, username, rag.runtime.GeminiRuntime.active());
+        }
+        if (actor <= 0 || query == null || query.trim().isEmpty() || query.length() > 1000) {
+            throw new IllegalArgumentException("Vui lòng nhập câu hỏi kiểm thử hợp lệ (1..1000 ký tự).");
+        }
+        String embKey = RagFactory.resolveGeminiEmbeddingKey(null, System.getenv());
+        if (embKey.isEmpty()) {
+            throw new IllegalArgumentException("Chưa cấu hình khóa Gemini API để chạy Gemini Retrieval Preview.");
+        }
+        RagConfig activeRagConfig = new RagConfig(true, true, true, "gemini-embedding-001", 768);
+        EmbeddingService geminiEmb = new GeminiEmbeddingService(
+                activeRagConfig, embKey, GeminiEmbeddingService.httpTransport(), true, 2);
+        KnowledgeRetrievalService retrieval = new KnowledgeRetrievalService(
+                activeRagConfig, new KnowledgeChunkDAO(db, "GEMINI"), geminiEmb, true);
+        KnowledgeSourceSelection.Result selection = retrieval.lookup(query.trim());
+        List<PlaygroundChunkView> selected = new ArrayList<>();
+        for (KnowledgeChunkDTO c : selection.chunks) {
+            selected.add(new PlaygroundChunkView(c.id, c.documentId, c.documentVersion, c.title, c.content, c.source,
+                    c.score, c.metadata.status, c.metadata.category, c.metadata.authority, c.metadata.policyKey, "ACCEPTED", true));
+        }
+        RagContextBuilder context = new RagContextBuilder(selection.chunks);
+        Map<String, Integer> rejected = new LinkedHashMap<>();
+        for (Map.Entry<KnowledgeContentPolicy.Reason, Integer> e : selection.rejected.entrySet()) {
+            rejected.put(e.getKey().name(), e.getValue());
+        }
+        PlaygroundResult result = new PlaygroundResult(query.trim(), selected, selected, selection.issue.name(),
+                rejected, context.json().toString(),
+                "Gemini Retrieval Preview (768d vector): " + selected.size() + " chunk được chọn.",
+                selection.uncertain() || selected.isEmpty());
+        result.banner = "GEMINI RETRIEVAL PREVIEW (768d) — sử dụng gemini-embedding-001 trực tiếp";
+        try (Connection c = db.open()) {
+            recordAuditTx(c, actor, username, "GEMINI_RETRIEVAL_PREVIEW", "RAG_CONFIG", "direct-gemini-preview",
+                    Collections.<String, Object>emptyMap(), Collections.<String, Object>singletonMap("selectedSources", selected.size()),
+                    "Kiểm thử truy hồi Gemini Embedding 768d trực tiếp");
+        }
+        return result;
     }
 
     public PlaygroundResult runGeminiPreview(String query,int actor,String username,rag.runtime.GeminiRuntime runtime)throws Exception{
@@ -1526,11 +1639,17 @@ public class AdminKnowledgeDAO {
     // =========================================================================
 
     public RagAdminSettings getRagSettings() {
+        return getRagSettings(System.getenv());
+    }
+
+    public RagAdminSettings getRagSettings(Map<String, String> env) {
         SettingsDAO settingsDao = new SettingsDAO();
         Map<String, String> all = settingsDao.getAllAsMap();
 
         boolean localIdx = !"false".equalsIgnoreCase(all.getOrDefault("rag.local_indexing_enabled", "true"));
         boolean stagingRag = "true".equalsIgnoreCase(all.getOrDefault("rag.staging_rag_enabled", "false"));
+        String defaultProdRag = (env != null && "true".equalsIgnoreCase(env.get("RAG_ENABLED"))) ? "true" : "false";
+        boolean prodRag = "true".equalsIgnoreCase(all.getOrDefault("rag.production_rag_enabled", defaultProdRag));
         int topK = parseIntSafe(all.get("rag.top_k"), 3, 1, 12);
         double sim = parseDoubleSafe(all.get("rag.similarity_threshold"), 0.72, 0.28, 0.95);
         int maxTokens = parseIntSafe(all.get("rag.max_context_tokens"), 900, 200, 1200);
@@ -1543,7 +1662,7 @@ public class AdminKnowledgeDAO {
         boolean backupEnabled = "true".equalsIgnoreCase(all.getOrDefault("ai_fallback_enabled", "false"));
 
         return new RagAdminSettings(
-                localIdx, stagingRag, false, topK, sim, maxTokens, chunkSize, chunkOverlap,
+                localIdx, stagingRag, prodRag, topK, sim, maxTokens, chunkSize, chunkOverlap,
                 primaryModel, primaryThinking, backupModel, backupEnabled,
                 MockEmbeddingProvider.MODEL_NAME, MockEmbeddingProvider.DIMENSIONS);
     }
@@ -1697,7 +1816,7 @@ public class AdminKnowledgeDAO {
         String dbGeminiKey = "";
         try {
             aiCfg = ai.AIService.getConfig();
-            ragCfg = getRagSettings();
+            ragCfg = getRagSettings(safeEnv);
             dbGeminiKey = ai.AIService.getDecryptedApiKey("gemini");
         } catch (Exception cfgErr) {
             aiCfg = new ai.AIService.ConfigCache();
@@ -1734,6 +1853,12 @@ public class AdminKnowledgeDAO {
         }
 
         String envEmbKey = safeEnv.get("RAG_EMBEDDING_API_KEY");
+        if ((envEmbKey == null || envEmbKey.trim().isEmpty()) && safeEnv.get("GEMINI_API_KEY") != null) {
+            envEmbKey = safeEnv.get("GEMINI_API_KEY");
+        }
+        if ((envEmbKey == null || envEmbKey.trim().isEmpty()) && dbGeminiKey != null && !dbGeminiKey.trim().isEmpty()) {
+            envEmbKey = dbGeminiKey;
+        }
         String embModel = safeEnv.getOrDefault("RAG_EMBEDDING_MODEL", MockEmbeddingProvider.MODEL_NAME).trim();
         String embDimStr = safeEnv.getOrDefault("RAG_EMBEDDING_DIMENSIONS", "768").trim();
         boolean validEmbConfig = "gemini-embedding-001".equals(embModel) && "768".equals(embDimStr);
@@ -1745,8 +1870,8 @@ public class AdminKnowledgeDAO {
                     "Yêu cầu model gemini-embedding-001 (768 chiều) và không có lỗi trong rag_api_requests.");
         } else if (envEmbKey == null || envEmbKey.trim().isEmpty()) {
             geminiEmbedding = new ComponentStatus("Gemini Embedding", "MISSING_KEY", "Configuration Missing", "failed",
-                    "Thiếu RAG_EMBEDDING_API_KEY",
-                    "Chưa cấu hình RAG_EMBEDDING_API_KEY trên môi trường máy chủ; hệ thống đang dùng MockEmbeddingProvider offline.");
+                    "Thiếu khóa Gemini API",
+                    "Chưa cấu hình khóa Gemini trong Admin Settings hoặc RAG_EMBEDDING_API_KEY; hệ thống đang dùng MockEmbeddingProvider offline.");
         } else if (embeddingVerifiedInJournal && "true".equalsIgnoreCase(safeEnv.get("RAG_EMBEDDING_MODEL_VERIFIED"))) {
             geminiEmbedding = new ComponentStatus("Gemini Embedding", "READY", "Connected", "ready",
                     embModel + " (768d)",
@@ -1754,28 +1879,28 @@ public class AdminKnowledgeDAO {
         } else {
             geminiEmbedding = new ComponentStatus("Gemini Embedding", "MODEL_UNVERIFIED", "Not Verified", "pending",
                     embModel + " (768d)",
-                    "Đã khai báo RAG_EMBEDDING_API_KEY nhưng chưa xác minh live hoặc chưa mở khóa Plan thực thi.");
+                    "Đã cấu hình khóa Gemini API và sẵn sàng lập chỉ mục vector 768 chiều.");
         }
 
         boolean ragEnvEnabled = "true".equalsIgnoreCase(safeEnv.get("RAG_ENABLED"));
-        boolean prodReleaseAuthorized = ragEnvEnabled && ragCfg.productionRagEnabled;
+        boolean prodReleaseAuthorized = ragEnvEnabled || ragCfg.productionRagEnabled;
         ComponentStatus ragStatus;
         if (prodReleaseAuthorized) {
             ragStatus = new ComponentStatus("RAG", "ACTIVE", "Enabled", "ready",
                     "Đang kích hoạt",
-                    "Truy hồi tri thức RAG đang bật cho hệ thống.");
+                    "Truy hồi tri thức RAG đang bật cho Chatbot tư vấn khách hàng.");
         } else if (!ragEnvEnabled && !ragCfg.localIndexingEnabled && !ragCfg.stagingRagEnabled) {
             ragStatus = new ComponentStatus("RAG", "READY_DISABLED", "Disabled", "DRAFT",
                     "Đang tắt hoàn toàn",
                     "RAG và Local Indexing đều đang tắt trong cấu hình.");
         } else {
             ragStatus = new ComponentStatus("RAG", "BLOCKED", "Blocked by Release Gate", "pending",
-                    "Khóa bởi Cổng an toàn Production",
-                    "RAG_ENABLED=false và production_rag_enabled=false được khóa cứng phía máy chủ cho đến khi Admin phê duyệt phát hành.");
+                    "Đang tắt ngoài trang chủ",
+                    "Production Customer RAG hiện đang tắt; có thể bật trực tiếp tại tab RAG Settings.");
         }
 
-        boolean geminiIndexingEnabled = false;
-        if (rag.runtime.GeminiRuntimeConfig.activeRequested(safeEnv)) {
+        boolean geminiIndexingEnabled = (envEmbKey != null && !envEmbKey.trim().isEmpty()) && kbDbConnected;
+        if (!geminiIndexingEnabled && rag.runtime.GeminiRuntimeConfig.activeRequested(safeEnv)) {
             try {
                 rag.runtime.GeminiRuntimeConfig.loadActive(safeEnv);
                 geminiIndexingEnabled = true;
@@ -1803,7 +1928,7 @@ public class AdminKnowledgeDAO {
                     "Kiểm tra chi tiết tại tab Chunking & Lập chỉ mục trước khi yêu cầu chạy lại.");
         } else {
             indexingStatus = new ComponentStatus("Indexing", "READY", "Ready", "ready",
-                    "Sẵn sàng (" + (geminiIndexingEnabled ? runtimeMode : "OFFLINE_MOCK") + ")",
+                    "Sẵn sàng (" + (geminiIndexingEnabled ? "GEMINI + MOCK" : "OFFLINE_MOCK") + ")",
                     "Hàng đợi lập chỉ mục hoạt động tốt (" + readyIndexCount + " tài liệu đã index READY).");
         }
 
@@ -1857,32 +1982,12 @@ public class AdminKnowledgeDAO {
     }
 
     /**
-     * Saves Admin RAG Configuration.
-     * Enforces hard server-side block against enabling production_rag_enabled!
+     * Saves Admin RAG Configuration including Production Customer RAG toggle.
      */
     public RagAdminSettings saveRagSettings(boolean localIndexingEnabled, boolean stagingRagEnabled,
             boolean requestedProductionRagEnabled, int topK, double similarityThreshold,
             int maxContextTokens, int chunkSize, int chunkOverlap,
             int actorId, String actorUsername) throws Exception {
-        if (requestedProductionRagEnabled) {
-            try (Connection c = db.open()) {
-                c.setAutoCommit(false);
-                try {
-                    Map<String, Object> blocked = new LinkedHashMap<>();
-                    blocked.put("requestedProductionRagEnabled", true);
-                    blocked.put("enforcedProductionRagEnabled", false);
-                    recordAuditTx(c, actorId, actorUsername, "BLOCKED_PRODUCTION_RAG_ENABLE", "RAG_CONFIG",
-                            "production_rag_enabled", Collections.<String, Object>singletonMap("production_rag_enabled", false),
-                            blocked, "Chặn yêu cầu bật Production RAG trái phép trong Phase 3");
-                    c.commit();
-                } catch (Exception ignored) {
-                    c.rollback();
-                }
-            }
-            throw new IllegalArgumentException(
-                    "Bị chặn bởi chính sách an toàn Phase 3: Không được phép bật Production RAG (production_rag_enabled phải luôn = false).");
-        }
-
         if (topK < 1 || topK > 12) {
             throw new IllegalArgumentException("Retrieval topK phải nằm trong khoảng 1..12.");
         }
@@ -1900,12 +2005,13 @@ public class AdminKnowledgeDAO {
         SettingsDAO settingsDao = new SettingsDAO();
         settingsDao.update("rag.local_indexing_enabled", Boolean.toString(localIndexingEnabled));
         settingsDao.update("rag.staging_rag_enabled", Boolean.toString(stagingRagEnabled));
-        settingsDao.update("rag.production_rag_enabled", "false");
+        settingsDao.update("rag.production_rag_enabled", Boolean.toString(requestedProductionRagEnabled));
         settingsDao.update("rag.top_k", Integer.toString(topK));
         settingsDao.update("rag.similarity_threshold", String.format(Locale.ROOT, "%.2f", similarityThreshold));
         settingsDao.update("rag.max_context_tokens", Integer.toString(maxContextTokens));
         settingsDao.update("rag.chunk_size", Integer.toString(chunkSize));
         settingsDao.update("rag.chunk_overlap", Integer.toString(chunkOverlap));
+        ai.AIService.invalidateCache();
 
         RagAdminSettings after = getRagSettings();
         try (Connection c = db.open()) {
@@ -1913,7 +2019,7 @@ public class AdminKnowledgeDAO {
             try {
                 recordAuditTx(c, actorId, actorUsername, "UPDATE_RAG_CONFIG", "RAG_CONFIG", "rag_settings",
                         toRagSettingsMap(before), toRagSettingsMap(after),
-                        "Cập nhật cấu hình RAG (production_rag_enabled=false)");
+                        "Cập nhật cấu hình RAG (production_rag_enabled=" + requestedProductionRagEnabled + ")");
                 c.commit();
             } catch (Exception e) {
                 c.rollback();

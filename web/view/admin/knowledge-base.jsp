@@ -1022,14 +1022,21 @@
         <div class="kb-panel">
             <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
                 <div>
-                    <h3>Điều khiển Lập chỉ mục Offline (MockEmbeddingProvider — 768 dimensions)</h3>
-                    <p style="font-size:13px;color:#94a3b8;margin:0;">Tất cả embedding trong chế độ phát triển/kiểm thử được tạo định danh 100% cục bộ, không gọi mạng tới Gemini API.</p>
+                    <h3>Điều khiển Lập chỉ mục Vector (Gemini 768d &amp; Offline Mock 768d)</h3>
+                    <p style="font-size:13px;color:#94a3b8;margin:0;">Hỗ trợ lập chỉ mục trực tiếp bằng <code>gemini-embedding-001</code> (768 chiều) cho môi trường Production hoặc <code>MockEmbeddingProvider</code> offline cho kiểm thử nội bộ.</p>
                 </div>
-                <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base">
-                    <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}">
-                    <input type="hidden" name="action" value="runOfflineIndexingBatch">
-                    <button type="submit" class="kb-btn">Chạy Batch Lập chỉ mục Offline ngay</button>
-                </form>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base">
+                        <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}">
+                        <input type="hidden" name="action" value="runGeminiIndexingBatch">
+                        <button type="submit" class="kb-btn">Chạy Batch Gemini Index (768d)</button>
+                    </form>
+                    <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base">
+                        <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}">
+                        <input type="hidden" name="action" value="runOfflineIndexingBatch">
+                        <button type="submit" class="kb-btn kb-btn-secondary">Chạy Batch Lập chỉ mục Offline</button>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -1060,9 +1067,15 @@
                                             <td>
                                                 <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base" style="display:inline;">
                                                     <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}">
+                                                    <input type="hidden" name="action" value="requestGeminiIndex">
+                                                    <input type="hidden" name="id" value="${sd.id}">
+                                                    <button type="submit" class="kb-btn">Gemini Index</button>
+                                                </form>
+                                                <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base" style="display:inline;">
+                                                    <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}">
                                                     <input type="hidden" name="action" value="reindexDocument">
                                                     <input type="hidden" name="id" value="${sd.id}">
-                                                    <button type="submit" class="kb-btn">Reindex</button>
+                                                    <button type="submit" class="kb-btn kb-btn-secondary">Mock Index</button>
                                                 </form>
                                                 <a class="kb-btn kb-btn-secondary" href="${pageContext.request.contextPath}/admin/knowledge-base?tab=indexing&amp;docId=${sd.id}">Xem Chunks</a>
                                             </td>
@@ -1117,7 +1130,7 @@
     <c:if test="${kbTab == 'rag-config'}">
         <div class="kb-panel">
             <h3>Cấu hình RAG &amp; Kiểm soát Truy hồi</h3>
-            <p style="font-size:13px;color:#94a3b8;">Tách biệt rõ ràng giữa Local Offline Indexing, Staging RAG và Production Customer RAG. <strong>Production Customer RAG luôn bị khóa cứng ở trạng thái <code>false</code> tại máy chủ.</strong></p>
+            <p style="font-size:13px;color:#94a3b8;">Quản lý bật/tắt <strong>Production Customer RAG</strong> (Chatbot ngoài trang chủ), <strong>Staging / Test RAG</strong> và <strong>Local Offline Indexing</strong>, cùng các thông số truy hồi Vector + FTS.</p>
 
             <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base">
                 <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}">
@@ -1140,9 +1153,10 @@
                         </select>
                     </div>
                     <div class="kb-field">
-                        <label>Production Customer RAG (Hard-Locked OFF)</label>
+                        <label>Production Customer RAG (Chatbot Trang chủ)</label>
                         <select name="productionRagEnabled">
-                            <option value="false" selected>KHÓA AN TOÀN (false)</option>
+                            <option value="true" ${ragSettings.productionRagEnabled ? 'selected' : ''}>Bật (true) — Đang áp dụng cho Chatbot</option>
+                            <option value="false" ${!ragSettings.productionRagEnabled ? 'selected' : ''}>Tắt (false) — Tạm ngưng ngoài trang chủ</option>
                         </select>
                     </div>
                     <div class="kb-field">
