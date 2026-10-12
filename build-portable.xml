@@ -4,12 +4,22 @@
     <property name="portable.dir" location=".build"/>
     <property name="portable.web" location="${portable.dir}/web"/>
     <property name="portable.war" location="${portable.dir}/dist/fpt-sale-rag.war"/>
+    <property name="dist.war" location="dist/fpt-sale.war"/>
+    <property name="build.version" value="5.3.0-online-rag"/>
+    <property name="build.commit" value="source-build"/>
     <path id="compile.path"><fileset dir="lib/runtime" includes="*.jar" excludes="standard-*.jar"/><fileset dir="lib/compile-only" includes="*.jar"/></path>
     <target name="compile">
+        <tstamp><format property="build.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" timezone="UTC"/></tstamp>
         <mkdir dir="${portable.web}/WEB-INF/classes"/>
         <javac srcdir="src/java" destdir="${portable.web}/WEB-INF/classes" encoding="UTF-8" release="8" includeantruntime="false" excludes="controller/TestController.java">
             <classpath refid="compile.path"/>
         </javac>
+        <echo file="${portable.web}/WEB-INF/classes/build-info.properties">build.version=${build.version}
+build.commit=${build.commit}
+build.timestamp=${build.timestamp}
+build.pipeline=portable-ant-jdk17-release8
+</echo>
+        <copy file="config/phase52-online-smoke-plan.json" tofile="${portable.web}/WEB-INF/classes/phase52-online-smoke-plan.json" failonerror="false" overwrite="true"/>
     </target>
     <target name="war" depends="compile">
         <copy todir="${portable.web}"><fileset dir="web" excludes="WEB-INF/classes/**,WEB-INF/lib/**,**/.env*,**/oauth.properties,**/*.log,**/*.sql,**/*.java"/></copy>
@@ -21,6 +31,8 @@
         <war destfile="${portable.war}" webxml="web/WEB-INF/web.xml" modificationtime="2026-01-01T00:00:00Z">
             <fileset dir="${portable.web}" excludes="WEB-INF/web.xml,WEB-INF/lib/standard-*.jar,**/oauth.properties,**/TestController*.class,**/.env*,**/*.log"/>
         </war>
+        <mkdir dir="dist"/>
+        <copy file="${portable.war}" tofile="${dist.war}" overwrite="true"/>
     </target>
     <target name="test" depends="compile">
         <mkdir dir="${portable.dir}/test-classes"/>

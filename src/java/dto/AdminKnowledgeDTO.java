@@ -688,4 +688,120 @@ public final class AdminKnowledgeDTO {
         public String getDeterministicMockAnswer() { return deterministicMockAnswer; }
         public boolean isAbstained() { return abstained; }
     }
+
+    public static final class ComponentStatus {
+        public final String name;
+        public final String code;
+        public final String state;
+        public final String badgeVariant;
+        public final String summary;
+        public final String detail;
+
+        public ComponentStatus(String name, String state, String badgeVariant, String summary, String detail) {
+            this(name, state == null ? "UNKNOWN" : state.toUpperCase(java.util.Locale.ROOT).replace(' ', '_'),
+                    state, badgeVariant, summary, detail);
+        }
+
+        public ComponentStatus(String name, String code, String state, String badgeVariant, String summary, String detail) {
+            this.name = name;
+            this.code = code == null ? "UNKNOWN" : code;
+            this.state = state;
+            this.badgeVariant = badgeVariant;
+            this.summary = summary == null ? "" : summary;
+            this.detail = detail == null ? "" : detail;
+        }
+
+        public String getName() { return name; }
+        public String getCode() { return code; }
+        public String getState() { return state; }
+        public String getBadgeVariant() { return badgeVariant; }
+        public String getSummary() { return summary; }
+        public String getDetail() { return detail; }
+    }
+
+    public static final class SystemReadinessStatus {
+        public final ComponentStatus geminiChat;
+        public final ComponentStatus geminiEmbedding;
+        public final ComponentStatus database;
+        public final ComponentStatus knowledgeBase;
+        public final ComponentStatus rag;
+        public final ComponentStatus indexing;
+        public final ComponentStatus backupModel;
+        public final boolean aiChatbotEnabled;
+        public final boolean ragEnabled;
+        public final boolean geminiIndexingEnabled;
+        public final boolean kbDatabaseConnected;
+        public final boolean productionReleaseAuthorized;
+        public final String runtimeMode;
+        public final String environment;
+        public final String buildVersion;
+        public final String buildCommit;
+        public final String buildTimestamp;
+        public final String storageBackend;
+
+        public SystemReadinessStatus(ComponentStatus geminiChat, ComponentStatus geminiEmbedding,
+                ComponentStatus knowledgeBase, ComponentStatus rag, ComponentStatus indexing,
+                ComponentStatus backupModel, boolean aiChatbotEnabled, boolean ragEnabled,
+                boolean geminiIndexingEnabled, boolean kbDatabaseConnected,
+                boolean productionReleaseAuthorized, String runtimeMode) {
+            this(geminiChat, geminiEmbedding,
+                    new ComponentStatus("Database", kbDatabaseConnected ? "CONNECTED" : "DISCONNECTED",
+                            kbDatabaseConnected ? "ready" : "offline",
+                            kbDatabaseConnected ? "PostgreSQL Connected" : "Database Disconnected", ""),
+                    knowledgeBase, rag, indexing, backupModel,
+                    aiChatbotEnabled, ragEnabled, geminiIndexingEnabled, kbDatabaseConnected,
+                    productionReleaseAuthorized, runtimeMode,
+                    utils.BuildInfo.getEnvironment(),
+                    utils.BuildInfo.getVersion(),
+                    utils.BuildInfo.getShortCommitSha(),
+                    utils.BuildInfo.getBuildTimestamp(),
+                    "DISK");
+        }
+
+        public SystemReadinessStatus(ComponentStatus geminiChat, ComponentStatus geminiEmbedding,
+                ComponentStatus database, ComponentStatus knowledgeBase, ComponentStatus rag,
+                ComponentStatus indexing, ComponentStatus backupModel, boolean aiChatbotEnabled,
+                boolean ragEnabled, boolean geminiIndexingEnabled, boolean kbDatabaseConnected,
+                boolean productionReleaseAuthorized, String runtimeMode, String environment,
+                String buildVersion, String buildCommit, String buildTimestamp, String storageBackend) {
+            this.geminiChat = geminiChat;
+            this.geminiEmbedding = geminiEmbedding;
+            this.database = database;
+            this.knowledgeBase = knowledgeBase;
+            this.rag = rag;
+            this.indexing = indexing;
+            this.backupModel = backupModel;
+            this.aiChatbotEnabled = aiChatbotEnabled;
+            this.ragEnabled = ragEnabled;
+            this.geminiIndexingEnabled = geminiIndexingEnabled;
+            this.kbDatabaseConnected = kbDatabaseConnected;
+            this.productionReleaseAuthorized = productionReleaseAuthorized;
+            this.runtimeMode = runtimeMode == null ? "OFFLINE_MOCK" : runtimeMode;
+            this.environment = environment == null ? "LOCAL" : environment;
+            this.buildVersion = buildVersion == null ? utils.BuildInfo.getVersion() : buildVersion;
+            this.buildCommit = buildCommit == null ? utils.BuildInfo.getShortCommitSha() : buildCommit;
+            this.buildTimestamp = buildTimestamp == null ? utils.BuildInfo.getBuildTimestamp() : buildTimestamp;
+            this.storageBackend = storageBackend == null ? "DISK" : storageBackend;
+        }
+
+        public ComponentStatus getGeminiChat() { return geminiChat; }
+        public ComponentStatus getGeminiEmbedding() { return geminiEmbedding; }
+        public ComponentStatus getDatabase() { return database; }
+        public ComponentStatus getKnowledgeBase() { return knowledgeBase; }
+        public ComponentStatus getRag() { return rag; }
+        public ComponentStatus getIndexing() { return indexing; }
+        public ComponentStatus getBackupModel() { return backupModel; }
+        public boolean isAiChatbotEnabled() { return aiChatbotEnabled; }
+        public boolean isRagEnabled() { return ragEnabled; }
+        public boolean isGeminiIndexingEnabled() { return geminiIndexingEnabled; }
+        public boolean isKbDatabaseConnected() { return kbDatabaseConnected; }
+        public boolean isProductionReleaseAuthorized() { return productionReleaseAuthorized; }
+        public String getRuntimeMode() { return runtimeMode; }
+        public String getEnvironment() { return environment; }
+        public String getBuildVersion() { return buildVersion; }
+        public String getBuildCommit() { return buildCommit; }
+        public String getBuildTimestamp() { return buildTimestamp; }
+        public String getStorageBackend() { return storageBackend; }
+    }
 }
+

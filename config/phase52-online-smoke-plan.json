@@ -1,0 +1,61 @@
+{
+  "planId": "phase52-online-render-supabase-smoke-v1",
+  "environment": "STAGING",
+  "approved": false,
+  "executionAuthorized": false,
+  "productionRagEnabled": false,
+  "projectModelsVerified": false,
+  "restConfigurationVerified": false,
+  "quotaVerified": false,
+  "pricingVerified": false,
+  "embeddingTier": "Free Tier",
+  "chatTier": "Free Tier",
+  "embeddingModel": "gemini-embedding-001",
+  "dimensions": 768,
+  "chatModel": "gemini-3.8-flash",
+  "thinkingLevel": "medium",
+  "backupModel": "gemini-3.5-flash-lite",
+  "backupThinkingLevel": "low",
+  "backupEnabled": false,
+  "backupProjectModelVerified": false,
+  "verifiedAtEpochSeconds": 0,
+  "expiresAtEpochSeconds": 0,
+  "embeddingProjectAlias": "fpt_embedding_staging",
+  "chatProjectAlias": "fpt_chat_staging",
+  "maxRequests": 4,
+  "documentRequests": 1,
+  "queryRequests": 2,
+  "chatRequests": 1,
+  "requestsPerMinute": 4,
+  "requestsPerDay": 20,
+  "tokensPerMinute": 30000,
+  "tokensPerDay": 60000,
+  "maxChatOutputTokens": 1200,
+  "embeddingRequestsRemaining": 8,
+  "chatRequestsRemaining": 6,
+  "embeddingTokensRemaining": 30000,
+  "chatTokensRemaining": 30000,
+  "documentPayloadHashes": [
+    "464d8523bcc5f69bf4a398738422f576e74a901024b6fd7a762677b81f243192"
+  ],
+  "queryPayloadHashes": [
+    "36742152fcf25e819537c9a4f6403a5d5d3fce5dc1561ca1183b5d5433781ece",
+    "3de10ff1392f5d8cec54ce7c4d0848bf49b78d7decf05c120a3d76de558c9d95"
+  ],
+  "documents": [
+    {
+      "id": 1,
+      "version": 2,
+      "hash": "96ffff87d0d513ceed8c2049b377f215e240dabfa24d4acf6c00e449a4445284",
+      "slug": "kb-wifi-modem-restart-guide",
+      "title": "Hướng dẫn kiểm tra và khởi động lại modem WiFi FPT",
+      "content": "Anh/chị kiểm tra nguồn điện adapter modem WiFi FPT, đảm bảo dây quang không bị gập và khởi động lại thiết bị sau 30 giây.",
+      "taskType": "RETRIEVAL_DOCUMENT"
+    }
+  ],
+  "questions": [
+    "Modem WiFi FPT mất kết nối hoặc đèn LOS đỏ thì cần kiểm tra những gì?",
+    "Thời tiết hôm nay tại Pleiku Gia Lai có mưa không?"
+  ],
+  "preparationNotes": "NON-EXECUTABLE until Administrator explicitly sets approved=true AND executionAuthorized=true, verifies Free Tier quota within 60 minutes of execution, and sets RAG_ONLINE_GEMINI_AUTHORIZED=true on an isolated STAGING PostgreSQL database (never Supabase production). Enforces maxRequests=4 (1 RETRIEVAL_DOCUMENT + 2 RETRIEVAL_QUERY + 1 CHAT), backupEnabled=false, 0 retries, and full PostgreSQL rag_api_requests ledger tracking."
+}

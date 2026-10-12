@@ -1,17 +1,31 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<div class="kb-workflow-stepper" aria-label="Quy trình Upload và Import 6 bước">
+    <div class="kb-step is-done"><span class="kb-step-num">1</span><span>Chọn tệp</span></div>
+    <div class="kb-step is-done"><span class="kb-step-num">2</span><span>Tải lên &amp; Trích xuất</span></div>
+    <div class="kb-step is-active"><span class="kb-step-num">3</span><span>Review phân mục</span></div>
+    <div class="kb-step"><span class="kb-step-num">4</span><span>Phê duyệt</span></div>
+    <div class="kb-step"><span class="kb-step-num">5</span><span>Xuất bản</span></div>
+    <div class="kb-step"><span class="kb-step-num">6</span><span>Lập chỉ mục</span></div>
+</div>
 <section class="kb-panel">
-    <h2>Phân mục tài liệu &amp; review từng phần</h2>
-    <p>Bản gốc được lưu để đối chiếu và không xuất bản nguyên khối. Phân loại là gợi ý; Admin review trước khi tạo nháp và duyệt xuất bản riêng.</p>
-    <p>Quy tắc AI và cấu hình chỉ nằm trong hàng chờ đề xuất. Chức năng áp dụng thay đổi system instructions chưa được triển khai.</p>
-    <c:if test="${empty selectedDoc}"><p>Chọn tài liệu upload ở tab Tài liệu, bấm “Giữ bản gốc &amp; preview từng mục”, hoặc tải lên tệp mới với tùy chọn phân mục.</p></c:if>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+        <div>
+            <h2 style="margin-bottom:6px;">Phân mục tài liệu &amp; Review từng phần</h2>
+            <p style="margin:0 0 4px;font-size:13px;color:#94a3b8;">Bản gốc được lưu để đối chiếu và không xuất bản nguyên khối. Phân loại là gợi ý; Admin review trước khi tạo nháp và duyệt xuất bản riêng.</p>
+            <p style="margin:0;font-size:12.5px;color:#64748b;">Quy tắc AI và cấu hình chỉ nằm trong hàng chờ đề xuất. Chức năng áp dụng thay đổi system instructions chưa được triển khai.</p>
+        </div>
+        <a class="kb-btn kb-btn-secondary" href="${pageContext.request.contextPath}/admin/knowledge-base?tab=upload">&larr; Quay lại Tải tệp lên</a>
+    </div>
+    <c:if test="${empty selectedDoc}"><p style="margin-top:12px;color:#fcd34d;font-size:13px;">Chọn tài liệu upload ở tab Tài liệu, bấm “Giữ bản gốc &amp; preview từng mục”, hoặc tải lên tệp mới với tùy chọn phân mục.</p></c:if>
     <c:if test="${not empty selectedDoc}">
-        <h3><c:out value="${selectedDoc.title}"/> — bản nguồn #<c:out value="${selectedDoc.id}"/></h3>
+        <hr style="border-color:rgba(255,255,255,0.08);margin:14px 0;">
+        <h3 style="margin-bottom:8px;"><c:out value="${selectedDoc.title}"/> — bản nguồn #<c:out value="${selectedDoc.id}"/></h3>
         <c:forEach items="${docFiles}" var="file">
-            <p><a class="kb-btn kb-btn-secondary" href="${pageContext.request.contextPath}/admin/knowledge-base?action=downloadOriginal&amp;docId=${selectedDoc.id}&amp;fileId=${file.id}">Tải bản gốc: <c:out value="${file.originalFilename}"/></a> SHA256: <c:out value="${file.sha256Hash}"/></p>
+            <p style="font-size:12.5px;"><a class="kb-btn kb-btn-secondary" href="${pageContext.request.contextPath}/admin/knowledge-base?action=downloadOriginal&amp;docId=${selectedDoc.id}&amp;fileId=${file.id}">Tải bản gốc: <c:out value="${file.originalFilename}"/></a> <span style="color:#94a3b8;margin-left:8px;">SHA256: <code><c:out value="${file.sha256Hash}"/></code></span></p>
         </c:forEach>
-        <details><summary>Xem toàn văn trích xuất hiện hành (v<c:out value="${selectedDoc.version}"/>)</summary><pre class="kb-import-text"><c:out value="${selectedDoc.content}"/></pre></details>
+        <details class="kb-advanced-details"><summary class="kb-advanced-summary">Xem toàn văn trích xuất hiện hành (v<c:out value="${selectedDoc.version}"/>)</summary><pre class="kb-import-text"><c:out value="${selectedDoc.content}"/></pre></details>
     </c:if>
 </section>
 <c:forEach items="${importSections}" var="section">

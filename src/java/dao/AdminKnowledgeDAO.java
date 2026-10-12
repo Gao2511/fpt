@@ -421,27 +421,60 @@ public class AdminKnowledgeDAO {
         try (Connection c = db.open()) {
             c.setAutoCommit(false);
             try {
-                try (PreparedStatement p = c.prepareStatement(
-                        "INSERT INTO public.knowledge_files ("
-                        + "id, document_id, version_number, original_filename, stored_filename, storage_rel_path, "
-                        + "detected_mime_type, file_extension, file_size_bytes, sha256_hash, extraction_status, "
-                        + "extracted_char_count, extraction_warning, uploaded_by"
-                        + ") VALUES (CAST(? AS uuid),?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
-                    p.setString(1, extraction.fileId.toString());
-                    p.setLong(2, doc.id);
-                    p.setLong(3, doc.version);
-                    p.setString(4, extraction.originalFilename);
-                    p.setString(5, extraction.storedFilename);
-                    p.setString(6, extraction.storageRelPath);
-                    p.setString(7, extraction.detectedMimeType);
-                    p.setString(8, extraction.extension);
-                    p.setLong(9, extraction.sizeBytes);
-                    p.setString(10, extraction.sha256Hash);
-                    p.setString(11, extraction.status);
-                    p.setInt(12, extraction.charCount);
-                    p.setString(13, extraction.warningMessage);
-                    p.setInt(14, actorId);
-                    p.executeUpdate();
+                boolean hasByteaCol = columnExists(c, "knowledge_files", "file_content");
+                String storageBackend = (hasByteaCol && extraction.rawBytes != null) ? "HYBRID" : "DISK";
+                if (hasByteaCol) {
+                    try (PreparedStatement p = c.prepareStatement(
+                            "INSERT INTO public.knowledge_files ("
+                            + "id, document_id, version_number, original_filename, stored_filename, storage_rel_path, "
+                            + "detected_mime_type, file_extension, file_size_bytes, sha256_hash, extraction_status, "
+                            + "extracted_char_count, extraction_warning, uploaded_by, file_content, storage_backend"
+                            + ") VALUES (CAST(? AS uuid),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
+                        p.setString(1, extraction.fileId.toString());
+                        p.setLong(2, doc.id);
+                        p.setLong(3, doc.version);
+                        p.setString(4, extraction.originalFilename);
+                        p.setString(5, extraction.storedFilename);
+                        p.setString(6, extraction.storageRelPath);
+                        p.setString(7, extraction.detectedMimeType);
+                        p.setString(8, extraction.extension);
+                        p.setLong(9, extraction.sizeBytes);
+                        p.setString(10, extraction.sha256Hash);
+                        p.setString(11, extraction.status);
+                        p.setInt(12, extraction.charCount);
+                        p.setString(13, extraction.warningMessage);
+                        p.setInt(14, actorId);
+                        if (extraction.rawBytes != null) {
+                            p.setBytes(15, extraction.rawBytes);
+                        } else {
+                            p.setNull(15, Types.BINARY);
+                        }
+                        p.setString(16, storageBackend);
+                        p.executeUpdate();
+                    }
+                } else {
+                    try (PreparedStatement p = c.prepareStatement(
+                            "INSERT INTO public.knowledge_files ("
+                            + "id, document_id, version_number, original_filename, stored_filename, storage_rel_path, "
+                            + "detected_mime_type, file_extension, file_size_bytes, sha256_hash, extraction_status, "
+                            + "extracted_char_count, extraction_warning, uploaded_by"
+                            + ") VALUES (CAST(? AS uuid),?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
+                        p.setString(1, extraction.fileId.toString());
+                        p.setLong(2, doc.id);
+                        p.setLong(3, doc.version);
+                        p.setString(4, extraction.originalFilename);
+                        p.setString(5, extraction.storedFilename);
+                        p.setString(6, extraction.storageRelPath);
+                        p.setString(7, extraction.detectedMimeType);
+                        p.setString(8, extraction.extension);
+                        p.setLong(9, extraction.sizeBytes);
+                        p.setString(10, extraction.sha256Hash);
+                        p.setString(11, extraction.status);
+                        p.setInt(12, extraction.charCount);
+                        p.setString(13, extraction.warningMessage);
+                        p.setInt(14, actorId);
+                        p.executeUpdate();
+                    }
                 }
 
                 Map<String, Object> fileAudit = new LinkedHashMap<>();
@@ -452,6 +485,7 @@ public class AdminKnowledgeDAO {
                 fileAudit.put("sizeBytes", extraction.sizeBytes);
                 fileAudit.put("extractionStatus", extraction.status);
                 fileAudit.put("extractedCharCount", extraction.charCount);
+                fileAudit.put("storageBackend", storageBackend);
                 recordAuditTx(c, actorId, actorUsername, "UPLOAD_FILE", "KNOWLEDGE_FILE",
                         extraction.fileId.toString(), Collections.<String, Object>emptyMap(), fileAudit,
                         "Tải lên tệp " + extraction.originalFilename + " -> Tài liệu #" + doc.id);
@@ -906,9 +940,12 @@ public class AdminKnowledgeDAO {
 
     public List<UploadedFileRecord> listUploadedFiles(Long documentId) throws Exception {
         List<UploadedFileRecord> list = new ArrayList<>();
+        String cols = "id, document_id, version_number, original_filename, stored_filename, storage_rel_path, "
+                + "detected_mime_type, file_extension, file_size_bytes, sha256_hash, extraction_status, "
+                + "extracted_char_count, extraction_warning, uploaded_by, uploaded_at";
         String sql = documentId == null
-                ? "SELECT * FROM public.knowledge_files ORDER BY uploaded_at DESC LIMIT 50"
-                : "SELECT * FROM public.knowledge_files WHERE document_id=? ORDER BY uploaded_at DESC";
+                ? "SELECT " + cols + " FROM public.knowledge_files ORDER BY uploaded_at DESC LIMIT 50"
+                : "SELECT " + cols + " FROM public.knowledge_files WHERE document_id=? ORDER BY uploaded_at DESC";
         try (Connection c = db.open();
              PreparedStatement p = c.prepareStatement(sql)) {
             if (documentId != null) p.setLong(1, documentId.longValue());
@@ -934,6 +971,25 @@ public class AdminKnowledgeDAO {
             }
         }
         return list;
+    }
+
+    public byte[] loadUploadedFileBytes(long documentId, String fileId) throws Exception {
+        if (documentId <= 0 || fileId == null || fileId.trim().isEmpty()) {
+            return null;
+        }
+        try (Connection c = db.open()) {
+            if (!columnExists(c, "knowledge_files", "file_content")) {
+                return null;
+            }
+            try (PreparedStatement p = c.prepareStatement(
+                    "SELECT file_content FROM public.knowledge_files WHERE document_id=? AND id=CAST(? AS uuid)")) {
+                p.setLong(1, documentId);
+                p.setString(2, fileId.trim());
+                try (ResultSet r = p.executeQuery()) {
+                    return r.next() ? r.getBytes(1) : null;
+                }
+            }
+        }
     }
 
     // =========================================================================
@@ -1405,7 +1461,7 @@ public class AdminKnowledgeDAO {
 
     /** Explicit synchronous one-job execution; upload/publish never invoke this method. */
     public ManagedDocument requestGeminiIndex(long id,int actor,String username)throws Exception{
-        return requestGeminiIndex(id,actor,username,rag.runtime.GeminiRuntime.local());
+        return requestGeminiIndex(id,actor,username,rag.runtime.GeminiRuntime.active());
     }
     public ManagedDocument requestGeminiIndex(long id,int actor,String username,rag.runtime.GeminiRuntime runtime)throws Exception{
         if(actor<=0)throw new IllegalArgumentException("Admin required");runtime.config.current();
@@ -1431,12 +1487,37 @@ public class AdminKnowledgeDAO {
         runtime.index(id);return findDocument(id);
     }
 
+    /** Explicitly recovers expired GEMINI/MOCK index job leases after a Render container restart without making API calls. */
+    public int recoverExpiredIndexLeases(int actor, String username) throws Exception {
+        if (actor <= 0) throw new IllegalArgumentException("Admin required");
+        try (Connection c = db.open()) {
+            c.setAutoCommit(false);
+            try {
+                int recovered = KnowledgeIndexJobDAO.recoverExpiredLeases(c);
+                recordAuditTx(c, actor, username, "RECOVER_EXPIRED_LEASES", "KNOWLEDGE_INDEX_JOB",
+                        "expired-leases", Collections.<String, Object>emptyMap(),
+                        Collections.<String, Object>singletonMap("recoveredCount", recovered),
+                        "Thu hồi " + recovered + " job quá hạn lease sau khi khởi động lại container (0 API calls)");
+                c.commit();
+                return recovered;
+            } catch (Exception e) {
+                c.rollback();
+                throw e;
+            }
+        }
+    }
+
     public PlaygroundResult runGeminiPreview(String query,int actor,String username)throws Exception{
+        return runGeminiPreview(query,actor,username,rag.runtime.GeminiRuntime.active());
+    }
+
+    public PlaygroundResult runGeminiPreview(String query,int actor,String username,rag.runtime.GeminiRuntime runtime)throws Exception{
         if(actor<=0||query==null||query.trim().isEmpty()||query.length()>1000)throw new IllegalArgumentException("Admin and valid query required");
-        rag.runtime.GeminiRuntime runtime=rag.runtime.GeminiRuntime.local();KnowledgeSourceSelection.Result selection=runtime.retrieval.lookup(query.trim());
+        KnowledgeSourceSelection.Result selection=runtime.retrieval.lookup(query.trim());
         List<PlaygroundChunkView> selected=new ArrayList<>();for(KnowledgeChunkDTO c:selection.chunks)selected.add(new PlaygroundChunkView(c.id,c.documentId,c.documentVersion,c.title,c.content,c.source,c.score,c.metadata.status,c.metadata.category,c.metadata.authority,c.metadata.policyKey,"ACCEPTED",true));
         RagContextBuilder context=new RagContextBuilder(selection.chunks);Map<String,Integer> rejected=new LinkedHashMap<>();for(Map.Entry<KnowledgeContentPolicy.Reason,Integer> e:selection.rejected.entrySet())rejected.put(e.getKey().name(),e.getValue());
-        PlaygroundResult result=new PlaygroundResult(query,selected,selected,selection.issue.name(),rejected,context.json().toString(),"Retrieval preview only; no Chat API request",selection.uncertain()||selected.isEmpty());result.banner="LOCAL GEMINI RETRIEVAL — consumes one approved query embedding slot; no Chat API";
+        String modeLabel=runtime.config.isOnline()?"ONLINE GEMINI RETRIEVAL":"LOCAL GEMINI RETRIEVAL";
+        PlaygroundResult result=new PlaygroundResult(query,selected,selected,selection.issue.name(),rejected,context.json().toString(),"Retrieval preview only; no Chat API request",selection.uncertain()||selected.isEmpty());result.banner=modeLabel+" — consumes one approved query embedding slot; no Chat API";
         try(Connection c=db.open()){recordAuditTx(c,actor,username,"GEMINI_RETRIEVAL_PREVIEW","RAG_CONFIG",runtime.config.planId,Collections.emptyMap(),Collections.singletonMap("selectedSources",selected.size()),"Sanitized preview; request/token counts in rag_api_requests");}return result;
     }
 
@@ -1465,6 +1546,314 @@ public class AdminKnowledgeDAO {
                 localIdx, stagingRag, false, topK, sim, maxTokens, chunkSize, chunkOverlap,
                 primaryModel, primaryThinking, backupModel, backupEnabled,
                 MockEmbeddingProvider.MODEL_NAME, MockEmbeddingProvider.DIMENSIONS);
+    }
+
+    public SystemReadinessStatus getSystemReadinessStatus() {
+        return getSystemReadinessStatus(System.getenv());
+    }
+
+    public SystemReadinessStatus getSystemReadinessStatus(Map<String, String> env) {
+        Map<String, String> safeEnv = env == null ? Collections.<String, String>emptyMap() : env;
+        String runtimeMode = safeEnv.getOrDefault("RAG_RUNTIME_MODE", "OFFLINE_MOCK").trim();
+        if (runtimeMode.isEmpty()) runtimeMode = "OFFLINE_MOCK";
+        String ragEnvironment = utils.BuildInfo.getEnvironment(safeEnv);
+
+        boolean kbDbConnected = false;
+        boolean chatVerifiedInJournal = false;
+        boolean embeddingVerifiedInJournal = false;
+        boolean chatErrorInJournal = false;
+        boolean embeddingErrorInJournal = false;
+        int waitingQuotaCount = 0;
+        int processingCount = 0;
+        int failedIndexCount = 0;
+        int readyIndexCount = 0;
+        int approvedPublishedCount = 0;
+        String storageBackend = "DISK";
+        ComponentStatus dbStatus;
+        ComponentStatus kbStatus;
+
+        try (Connection c = db.open()) {
+            List<String> missing = new ArrayList<>();
+            boolean hasPgVector = false;
+            try (Statement s = c.createStatement()) {
+                try (ResultSet r = s.executeQuery("SELECT EXISTS(SELECT 1 FROM pg_extension WHERE extname='vector')")) {
+                    hasPgVector = r.next() && r.getBoolean(1);
+                    if (!hasPgVector) missing.add("pgvector");
+                }
+                boolean has002 = regclassExists(s, "public.knowledge_documents")
+                        && regclassExists(s, "public.knowledge_chunks")
+                        && regclassExists(s, "public.knowledge_index_jobs");
+                if (!has002) missing.add("002-rag-mvp.sql");
+
+                boolean has003 = has002 && columnExists(c, "knowledge_documents", "policy_key");
+                if (!has003) missing.add("003-rag-source-policy.sql");
+
+                boolean has004 = regclassExists(s, "public.knowledge_document_revisions")
+                        && regclassExists(s, "public.knowledge_document_reviews")
+                        && regclassExists(s, "public.knowledge_files")
+                        && regclassExists(s, "public.knowledge_faqs")
+                        && regclassExists(s, "public.knowledge_faq_revisions")
+                        && regclassExists(s, "public.admin_audit_logs");
+                if (!has004) missing.add("004-admin-knowledge-base.sql");
+
+                boolean has005 = regclassExists(s, "public.knowledge_import_sections");
+                boolean has006 = regclassExists(s, "public.rag_runtime_plans")
+                        && regclassExists(s, "public.rag_api_requests")
+                        && (has002 && columnExists(c, "knowledge_documents", "embedding_provider"));
+                if (("LOCAL_GEMINI".equals(runtimeMode) || "STAGING".equals(runtimeMode) || "PRODUCTION".equals(runtimeMode)) && !has006) {
+                    missing.add("006-rag-gemini-runtime.sql");
+                }
+                boolean has007 = has004 && columnExists(c, "knowledge_files", "file_content")
+                        && regclassExists(s, "public.rag_schema_migrations");
+                if (has007) {
+                    storageBackend = "HYBRID_DB";
+                }
+
+                if (has002) {
+                    try (ResultSet r = s.executeQuery(
+                            "SELECT indexing_status, COUNT(*) FROM public.knowledge_documents GROUP BY indexing_status")) {
+                        while (r.next()) {
+                            String st = r.getString(1);
+                            int cnt = r.getInt(2);
+                            if ("waiting_for_quota".equals(st)) waitingQuotaCount += cnt;
+                            else if ("processing".equals(st)) processingCount += cnt;
+                            else if ("failed".equals(st) || "failed_retryable".equals(st)) failedIndexCount += cnt;
+                            else if ("ready".equals(st)) readyIndexCount += cnt;
+                        }
+                    }
+                    try (ResultSet r = s.executeQuery(
+                            "SELECT COUNT(*) FROM public.knowledge_documents WHERE status='published' AND approved_by>0")) {
+                        if (r.next()) approvedPublishedCount = r.getInt(1);
+                    }
+                    try (ResultSet r = s.executeQuery(
+                            "SELECT status, COUNT(*) FROM public.knowledge_index_jobs WHERE status IN ('running','waiting_for_quota') GROUP BY status")) {
+                        while (r.next()) {
+                            String st = r.getString(1);
+                            int cnt = r.getInt(2);
+                            if ("waiting_for_quota".equals(st)) waitingQuotaCount += cnt;
+                            else if ("running".equals(st)) processingCount += cnt;
+                        }
+                    }
+                }
+
+                if (has006) {
+                    try (ResultSet r = s.executeQuery(
+                            "SELECT request_group, state, COUNT(*) FROM public.rag_api_requests GROUP BY request_group, state")) {
+                        while (r.next()) {
+                            String grp = r.getString(1);
+                            String st = r.getString(2);
+                            int cnt = r.getInt(3);
+                            if ("CHAT".equals(grp)) {
+                                if ("COMPLETED".equals(st) && cnt > 0) chatVerifiedInJournal = true;
+                                if (("FAILED".equals(st) || "UNCERTAIN".equals(st)) && cnt > 0) chatErrorInJournal = true;
+                            } else if ("DOCUMENT".equals(grp) || "QUERY".equals(grp)) {
+                                if ("COMPLETED".equals(st) && cnt > 0) embeddingVerifiedInJournal = true;
+                                if (("FAILED".equals(st) || "UNCERTAIN".equals(st)) && cnt > 0) embeddingErrorInJournal = true;
+                            }
+                        }
+                    }
+                }
+
+                if (missing.isEmpty()) {
+                    kbDbConnected = true;
+                    List<String> optionalMissing = new ArrayList<>();
+                    if (!has005) optionalMissing.add("005");
+                    if (!has006) optionalMissing.add("006");
+                    if (!has007) optionalMissing.add("007");
+                    String detailMsg = optionalMissing.isEmpty()
+                            ? "Đã xác minh extension vector và đầy đủ bảng migrations 001–007 (Lưu trữ tệp bền vững: " + storageBackend + ")."
+                            : "Đã xác minh pgvector và bảng KB cốt lõi 002–004 (migration mở rộng chưa áp dụng: " + String.join(", ", optionalMissing) + ").";
+                    dbStatus = new ComponentStatus("Database", "CONNECTED", "CONNECTED", "ready",
+                            "PostgreSQL + pgvector sẵn sàng", detailMsg);
+                    String kbCode = approvedPublishedCount > 0 ? "READY" : "NO_APPROVED_DOCS";
+                    String kbSummary = approvedPublishedCount > 0
+                            ? approvedPublishedCount + " tài liệu đã duyệt & xuất bản"
+                            : "Chưa có tài liệu xuất bản (0 approved docs)";
+                    kbStatus = new ComponentStatus("Knowledge Base", kbCode, "Database Ready", "ready",
+                            kbSummary, detailMsg);
+                } else {
+                    kbDbConnected = false;
+                    String dbCode = !hasPgVector ? "PGVECTOR_MISSING" : "MIGRATION_PENDING";
+                    dbStatus = new ComponentStatus("Database", dbCode, dbCode, "pending",
+                            "Thiếu: " + String.join(", ", missing),
+                            "Cần chạy thủ công các migration còn thiếu trên PostgreSQL/Supabase trước khi vận hành.");
+                    kbStatus = new ComponentStatus("Knowledge Base", "DEMO_FALLBACK", "Migration Missing", "pending",
+                            "Thiếu: " + String.join(", ", missing),
+                            "Cần chạy thủ công các migration còn thiếu trên PostgreSQL/Supabase trước khi vận hành.");
+                }
+            }
+        } catch (Exception dbErr) {
+            kbDbConnected = false;
+            dbStatus = new ComponentStatus("Database", "DISCONNECTED", "DISCONNECTED", "failed",
+                    "Không thể kết nối PostgreSQL",
+                    "Kiểm tra cấu hình DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD và SSL mode.");
+            kbStatus = new ComponentStatus("Knowledge Base", "DEMO_FALLBACK", "Error", "failed",
+                    "Không thể kết nối PostgreSQL",
+                    "Kiểm tra cấu hình DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD và SSL mode.");
+        }
+
+        ai.AIService.ConfigCache aiCfg;
+        RagAdminSettings ragCfg;
+        String dbGeminiKey = "";
+        try {
+            aiCfg = ai.AIService.getConfig();
+            ragCfg = getRagSettings();
+            dbGeminiKey = ai.AIService.getDecryptedApiKey("gemini");
+        } catch (Exception cfgErr) {
+            aiCfg = new ai.AIService.ConfigCache();
+            ragCfg = new RagAdminSettings(true, false, false, 3, 0.72, 900, 1000, 100,
+                    "gemini-3.8-flash", "medium", "gemini-3.5-flash-lite", false,
+                    MockEmbeddingProvider.MODEL_NAME, MockEmbeddingProvider.DIMENSIONS);
+        }
+
+        String envChatKey = safeEnv.get("RAG_CHAT_TEST_API_KEY");
+        String envProdChatKey = safeEnv.get("GEMINI_API_KEY");
+        boolean hasChatKey = (dbGeminiKey != null && !dbGeminiKey.trim().isEmpty())
+                || (envChatKey != null && !envChatKey.trim().isEmpty())
+                || (envProdChatKey != null && !envProdChatKey.trim().isEmpty());
+        String chatModel = (aiCfg.activeModel != null && !aiCfg.activeModel.trim().isEmpty())
+                ? aiCfg.activeModel.trim() : ragCfg.primaryChatModel;
+
+        ComponentStatus geminiChat;
+        if (chatErrorInJournal) {
+            geminiChat = new ComponentStatus("Gemini Chat", "QUOTA_EXHAUSTED", "Error", "failed",
+                    "Ghi nhận lỗi trong nhật ký thực thi",
+                    "Bảng rag_api_requests có trạng thái FAILED/UNCERTAIN cho nhóm CHAT. Kiểm tra journal trước khi thử lại.");
+        } else if (!hasChatKey || chatModel == null || chatModel.trim().isEmpty()) {
+            geminiChat = new ComponentStatus("Gemini Chat", "MISSING_KEY", "Configuration Missing", "failed",
+                    "Thiếu API Key hoặc Model",
+                    "Chưa cấu hình khóa Gemini Chat trong Admin Settings hoặc biến GEMINI_API_KEY / RAG_CHAT_TEST_API_KEY.");
+        } else if (chatVerifiedInJournal) {
+            geminiChat = new ComponentStatus("Gemini Chat", "READY", "Connected", "ready",
+                    chatModel + " (Thinking: " + ragCfg.primaryThinkingLevel + ")",
+                    "Đã có bằng chứng kết nối thành công trong rag_api_requests (0 live calls khi hiển thị trạng thái).");
+        } else {
+            geminiChat = new ComponentStatus("Gemini Chat", "MODEL_UNVERIFIED", "Not Verified", "pending",
+                    chatModel + " (Thinking: " + ragCfg.primaryThinkingLevel + ")",
+                    "Đã cấu hình Model/Key nhưng chưa xác minh kết nối trực tiếp (không tự gọi Gemini API để kiểm tra).");
+        }
+
+        String envEmbKey = safeEnv.get("RAG_EMBEDDING_API_KEY");
+        String embModel = safeEnv.getOrDefault("RAG_EMBEDDING_MODEL", MockEmbeddingProvider.MODEL_NAME).trim();
+        String embDimStr = safeEnv.getOrDefault("RAG_EMBEDDING_DIMENSIONS", "768").trim();
+        boolean validEmbConfig = "gemini-embedding-001".equals(embModel) && "768".equals(embDimStr);
+
+        ComponentStatus geminiEmbedding;
+        if (!validEmbConfig || embeddingErrorInJournal) {
+            geminiEmbedding = new ComponentStatus("Gemini Embedding", "QUOTA_EXHAUSTED", "Error", "failed",
+                    "Cấu hình hoặc journal lỗi",
+                    "Yêu cầu model gemini-embedding-001 (768 chiều) và không có lỗi trong rag_api_requests.");
+        } else if (envEmbKey == null || envEmbKey.trim().isEmpty()) {
+            geminiEmbedding = new ComponentStatus("Gemini Embedding", "MISSING_KEY", "Configuration Missing", "failed",
+                    "Thiếu RAG_EMBEDDING_API_KEY",
+                    "Chưa cấu hình RAG_EMBEDDING_API_KEY trên môi trường máy chủ; hệ thống đang dùng MockEmbeddingProvider offline.");
+        } else if (embeddingVerifiedInJournal && "true".equalsIgnoreCase(safeEnv.get("RAG_EMBEDDING_MODEL_VERIFIED"))) {
+            geminiEmbedding = new ComponentStatus("Gemini Embedding", "READY", "Connected", "ready",
+                    embModel + " (768d)",
+                    "Đã xác minh sinh vector 768 chiều hợp lệ trong rag_api_requests.");
+        } else {
+            geminiEmbedding = new ComponentStatus("Gemini Embedding", "MODEL_UNVERIFIED", "Not Verified", "pending",
+                    embModel + " (768d)",
+                    "Đã khai báo RAG_EMBEDDING_API_KEY nhưng chưa xác minh live hoặc chưa mở khóa Plan thực thi.");
+        }
+
+        boolean ragEnvEnabled = "true".equalsIgnoreCase(safeEnv.get("RAG_ENABLED"));
+        boolean prodReleaseAuthorized = ragEnvEnabled && ragCfg.productionRagEnabled;
+        ComponentStatus ragStatus;
+        if (prodReleaseAuthorized) {
+            ragStatus = new ComponentStatus("RAG", "ACTIVE", "Enabled", "ready",
+                    "Đang kích hoạt",
+                    "Truy hồi tri thức RAG đang bật cho hệ thống.");
+        } else if (!ragEnvEnabled && !ragCfg.localIndexingEnabled && !ragCfg.stagingRagEnabled) {
+            ragStatus = new ComponentStatus("RAG", "READY_DISABLED", "Disabled", "DRAFT",
+                    "Đang tắt hoàn toàn",
+                    "RAG và Local Indexing đều đang tắt trong cấu hình.");
+        } else {
+            ragStatus = new ComponentStatus("RAG", "BLOCKED", "Blocked by Release Gate", "pending",
+                    "Khóa bởi Cổng an toàn Production",
+                    "RAG_ENABLED=false và production_rag_enabled=false được khóa cứng phía máy chủ cho đến khi Admin phê duyệt phát hành.");
+        }
+
+        boolean geminiIndexingEnabled = false;
+        if (rag.runtime.GeminiRuntimeConfig.activeRequested(safeEnv)) {
+            try {
+                rag.runtime.GeminiRuntimeConfig.loadActive(safeEnv);
+                geminiIndexingEnabled = true;
+            } catch (Exception ignored) {
+                geminiIndexingEnabled = false;
+            }
+        }
+
+        ComponentStatus indexingStatus;
+        if (!kbDbConnected) {
+            indexingStatus = new ComponentStatus("Indexing", "FAILED_RETRYABLE", "Failed", "failed",
+                    "Chưa sẵn sàng do CSDL/Migration",
+                    "Cần kết nối PostgreSQL và hoàn tất migrations 002–007 trước khi lập chỉ mục.");
+        } else if (waitingQuotaCount > 0) {
+            indexingStatus = new ComponentStatus("Indexing", "WAITING_FOR_QUOTA", "Waiting for Quota", "pending",
+                    waitingQuotaCount + " tác vụ chờ hạn ngạch",
+                    "Có tài liệu ở trạng thái waiting_for_quota; không tự động retry để bảo vệ Free Tier.");
+        } else if (processingCount > 0) {
+            indexingStatus = new ComponentStatus("Indexing", "QUEUED", "Processing", "APPROVED",
+                    processingCount + " tác vụ đang xử lý",
+                    "Đang thực thi phân đoạn và tạo chỉ mục vector.");
+        } else if (failedIndexCount > 0) {
+            indexingStatus = new ComponentStatus("Indexing", "FAILED_RETRYABLE", "Failed", "failed",
+                    failedIndexCount + " tài liệu lỗi lập chỉ mục",
+                    "Kiểm tra chi tiết tại tab Chunking & Lập chỉ mục trước khi yêu cầu chạy lại.");
+        } else {
+            indexingStatus = new ComponentStatus("Indexing", "READY", "Ready", "ready",
+                    "Sẵn sàng (" + (geminiIndexingEnabled ? runtimeMode : "OFFLINE_MOCK") + ")",
+                    "Hàng đợi lập chỉ mục hoạt động tốt (" + readyIndexCount + " tài liệu đã index READY).");
+        }
+
+        ComponentStatus backupStatus;
+        if (!aiCfg.fallbackEnabled) {
+            backupStatus = new ComponentStatus("Backup Model", "DISABLED", "Disabled", "DRAFT",
+                    "Đang tắt (" + ragCfg.backupChatModel + ")",
+                    "Chế độ tự động chuyển đổi sang Backup Model đang tắt theo cấu hình an toàn.");
+        } else {
+            backupStatus = new ComponentStatus("Backup Model", "READY", "Unverified", "pending",
+                    ragCfg.backupChatModel + " (Thinking: " + aiCfg.fallbackThinkingLevel + ")",
+                    "Đã bật Fallback trong cấu hình nhưng chưa xác minh kết nối trực tiếp của model dự phòng.");
+        }
+
+        return new SystemReadinessStatus(
+                geminiChat,
+                geminiEmbedding,
+                dbStatus,
+                kbStatus,
+                ragStatus,
+                indexingStatus,
+                backupStatus,
+                aiCfg.chatbotEnabled,
+                prodReleaseAuthorized,
+                geminiIndexingEnabled,
+                kbDbConnected,
+                prodReleaseAuthorized,
+                runtimeMode,
+                ragEnvironment,
+                utils.BuildInfo.getVersion(),
+                utils.BuildInfo.getShortCommitSha(safeEnv),
+                utils.BuildInfo.getBuildTimestamp(),
+                storageBackend);
+    }
+
+    private static boolean regclassExists(Statement s, String qualifiedTable) throws SQLException {
+        try (ResultSet r = s.executeQuery("SELECT to_regclass('" + qualifiedTable + "') IS NOT NULL")) {
+            return r.next() && r.getBoolean(1);
+        }
+    }
+
+    private static boolean columnExists(Connection c, String table, String column) throws SQLException {
+        try (PreparedStatement p = c.prepareStatement(
+                "SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name=? AND column_name=?")) {
+            p.setString(1, table);
+            p.setString(2, column);
+            try (ResultSet r = p.executeQuery()) {
+                return r.next();
+            }
+        }
     }
 
     /**

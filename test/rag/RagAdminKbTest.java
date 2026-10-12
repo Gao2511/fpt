@@ -391,6 +391,264 @@ public final class RagAdminKbTest {
                 check(statusHolder[0] == 200 && chainHolder[0] == 1, "Verified admin with CSRF must pass filter");
             });
 
+            // 4. PHASE 5.1: SYSTEM READINESS STATUS & SIDEBAR / STATUS PANEL VERIFICATION
+            test("Phase 5.1 getSystemReadinessStatus evaluates 6 components and 5 dimensions with 0 live API calls", () -> {
+                cms.FakeDatabase fakeDb = new cms.FakeDatabase();
+                fakeDb.install();
+                AdminKnowledgeDAO dao = new AdminKnowledgeDAO(new RagDatabase(() -> {
+                    throw new java.sql.SQLException("Simulated offline DB connection error");
+                }));
+
+                // Case A: Empty environment + DB unreachable -> Configuration Missing / Error / Blocked by Release Gate
+                Map<String, String> emptyEnv = new HashMap<>();
+                SystemReadinessStatus stEmpty = dao.getSystemReadinessStatus(emptyEnv);
+                check("OFFLINE_MOCK".equals(stEmpty.getRuntimeMode()), "Default runtime mode should be OFFLINE_MOCK");
+                check("Configuration Missing".equals(stEmpty.getGeminiChat().getState()), "Missing chat key -> Configuration Missing, got: " + stEmpty.getGeminiChat().getState());
+                check("Configuration Missing".equals(stEmpty.getGeminiEmbedding().getState()), "Missing embedding key -> Configuration Missing");
+                check("Error".equals(stEmpty.getKnowledgeBase().getState()), "Unreachable DB -> Error");
+                check("Blocked by Release Gate".equals(stEmpty.getRag().getState()), "Production RAG -> Blocked by Release Gate");
+                check("Failed".equals(stEmpty.getIndexing().getState()), "Indexing without DB -> Failed");
+                check("Disabled".equals(stEmpty.getBackupModel().getState()), "Backup model default -> Disabled");
+                check(!stEmpty.isRagEnabled() && !stEmpty.isProductionReleaseAuthorized() && !stEmpty.isKbDatabaseConnected(), "Flags must be false");
+
+                // Case B: Keys present in env, but NO journal verification -> must report "Not Verified", NEVER "Connected"
+                Map<String, String> keyEnv = new HashMap<>();
+                keyEnv.put("RAG_CHAT_TEST_API_KEY", "synthetic-chat-key-not-verified");
+                keyEnv.put("RAG_EMBEDDING_API_KEY", "synthetic-emb-key-not-verified");
+                keyEnv.put("RAG_EMBEDDING_MODEL", "gemini-embedding-001");
+                keyEnv.put("RAG_EMBEDDING_DIMENSIONS", "768");
+                SystemReadinessStatus stKeys = dao.getSystemReadinessStatus(keyEnv);
+                check("Not Verified".equals(stKeys.getGeminiChat().getState()), "Unverified chat key must report Not Verified, never Connected");
+                check("Not Verified".equals(stKeys.getGeminiEmbedding().getState()), "Unverified embedding key must report Not Verified, never Connected");
+                check(!"Connected".equals(stKeys.getGeminiChat().getState()) && !"Connected".equals(stKeys.getGeminiEmbedding().getState()), "Must never falsely report Connected");
+            });
+
+            test("Phase 5.1 Admin Sidebar and Knowledge Base Status Panel JSP structure verified", () -> {
+                String headerJsp = new String(Files.readAllBytes(Paths.get("web/view/admin/admin-header.jsp")), StandardCharsets.UTF_8);
+                check(headerJsp.contains("id=\"adminSidebar\"") && headerJsp.contains("class=\"admin-sidebar\""), "Missing left sidebar container");
+                check(headerJsp.contains("id=\"adminSidebarCollapseBtn\"") && headerJsp.contains("id=\"adminMobileMenuBtn\""), "Missing collapse/mobile toggle controls");
+                check(headerJsp.contains("Quản lý Website") && headerJsp.contains("AI &amp; Chatbot") && headerJsp.contains("Hệ thống"), "Missing required sidebar groups");
+                check(headerJsp.contains("/admin/content#cms-images") && headerJsp.contains("Media / Hình ảnh"), "Missing Media / Hình ảnh link");
+                check(headerJsp.contains("id=\"sidebarGroupAi\"") && headerJsp.contains("RAG Playground") && headerJsp.contains("AI Model Settings"), "Missing expandable AI submenu items");
+                check(headerJsp.contains("test=\"${!demoMode}\""), "Missing demoMode protection in sidebar");
+
+                String kbJsp = new String(Files.readAllBytes(Paths.get("web/view/admin/knowledge-base.jsp")), StandardCharsets.UTF_8);
+                check(kbJsp.contains("id=\"adminStatusPanel\""), "Missing 7-card adminStatusPanel");
+                for (String comp : Arrays.asList("gemini-chat", "gemini-embedding", "database", "knowledge-base", "rag", "indexing", "backup-model")) {
+                    check(kbJsp.contains("data-component=\"" + comp + "\""), "Missing status card for: " + comp);
+                }
+                check(kbJsp.contains("id=\"kbBuildMeta\""), "Missing build metadata pill in knowledge-base.jsp");
+                check(headerJsp.contains("id=\"adminBuildMeta\""), "Missing build metadata footer in admin-header.jsp");
+            });
+
+            // 5. PHASE 5.2 & 5.3: RENDER + SUPABASE + GEMINI ONLINE INTEGRATION VERIFICATION
+            test("Phase 5.2/5.3 BuildInfo, Dockerfile multi-stage source build, and migration 007 verified", () -> {
+                check("5.3.0-online-rag".equals(utils.BuildInfo.getVersion()), "BuildInfo version mismatch: " + utils.BuildInfo.getVersion());
+                Map<String, String> renderEnv = new HashMap<>();
+                renderEnv.put("RENDER_GIT_COMMIT", "abcdef1234567890abcdef1234567890abcdef12");
+                renderEnv.put("RAG_ENVIRONMENT", "PRODUCTION");
+                check("abcdef12".equals(utils.BuildInfo.getShortCommitSha(renderEnv)), "Short commit SHA mismatch");
+                check("PRODUCTION".equals(utils.BuildInfo.getEnvironment(renderEnv)), "Environment mismatch");
+
+                String dockerfile = new String(Files.readAllBytes(Paths.get("Dockerfile")), StandardCharsets.UTF_8);
+                check(dockerfile.contains("FROM eclipse-temurin:17-jdk AS build"), "Dockerfile must use multi-stage JDK 17 build");
+                check(dockerfile.contains("sh tools/bootstrap-libs.sh"), "Dockerfile must bootstrap verified dependencies");
+                check(dockerfile.contains("ant -f build-portable.xml"), "Dockerfile must compile WAR from source using build-portable.xml");
+                check(!dockerfile.contains("COPY dist/fpt-sale.war"), "Dockerfile must NOT copy prebuilt dist/fpt-sale.war");
+
+                String mig007 = new String(Files.readAllBytes(Paths.get("database/migrations/007-online-production-readiness.sql")), StandardCharsets.UTF_8);
+                check(mig007.contains("rag_schema_migrations") && mig007.contains("file_content BYTEA") && mig007.contains("storage_backend"), "Migration 007 missing schema version or durable BYTEA columns");
+                check(!mig007.contains("CREATE EXTENSION"), "Migration 007 must verify pgvector without auto-installing extensions");
+                check(mig007.contains("005-knowledge-section-import.sql"), "Migration 007 must reference exact 005 filename");
+
+                String verifySql = new String(Files.readAllBytes(Paths.get("database/migrations/verify-supabase-readiness.sql")), StandardCharsets.UTF_8);
+                check(verifySql.contains("admin_audit_logs") && verifySql.contains("vector_dimensions") && verifySql.contains("storage_rel_path"), "verify-supabase-readiness.sql must match actual schema column/table names");
+                check(!verifySql.contains("ai_provider_settings") && !verifySql.contains("knowledge_audit_logs") && !verifySql.contains("rag_retrieval_logs"), "verify-supabase-readiness.sql must not reference non-existent tables");
+                check(Files.isRegularFile(Paths.get("config/phase52-online-smoke-plan.json")), "Missing phase52-online-smoke-plan.json");
+            });
+
+            test("Phase 5.3 Smoke Plan payload hashes, executionAuthorized gate, and STAGING/PRODUCTION rules verified", () -> {
+                String rawSmokePlan = new String(Files.readAllBytes(Paths.get("config/phase52-online-smoke-plan.json")), StandardCharsets.UTF_8);
+                com.google.gson.JsonObject diskPlan = com.google.gson.JsonParser.parseString(rawSmokePlan).getAsJsonObject();
+                check(!diskPlan.get("approved").getAsBoolean(), "Smoke plan approved must remain false by default");
+                check(!diskPlan.get("executionAuthorized").getAsBoolean(), "Smoke plan executionAuthorized must remain false by default");
+                check(diskPlan.get("maxRequests").getAsInt() == 4
+                        && diskPlan.get("documentRequests").getAsInt() == 1
+                        && diskPlan.get("queryRequests").getAsInt() == 2
+                        && diskPlan.get("chatRequests").getAsInt() == 1, "Smoke plan must enforce 4-request breakdown (1 doc + 2 query + 1 chat)");
+                check(!diskPlan.get("backupEnabled").getAsBoolean(), "Smoke plan must keep backupEnabled=false");
+
+                GeminiEmbeddingService embBuilder = new GeminiEmbeddingService(new RagConfig(true, true, true, "gemini-embedding-001", 768), "synthetic");
+                com.google.gson.JsonObject docEntry = diskPlan.getAsJsonArray("documents").get(0).getAsJsonObject();
+                String docTitle = docEntry.get("title").getAsString();
+                String docContent = docEntry.get("content").getAsString();
+                check(VectorValues.hash(docContent).equals(docEntry.get("hash").getAsString()), "Smoke plan document content hash mismatch");
+                check(KnowledgeContentPolicy.contentReason(docTitle, docContent) == KnowledgeContentPolicy.Reason.ACCEPTED, "Smoke plan document must pass KnowledgeContentPolicy");
+                String expectedDocPayloadHash = VectorValues.hash(embBuilder.requestBody(docTitle, docContent, "RETRIEVAL_DOCUMENT").toString());
+                check(expectedDocPayloadHash.equals(diskPlan.getAsJsonArray("documentPayloadHashes").get(0).getAsString()), "Smoke plan document payload hash mismatch");
+
+                com.google.gson.JsonArray questions = diskPlan.getAsJsonArray("questions");
+                com.google.gson.JsonArray queryHashes = diskPlan.getAsJsonArray("queryPayloadHashes");
+                check(questions.size() == 2 && queryHashes.size() == 2, "Smoke plan must contain 2 questions (1 approved knowledge + 1 unrelated)");
+                for (int i = 0; i < 2; i++) {
+                    String qText = questions.get(i).getAsString();
+                    String expectedQHash = VectorValues.hash(embBuilder.requestBody(null, qText, "RETRIEVAL_QUERY").toString());
+                    check(expectedQHash.equals(queryHashes.get(i).getAsString()), "Smoke plan query payload hash mismatch at index " + i);
+                }
+            });
+
+            test("Phase 5.2 Online STAGING/PRODUCTION config rejects loopback DB, Windows paths, and unapproved plans", () -> {
+                // 1. DBUtils online database validation
+                for (String envName : Arrays.asList("STAGING", "PRODUCTION")) {
+                    for (String loopHost : Arrays.asList("127.0.0.1", "localhost", "::1", "127.0.0.5")) {
+                        boolean rejectedLoop = false;
+                        try {
+                            utils.DBUtils.validateOnlineDatabase(envName, loopHost, "require");
+                        } catch (IllegalArgumentException expected) {
+                            rejectedLoop = true;
+                        }
+                        check(rejectedLoop, envName + " must reject loopback DB host " + loopHost);
+                    }
+                    boolean rejectedDisableSsl = false;
+                    try {
+                        utils.DBUtils.validateOnlineDatabase(envName, "aws-0-ap-southeast-1.pooler.supabase.com", "disable");
+                    } catch (IllegalArgumentException expected) {
+                        rejectedDisableSsl = true;
+                    }
+                    check(rejectedDisableSsl, envName + " must reject DB_SSLMODE=disable");
+                    utils.DBUtils.validateOnlineDatabase(envName, "aws-0-ap-southeast-1.pooler.supabase.com", "require");
+                }
+
+                // 2. GeminiRuntimeConfig.online validation
+                long now = java.time.Instant.now().getEpochSecond();
+                com.google.gson.JsonObject onlinePlan = new com.google.gson.JsonObject();
+                onlinePlan.addProperty("planId", "phase52-online-smoke-test");
+                for (String flag : Arrays.asList("approved", "executionAuthorized", "projectModelsVerified", "restConfigurationVerified", "quotaVerified", "pricingVerified")) {
+                    onlinePlan.addProperty(flag, true);
+                }
+                onlinePlan.addProperty("embeddingTier", "Free Tier");
+                onlinePlan.addProperty("chatTier", "Free Tier");
+                onlinePlan.addProperty("embeddingModel", "gemini-embedding-001");
+                onlinePlan.addProperty("dimensions", 768);
+                onlinePlan.addProperty("chatModel", "gemini-3.8-flash");
+                onlinePlan.addProperty("thinkingLevel", "medium");
+                onlinePlan.addProperty("backupModel", "gemini-3.5-flash-lite");
+                onlinePlan.addProperty("backupThinkingLevel", "low");
+                onlinePlan.addProperty("backupEnabled", false);
+                onlinePlan.addProperty("verifiedAtEpochSeconds", now);
+                onlinePlan.addProperty("expiresAtEpochSeconds", now + 900);
+                onlinePlan.addProperty("embeddingProjectAlias", "fpt_embedding_online");
+                onlinePlan.addProperty("chatProjectAlias", "fpt_chat_online");
+                onlinePlan.addProperty("maxRequests", 4);
+                onlinePlan.addProperty("documentRequests", 1);
+                onlinePlan.addProperty("queryRequests", 2);
+                onlinePlan.addProperty("chatRequests", 1);
+                onlinePlan.addProperty("requestsPerMinute", 4);
+                onlinePlan.addProperty("requestsPerDay", 20);
+                onlinePlan.addProperty("tokensPerMinute", 30000);
+                onlinePlan.addProperty("tokensPerDay", 60000);
+                onlinePlan.addProperty("maxChatOutputTokens", 1200);
+                onlinePlan.addProperty("embeddingRequestsRemaining", 8);
+                onlinePlan.addProperty("chatRequestsRemaining", 6);
+                onlinePlan.addProperty("embeddingTokensRemaining", 30000);
+                onlinePlan.addProperty("chatTokensRemaining", 30000);
+                for (String arr : Arrays.asList("documentPayloadHashes", "queryPayloadHashes", "questions", "documents")) {
+                    onlinePlan.add(arr, new com.google.gson.JsonArray());
+                }
+
+                Map<String, String> onlineEnv = new HashMap<>();
+                onlineEnv.put("RAG_RUNTIME_MODE", "PRODUCTION");
+                onlineEnv.put("RAG_ENVIRONMENT", "PRODUCTION");
+                onlineEnv.put("RAG_ENABLED", "false");
+                onlineEnv.put("RAG_DATABASE_APPROVED", "true");
+                onlineEnv.put("RAG_ONLINE_GEMINI_AUTHORIZED", "true");
+                onlineEnv.put("RAG_EMBEDDING_CALLS_APPROVED", "true");
+                onlineEnv.put("DB_HOST", "aws-0-ap-southeast-1.pooler.supabase.com");
+                onlineEnv.put("DB_PORT", "6543");
+                onlineEnv.put("DB_NAME", "postgres");
+                onlineEnv.put("DB_USER", "postgres.syntheticref");
+                onlineEnv.put("DB_PASSWORD", "synthetic-supabase-password");
+                onlineEnv.put("DB_SSLMODE", "require");
+                onlineEnv.put("RAG_EMBEDDING_API_KEY", "synthetic-online-emb-key");
+                onlineEnv.put("GEMINI_API_KEY", "synthetic-online-chat-key");
+
+                rag.runtime.GeminiRuntimeConfig validOnline = rag.runtime.GeminiRuntimeConfig.online(onlineEnv, onlinePlan);
+                check(validOnline.isOnline() && validOnline.getTotalLimit() == 4 && !validOnline.backupEnabled, "Valid online config failed");
+
+                // Reject executionAuthorized=false even when approved=true
+                com.google.gson.JsonObject unauthPlan = onlinePlan.deepCopy();
+                unauthPlan.addProperty("executionAuthorized", false);
+                boolean rejectedExecAuth = false;
+                try {
+                    rag.runtime.GeminiRuntimeConfig.online(onlineEnv, unauthPlan);
+                } catch (IllegalArgumentException expected) {
+                    rejectedExecAuth = true;
+                }
+                check(rejectedExecAuth, "Must reject executionAuthorized=false even when approved=true");
+
+                // Reject Windows path in PRODUCTION
+                Map<String, String> winPathEnv = new HashMap<>(onlineEnv);
+                winPathEnv.put("KB_STORAGE_DIR", "D:\\miniproject\\uploads");
+                boolean rejectedWinPath = false;
+                try {
+                    rag.runtime.GeminiRuntimeConfig.online(winPathEnv, onlinePlan);
+                } catch (IllegalArgumentException expected) {
+                    rejectedWinPath = true;
+                }
+                check(rejectedWinPath, "PRODUCTION must reject Windows path in KB_STORAGE_DIR");
+
+                // Reject loopback DB in PRODUCTION
+                Map<String, String> loopDbEnv = new HashMap<>(onlineEnv);
+                loopDbEnv.put("DB_HOST", "127.0.0.1");
+                boolean rejectedLoopDb = false;
+                try {
+                    rag.runtime.GeminiRuntimeConfig.online(loopDbEnv, onlinePlan);
+                } catch (IllegalArgumentException expected) {
+                    rejectedLoopDb = true;
+                }
+                check(rejectedLoopDb, "PRODUCTION must reject loopback DB_HOST");
+
+                // Reject missing RAG_ONLINE_GEMINI_AUTHORIZED
+                Map<String, String> unauthEnv = new HashMap<>(onlineEnv);
+                unauthEnv.remove("RAG_ONLINE_GEMINI_AUTHORIZED");
+                boolean rejectedUnauth = false;
+                try {
+                    rag.runtime.GeminiRuntimeConfig.online(unauthEnv, onlinePlan);
+                } catch (IllegalArgumentException expected) {
+                    rejectedUnauth = true;
+                }
+                check(rejectedUnauth, "PRODUCTION must reject missing RAG_ONLINE_GEMINI_AUTHORIZED");
+            });
+
+            test("Phase 5.5 Admin Sidebar 5-group architecture and Knowledge Base progressive disclosure verified", () -> {
+                String headerJsp = new String(Files.readAllBytes(Paths.get("web/view/admin/admin-header.jsp")), StandardCharsets.UTF_8);
+                for (String groupLabel : Arrays.asList("Tổng quan", "Quản lý Website", "Khách hàng", "AI &amp; Chatbot", "Hệ thống")) {
+                    check(headerJsp.contains(groupLabel), "Missing sidebar group label: " + groupLabel);
+                }
+                for (String navItem : Arrays.asList(
+                        "Dashboard", "Nội dung trang", "Gói cước / Sản phẩm", "Media / Hình ảnh", "Thông tin kinh doanh",
+                        "Danh sách khách hàng", "Thông báo / Lịch sử Email",
+                        "Tổng quan AI", "Tài liệu / Knowledge Base", "Upload &amp; Import", "FAQ", "Indexing",
+                        "RAG Playground", "AI Model Settings", "RAG Settings", "Monitoring / Audit",
+                        "Cài đặt chung", "Quản lý tài khoản", "Đăng xuất")) {
+                    check(headerJsp.contains(navItem), "Missing sidebar menu item: " + navItem);
+                }
+
+                String kbJsp = new String(Files.readAllBytes(Paths.get("web/view/admin/knowledge-base.jsp")), StandardCharsets.UTF_8);
+                check(kbJsp.contains("kb-metrics-grid-6"), "Missing 6-KPI summary grid on AI overview dashboard");
+                check(kbJsp.contains("kb-advanced-details"), "Missing progressive disclosure details panels in knowledge-base.jsp");
+                check(kbJsp.contains("kb-workflow-stepper"), "Missing visual workflow stepper in knowledge-base.jsp");
+                check(kbJsp.contains("id=\"faqQuickSearch\"") && kbJsp.contains("id=\"faqStatusFilter\""), "Missing FAQ quick search/filter controls");
+                check(kbJsp.contains("name=\"auditResource\"") && kbJsp.contains("name=\"auditAction\""), "Missing Audit Log filter controls");
+
+                String geminiRuntimeJsp = new String(Files.readAllBytes(Paths.get("web/view/admin/knowledge-gemini-runtime.jsp")), StandardCharsets.UTF_8);
+                check(geminiRuntimeJsp.contains("kb-advanced-details") && geminiRuntimeJsp.contains("recoverExpiredLeases"),
+                        "Missing progressive disclosure wrapper in knowledge-gemini-runtime.jsp");
+
+                String importJsp = new String(Files.readAllBytes(Paths.get("web/view/admin/knowledge-import.jsp")), StandardCharsets.UTF_8);
+                check(importJsp.contains("kb-workflow-stepper"), "Missing 6-step workflow stepper in knowledge-import.jsp");
+            });
+
             System.out.println("RagAdminKbTest: " + passed + " tests passed (0 external API calls)");
         } finally {
             try (DirectoryStream<Path> ds = Files.newDirectoryStream(tempStorage)) {
@@ -400,3 +658,4 @@ public final class RagAdminKbTest {
         }
     }
 }
+

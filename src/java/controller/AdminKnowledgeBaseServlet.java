@@ -48,8 +48,8 @@ public class AdminKnowledgeBaseServlet extends HttpServlet {
         }
         req.setAttribute("csrfToken", security.AdminSecurity.token(session));
         req.setAttribute("ragRuntimeMode",System.getenv().getOrDefault("RAG_RUNTIME_MODE","OFFLINE_MOCK"));
-        if("LOCAL_GEMINI".equals(req.getAttribute("ragRuntimeMode")))try{
-            req.setAttribute("ragLivePlan",rag.runtime.GeminiRuntimeConfig.load(System.getenv()));
+        if(rag.runtime.GeminiRuntimeConfig.activeRequested(System.getenv()))try{
+            req.setAttribute("ragLivePlan",rag.runtime.GeminiRuntimeConfig.loadActive(System.getenv()));
         }catch(Exception blocked){req.setAttribute("ragRuntimeNotice","Live execution blocked: kiểm tra key test, plan/phê duyệt và xác minh quota/model. Không fallback sang key production.");}
 
         String tab = cleanParam(req.getParameter("tab"), "dashboard");
@@ -59,15 +59,28 @@ public class AdminKnowledgeBaseServlet extends HttpServlet {
         req.setAttribute("kbTab", tab);
 
         AdminKnowledgeDAO store = dao();
+        req.setAttribute("systemStatus", store.getSystemReadinessStatus());
+        try {
+            req.setAttribute("ragSettings", store.getRagSettings());
+        } catch (Exception ignored) {}
         try {
             if("downloadOriginal".equals(req.getParameter("action"))){
                 long documentId=parseLong(req.getParameter("docId"),0);String fileId=req.getParameter("fileId");
                 UploadedFileRecord found=null;for(UploadedFileRecord f:store.listUploadedFiles(documentId))if(f.id.equals(fileId))found=f;
                 if(found==null){resp.sendError(404);return;}
-                java.nio.file.Path root=extractor().getStorageRoot().toRealPath();
-                java.nio.file.Path path=root.resolve(found.storageRelPath).normalize().toRealPath();
-                if(!path.startsWith(root)||!java.nio.file.Files.isRegularFile(path)||java.nio.file.Files.size(path)!=found.fileSizeBytes){resp.sendError(404);return;}
-                byte[] bytes=java.nio.file.Files.readAllBytes(path);
+                byte[] bytes=store.loadUploadedFileBytes(documentId,fileId);
+                if(bytes==null){
+                    java.nio.file.Path storageRoot=extractor().getStorageRoot();
+                    if(!java.nio.file.Files.isDirectory(storageRoot)){resp.sendError(404);return;}
+                    java.nio.file.Path root=storageRoot.toRealPath();
+                    java.nio.file.Path candidate=root.resolve(found.storageRelPath).normalize();
+                    if(!java.nio.file.Files.isRegularFile(candidate)){resp.sendError(404);return;}
+                    java.nio.file.Path path=candidate.toRealPath();
+                    if(!path.startsWith(root)||java.nio.file.Files.size(path)!=found.fileSizeBytes){resp.sendError(404);return;}
+                    bytes=java.nio.file.Files.readAllBytes(path);
+                }else if(bytes.length!=found.fileSizeBytes){
+                    resp.sendError(409);return;
+                }
                 StringBuilder hash=new StringBuilder();for(byte b:java.security.MessageDigest.getInstance("SHA-256").digest(bytes))hash.append(String.format("%02x",b&255));
                 if(!hash.toString().equals(found.sha256Hash)){resp.sendError(409);return;}
                 resp.setContentType("application/octet-stream");resp.setHeader("Content-Disposition","attachment; filename*=UTF-8''"+java.net.URLEncoder.encode(found.originalFilename,"UTF-8").replace("+","%20"));
@@ -416,6 +429,13 @@ public class AdminKnowledgeBaseServlet extends HttpServlet {
                 int processed = store.runOfflineIndexingBatch(20, actorId, actorName);
                 session.setAttribute("kbMessage", "Đã chạy bộ lập chỉ mục offline (MockEmbeddingProvider): xử lý "
                         + processed + " job (0 Gemini API calls).");
+                resp.sendRedirect(req.getContextPath() + "/admin/knowledge-base?tab=indexing");
+                return;
+
+            } else if ("recoverExpiredLeases".equals(action)) {
+                targetTab = "indexing";
+                int recovered = store.recoverExpiredIndexLeases(actorId, actorName);
+                session.setAttribute("kbMessage", "Đã thu hồi " + recovered + " job quá hạn lease sang trạng thái failed_retryable (0 Gemini API calls).");
                 resp.sendRedirect(req.getContextPath() + "/admin/knowledge-base?tab=indexing");
                 return;
 

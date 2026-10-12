@@ -271,3 +271,233 @@
     margin-bottom: 16px;
 }
 .kb-import-text { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 28rem; overflow: auto; padding: 1rem; }
+
+/* Phase 5.1: Admin Status Panel & 5 Operational Dimensions */
+.kb-readiness-panel {
+    margin-bottom: 20px;
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.88));
+}
+.kb-readiness-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+.kb-readiness-header h3 {
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 800;
+    color: #f8fafc;
+}
+.kb-readiness-header p {
+    margin: 0;
+    font-size: 12.5px;
+    color: #94a3b8;
+}
+.kb-dimension-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.kb-dim-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #cbd5e1;
+}
+.kb-dim-pill.kb-dim-on {
+    background: rgba(16, 185, 129, 0.16);
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #6ee7b7;
+}
+.kb-dim-pill.kb-dim-warn {
+    background: rgba(245, 158, 11, 0.16);
+    border-color: rgba(245, 158, 11, 0.4);
+    color: #fcd34d;
+}
+.kb-dim-pill.kb-dim-err {
+    background: rgba(239, 68, 68, 0.16);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+}
+.kb-status-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+@media (max-width: 1180px) {
+    .kb-status-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 720px) {
+    .kb-status-grid {
+        grid-template-columns: 1fr;
+    }
+    .kb-page {
+        padding: 16px 14px 48px;
+    }
+}
+.kb-status-card {
+    background: rgba(15, 23, 42, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.kb-status-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+.kb-status-title {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: #f8fafc;
+}
+.kb-status-summary {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #38bdf8;
+}
+.kb-status-kv {
+    list-style: none;
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(30, 41, 59, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 12px;
+    line-height: 1.65;
+}
+.kb-status-kv li {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+.kb-status-kv li span {
+    color: #94a3b8;
+}
+.kb-status-detail {
+    font-size: 11.5px;
+    color: #94a3b8;
+    line-height: 1.45;
+}
+
+/* Phase 5.5: Progressive Disclosure (<details>), Workflow Stepper & 6-KPI Grid */
+.kb-metrics-grid-6 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 1024px) {
+    .kb-metrics-grid-6 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 640px) {
+    .kb-metrics-grid-6 {
+        grid-template-columns: 1fr;
+    }
+}
+
+.kb-advanced-details {
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.65);
+    padding: 12px 16px;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+.kb-advanced-details[open] {
+    border-color: rgba(243, 112, 33, 0.35);
+    background: rgba(15, 23, 42, 0.9);
+}
+.kb-advanced-summary {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #e2e8f0;
+    list-style: none;
+    user-select: none;
+}
+.kb-advanced-summary::-webkit-details-marker {
+    display: none;
+}
+.kb-advanced-summary:hover {
+    color: #ffffff;
+}
+.kb-advanced-body {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.kb-workflow-stepper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.kb-step {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.kb-step-num {
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    background: rgba(148, 163, 184, 0.2);
+    color: #cbd5e1;
+}
+.kb-step.is-active {
+    background: rgba(243, 112, 33, 0.16);
+    border-color: rgba(243, 112, 33, 0.45);
+    color: #fdba74;
+}
+.kb-step.is-active .kb-step-num {
+    background: #f37021;
+    color: #ffffff;
+}
+.kb-step.is-done {
+    background: rgba(16, 185, 129, 0.14);
+    border-color: rgba(16, 185, 129, 0.35);
+    color: #6ee7b7;
+}
+.kb-step.is-done .kb-step-num {
+    background: #10b981;
+    color: #052e16;
+}
+
+

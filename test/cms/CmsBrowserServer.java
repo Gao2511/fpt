@@ -23,6 +23,7 @@ public class CmsBrowserServer {
         servlet(context,"content",new controller.AdminContentServlet(),"/admin/content","/admin/business");
         servlet(context,"packages",new controller.AdminPackageServlet(),"/admin/packages");
         servlet(context,"settings",new controller.AdminSettingsServlet(),"/admin/settings");
+        Wrapper kb=servlet(context,"kb",new controller.AdminKnowledgeBaseServlet(),"/admin/knowledge-base");kb.setMultipartConfigElement(new MultipartConfigElement("",10485760,12582912,0));
         // Demo routes are intercepted by the filter. Sentinel ensures they never reach live controllers.
         servlet(context,"sensitive",new HttpServlet(){protected void service(HttpServletRequest r,HttpServletResponse p)throws java.io.IOException{p.sendError(500,"Unexpected live controller execution");}},"/admin/dashboard","/admin/customers","/admin/customer-detail","/admin/users","/admin/email-logs","/admin/ai-playground","/ContactServlet","/profile","/change-password","/register","/reset-password","/ai-chat");
         Wrapper media=servlet(context,"media",new controller.MediaServlet(),"/admin/media","/media");media.setMultipartConfigElement(new MultipartConfigElement("",2097152,2200000,0));

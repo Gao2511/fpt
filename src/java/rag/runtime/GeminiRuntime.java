@@ -19,15 +19,37 @@ public final class GeminiRuntime {
         this.chatWire=chatWire;
         this.config=config;this.db=db;this.ledger=ledger;embeddings=injected==null?new RuntimeEmbeddingService(config,ledger):injected;
         if(!"GEMINI".equals(embeddings.providerKind())||!"gemini-embedding-001".equals(embeddings.model())||embeddings.dimensions()!=768)throw new RagException(RagException.Code.CONFIGURATION);
-        verifyDatabase(db);retrieval=new KnowledgeRetrievalService(config.rag(),new KnowledgeChunkDAO(db,"GEMINI"),embeddings,true);
+        if(config.isOnline())verifyOnlineDatabase(db);else verifyDatabase(db);
+        retrieval=new KnowledgeRetrievalService(config.rag(),new KnowledgeChunkDAO(db,"GEMINI"),embeddings,true);
     }
     public static GeminiRuntime local()throws Exception{return new GeminiRuntime(GeminiRuntimeConfig.load(System.getenv()),new RagDatabase());}
+    public static GeminiRuntime online()throws Exception{return new GeminiRuntime(GeminiRuntimeConfig.loadOnline(System.getenv()),new RagDatabase());}
+    public static GeminiRuntime active()throws Exception{return new GeminiRuntime(GeminiRuntimeConfig.loadActive(System.getenv()),new RagDatabase());}
     public static void verifyDatabase(RagDatabase db)throws Exception{
         try(Connection c=db.open()){
             java.net.URI jdbc=new java.net.URI(c.getMetaData().getURL().substring(5));
             if(!"127.0.0.1".equals(jdbc.getHost())||!"/fpt_rag_test".equals(jdbc.getPath()))throw new RagException(RagException.Code.CONFIGURATION);
             try(Statement s=c.createStatement();ResultSet r=s.executeQuery("SELECT current_database(),to_regclass('public.rag_api_requests') IS NOT NULL")){
                 if(!r.next()||!"fpt_rag_test".equals(r.getString(1))||!r.getBoolean(2))throw new RagException(RagException.Code.CONFIGURATION);
+            }
+        }
+    }
+    public static void verifyOnlineDatabase(RagDatabase db)throws Exception{
+        try(Connection c=db.open()){
+            String url=c.getMetaData().getURL();
+            if(url!=null&&url.startsWith("jdbc:")){
+                java.net.URI jdbc=new java.net.URI(url.substring(5));
+                if(utils.DBUtils.isLoopbackHost(jdbc.getHost()))throw new RagException(RagException.Code.CONFIGURATION);
+            }
+            try(Statement s=c.createStatement();ResultSet r=s.executeQuery(
+                "SELECT EXISTS(SELECT 1 FROM pg_extension WHERE extname='vector'),"
+                +"to_regclass('public.rag_api_requests') IS NOT NULL,"
+                +"to_regclass('public.rag_runtime_plans') IS NOT NULL,"
+                +"to_regclass('public.knowledge_documents') IS NOT NULL,"
+                +"to_regclass('public.knowledge_chunks') IS NOT NULL,"
+                +"to_regclass('public.knowledge_index_jobs') IS NOT NULL")){
+                if(!r.next()||!r.getBoolean(1)||!r.getBoolean(2)||!r.getBoolean(3)||!r.getBoolean(4)||!r.getBoolean(5)||!r.getBoolean(6))
+                    throw new RagException(RagException.Code.CONFIGURATION);
             }
         }
     }

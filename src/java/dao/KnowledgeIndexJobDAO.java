@@ -20,12 +20,47 @@ public class KnowledgeIndexJobDAO {
             p.setLong(1,d.id);p.setLong(2,d.version);p.setString(3,d.contentHash);p.setString(4,cfg.model);p.setInt(5,cfg.dimensions);p.setTimestamp(6,RagDatabase.timestamp(d.effectiveAt));p.setLong(7,d.id);p.executeUpdate();
         }
     }
+    public static int recoverExpiredLeases(Connection c) throws SQLException {
+        int recovered = 0;
+        try (PreparedStatement p = c.prepareStatement(
+                "WITH expired_gemini AS ("
+                + "UPDATE public.knowledge_index_jobs SET status='failed_retryable',error_code='LEASE_EXPIRED',lease_until=NULL,updated_at=CURRENT_TIMESTAMP "
+                + "WHERE status='running' AND lease_until<CURRENT_TIMESTAMP AND embedding_provider='GEMINI' "
+                + "RETURNING document_id,document_version,document_hash) "
+                + "UPDATE public.knowledge_documents d SET indexing_status='failed_retryable',embedding_error='LEASE_EXPIRED',updated_at=CURRENT_TIMESTAMP "
+                + "FROM expired_gemini e WHERE d.id=e.document_id AND d.version=e.document_version AND d.content_hash=e.document_hash AND d.indexing_status<>'ready'")) {
+            recovered += p.executeUpdate();
+        }
+        try (PreparedStatement p = c.prepareStatement(
+                "WITH exhausted AS ("
+                + "UPDATE public.knowledge_index_jobs SET status='failed',error_code='TIMEOUT',updated_at=CURRENT_TIMESTAMP "
+                + "WHERE status='running' AND lease_until<CURRENT_TIMESTAMP AND attempts>=3 "
+                + "RETURNING document_id,document_version,document_hash) "
+                + "UPDATE public.knowledge_documents d SET indexing_status='failed',updated_at=CURRENT_TIMESTAMP "
+                + "FROM exhausted e WHERE d.id=e.document_id AND d.version=e.document_version AND d.content_hash=e.document_hash AND d.indexing_status<>'ready'")) {
+            recovered += p.executeUpdate();
+        }
+        return recovered;
+    }
+    public int recoverExpiredLeases() throws Exception {
+        try (Connection c = db.open()) {
+            c.setAutoCommit(false);
+            try {
+                int count = recoverExpiredLeases(c);
+                c.commit();
+                return count;
+            } catch (Exception e) {
+                c.rollback();
+                throw e;
+            }
+        }
+    }
     public KnowledgeIndexJobDTO claim() throws Exception {
         UUID token=UUID.randomUUID();
         try(Connection c=db.open()) {
             c.setAutoCommit(false);
             try {
-                try(PreparedStatement p=c.prepareStatement("WITH exhausted AS (UPDATE public.knowledge_index_jobs SET status='failed',error_code='TIMEOUT',updated_at=CURRENT_TIMESTAMP WHERE status='running' AND lease_until<CURRENT_TIMESTAMP AND attempts>=3 RETURNING document_id,document_version,document_hash) UPDATE public.knowledge_documents d SET indexing_status='failed',updated_at=CURRENT_TIMESTAMP FROM exhausted e WHERE d.id=e.document_id AND d.version=e.document_version AND d.content_hash=e.document_hash AND d.indexing_status<>'ready'")) {p.executeUpdate();}
+                recoverExpiredLeases(c);
                 String sql="WITH next_job AS (SELECT id FROM public.knowledge_index_jobs WHERE embedding_provider='"+kind+"' "+(onlyDocument==null?"":"AND document_id="+onlyDocument.longValue()+" ")+"AND attempts<3 AND ((status='queued' AND available_at<=CURRENT_TIMESTAMP) OR (status='running' AND lease_until<CURRENT_TIMESTAMP AND embedding_provider='MOCK')) ORDER BY available_at,id FOR UPDATE SKIP LOCKED LIMIT 1) "
                     +"UPDATE public.knowledge_index_jobs j SET status='running',attempts=attempts+1,lease_token=?,lease_until=CURRENT_TIMESTAMP+INTERVAL '5 minutes',updated_at=CURRENT_TIMESTAMP FROM next_job n WHERE j.id=n.id RETURNING j.*";
                 KnowledgeIndexJobDTO job=null;

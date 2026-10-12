@@ -50,10 +50,19 @@ public final class DocumentExtractionService {
         public final String extractedText;
         public final int charCount;
         public final String warningMessage;
+        public final byte[] rawBytes;
 
         public ExtractionResult(UUID fileId, String originalFilename, String storedFilename,
                 String storageRelPath, String detectedMimeType, String extension, long sizeBytes,
                 String sha256Hash, String status, String extractedText, int charCount, String warningMessage) {
+            this(fileId, originalFilename, storedFilename, storageRelPath, detectedMimeType, extension,
+                    sizeBytes, sha256Hash, status, extractedText, charCount, warningMessage, null);
+        }
+
+        public ExtractionResult(UUID fileId, String originalFilename, String storedFilename,
+                String storageRelPath, String detectedMimeType, String extension, long sizeBytes,
+                String sha256Hash, String status, String extractedText, int charCount, String warningMessage,
+                byte[] rawBytes) {
             this.fileId = fileId;
             this.originalFilename = originalFilename;
             this.storedFilename = storedFilename;
@@ -66,6 +75,7 @@ public final class DocumentExtractionService {
             this.extractedText = extractedText;
             this.charCount = charCount;
             this.warningMessage = warningMessage == null ? "" : warningMessage;
+            this.rawBytes = rawBytes != null ? Arrays.copyOf(rawBytes, rawBytes.length) : null;
         }
     }
 
@@ -87,10 +97,21 @@ public final class DocumentExtractionService {
         this.storageRoot = normalized;
     }
 
-    private static Path resolveDefaultStorageRoot() {
+    public static Path resolveDefaultStorageRoot() {
         String custom = System.getProperty("fpt.kb.upload.dir");
         if (custom != null && !custom.trim().isEmpty()) {
             return Paths.get(custom.trim());
+        }
+        String envDir = System.getenv("KB_STORAGE_DIR");
+        if (envDir != null && !envDir.trim().isEmpty()) {
+            String trimmed = envDir.trim();
+            String ragEnv = System.getenv("RAG_ENVIRONMENT");
+            if (ragEnv != null && ("STAGING".equalsIgnoreCase(ragEnv.trim()) || "PRODUCTION".equalsIgnoreCase(ragEnv.trim()))) {
+                if (trimmed.matches("^[A-Za-z]:.*") || trimmed.indexOf('\\') >= 0) {
+                    throw new IllegalArgumentException("KB_STORAGE_DIR must not use a local Windows path in STAGING/PRODUCTION");
+                }
+            }
+            return Paths.get(trimmed);
         }
         return Paths.get(System.getProperty("java.io.tmpdir"), "fpt-kb-uploads");
     }
@@ -177,7 +198,8 @@ public final class DocumentExtractionService {
                 status,
                 extracted,
                 extracted.length(),
-                warning);
+                warning,
+                bytes);
     }
 
     public static String sanitizeFilename(String rawFilename) {

@@ -4,6 +4,8 @@
 .env
 .env.*
 !.env.example
+dist
+lib
 nbproject/private
 **/oauth.properties
 **/*.log
@@ -11,3 +13,4 @@ build
 test
 test-e2e
 node_modules
+

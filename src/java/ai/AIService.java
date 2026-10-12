@@ -217,14 +217,14 @@ public class AIService {
     }
 
     public static ChatResponse askAI(String question, String sessionId) throws AIException {
-        if(rag.runtime.GeminiRuntimeConfig.requested(System.getenv())){
+        if(rag.runtime.GeminiRuntimeConfig.activeRequested(System.getenv())){
             try{
-                rag.runtime.GeminiRuntime runtime=rag.runtime.GeminiRuntime.local();
+                rag.runtime.GeminiRuntime runtime=rag.runtime.GeminiRuntime.active();
                 ConfigCache local=getConfig();
                 if(!local.chatbotEnabled||!"gemini".equals(local.activeProvider)||!"gemini-3.8-flash".equals(local.activeModel)||!"medium".equals(local.thinkingLevel)||
                     (runtime.config.backupEnabled&&(!local.fallbackEnabled||!"gemini".equals(local.fallbackProvider)||!"gemini-3.5-flash-lite".equals(local.fallbackModel)||!"low".equals(local.fallbackThinkingLevel))))throw new IllegalArgumentException();
                 return runtime.chat(question,ai.session.ChatSessionManager.getOrCreate(sessionId),cms.SiteContent.publicCatalog(),local.systemPrompt);
-            }catch(AIException e){throw e;}catch(Exception e){throw new AIException(AIException.ErrorType.INVALID_REQUEST,"Gemini local chưa được cấu hình/phê duyệt đầy đủ. Kiểm tra môi trường test và kế hoạch riêng.","System");}
+            }catch(AIException e){throw e;}catch(Exception e){throw new AIException(AIException.ErrorType.INVALID_REQUEST,"Gemini runtime chưa được cấu hình/phê duyệt đầy đủ. Kiểm tra môi trường và kế hoạch riêng.","System");}
         }
         ConfigCache cfg = getConfig();
         if (!cfg.chatbotEnabled) throw new AIException(AIException.ErrorType.SERVER_ERROR,
@@ -262,6 +262,13 @@ public class AIService {
         String key = cfg.rawSettings.get("ai_provider_" + provider.getId() + "_key");
         if ((key == null || key.isEmpty()) && "gemini".equals(provider.getId())) key = cfg.rawSettings.get("gemini_api_key");
         String decrypted = (key != null && !key.isEmpty()) ? CryptoUtil.decrypt(key) : "";
+        if (decrypted.isEmpty() && "gemini".equals(provider.getId())
+                && rag.runtime.GeminiRuntimeConfig.onlineRequested(System.getenv())) {
+            String envKey = System.getenv("GEMINI_API_KEY");
+            if (envKey != null && !envKey.trim().isEmpty()) {
+                decrypted = envKey.trim();
+            }
+        }
         return new ai.consultation.ConsultationEngine.Target(
                 provider,
                 decrypted,
