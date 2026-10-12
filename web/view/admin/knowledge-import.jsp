@@ -1,19 +1,15 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-<div class="kb-workflow-stepper" aria-label="Quy trình Upload và Import 6 bước">
-    <div class="kb-step is-done"><span class="kb-step-num">1</span><span>Chọn tệp</span></div>
-    <div class="kb-step is-done"><span class="kb-step-num">2</span><span>Tải lên &amp; Trích xuất</span></div>
-    <div class="kb-step is-active"><span class="kb-step-num">3</span><span>Review phân mục</span></div>
-    <div class="kb-step"><span class="kb-step-num">4</span><span>Phê duyệt</span></div>
-    <div class="kb-step"><span class="kb-step-num">5</span><span>Xuất bản</span></div>
-    <div class="kb-step"><span class="kb-step-num">6</span><span>Lập chỉ mục</span></div>
+<div class="kb-workflow-stepper" aria-label="Tải lên và Xuất bản">
+    <div class="kb-step is-done"><span class="kb-step-num">1</span><span>Tải lên &amp; trích xuất</span></div>
+    <div class="kb-step is-active"><span class="kb-step-num">2</span><span>Kiểm tra nội dung &amp; Xuất bản</span></div>
 </div>
 <section class="kb-panel">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
         <div>
             <h2 style="margin-bottom:6px;">Phân mục tài liệu &amp; Review từng phần</h2>
-            <p style="margin:0 0 4px;font-size:13px;color:#94a3b8;">Bản gốc được lưu để đối chiếu và không xuất bản nguyên khối. Phân loại là gợi ý; Admin review trước khi tạo nháp và duyệt xuất bản riêng.</p>
+            <p style="margin:0 0 4px;font-size:13px;color:#94a3b8;">Bản gốc được giữ để đối chiếu. Nút Xuất bản phía trên tự tạo các entry đơn chủ đề và xếp hàng Gemini; phần quy tắc/cấu hình/chưa phù hợp vẫn cần duyệt thủ công.</p>
             <p style="margin:0;font-size:12.5px;color:#64748b;">Quy tắc AI và cấu hình chỉ nằm trong hàng chờ đề xuất. Chức năng áp dụng thay đổi system instructions chưa được triển khai.</p>
         </div>
         <a class="kb-btn kb-btn-secondary" href="${pageContext.request.contextPath}/admin/knowledge-base?tab=upload">&larr; Quay lại Tải tệp lên</a>

@@ -32,6 +32,7 @@ public class AdminKnowledgeBaseServlet extends HttpServlet {
     protected DocumentExtractionService extractor() {
         return new DocumentExtractionService();
     }
+    protected dao.KnowledgeLifecycleDAO lifecycle() { return new dao.KnowledgeLifecycleDAO(); }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -52,11 +53,15 @@ public class AdminKnowledgeBaseServlet extends HttpServlet {
             req.setAttribute("ragLivePlan",rag.runtime.GeminiRuntimeConfig.loadActive(System.getenv()));
         }catch(Exception blocked){req.setAttribute("ragRuntimeNotice","Live execution blocked: kiểm tra key test, plan/phê duyệt và xác minh quota/model. Không fallback sang key production.");}
 
-        String tab = cleanParam(req.getParameter("tab"), "dashboard");
-        if (!Arrays.asList("dashboard", "documents", "upload", "imports", "faqs", "indexing", "rag-config", "audit", "playground").contains(tab)) {
-            tab = "dashboard";
+        String tab = cleanParam(req.getParameter("tab"), "upload");
+        if (!Arrays.asList("dashboard", "documents", "upload", "imports", "faqs", "indexing", "rag-config", "audit", "playground", "verify", "advanced").contains(tab)) {
+            tab = "upload";
         }
+        if(req.getAttribute("kbTab")!=null)tab=req.getAttribute("kbTab").toString();
         req.setAttribute("kbTab", tab);
+        req.setAttribute("kbTextLimit",rag.KnowledgeLimits.text());req.setAttribute("kbExtractedLimit",rag.KnowledgeLimits.extracted());req.setAttribute("kbUploadLimit",rag.KnowledgeLimits.upload());
+        req.setAttribute("kbWorkerAuthorized",rag.KnowledgePublishWorker.authorized(System.getenv()));
+        req.setAttribute("ragRequestEvidence",rag.RagRequestEvidence.recent());
 
         AdminKnowledgeDAO store = dao();
         req.setAttribute("systemStatus", store.getSystemReadinessStatus());
@@ -64,6 +69,9 @@ public class AdminKnowledgeBaseServlet extends HttpServlet {
             req.setAttribute("ragSettings", store.getRagSettings());
         } catch (Exception ignored) {}
         try {
+            req.setAttribute("kbLifecycleAvailable",lifecycle().available());
+            if(Boolean.TRUE.equals(req.getAttribute("kbLifecycleAvailable")))req.setAttribute("kbPublishJobs",lifecycle().jobs());
+            req.setAttribute("kbReadiness",lifecycle().readiness());
             if("downloadOriginal".equals(req.getParameter("action"))){
                 long documentId=parseLong(req.getParameter("docId"),0);String fileId=req.getParameter("fileId");
                 UploadedFileRecord found=null;for(UploadedFileRecord f:store.listUploadedFiles(documentId))if(f.id.equals(fileId))found=f;
@@ -202,7 +210,53 @@ public class AdminKnowledgeBaseServlet extends HttpServlet {
 
         AdminKnowledgeDAO store = dao();
         try {
-            if ("prepareImport".equals(action)) {
+            if("simplePublish".equals(action)||"publishDocument".equals(action)){
+                targetTab="documents";
+                long id=parseLong(req.getParameter("id"),0),version=parseLong(req.getParameter("version"),0);
+                if(!lifecycle().available())throw new IllegalStateException("Cần áp dụng migration 008 trước khi xuất bản theo luồng mới.");
+                ManagedDocument d=store.findDocument(id);if(d==null||version!=d.version)throw new IllegalArgumentException("Tài liệu đã thay đổi; tải lại để duyệt đúng phiên bản.");
+                long job=lifecycle().publish(id,version,actorId);
+                session.setAttribute("kbMessage","Yêu cầu xuất bản #"+job+": xem trạng thái thực tế ở bảng tiến độ. Bấm lại không tạo request trùng. Chỉ có thể dùng trong chatbot sau khi Gemini lập chỉ mục thành công và gate RAG được bật riêng.");
+                resp.sendRedirect(req.getContextPath()+"/admin/knowledge-base?tab=documents&docId="+id);return;
+            } else if("publishUploadSections".equals(action)){
+                targetTab="imports";long id=parseLong(req.getParameter("id"),0),version=parseLong(req.getParameter("version"),0);
+                if(!lifecycle().available())throw new IllegalStateException("Cần migration 008.");
+                store.prepareImport(id,version,actorId,actorName);int queued=0,held=0;
+                for(dto.KnowledgeImportSection section:store.listImportSections(id)){
+                    if(section.sourceVersion!=version)continue;
+                    if(Arrays.asList("KNOWLEDGE_BASE","FAQ").contains(section.classification) && !"IGNORED".equals(section.reviewState)){
+                        // Classification remains a suggestion; preflight enforces topic/authority policy.
+                        rag.importer.DocumentSectionService.validateEntry(section.title,section.content);
+                        if(!"CREATED".equals(section.reviewState))store.reviewImportSection(section.id,section.title,"KNOWLEDGE_BASE",false,actorId,actorName);
+                        dto.KnowledgeImportSection entry=store.createImportDraft(section.id,actorId,actorName);
+                        if(entry.documentId!=null){ManagedDocument child=store.findDocument(entry.documentId);lifecycle().publish(child.id,child.version,actorId);queued++;}else held++;
+                    }else held++;
+                }
+                session.setAttribute("kbMessage","Đã xếp hàng "+queued+" phần tri thức; "+held+" phần quy tắc/cấu hình/chưa phù hợp giữ lại để duyệt thủ công. Bản gốc được bảo toàn.");
+                resp.sendRedirect(req.getContextPath()+"/admin/knowledge-base?tab=imports&docId="+id);return;
+            } else if("restoreDocumentDraft".equals(action)){
+                targetTab="documents";long id=parseLong(req.getParameter("id"),0),version=parseLong(req.getParameter("version"),0);
+                ManagedDocument d=store.findDocument(id);if(d==null||version!=d.version)throw new IllegalArgumentException("Phiên bản đã thay đổi.");
+                ManagedDocument restored=store.rollbackDocument(id,version,actorId,actorName);
+                session.setAttribute("kbMessage","Đã tạo bản nháp khôi phục v"+restored.version+"; cần duyệt Xuất bản và lập chỉ mục lại.");
+                resp.sendRedirect(req.getContextPath()+"/admin/knowledge-base?tab=documents&docId="+id);return;
+            } else if("permanentDeleteDocument".equals(action)){
+                targetTab="documents";long id=parseLong(req.getParameter("id"),0);
+                java.util.List<String> paths=lifecycle().permanentDelete(id,parseLong(req.getParameter("version"),0),actorId,req.getParameter("confirmation"));
+                // UUID-only storage names outside webroot; never follow upload-controlled paths/symlinks.
+                java.nio.file.Path root=extractor().getStorageRoot().toAbsolutePath().normalize();
+                for(String path:paths)if(path!=null&&path.matches("[0-9a-f-]{36}\\.(pdf|docx|txt|md)")){
+                    java.nio.file.Path file=root.resolve(path).normalize();
+                    if(file.getParent().equals(root)&&!java.nio.file.Files.isSymbolicLink(file))try{java.nio.file.Files.deleteIfExists(file);}catch(IOException ignored){session.setAttribute("kbMessage","Đã xóa dữ liệu; tệp disk cần quản trị viên dọn thủ công.");}
+                }
+                if(session.getAttribute("kbMessage")==null)session.setAttribute("kbMessage","Đã xóa tài liệu và dữ liệu liên quan; giữ audit tối thiểu.");
+                resp.sendRedirect(req.getContextPath()+"/admin/knowledge-base?tab=documents");return;
+            } else if("readOnlyRetrieval".equals(action)){
+                targetTab="verify";String query=req.getParameter("query");
+                if(query==null||query.trim().isEmpty()||query.length()>1000)throw new IllegalArgumentException("Nhập câu hỏi tối đa 1000 ký tự.");
+                rag.KnowledgeSourceSelection.Result result=store.readOnlyRetrieval(query);
+                req.setAttribute("kbRetrievalPreview",result);req.setAttribute("kbTab","verify");doGet(req,resp);return;
+            } else if ("prepareImport".equals(action)) {
                 long id=parseLong(req.getParameter("id"),0);store.prepareImport(id,parseLong(req.getParameter("version"),0),actorId,actorName);
                 resp.sendRedirect(req.getContextPath()+"/admin/knowledge-base?tab=imports&docId="+id);return;
             } else if("reviewImportSection".equals(action)||"createImportDraft".equals(action)){
@@ -238,11 +292,17 @@ public class AdminKnowledgeBaseServlet extends HttpServlet {
                 targetTab = "documents";
                 long id = parseLong(req.getParameter("id"), 0L);
                 boolean preservePublished = "true".equalsIgnoreCase(req.getParameter("preservePublishedState"));
+                String editedContent=req.getParameter("content");
+                if(editedContent==null && "true".equals(req.getParameter("preserveUploadedContent"))){
+                    ManagedDocument existing=store.findDocument(id);
+                    if(existing==null||!"UPLOAD".equals(existing.sourceType)||existing.version!=parseLong(req.getParameter("version"),0))throw new IllegalArgumentException("Tải lại đúng phiên bản trước khi sửa metadata.");
+                    editedContent=existing.content;
+                }
                 ManagedDocument updated = store.updateDocument(
                         id,
                         req.getParameter("title"),
                         cleanParam(req.getParameter("category"), "guide"),
-                        req.getParameter("content"),
+                        editedContent,
                         cleanParam(req.getParameter("source"), "manual:admin"),
                         req.getParameter("tags"),
                         req.getParameter("department"),
@@ -256,7 +316,7 @@ public class AdminKnowledgeBaseServlet extends HttpServlet {
                         preservePublished,
                         req.getParameter("changeNote"),
                         actorId,
-                        actorName);
+                        actorName,parseLong(req.getParameter("version"),-1));
                 session.setAttribute("kbMessage", "Đã lưu phiên bản mới v" + updated.version + " cho tài liệu #" + updated.id
                         + " (Trạng thái: " + updated.workflowStatus + ").");
                 resp.sendRedirect(req.getContextPath() + "/admin/knowledge-base?tab=documents&docId=" + updated.id);
@@ -345,10 +405,12 @@ public class AdminKnowledgeBaseServlet extends HttpServlet {
                         parseInt(req.getParameter("chunkOverlap"), 100),
                         actorId,
                         actorName);
+                long replacement=parseLong(req.getParameter("replacementId"),0);
+                if(replacement>0)lifecycle().linkReplacement(created.id,created.version,replacement,actorId);
                 session.setAttribute("kbMessage", "Đã tải lên '" + extraction.originalFilename + "' ("
                         + extraction.status + ", " + extraction.charCount + " ký tự) -> Tạo tài liệu #"
                         + created.id + " ở trạng thái " + created.workflowStatus + " (chưa xuất bản/chưa lập chỉ mục).");
-                if("true".equals(req.getParameter("splitImport")) && "EXTRACTED".equals(extraction.status)){
+                if("EXTRACTED".equals(extraction.status)){
                     store.prepareImport(created.id,created.version,actorId,actorName);
                     resp.sendRedirect(req.getContextPath()+"/admin/knowledge-base?tab=imports&docId="+created.id);
                 }else resp.sendRedirect(req.getContextPath() + "/admin/knowledge-base?tab=documents&docId=" + created.id);

@@ -13,6 +13,9 @@ public final class KnowledgeSourceSelection {
         public final Map<KnowledgeContentPolicy.Reason,Integer> rejected;
         public Result(List<KnowledgeChunkDTO> chunks,Issue issue,Map<KnowledgeContentPolicy.Reason,Integer> rejected){this.chunks=Collections.unmodifiableList(new ArrayList<>(chunks));this.issue=issue;Map<KnowledgeContentPolicy.Reason,Integer> copy=new EnumMap<>(KnowledgeContentPolicy.Reason.class);copy.putAll(rejected);this.rejected=Collections.unmodifiableMap(copy);}
         public boolean uncertain(){return issue==Issue.VERSION_CONFLICT||issue==Issue.SOURCE_CONFLICT||issue==Issue.AMBIGUOUS_SUBJECT;}
+        public List<KnowledgeChunkDTO> getChunks(){return chunks;}
+        public String getIssue(){return issue.name();}
+        public Map<KnowledgeContentPolicy.Reason,Integer> getRejected(){return rejected;}
     }
     private KnowledgeSourceSelection(){}
     public static Result empty(Issue issue){return new Result(Collections.emptyList(),issue,new EnumMap<>(KnowledgeContentPolicy.Reason.class));}

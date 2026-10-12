@@ -501,3 +501,13 @@
 }
 
 
+
+/* Phase 5.7: four everyday destinations, existing admin theme and bounded previews. */
+.kb-primary-nav {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
+.kb-primary-nav a {text-align:center;white-space:normal;}
+.kb-advanced-links {display:flex;flex-wrap:wrap;gap:12px;padding:16px;}
+.kb-snippet {white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto;}
+.kb-page progress {width:110px;accent-color:#f37021;}
+.kb-page input,.kb-page select {max-width:100%;}
+.kb-page .kb-panel {min-width:0;}
+@media(max-width:768px){.kb-primary-nav{grid-template-columns:repeat(2,minmax(0,1fr));}.kb-filter-row{flex-wrap:wrap;}}

@@ -28,7 +28,6 @@ public final class DocumentExtractionService {
     private static final long MAX_UNCOMPRESSED_BYTES = 25L * 1024L * 1024L; // 25 MB
     private static final int MAX_ZIP_ENTRIES = 250;
     private static final int MAX_COMPRESSION_RATIO = 50;
-    private static final int MAX_EXTRACTED_CHARS = 60000;
 
     private static final Set<String> ALLOWED_EXTENSIONS = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList("pdf", "docx", "txt", "md")));
@@ -135,7 +134,7 @@ public final class DocumentExtractionService {
             throw new IllegalArgumentException("Không có dữ liệu tệp tải lên.");
         }
 
-        byte[] bytes = readBounded(input, MAX_UPLOAD_BYTES);
+        byte[] bytes = readBounded(input, rag.KnowledgeLimits.upload());
         if (bytes.length == 0) {
             throw new IllegalArgumentException("Tệp tải lên rỗng (0 byte).");
         }
@@ -167,6 +166,8 @@ public final class DocumentExtractionService {
         } catch (SecurityException se) {
             // Security violations (macros, XXE, ZIP bomb, PDF JS) are rejected outright.
             throw new IllegalArgumentException(se.getMessage());
+        } catch (ExtractionLimitException tooLarge) {
+            throw tooLarge;
         } catch (Exception ex) {
             status = "PROCESSING_FAILED";
             warning = ex.getMessage() != null ? ex.getMessage() : "Không thể trích xuất văn bản từ tệp.";
@@ -177,12 +178,8 @@ public final class DocumentExtractionService {
             status = "PROCESSING_FAILED";
             warning = "Không trích xuất được nội dung văn bản (tệp có thể chỉ chứa hình ảnh scan hoặc mã hóa font đặc biệt).";
         }
-        if (extracted.length() > MAX_EXTRACTED_CHARS) {
-            extracted = extracted.substring(0, MAX_EXTRACTED_CHARS).trim();
-            warning = warning.isEmpty()
-                    ? "Nội dung đã được cắt giới hạn tối đa 60.000 ký tự."
-                    : warning + " Nội dung cắt giới hạn 60.000 ký tự.";
-        }
+        if (extracted.length() > rag.KnowledgeLimits.extracted())
+            throw new IllegalArgumentException("Văn bản vượt giới hạn " + rag.KnowledgeLimits.extracted() + " ký tự; hãy chia tài liệu. Nội dung không bị cắt ngắn.");
 
         Files.write(target, bytes, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
 
@@ -250,7 +247,7 @@ public final class DocumentExtractionService {
         while ((n = in.read(buf)) != -1) {
             total += n;
             if (total > maxBytes) {
-                throw new IllegalArgumentException("Kích thước tệp vượt quá giới hạn cho phép (tối đa 10 MB).");
+                throw new IllegalArgumentException("Kích thước tệp vượt quá giới hạn cho phép: " + maxBytes + " bytes.");
             }
             out.write(buf, 0, n);
         }
@@ -420,16 +417,17 @@ public final class DocumentExtractionService {
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(new InputSource(new ByteArrayInputStream(documentXml)));
         StringBuilder out = new StringBuilder();
-        extractWordNodes(doc.getDocumentElement(), out);
+        extractWordNodes(doc.getDocumentElement(), out,0);
         return out.toString();
     }
 
-    private static void extractWordNodes(Node node, StringBuilder out) {
+    private static void extractWordNodes(Node node, StringBuilder out,int depth) {
         if (node == null) return;
+        if(depth>100)throw new SecurityException("Cấu trúc DOCX lồng quá sâu.");
         String local = node.getLocalName() != null ? node.getLocalName() : node.getNodeName();
         if (local.endsWith(":t") || "t".equals(local)) {
             String text = node.getTextContent();
-            if (text != null) out.append(text);
+            if (text != null) appendBounded(out,text);
             return;
         }
         if (local.endsWith(":tab") || "tab".equals(local)) {
@@ -442,13 +440,21 @@ public final class DocumentExtractionService {
         }
         NodeList children = node.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
-            extractWordNodes(children.item(i), out);
+            extractWordNodes(children.item(i), out,depth+1);
         }
         if (local.endsWith(":p") || "p".equals(local) || local.endsWith(":tr") || "tr".equals(local)) {
             out.append('\n');
         } else if (local.endsWith(":tc") || "tc".equals(local)) {
             out.append(" | ");
         }
+        if(out.length()>rag.KnowledgeLimits.extracted())throw new ExtractionLimitException();
+    }
+    private static final class ExtractionLimitException extends IllegalArgumentException {
+        ExtractionLimitException(){super("Văn bản vượt giới hạn "+rag.KnowledgeLimits.extracted()+" ký tự; hãy chia tài liệu. Nội dung không bị cắt ngắn.");}
+    }
+    private static void appendBounded(StringBuilder out,String text) {
+        if((long)out.length()+text.length()>rag.KnowledgeLimits.extracted())throw new ExtractionLimitException();
+        out.append(text);
     }
 
     private static String extractPdfText(byte[] bytes) throws Exception {
@@ -571,7 +577,7 @@ public final class DocumentExtractionService {
                 }
                 String decoded = decodePdfStringBytes(lit.toString().getBytes(StandardCharsets.ISO_8859_1));
                 if (!decoded.isEmpty()) {
-                    out.append(decoded).append(' ');
+                    appendBounded(out,decoded+" ");
                 }
             } else if (c == '<' && i + 1 < len && stream.charAt(i + 1) != '<') {
                 int endHex = stream.indexOf('>', i + 1);
@@ -581,7 +587,7 @@ public final class DocumentExtractionService {
                         byte[] raw = hexToBytes(hex);
                         String decoded = decodePdfStringBytes(raw);
                         if (!decoded.isEmpty()) {
-                            out.append(decoded).append(' ');
+                            appendBounded(out,decoded+" ");
                         }
                     }
                     i = endHex + 1;

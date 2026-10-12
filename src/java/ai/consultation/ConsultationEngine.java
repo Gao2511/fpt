@@ -77,6 +77,7 @@ public final class ConsultationEngine {
                              Target primary, Target fallback, ChatOptions options, String systemPrompt) throws AIException {
         if (question == null || question.trim().isEmpty() || question.length() > 2000) throw new AIException(AIException.ErrorType.INVALID_REQUEST, "Vui lòng nhập câu hỏi tối đa 2000 ký tự.", "System");
         boolean locked = false;
+        rag.RagRequestEvidence evidence=rag.RagRequestEvidence.begin(retrieval.enabled());
         try {
             locked = session.turnLock.tryLock(2, TimeUnit.SECONDS);
             if (!locked) throw new AIException(AIException.ErrorType.HIGH_DEMAND, "Vui lòng chờ câu trả lời trước hoàn tất.", "System");
@@ -145,6 +146,7 @@ public final class ConsultationEngine {
                 ChatOptions targetOptions = target.optionsFor(options);
                 attemptsMade++;
                 try {
+                    rag.RagRequestEvidence.sent(context.chunks,"gemini".equalsIgnoreCase(target.provider.getId()));
                     ChatResponse raw = target.provider.chat(messages, target.key, target.model, target.baseUrl, targetOptions);
                     if (options.isExpired()) break;
                     ConsultationReply reply = ConsultationReply.parse(raw, catalog, target.key, context);
@@ -200,7 +202,7 @@ public final class ConsultationEngine {
         } catch (InterruptedException interrupted) {
             Thread.currentThread().interrupt();
             throw new AIException(AIException.ErrorType.TIMEOUT, "Yêu cầu đã bị gián đoạn. Anh/chị vui lòng thử lại.", "System");
-        } finally { if (locked) session.turnLock.unlock(); }
+        } finally { evidence.close(); if (locked) session.turnLock.unlock(); }
     }
     private static boolean ragQuestion(String question) {
         String q = ProductCatalog.normalize(question);

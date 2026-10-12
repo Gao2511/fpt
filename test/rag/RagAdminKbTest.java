@@ -429,7 +429,8 @@ public final class RagAdminKbTest {
                 check(headerJsp.contains("id=\"adminSidebarCollapseBtn\"") && headerJsp.contains("id=\"adminMobileMenuBtn\""), "Missing collapse/mobile toggle controls");
                 check(headerJsp.contains("Quản lý Website") && headerJsp.contains("AI &amp; Chatbot") && headerJsp.contains("Hệ thống"), "Missing required sidebar groups");
                 check(headerJsp.contains("/admin/content#cms-images") && headerJsp.contains("Media / Hình ảnh"), "Missing Media / Hình ảnh link");
-                check(headerJsp.contains("id=\"sidebarGroupAi\"") && headerJsp.contains("RAG Playground") && headerJsp.contains("AI Model Settings"), "Missing expandable AI submenu items");
+                String advancedLinks=new String(Files.readAllBytes(Paths.get("web/view/admin/knowledge-advanced-links.jsp")),StandardCharsets.UTF_8);
+                check(headerJsp.contains("id=\"sidebarGroupAi\"") && advancedLinks.contains("RAG Playground") && advancedLinks.contains("/admin/settings"), "Missing expandable AI advanced routes");
                 check(headerJsp.contains("test=\"${!demoMode}\""), "Missing demoMode protection in sidebar");
 
                 String kbJsp = new String(Files.readAllBytes(Paths.get("web/view/admin/knowledge-base.jsp")), StandardCharsets.UTF_8);
@@ -628,8 +629,7 @@ public final class RagAdminKbTest {
                 for (String navItem : Arrays.asList(
                         "Dashboard", "Nội dung trang", "Gói cước / Sản phẩm", "Media / Hình ảnh", "Thông tin kinh doanh",
                         "Danh sách khách hàng", "Thông báo / Lịch sử Email",
-                        "Tổng quan AI", "Tài liệu / Knowledge Base", "Upload &amp; Import", "FAQ", "Indexing",
-                        "RAG Playground", "AI Model Settings", "RAG Settings", "Monitoring / Audit",
+                        "Tải lên &amp; Xuất bản", "Quản lý tài liệu", "Kiểm tra AI RAG", "Cài đặt nâng cao",
                         "Cài đặt chung", "Quản lý tài khoản", "Đăng xuất")) {
                     check(headerJsp.contains(navItem), "Missing sidebar menu item: " + navItem);
                 }

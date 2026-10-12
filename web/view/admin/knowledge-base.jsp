@@ -22,7 +22,7 @@
     <div class="kb-header-banner">
         <div>
             <span style="font-size:11px;font-weight:700;color:#f37021;letter-spacing:0.08em;">QUẢN TRỊ TRI THỨC AI &amp; RAG</span>
-            <h1>AI Knowledge Base &amp; RAG Management System</h1>
+            <h1>Kho tri thức AI</h1>
             <p>Quản lý tài liệu, duyệt xuất bản có phiên bản và lập chỉ mục vector 768 chiều. Trạng thái được tổng hợp từ cấu hình máy chủ, PostgreSQL và nhật ký thực thi (0 cuộc gọi Gemini API khi tải trang).</p>
         </div>
         <div class="kb-status-pills">
@@ -33,19 +33,14 @@
         </div>
     </div>
 
-    <!-- SUB-NAVIGATION TABS -->
-    <nav class="kb-subnav" aria-label="Knowledge Base Sections">
-        <a href="${pageContext.request.contextPath}/admin/knowledge-base?tab=dashboard" class="${kbTab == 'dashboard' ? 'active' : ''}">1. Tổng quan AI</a>
-        <a href="${pageContext.request.contextPath}/admin/knowledge-base?tab=documents" class="${kbTab == 'documents' ? 'active' : ''}">2. Tài liệu (${metrics.totalDocuments})</a>
-        <a href="${pageContext.request.contextPath}/admin/knowledge-base?tab=upload" class="${kbTab == 'upload' ? 'active' : ''}">3. Upload &amp; Trích xuất</a>
-        <a href="${pageContext.request.contextPath}/admin/knowledge-base?tab=imports" class="${kbTab == 'imports' ? 'active' : ''}">Review Phân mục</a>
-        <a href="${pageContext.request.contextPath}/admin/knowledge-base?tab=faqs" class="${kbTab == 'faqs' ? 'active' : ''}">4. FAQ (${metrics.totalFaqs})</a>
-        <a href="${pageContext.request.contextPath}/admin/knowledge-base?tab=indexing" class="${kbTab == 'indexing' ? 'active' : ''}">5. Indexing (${metrics.needingReindexDocuments})</a>
-        <a href="${pageContext.request.contextPath}/admin/knowledge-base?tab=playground" class="${kbTab == 'playground' ? 'active' : ''}">6. RAG Playground</a>
-        <a href="${pageContext.request.contextPath}/admin/knowledge-base?tab=rag-config" class="${kbTab == 'rag-config' ? 'active' : ''}">7. RAG Settings</a>
-        <a href="${pageContext.request.contextPath}/admin/knowledge-base?tab=audit" class="${kbTab == 'audit' ? 'active' : ''}">8. Monitoring &amp; Audit</a>
+    <nav class="kb-subnav kb-primary-nav" aria-label="Knowledge Base Sections">
+        <a href="${pageContext.request.contextPath}/admin/knowledge-base?tab=upload" class="${kbTab == 'upload' || kbTab == 'imports' ? 'active' : ''}">1. Tải lên &amp; Xuất bản</a>
+        <a href="${pageContext.request.contextPath}/admin/knowledge-base?tab=documents" class="${kbTab == 'documents' ? 'active' : ''}">2. Quản lý tài liệu</a>
+        <a href="${pageContext.request.contextPath}/admin/knowledge-base?tab=verify" class="${kbTab == 'verify' ? 'active' : ''}">3. Kiểm tra AI RAG</a>
+        <a href="${pageContext.request.contextPath}/admin/knowledge-base?tab=advanced" class="${kbTab == 'advanced' ? 'active' : ''}">4. Cài đặt nâng cao</a>
     </nav>
-
+    <details class="kb-advanced-details"><summary>Công cụ nâng cao &amp; đường dẫn cũ</summary><jsp:include page="/view/admin/knowledge-advanced-links.jsp"/></details>
+    <jsp:include page="/view/admin/knowledge-simple.jsp"/>
     <!-- FLASH & ERROR MESSAGES -->
     <c:if test="${not empty kbError}">
         <div class="kb-alert kb-alert-error" role="alert"><c:out value="${kbError}"/></div>
@@ -454,7 +449,10 @@
 
                     <div class="kb-field" style="margin-bottom:14px;">
                         <label>Nội dung văn bản chuẩn hóa (không chứa thông tin giá cước/tốc độ gói do DB quản lý) *</label>
-                        <textarea name="content" rows="8" maxlength="60000" required><c:out value="${not empty selectedDoc ? selectedDoc.content : ''}"/></textarea>
+                        <c:set var="largeUploadedContent" value="${selectedDoc.sourceType == 'UPLOAD' && fn:length(selectedDoc.content) > kbTextLimit}"/>
+                        <textarea name="content" rows="8" maxlength="${selectedDoc.sourceType == 'UPLOAD' ? kbExtractedLimit : kbTextLimit}" ${largeUploadedContent ? 'disabled' : 'required'}><c:out value="${not empty selectedDoc ? selectedDoc.content : ''}"/></textarea>
+                        <c:if test="${not empty selectedDoc}"><input type="hidden" name="version" value="${selectedDoc.version}"></c:if>
+                        <c:if test="${largeUploadedContent}"><input type="hidden" name="preserveUploadedContent" value="true"><small>Văn bản lớn được giữ nguyên khi sửa metadata. Để sửa nội dung, upload phiên bản thay thế; không gửi toàn bộ văn bản qua form.</small></c:if>
                     </div>
 
                     <details class="kb-advanced-details" style="margin-bottom:14px;">
@@ -513,7 +511,7 @@
             </div>
 
             <!-- LIFECYCLE WORKFLOW, VERSION HISTORY & DIFF -->
-            <div class="kb-panel">
+            <details class="kb-panel"><summary>Lịch sử phiên bản &amp; quy trình nâng cao</summary>
                 <c:choose>
                     <c:when test="${empty selectedDoc}">
                         <h3>Quy trình Duyệt, Phiên bản &amp; Xuất bản</h3>
@@ -559,7 +557,7 @@
                             <c:if test="${selectedDoc.workflowStatus == 'APPROVED'}">
                                 <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base">
                                     <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}">
-                                    <input type="hidden" name="action" value="publishDocument">
+                                    <input type="hidden" name="action" value="publishDocument"><input type="hidden" name="version" value="${selectedDoc.version}">
                                     <input type="hidden" name="id" value="${selectedDoc.id}">
                                     <button type="submit" class="kb-btn kb-btn-success">Xuất bản (Publish)</button>
                                 </form>
@@ -664,136 +662,12 @@
                         </c:if>
                     </c:otherwise>
                 </c:choose>
-            </div>
+            </details>
         </div>
     </c:if>
 
     <!-- ===================================================================
          TAB 3: SECURE DOCUMENT UPLOAD & TEXT EXTRACTION
-         =================================================================== -->
-    <c:if test="${kbTab == 'upload'}">
-        <div class="kb-workflow-stepper" aria-label="Quy trình Upload và Import 6 bước">
-            <div class="kb-step is-active"><span class="kb-step-num">1</span><span>Chọn tệp</span></div>
-            <div class="kb-step is-active"><span class="kb-step-num">2</span><span>Tải lên &amp; Trích xuất</span></div>
-            <div class="kb-step"><span class="kb-step-num">3</span><span>Review phân mục</span></div>
-            <div class="kb-step"><span class="kb-step-num">4</span><span>Phê duyệt</span></div>
-            <div class="kb-step"><span class="kb-step-num">5</span><span>Xuất bản</span></div>
-            <div class="kb-step"><span class="kb-step-num">6</span><span>Lập chỉ mục</span></div>
-        </div>
-        <div class="kb-grid-2">
-            <div class="kb-panel">
-                <h3>Tải lên &amp; Trích xuất văn bản an toàn (.PDF, .DOCX, .TXT, .MD)</h3>
-                <p style="font-size:13px;color:#94a3b8;">Hệ thống kiểm tra chữ ký byte (magic bytes), chặn thực thi/macro/ZIP bomb, lưu ngoài web root và tạo bản nháp <code>DRAFT</code> để Admin kiểm duyệt trước khi xuất bản.</p>
-                <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base" enctype="multipart/form-data">
-                    <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}">
-                    <input type="hidden" name="action" value="uploadDocument">
-                    <input type="hidden" name="tab" value="upload">
-
-                    <div class="kb-form-grid">
-                        <div class="kb-field">
-                            <label>Chọn tệp (.pdf, .docx, .txt, .md — tối đa 10 MB) *</label>
-                            <input type="file" name="documentFile" accept=".pdf,.docx,.txt,.md" required>
-                        </div>
-                        <div class="kb-field">
-                            <label>Tiêu đề tài liệu (để trống sẽ lấy theo tên tệp)</label>
-                            <input type="text" name="title" maxlength="200">
-                        </div>
-                        <div class="kb-field">
-                            <label>Danh mục</label>
-                            <select name="category">
-                                <option value="guide">Hướng dẫn (guide)</option>
-                                <option value="policy">Chính sách (policy)</option>
-                                <option value="faq">Hỏi đáp (faq)</option>
-                            </select>
-                        </div>
-                        <div class="kb-field">
-                            <label>Độ tin cậy (Source Authority)</label>
-                            <select name="sourceAuthority">
-                                <option value="admin_reviewed">admin_reviewed</option>
-                                <option value="official">official</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <details class="kb-advanced-details" style="margin-bottom:14px;">
-                        <summary class="kb-advanced-summary">
-                            <span>Metadata nâng cao (Policy Key, Tags, Phòng ban)</span>
-                            <span class="kb-badge kb-badge-DRAFT">Tùy chọn</span>
-                        </summary>
-                        <div class="kb-form-grid kb-advanced-body">
-                            <div class="kb-field">
-                                <label>Policy Key</label>
-                                <input type="text" name="policyKey" maxlength="100" placeholder="vd: support.process">
-                            </div>
-                            <div class="kb-field">
-                                <label>Tags</label>
-                                <input type="text" name="tags" maxlength="500">
-                            </div>
-                            <div class="kb-field">
-                                <label>Phòng ban</label>
-                                <input type="text" name="department" maxlength="100" value="Kỹ thuật &amp; CSKH">
-                            </div>
-                        </div>
-                    </details>
-
-                    <div class="kb-field" style="margin-bottom:14px;"><label><input type="checkbox" name="splitImport" value="true" checked> Giữ bản gốc và preview phân mục (khuyến nghị cho kịch bản nhiều chủ đề)</label></div>
-                    <div class="kb-actions-inline">
-                        <button type="submit" class="kb-btn">Tải lên &amp; Trích xuất vào bản nháp (DRAFT)</button>
-                        <a class="kb-btn kb-btn-secondary" href="${pageContext.request.contextPath}/admin/knowledge-base?tab=imports">Mở Review Phân mục &rarr;</a>
-                    </div>
-                </form>
-            </div>
-
-            <div class="kb-panel">
-                <h3>Lịch sử tệp đã tải lên</h3>
-                <div class="kb-table-wrap">
-                    <table class="kb-table">
-                        <thead>
-                            <tr>
-                                <th>Tên tệp gốc</th>
-                                <th>Định dạng / Kích thước</th>
-                                <th>Trạng thái trích xuất</th>
-                                <th>Tài liệu liên kết</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:choose>
-                                <c:when test="${empty uploadedFiles}">
-                                    <tr><td colspan="4">Chưa có tệp nào được tải lên.</td></tr>
-                                </c:when>
-                                <c:otherwise>
-                                    <c:forEach items="${uploadedFiles}" var="uf">
-                                        <tr>
-                                            <td>
-                                                <strong><c:out value="${uf.originalFilename}"/></strong><br>
-                                                <small style="color:#64748b;">SHA-256: <code><c:out value="${fn:substring(uf.sha256Hash, 0, 16)}"/>...</code></small>
-                                            </td>
-                                            <td><code>.<c:out value="${uf.fileExtension}"/></code> (<c:out value="${uf.fileSizeBytes}"/> bytes)</td>
-                                            <td>
-                                                <span class="kb-badge kb-badge-${uf.extractionStatus}"><c:out value="${uf.extractionStatus}"/></span>
-                                                (<c:out value="${uf.extractedCharCount}"/> ký tự)
-                                                <c:if test="${not empty uf.extractionWarning}">
-                                                    <br><small style="color:#fca5a5;"><c:out value="${uf.extractionWarning}"/></small>
-                                                </c:if>
-                                            </td>
-                                            <td>
-                                                <c:if test="${not empty uf.documentId}">
-                                                    <a class="kb-btn kb-btn-secondary" href="${pageContext.request.contextPath}/admin/knowledge-base?tab=documents&amp;docId=${uf.documentId}">Tài liệu #<c:out value="${uf.documentId}"/></a>
-                                                </c:if>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
-                                </c:otherwise>
-                            </c:choose>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </c:if>
-
-    <!-- ===================================================================
-         TAB 4: FAQ MANAGEMENT MODULE
          =================================================================== -->
     <c:if test="${kbTab == 'faqs'}">
         <div class="kb-grid-2">
@@ -1386,5 +1260,6 @@
         <jsp:include page="/view/admin/knowledge-gemini-runtime.jsp"/>
     </c:if>
 </main>
+<script src="${pageContext.request.contextPath}/assets/admin/admin-kb-lifecycle.js"></script>
 </body>
 </html>

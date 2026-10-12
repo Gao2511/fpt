@@ -1,0 +1,33 @@
+'use strict';
+const {chromium}=require('playwright-core');
+const {spawn}=require('node:child_process');
+const path=require('node:path');
+const fs=require('node:fs');
+const assert=require('node:assert/strict');
+(async()=>{
+ const child=spawn('java',['-Dfile.encoding=UTF-8','-cp',process.env.KB57_TEST_CLASSPATH,'cms.KnowledgeViewServer',process.env.KB57_WEB,process.env.KB57_EVIDENCE],{env:{...process.env,KB_GEMINI_WORKER_ENABLED:'false',RAG_ENABLED:'false',RAG_EMBEDDING_CALLS_APPROVED:'false',DB_HOST:'127.0.0.1',DB_PORT:'1',DB_NAME:'offline_fixture',DB_USER:'FAKE_TEST',DB_PASSWORD:'FAKE_TEST'},stdio:['ignore','pipe','pipe']});
+ let browser,errors='';child.stderr.on('data',b=>{errors+=b.toString();});
+ try {
+  const port=await new Promise((resolve,reject)=>{let out='';const timeout=setTimeout(()=>reject(new Error('Fixture start timeout: '+errors.slice(-1200))),30000);child.stdout.on('data',b=>{out+=b.toString();let m=out.match(/KB57_TEST_PORT=(\d+)/);if(m){clearTimeout(timeout);resolve(m[1]);}});child.on('exit',()=>{clearTimeout(timeout);reject(new Error('Fixture exited: '+errors.slice(-1200)));});});
+  browser=await chromium.launch({headless:true,executablePath:process.env.KB57_CHROME});
+  const page=await browser.newPage();const base='http://127.0.0.1:'+port;await page.route('**/*',r=>r.request().url().startsWith(base)?r.continue():r.abort());
+  for(const width of [1440,375])for(const tab of ['upload','documents','verify','advanced']){
+   await page.setViewportSize({width,height:980});const response=await page.goto(base+'/admin/knowledge-base?tab='+tab);assert.equal(response.status(),200,tab);
+   fs.writeFileSync(path.join(process.env.KB57_EVIDENCE,tab+'-'+width+'.html'),await page.content());
+   assert.equal(await page.locator('.kb-primary-nav > a').count(),4);
+   assert.equal(await page.locator('.kb-primary-nav > a.active').count(),1);
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'horizontal overflow '+width+' '+tab);
+   assert.equal(await page.locator('script').filter({hasText:'danger'}).count(),0,'stored XSS');
+   for(const form of await page.locator('form[method="post"]').all())assert.equal(await form.locator('[name="csrf_token"]').count(),1,'CSRF field');
+   if(tab==='verify')assert.match(await page.locator('main').textContent(),/0 API calls/);
+   await page.screenshot({path:path.join(process.env.KB57_EVIDENCE,tab+'-'+width+'.png'),fullPage:true});console.log('PASS KB57 browser '+tab+' '+width);
+  }
+  await page.goto(base+'/admin/knowledge-base?tab=documents&large=true');
+  assert.equal(await page.locator('textarea[name="content"]').isDisabled(),true);
+  const editor=page.locator('form').filter({has:page.locator('textarea[name="content"]')});
+  assert.equal(await editor.locator('[name="preserveUploadedContent"]').inputValue(),'true');
+  assert.equal(await editor.locator('[name="version"]').count(),1);
+  console.log('PASS KB57 browser large-body metadata edit avoids oversized form submission');
+  console.log('KB57 browser: 9/9 checks PASS; real API requests=0');
+ }finally{if(browser)await browser.close();child.kill();}
+})().catch(e=>{console.error(e.message);process.exitCode=1;});

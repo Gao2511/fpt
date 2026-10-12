@@ -34,7 +34,7 @@ public final class DocumentChunkingService {
     }
 
     public List<String> chunk(String content, int maxChunkSize, int overlap) throws RagException {
-        if(content==null || content.trim().isEmpty() || content.length()>60000) throw new RagException(RagException.Code.INVALID_DOCUMENT);
+        if(content==null || content.trim().isEmpty() || content.length()>KnowledgeLimits.extracted()) throw new RagException(RagException.Code.INVALID_DOCUMENT);
         if(maxChunkSize<MIN_CHUNK_SIZE || maxChunkSize>MAX_CHUNK_SIZE || overlap<0 || overlap>MAX_OVERLAP || overlap>=maxChunkSize/2)
             throw new RagException(RagException.Code.INVALID_DOCUMENT);
         String text=content.replace("\r\n","\n").replace('\r','\n').trim();
@@ -55,7 +55,7 @@ public final class DocumentChunkingService {
             if(next<text.length() && Character.isLowSurrogate(text.charAt(next)))next++;
             start=next;
         }
-        if(chunks.size()>100)throw new RagException(RagException.Code.INVALID_DOCUMENT);
+        if(chunks.size()>5000)throw new RagException(RagException.Code.INVALID_DOCUMENT);
         return Collections.unmodifiableList(chunks);
     }
 

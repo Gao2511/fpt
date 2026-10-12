@@ -68,7 +68,7 @@ public final class RagBehaviorTest {
             for(String part:parts)check(part.length()<=1000 && !part.isEmpty());
             check(parts.get(0).startsWith("Hướng dẫn") && parts.get(parts.size()-1).endsWith("an toàn."));
         });
-        test("empty and oversized documents rejected",()->{expect(RagException.Code.INVALID_DOCUMENT,()->new DocumentChunkingService().chunk(" "));expect(RagException.Code.INVALID_DOCUMENT,()->new DocumentChunkingService().chunk(String.join("",Collections.nCopies(60001,"x"))));});
+        test("empty and oversized documents rejected",()->{expect(RagException.Code.INVALID_DOCUMENT,()->new DocumentChunkingService().chunk(" "));expect(RagException.Code.INVALID_DOCUMENT,()->new DocumentChunkingService().chunk(String.join("",Collections.nCopies(KnowledgeLimits.extracted()+1,"x"))));});
         test("Unicode chunk boundaries do not split surrogate pairs",()->{String t=String.join("",Collections.nCopies(600,"😀 "));for(String p:new DocumentChunkingService().chunk(t))check(!Character.isLowSurrogate(p.charAt(0)) && !Character.isHighSurrogate(p.charAt(p.length()-1)));});
         test("document hashing includes source metadata",()->{check(!VectorValues.hash("title\ntext").equals(VectorValues.hash("other\ntext")));});
         test("vectors normalize and round trip",()->{float[] v=new float[768];v[0]=3;v[1]=4;float[] parsed=VectorValues.parse(VectorValues.sql(v));check(Math.abs(parsed[0]-.6)<1e-6 && Math.abs(parsed[1]-.8)<1e-6);});

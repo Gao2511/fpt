@@ -21,7 +21,7 @@ public final class DocumentSectionService {
     }
     private static final Pattern HEADING=Pattern.compile("(?im)^(?:#{1,6}\\s+.+|(?:PHẦN|MỤC|CHƯƠNG)\\s+[^\\r\\n]+|[0-9]{1,2}[.)]\\s+[^\\r\\n]+|[IVX]{1,6}[.)]\\s+[^\\r\\n]+)$");
     public List<Section> detect(String text){
-        if(text==null||text.trim().isEmpty()||text.length()>60000)throw new IllegalArgumentException("Văn bản trích xuất không hợp lệ.");
+        if(text==null||text.trim().isEmpty()||text.length()>KnowledgeLimits.extracted())throw new IllegalArgumentException("Văn bản trích xuất không hợp lệ.");
         List<Integer> offsets=new ArrayList<>();offsets.add(0);Matcher m=HEADING.matcher(text);
         while(m.find())if(m.start()>0)offsets.add(m.start());
         if(offsets.size()>200)throw new IllegalArgumentException("Có quá nhiều mục; cần chia tệp trước khi nhập.");
@@ -45,6 +45,7 @@ public final class DocumentSectionService {
     }
     public static boolean singleTopic(String title){return RetrievalQuery.subjectTopics(title).size()==1;}
     public static void validateEntry(String title,String content)throws RagException{
+        if(KnowledgeContentPolicy.contentReason(title,content)!=KnowledgeContentPolicy.Reason.ACCEPTED)throw new IllegalArgumentException("Nội dung chưa đạt source policy; giữ hàng chờ duyệt.");
         Kind suggested=classify(title,content);
         if(suggested==Kind.AI_BEHAVIOR||suggested==Kind.ADMIN_CONFIGURATION)throw new IllegalArgumentException("Quy tắc vận hành/cấu hình không được chuyển thành tri thức trả lời tự động.");
         if(!singleTopic(title))throw new IllegalArgumentException("Tiêu đề phải xác định đúng một chủ đề; hãy tách mục hoặc sửa tiêu đề trước khi tạo entry.");

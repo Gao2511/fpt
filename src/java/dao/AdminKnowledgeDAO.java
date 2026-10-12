@@ -39,6 +39,13 @@ public class AdminKnowledgeDAO {
     public MockEmbeddingProvider getMockEmbeddings() {
         return mockEmbeddings;
     }
+    /** Lexical-only, real-index preview. No embedding or Chat API, even when live gates are open. */
+    public KnowledgeSourceSelection.Result readOnlyRetrieval(String query)throws Exception {
+        KnowledgeChunkDAO chunks=new KnowledgeChunkDAO(db,"GEMINI");
+        KnowledgeSourceSelection.Result result=KnowledgeSourceSelection.select(chunks.search(query,null,"gemini-embedding-001",768,12),query);
+        for(KnowledgeChunkDTO chunk:result.chunks)if(!chunks.current(chunk))return KnowledgeSourceSelection.empty(KnowledgeSourceSelection.Issue.UNAVAILABLE);
+        return result;
+    }
 
     public List<dto.KnowledgeImportSection> listImportSections(long sourceId) throws Exception {
         List<dto.KnowledgeImportSection> out=new ArrayList<>();
@@ -508,10 +515,18 @@ public class AdminKnowledgeDAO {
             Long supersedesDocumentId, Instant effectiveAt, Instant expiresAt,
             int chunkSize, int chunkOverlap, boolean preservePublishedState, String changeNote,
             int actorId, String actorUsername) throws Exception {
+        return updateDocument(id,title,category,content,source,tags,department,policyKey,sourceAuthority,supersedesDocumentId,effectiveAt,expiresAt,chunkSize,chunkOverlap,preservePublishedState,changeNote,actorId,actorUsername,-1);
+    }
+    public ManagedDocument updateDocument(long id, String title, String category, String content, String source,
+            String tags, String department, String policyKey, String sourceAuthority,
+            Long supersedesDocumentId, Instant effectiveAt, Instant expiresAt,
+            int chunkSize, int chunkOverlap, boolean preservePublishedState, String changeNote,
+            int actorId, String actorUsername,long expectedVersion) throws Exception {
         ManagedDocument existing = findDocument(id);
         if (existing == null) {
             throw new IllegalArgumentException("Không tìm thấy tài liệu #" + id);
         }
+        if(expectedVersion>0&&existing.version!=expectedVersion)throw new RagException(RagException.Code.STALE_VERSION);
         validateDocumentInputs(title, category, content, source, existing.sourceType, policyKey, sourceAuthority,
                 effectiveAt, expiresAt, chunkSize, chunkOverlap, actorId);
 
@@ -1467,62 +1482,17 @@ public class AdminKnowledgeDAO {
     }
 
     /** Explicit synchronous one-job execution; upload/publish never invoke this method. */
+    /** Legacy Admin route now delegates to the durable queue rather than synchronous unbudgeted calls. */
     public ManagedDocument requestGeminiIndex(long id, int actor, String username) throws Exception {
-        if (rag.runtime.GeminiRuntimeConfig.smokePlanConfigured(System.getenv())) {
+        if (rag.runtime.GeminiRuntimeConfig.smokePlanConfigured(System.getenv()))
             return requestGeminiIndex(id, actor, username, rag.runtime.GeminiRuntime.active());
-        }
-        if (actor <= 0) throw new IllegalArgumentException("Yêu cầu tài khoản Admin hợp lệ.");
-        ManagedDocument d = findDocument(id);
-        if (d == null || !"PUBLISHED".equals(d.workflowStatus) || d.approvedBy <= 0 || d.approvedAt == null
-                || (d.effectiveAt != null && Instant.now().isBefore(d.effectiveAt))
-                || (d.expiresAt != null && !Instant.now().isBefore(d.expiresAt))) {
-            throw new IllegalArgumentException("Chỉ tài liệu PUBLISHED đã duyệt và đang trong thời hạn hiệu lực mới được phép lập chỉ mục Gemini.");
-        }
-        for (String chunk : new DocumentChunkingService().chunk(d.content, d.chunkSize, d.chunkOverlap)) {
-            if (KnowledgeContentPolicy.contentReason(d.title, chunk) != KnowledgeContentPolicy.Reason.ACCEPTED) {
-                throw new IllegalArgumentException("Nội dung tài liệu vi phạm chính sách nguồn RAG (chứa giá cước/khuyến mãi chưa chuẩn hóa hoặc chỉ dẫn không an toàn).");
-            }
-        }
-        String embKey = RagFactory.resolveGeminiEmbeddingKey(null, System.getenv());
-        if (embKey.isEmpty()) {
-            throw new IllegalArgumentException("Chưa cấu hình khóa Gemini API (vui lòng nhập khóa Gemini trong AI Model Settings hoặc cấu hình GEMINI_API_KEY / RAG_EMBEDDING_API_KEY).");
-        }
-        RagConfig activeRagConfig = new RagConfig(true, true, true, "gemini-embedding-001", 768);
-        try (Connection c = db.open()) {
-            c.setAutoCommit(false);
-            try {
-                try (PreparedStatement p = c.prepareStatement(
-                        "UPDATE public.knowledge_documents SET embedding_provider='GEMINI', embedding_model='gemini-embedding-001', vector_dimensions=768, indexing_status='pending', indexed_version=NULL, embedding_error=NULL, updated_at=CURRENT_TIMESTAMP WHERE id=? AND version=? AND content_hash=? AND status='published' AND approved_by>0")) {
-                    p.setLong(1, id);
-                    p.setLong(2, d.version);
-                    p.setString(3, d.contentHash);
-                    if (p.executeUpdate() != 1) throw new RagException(RagException.Code.STALE_VERSION);
-                }
-                try (PreparedStatement p = c.prepareStatement(
-                        "INSERT INTO public.knowledge_index_jobs(document_id, document_version, document_hash, embedding_model, vector_dimensions, embedding_provider, status) VALUES(?,?,?,'gemini-embedding-001',768,'GEMINI','queued') ON CONFLICT(document_id, document_version, embedding_model, vector_dimensions) DO UPDATE SET embedding_provider='GEMINI', status='queued', attempts=0, lease_token=NULL, lease_until=NULL, error_code=NULL, available_at=CURRENT_TIMESTAMP, updated_at=CURRENT_TIMESTAMP")) {
-                    p.setLong(1, id);
-                    p.setLong(2, d.version);
-                    p.setString(3, d.contentHash);
-                    p.executeUpdate();
-                }
-                recordAuditTx(c, actor, username, "REQUEST_GEMINI_INDEX", "KNOWLEDGE_DOCUMENT", Long.toString(id),
-                        Collections.<String, Object>emptyMap(),
-                        Collections.<String, Object>singletonMap("embeddingModel", "gemini-embedding-001 (768d)"),
-                        "Lập chỉ mục vector thật bằng Gemini Embedding (gemini-embedding-001, 768 chiều)");
-                c.commit();
-            } catch (Exception e) {
-                c.rollback();
-                throw e;
-            }
-        }
-        EmbeddingService geminiEmbeddings = new GeminiEmbeddingService(
-                activeRagConfig, embKey, GeminiEmbeddingService.httpTransport(), true, 2);
-        new KnowledgeIndexingService(
-                db,
-                new KnowledgeDocumentDAO(db, activeRagConfig),
-                new KnowledgeChunkDAO(db, "GEMINI"),
-                new KnowledgeIndexJobDAO(db, "GEMINI", id),
-                geminiEmbeddings).runNext();
+        if(actor<=0)throw new IllegalArgumentException("Yêu cầu Admin hợp lệ.");
+        KnowledgeLifecycleDAO lifecycle=new KnowledgeLifecycleDAO(db);
+        if(!lifecycle.available())throw new IllegalStateException("Cần migration 008 trước khi lập chỉ mục Gemini bằng hàng đợi có ngân sách.");
+        ManagedDocument d=findDocument(id);
+        if(d==null||!"PUBLISHED".equals(d.workflowStatus)||d.approvedBy<=0||d.approvedAt==null)throw new IllegalArgumentException("Chỉ tài liệu PUBLISHED đã duyệt mới được reindex từ công cụ nâng cao.");
+        if("GEMINI".equals(d.embeddingProvider)&&"ready".equals(d.indexingStatus)&&d.indexedVersion!=null&&d.indexedVersion.longValue()==d.version)return d;
+        lifecycle.queueReindex(id,d.version,actor);
         return findDocument(id);
     }
 
@@ -2259,8 +2229,9 @@ public class AdminKnowledgeDAO {
         if (category == null || !VALID_CATEGORIES.contains(category.trim().toLowerCase(Locale.ROOT))) {
             throw new IllegalArgumentException("Danh mục tài liệu không hợp lệ (chỉ nhận faq, policy, guide).");
         }
-        if (content == null || content.trim().isEmpty() || content.length() > 60000) {
-            throw new IllegalArgumentException("Nội dung tài liệu bắt buộc (1..60.000 ký tự).");
+        int contentLimit="UPLOAD".equalsIgnoreCase(sourceType) ? KnowledgeLimits.extracted() : KnowledgeLimits.text();
+        if (content == null || content.trim().isEmpty() || content.length() > contentLimit) {
+            throw new IllegalArgumentException("Nội dung tài liệu bắt buộc (1.."+contentLimit+" ký tự).");
         }
         if (source == null || source.trim().isEmpty() || source.trim().length() > 500) {
             throw new IllegalArgumentException("Nguồn tài liệu (source) bắt buộc (1..500 ký tự).");
@@ -2391,7 +2362,7 @@ public class AdminKnowledgeDAO {
         }
     }
 
-    private static ManagedDocument readManagedDocument(ResultSet r) throws SQLException {
+    static ManagedDocument readManagedDocument(ResultSet r) throws SQLException {
         ManagedDocument d=new ManagedDocument(
                 r.getLong("id"),
                 r.getLong("version"),

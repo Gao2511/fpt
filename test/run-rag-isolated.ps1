@@ -1,6 +1,6 @@
 # Creates ONLY a new disposable local test container; never reads production/local website credentials.
 # Requires Docker Desktop already running. Container is stopped in finally, preserved for inspection.
-param([string]$Image='pgvector/pgvector:0.8.2-pg17@sha256:feb68f4f15446397d8cac7f4fe48fe4586de83160d1fc48b46283312d1a33966', [switch]$Phase24, [switch]$Phase3, [switch]$Phase4)
+param([string]$Image='pgvector/pgvector:0.8.2-pg17@sha256:feb68f4f15446397d8cac7f4fe48fe4586de83160d1fc48b46283312d1a33966', [switch]$Phase24, [switch]$Phase3, [switch]$Phase4, [switch]$Phase57)
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
 . "$PSScriptRoot/rag-docker-command.ps1"
@@ -38,10 +38,15 @@ try {
         Invoke-RagDocker -DockerArgs @('cp',"$root/database/migrations/$migration","${name}:/tmp/$migration") | Out-Null
         Invoke-RagDocker -DockerArgs @('exec',$name,'psql','-U','fpt_rag_user','-d','fpt_rag_test','--set','ON_ERROR_STOP=1','-f',"/tmp/$migration")
     }
+    if($Phase57){foreach($migration in @('007-online-production-readiness.sql','008-knowledge-publish-lifecycle.sql')){
+        Invoke-RagDocker -DockerArgs @('cp',"$root/database/migrations/$migration","${name}:/tmp/$migration") | Out-Null
+        Invoke-RagDocker -DockerArgs @('exec',$name,'psql','-U','fpt_rag_user','-d','fpt_rag_test','--set','ON_ERROR_STOP=1','-f',"/tmp/$migration") | Out-Null
+    }}
     Invoke-RagDocker -DockerArgs @('exec',$name,'psql','-U','fpt_rag_user','-d','fpt_rag_test','-t','-c',"SELECT version(), extversion FROM pg_extension WHERE extname='vector';")
     $vars=@{DB_HOST='127.0.0.1';DB_PORT=$port;DB_NAME='fpt_rag_test';DB_USER='fpt_rag_user';DB_PASSWORD=$password;DB_SSLMODE='disable';RAG_ENVIRONMENT='development';RAG_TEST_DATABASE_APPROVED='true';RAG_ENABLED='false';RAG_EMBEDDING_CALLS_APPROVED='false'}
     foreach($key in $vars.Keys){$old[$key]=[Environment]::GetEnvironmentVariable($key,'Process');[Environment]::SetEnvironmentVariable($key,$vars[$key],'Process')}
-    if($Phase4){ & "$PSScriptRoot/run-rag-phase4-postgres.ps1" }
+    if($Phase57){ & "$PSScriptRoot/run-knowledge-lifecycle.ps1" -Postgres }
+    elseif($Phase4){ & "$PSScriptRoot/run-rag-phase4-postgres.ps1" }
     elseif($Phase3){ & "$PSScriptRoot/run-rag-phase3-postgres.ps1" }
     elseif($Phase24){ & "$PSScriptRoot/run-rag-phase24-e2e.ps1" }
     else { & "$PSScriptRoot/run-rag-postgres-tests.ps1" }

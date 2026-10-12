@@ -36,7 +36,7 @@ public final class RagContextBuilder {
         for(long id:ids) {
             KnowledgeChunkDTO c=find(id);if(!retrieval.current(c))return unavailable();
             text.append(c.content).append('\n');
-        }return text.toString().trim();
+        }RagRequestEvidence.grounded(true);return text.toString().trim();
     }
     private static String unavailable(){return "Dạ em chưa có nguồn còn hiệu lực và thống nhất để xác nhận thông tin này. Anh/chị vui lòng liên hệ tư vấn viên để được kiểm tra trường hợp cụ thể.";}
 }

@@ -18,6 +18,8 @@ public final class KnowledgeChunkDTO {
     public final String title, content, source, documentHash;
     public final double score;
     public final Instant effectiveAt, expiresAt;
+    public long getDocumentId(){return documentId;} public String getTitle(){return title;}
+    public String getContent(){return content;} public String getSource(){return source;} public double getScore(){return score;}
     public KnowledgeChunkDTO(long id,long documentId,long version,String hash,String title,String content,String source,
             Instant effectiveAt,Instant expiresAt,double score) {
         this(id,documentId,version,hash,title,content,source,effectiveAt,expiresAt,score,null);
