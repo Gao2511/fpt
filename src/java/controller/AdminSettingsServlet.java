@@ -51,6 +51,12 @@ public class AdminSettingsServlet extends HttpServlet {
         AIService.ConfigCache consultationConfig = AIService.getConfig();
         settingsMap.put("ai_temperature", Double.toString(consultationConfig.temperature));
         settingsMap.put("ai_max_tokens", Integer.toString(consultationConfig.maxTokens));
+        settingsMap.putIfAbsent("ai_thinking_level", consultationConfig.thinkingLevel != null && !consultationConfig.thinkingLevel.isEmpty() ? consultationConfig.thinkingLevel : AIService.DEFAULT_PRIMARY_THINKING_LEVEL);
+        settingsMap.putIfAbsent("ai_fallback_enabled", consultationConfig.fallbackEnabled ? "true" : "false");
+        settingsMap.putIfAbsent("ai_fallback_provider", consultationConfig.fallbackProvider != null ? consultationConfig.fallbackProvider : "");
+        settingsMap.putIfAbsent("ai_fallback_model", consultationConfig.fallbackModel != null && !consultationConfig.fallbackModel.isEmpty() ? consultationConfig.fallbackModel : AIService.DEFAULT_BACKUP_MODEL);
+        settingsMap.putIfAbsent("ai_fallback_thinking_level", consultationConfig.fallbackThinkingLevel != null && !consultationConfig.fallbackThinkingLevel.isEmpty() ? consultationConfig.fallbackThinkingLevel : AIService.DEFAULT_BACKUP_THINKING_LEVEL);
+        settingsMap.putIfAbsent("ai_fallback_max_tokens", Integer.toString(consultationConfig.fallbackMaxTokens));
         request.setAttribute("settingsMap", settingsMap);
         request.setAttribute("promptRevisions",settingsDAO.revisions("prompt"));
 
@@ -330,9 +336,33 @@ public class AdminSettingsServlet extends HttpServlet {
             double temperature=Double.parseDouble(request.getParameter("ai_temperature"));int tokens=Integer.parseInt(request.getParameter("ai_max_tokens"));
             if(!ProviderRegistry.exists(provider)||model==null||!model.matches("[A-Za-z0-9._:/-]{1,160}")||!Double.isFinite(temperature)||temperature<0||temperature>0.5||tokens<1200||tokens>2400)throw new IllegalArgumentException("Kiểm tra provider, model, temperature và token");
             if(fallback!=null&&!fallback.isEmpty()&&(!ProviderRegistry.exists(fallback)||fallbackModel==null||!fallbackModel.matches("[A-Za-z0-9._:/-]{1,160}")))throw new IllegalArgumentException("Provider dự phòng không hợp lệ");
+            if(fallback!=null&&!fallback.isEmpty()&&provider.equalsIgnoreCase(fallback)&&model.equalsIgnoreCase(fallbackModel))throw new IllegalArgumentException("Model dự phòng không được trùng với Model chính");
+            String thinkingLevel=request.getParameter("ai_thinking_level");
+            if(thinkingLevel!=null&&!thinkingLevel.trim().isEmpty()){
+                thinkingLevel=thinkingLevel.trim().toLowerCase();
+                if(!thinkingLevel.matches("minimal|low|medium|high"))throw new IllegalArgumentException("Thinking level không hợp lệ");
+                if(ai.provider.GeminiProvider.isGemini3Model(model)&&!ai.provider.GeminiProvider.isSupportedThinkingLevel(model,thinkingLevel))throw new IllegalArgumentException("Thinking level không tương thích với model chính");
+            }
+            String fallbackThinkingLevel=request.getParameter("ai_fallback_thinking_level");
+            if(fallbackThinkingLevel!=null&&!fallbackThinkingLevel.trim().isEmpty()){
+                fallbackThinkingLevel=fallbackThinkingLevel.trim().toLowerCase();
+                if(!fallbackThinkingLevel.matches("minimal|low|medium|high"))throw new IllegalArgumentException("Thinking level dự phòng không hợp lệ");
+                if(fallbackModel!=null&&ai.provider.GeminiProvider.isGemini3Model(fallbackModel)&&!ai.provider.GeminiProvider.isSupportedThinkingLevel(fallbackModel,fallbackThinkingLevel))throw new IllegalArgumentException("Thinking level không tương thích với model dự phòng");
+            }
+            String fallbackMaxTokensParam=request.getParameter("ai_fallback_max_tokens");
+            int fallbackTokens=AIService.DEFAULT_BACKUP_MAX_TOKENS;
+            if(fallbackMaxTokensParam!=null&&!fallbackMaxTokensParam.trim().isEmpty()){
+                fallbackTokens=Integer.parseInt(fallbackMaxTokensParam.trim());
+                if(fallbackTokens<1200||fallbackTokens>2400)throw new IllegalArgumentException("Token dự phòng phải từ 1200 đến 2400");
+            }
             String prompt=request.getParameter("ai_system_prompt");if(prompt==null||prompt.length()>12000||prompt.indexOf((char)0)>=0)throw new IllegalArgumentException("Prompt tối đa 12000 ký tự");
             String url=request.getParameter("current_base_url");if(url!=null&&!url.trim().isEmpty())SSRFValidator.validateBaseUrl(url.trim(),SSRFValidator.localAllowed(url.trim()));
             Map<String,String> updates=new java.util.LinkedHashMap<>();updates.put("ai_active_provider",provider);updates.put("ai_active_model",model);updates.put("ai_fallback_provider",fallback==null?"":fallback);updates.put("ai_fallback_model",fallbackModel==null?"":fallbackModel);
+            String fallbackEnabledParam=request.getParameter("ai_fallback_enabled");
+            if(fallbackEnabledParam!=null)updates.put("ai_fallback_enabled",("true".equalsIgnoreCase(fallbackEnabledParam)||"on".equalsIgnoreCase(fallbackEnabledParam))?"true":"false");
+            if(thinkingLevel!=null&&!thinkingLevel.isEmpty())updates.put("ai_thinking_level",thinkingLevel);
+            if(fallbackThinkingLevel!=null&&!fallbackThinkingLevel.isEmpty())updates.put("ai_fallback_thinking_level",fallbackThinkingLevel);
+            if(fallbackMaxTokensParam!=null&&!fallbackMaxTokensParam.trim().isEmpty())updates.put("ai_fallback_max_tokens",Integer.toString(fallbackTokens));
             updates.put("ai_system_prompt",prompt);updates.put("gemini_system_prompt",prompt);updates.put("ai_temperature",Double.toString(temperature));updates.put("gemini_temperature",Double.toString(temperature));updates.put("ai_max_tokens",Integer.toString(tokens));updates.put("gemini_max_tokens",Integer.toString(tokens));updates.put("ai_chatbot_enabled","true".equals(request.getParameter("ai_chatbot_enabled"))||"on".equals(request.getParameter("ai_chatbot_enabled"))?"true":"false");
             if("gemini".equals(provider))updates.put("gemini_model",model);if(url!=null)updates.put("ai_provider_"+provider+"_base_url",url.trim());
             String key=request.getParameter("current_api_key");if(key!=null&&!key.trim().isEmpty()&&!CryptoUtil.isMasked(key)){String encrypted=CryptoUtil.encrypt(key.trim());updates.put("ai_provider_"+provider+"_key",encrypted);if("gemini".equals(provider))updates.put("gemini_api_key",encrypted);}

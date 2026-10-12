@@ -293,6 +293,63 @@
                         </div>
                     </div>
 
+                    <div class="form-group-dark" style="margin-top: 14px;">
+                        <label class="form-label-dark" for="ai_thinking_level">
+                            Mức suy luận Model chính (Gemini 3 Thinking Level)
+                        </label>
+                        <select name="ai_thinking_level" id="ai_thinking_level" class="select-dark">
+                            <option value="low" ${settingsMap['ai_thinking_level'] == 'low' ? 'selected' : ''}>Low (Tốc độ cao)</option>
+                            <option value="medium" ${empty settingsMap['ai_thinking_level'] || settingsMap['ai_thinking_level'] == 'medium' ? 'selected' : ''}>Medium (Khuyên dùng cho Gemini 3.8 Flash)</option>
+                            <option value="high" ${settingsMap['ai_thinking_level'] == 'high' ? 'selected' : ''}>High (Suy luận sâu)</option>
+                        </select>
+                    </div>
+
+                    <!-- 6B. CẤU HÌNH MODEL DỰ PHÒNG AN TOÀN (BACKUP MODEL & SAFE FAILOVER) -->
+                    <div style="margin-top: 16px; padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <div>
+                                <strong style="color:#f8fafc; font-size:13.5px;">Model Dự Phòng An Toàn (Safe Failover)</strong>
+                                <div style="font-size:11.5px; color:#94a3b8;">Chỉ chuyển 1 lần sang model dự phòng khi model chính gặp lỗi tạm thời (429/503/5xx/Timeout). Không tự xoay API Key.</div>
+                            </div>
+                            <select name="ai_fallback_enabled" id="ai_fallback_enabled" class="select-dark" style="width:auto; min-width:130px;">
+                                <option value="false" ${settingsMap['ai_fallback_enabled'] != 'true' ? 'selected' : ''}>Tắt dự phòng</option>
+                                <option value="true" ${settingsMap['ai_fallback_enabled'] == 'true' ? 'selected' : ''}>Bật dự phòng</option>
+                            </select>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div class="form-group-dark" style="margin-bottom:0;">
+                                <label class="form-label-dark" for="ai_fallback_provider">Provider Dự Phòng</label>
+                                <select name="ai_fallback_provider" id="ai_fallback_provider" class="select-dark">
+                                    <option value="" ${empty settingsMap['ai_fallback_provider'] ? 'selected' : ''}>-- Không sử dụng --</option>
+                                    <c:forEach var="p" items="${providers}">
+                                        <option value="${fn:escapeXml(p.id)}" ${settingsMap['ai_fallback_provider'] == p.id ? 'selected' : ''}>${fn:escapeXml(p.displayName)}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                            <div class="form-group-dark" style="margin-bottom:0;">
+                                <label class="form-label-dark" for="ai_fallback_model">Mã Model Dự Phòng</label>
+                                <input type="text" name="ai_fallback_model" id="ai_fallback_model" class="input-dark"
+                                       value="${fn:escapeXml(not empty settingsMap['ai_fallback_model'] ? settingsMap['ai_fallback_model'] : 'gemini-3.5-flash-lite')}"
+                                       placeholder="VD: gemini-3.5-flash-lite">
+                            </div>
+                            <div class="form-group-dark" style="margin-bottom:0;">
+                                <label class="form-label-dark" for="ai_fallback_thinking_level">Thinking Level Dự Phòng</label>
+                                <select name="ai_fallback_thinking_level" id="ai_fallback_thinking_level" class="select-dark">
+                                    <option value="minimal" ${settingsMap['ai_fallback_thinking_level'] == 'minimal' ? 'selected' : ''}>Minimal (Flash-Lite)</option>
+                                    <option value="low" ${empty settingsMap['ai_fallback_thinking_level'] || settingsMap['ai_fallback_thinking_level'] == 'low' ? 'selected' : ''}>Low (Khuyên dùng cho Flash-Lite)</option>
+                                    <option value="medium" ${settingsMap['ai_fallback_thinking_level'] == 'medium' ? 'selected' : ''}>Medium</option>
+                                    <option value="high" ${settingsMap['ai_fallback_thinking_level'] == 'high' ? 'selected' : ''}>High</option>
+                                </select>
+                            </div>
+                            <div class="form-group-dark" style="margin-bottom:0;">
+                                <label class="form-label-dark" for="ai_fallback_max_tokens">Max Tokens Dự Phòng</label>
+                                <input type="number" name="ai_fallback_max_tokens" id="ai_fallback_max_tokens"
+                                       min="1200" max="2400" step="50" class="input-dark"
+                                       value="${fn:escapeXml(not empty settingsMap['ai_fallback_max_tokens'] ? settingsMap['ai_fallback_max_tokens'] : '1200')}">
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- 7. TRẠNG THÁI BẬT/TẮT CHATBOT -->
                     <div class="toggle-card">
                         <div class="toggle-info">

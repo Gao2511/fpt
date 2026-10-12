@@ -3,45 +3,33 @@ package utils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
+/** Environment-only JDBC configuration. Never log credentials or connection URLs. */
 public class DBUtils {
-
-    // ⭐ Supabase PostgreSQL config
-    // - Local (NetBeans): đọc từ ENV nếu có, không thì dùng giá trị mặc định
-    // - Production (Render): set ENV trong dashboard Render
-    private static final String DB_HOST = getEnv("DB_HOST",
-            "aws-0-ap-southeast-1.pooler.supabase.com");
-    private static final String DB_PORT = getEnv("DB_PORT", "5432");
-    private static final String DB_NAME = getEnv("DB_NAME", "postgres");
-    private static final String DB_USER = getEnv("DB_USER",
-            "postgres.dllkuavomoccgnzpemwx");  // ⚠️ 2 chữ "ll"
-    private static final String DB_PASSWORD = getEnv("DB_PASSWORD",
-            "Caoky@2k528");  // ⚠️ Thay password của bạn
-
-    private static String getEnv(String key, String defaultValue) {
-        String value = System.getenv(key);
-        return (value != null && !value.isEmpty()) ? value : defaultValue;
-    }
-
-    public static Connection getConnection()
-            throws ClassNotFoundException, SQLException {
-
-        // ⭐ Load driver PostgreSQL (không phải SQL Server nữa)
+    public static Connection getConnection() throws ClassNotFoundException, SQLException {
         Class.forName("org.postgresql.Driver");
-
-        // ⭐ JDBC URL cho Supabase (Session pooler)
-        // sslmode=require: Supabase yêu cầu SSL
-        String url = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME
-                   + "?sslmode=" + sslMode(DB_HOST, System.getenv("DB_SSLMODE"))
-                   + "&connectTimeout=10"
-                   + "&socketTimeout=30";
-
-        System.out.println("Connecting to PostgreSQL: " + DB_HOST + ":" + DB_PORT + "/" + DB_NAME);
-        return DriverManager.getConnection(url, DB_USER, DB_PASSWORD);
+        String host = required("DB_HOST"), port = required("DB_PORT"), name = required("DB_NAME");
+        if ((!host.matches("[A-Za-z0-9.-]+") && !"::1".equals(host)) || !port.matches("[0-9]{1,5}") ||
+            Integer.parseInt(port)<1 || Integer.parseInt(port)>65535 || !name.matches("[A-Za-z0-9_-]+"))
+            throw new SQLException("Invalid database configuration");
+        Properties p = new Properties();
+        p.setProperty("user", required("DB_USER"));
+        p.setProperty("password", required("DB_PASSWORD"));
+        p.setProperty("sslmode", sslMode(host, System.getenv("DB_SSLMODE")));
+        p.setProperty("connectTimeout", "5");
+        p.setProperty("socketTimeout", "30");
+        String jdbcHost="::1".equals(host)?"[::1]":host;
+        return DriverManager.getConnection("jdbc:postgresql://" + jdbcHost + ":" + port + "/" + name, p);
     }
-
+    private static String required(String name) throws SQLException {
+        String value = System.getenv(name);
+        if (value == null || value.trim().isEmpty()) throw new SQLException("Missing environment variable: " + name);
+        return value;
+    }
     public static String sslMode(String host, String requested) {
-        if (requested == null || requested.isEmpty() || "require".equals(requested)) return "require";
+        if (requested == null || requested.isEmpty() || "require".equals(requested) || "verify-full".equals(requested))
+            return requested == null || requested.isEmpty() ? "require" : requested;
         if ("disable".equals(requested) && ("127.0.0.1".equals(host) || "localhost".equals(host) || "::1".equals(host))) return "disable";
         throw new IllegalArgumentException("DB_SSLMODE=disable is permitted only for a loopback database");
     }

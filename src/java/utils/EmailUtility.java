@@ -33,10 +33,8 @@ public class EmailUtility {
         }
 
         if (apiKey == null || apiKey.trim().isEmpty()) {
-            System.err.println("⚠️ [EmailUtility] RESEND_API_KEY chưa được cấu hình. (Đã ghi log nội dung mail bên dưới)");
-            System.out.println("   📧 To: " + toEmail + " | Subject: " + subject);
-            System.out.println("   📄 Body: " + textBody);
-            return true; // Trả về true để không chặn luồng dev/test
+            System.err.println("[EmailUtility] Mail provider not configured; message not sent");
+            return false;
         }
 
         try {
@@ -80,18 +78,15 @@ public class EmailUtility {
             }
 
             if (statusCode >= 200 && statusCode < 300) {
-                System.out.println("✅ [EmailUtility] Gửi mail thành công đến: " + toEmail);
-                System.out.println("   Response: " + responseStr.toString());
+                System.out.println("[EmailUtility] Message accepted by mail provider");
                 return true;
             } else {
                 System.err.println("❌ [EmailUtility] Gửi mail thất bại (HTTP " + statusCode + ")");
-                System.err.println("   Response: " + responseStr.toString());
                 return false;
             }
 
         } catch (IOException e) {
-            System.err.println("❌ [EmailUtility] Lỗi kết nối: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("[EmailUtility] Mail provider connection failed");
             return false;
         }
     }
@@ -120,9 +115,6 @@ public class EmailUtility {
                         + "  <p style=\"font-size: 12px; color: #94a3b8; text-align: center; margin: 0;\">Đây là email tự động từ hệ thống FPT Telecom. Vui lòng không trả lời email này.</p>"
                         + "</div>";
 
-        System.out.println("====================================================");
-        System.out.println("🔐 [FPT TELECOM OTP] Email: " + toEmail + " | Mã OTP: " + otpCode);
-        System.out.println("====================================================");
 
         return sendEmail(toEmail, subject, textBody, htmlBody);
     }

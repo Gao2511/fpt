@@ -113,6 +113,18 @@
                 <span>Cấu hình AI</span>
             </a>
         </c:if>
+
+        <!-- 9. AI Knowledge Base -->
+        <c:if test="${!demoMode}">
+            <a href="${pageContext.request.contextPath}/admin/knowledge-base"
+               class="${param.activeTab == 'knowledge-base' ? 'active' : ''}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                </svg>
+                <span>AI Knowledge Base</span>
+            </a>
+        </c:if>
     </nav>
 
     <!-- THÔNG TIN TÀI KHOẢN ADMIN BÊN PHẢI -->

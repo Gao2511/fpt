@@ -62,7 +62,7 @@ public class SettingsDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getString("setting_value");
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("SettingsDAO", e); }
         return null;
     }
 
@@ -76,7 +76,7 @@ public class SettingsDAO {
             while (rs.next()) {
                 map.put(rs.getString("setting_key"), rs.getString("setting_value"));
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("SettingsDAO", e); }
         return map;
     }
 
@@ -96,7 +96,7 @@ public class SettingsDAO {
                 s.setUpdatedAt(rs.getTimestamp("updated_at"));
                 list.add(s);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("SettingsDAO", e); }
         return list;
     }
 
@@ -111,7 +111,7 @@ public class SettingsDAO {
             ps.setString(1, key);
             ps.setString(2, value);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("SettingsDAO", e); return false; }
     }
 
     /** Insert hoặc Update (upsert) — PostgreSQL ON CONFLICT */
@@ -128,6 +128,6 @@ public class SettingsDAO {
             ps.setString(2, value);
             ps.setString(3, description);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("SettingsDAO", e); return false; }
     }
 }

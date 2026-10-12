@@ -31,11 +31,21 @@ public class AIService {
     private static long cacheExpiresAt = 0L;
     private static final long CACHE_TTL_MS = 60000L; // 60s
 
+    public static final String DEFAULT_PRIMARY_TEST_MODEL = "gemini-3.8-flash";
+    public static final String DEFAULT_BACKUP_MODEL = "gemini-3.5-flash-lite";
+    public static final String DEFAULT_PRIMARY_THINKING_LEVEL = "medium";
+    public static final String DEFAULT_BACKUP_THINKING_LEVEL = "low";
+    public static final int DEFAULT_BACKUP_MAX_TOKENS = 1200;
+
     public static class ConfigCache {
         public String activeProvider = "gemini";
         public String activeModel = "";
+        public String thinkingLevel = DEFAULT_PRIMARY_THINKING_LEVEL;
+        public boolean fallbackEnabled = false;
         public String fallbackProvider = "";
         public String fallbackModel = "";
+        public String fallbackThinkingLevel = DEFAULT_BACKUP_THINKING_LEVEL;
+        public int fallbackMaxTokens = DEFAULT_BACKUP_MAX_TOKENS;
         public String systemPrompt = "";
         public double temperature = 0.3;
         public int maxTokens = 1200;
@@ -49,6 +59,74 @@ public class AIService {
     public static synchronized void invalidateCache() {
         cachedConfig = null;
         cacheExpiresAt = 0L;
+    }
+
+    public static ConfigCache parseConfig(Map<String, String> sourceMap) {
+        Map<String, String> map = new ConcurrentHashMap<>();
+        if (sourceMap != null) {
+            for (Map.Entry<String, String> entry : sourceMap.entrySet()) {
+                if (entry.getKey() != null && entry.getValue() != null) {
+                    map.put(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        ConfigCache cfg = new ConfigCache();
+        cfg.rawSettings = new ConcurrentHashMap<>(map);
+
+        cfg.activeProvider = map.getOrDefault("ai_active_provider", "gemini").trim();
+        cfg.activeModel = map.getOrDefault("ai_active_model", map.getOrDefault("gemini_model", "")).trim();
+        cfg.thinkingLevel = resolveThinkingLevel(cfg.activeModel, map.get("ai_thinking_level"), DEFAULT_PRIMARY_THINKING_LEVEL);
+
+        cfg.fallbackProvider = map.getOrDefault("ai_fallback_provider", "").trim();
+        cfg.fallbackModel = map.getOrDefault("ai_fallback_model", "").trim();
+        if (map.containsKey("ai_fallback_enabled")) {
+            String fbFlag = map.get("ai_fallback_enabled").trim();
+            cfg.fallbackEnabled = !"false".equalsIgnoreCase(fbFlag) && !"0".equals(fbFlag) && !fbFlag.isEmpty();
+        } else {
+            cfg.fallbackEnabled = !cfg.fallbackProvider.isEmpty() && !cfg.fallbackModel.isEmpty();
+        }
+        if (cfg.fallbackEnabled && "gemini".equalsIgnoreCase(cfg.fallbackProvider) && cfg.fallbackModel.isEmpty()) {
+            cfg.fallbackModel = DEFAULT_BACKUP_MODEL;
+        }
+        cfg.fallbackThinkingLevel = resolveThinkingLevel(cfg.fallbackModel, map.get("ai_fallback_thinking_level"), DEFAULT_BACKUP_THINKING_LEVEL);
+
+        try {
+            cfg.fallbackMaxTokens = Integer.parseInt(map.getOrDefault("ai_fallback_max_tokens", String.valueOf(DEFAULT_BACKUP_MAX_TOKENS)).trim());
+        } catch (Exception e) { cfg.fallbackMaxTokens = DEFAULT_BACKUP_MAX_TOKENS; }
+        cfg.fallbackMaxTokens = Math.max(1200, Math.min(2400, cfg.fallbackMaxTokens));
+
+        cfg.systemPrompt = ai.consultation.ConsultationPrompt.resolve(map);
+
+        try {
+            cfg.temperature = Double.parseDouble(map.getOrDefault("ai_temperature",
+                    map.getOrDefault("gemini_temperature", "0.3")));
+        } catch (Exception e) { cfg.temperature = 0.3; }
+        if (!Double.isFinite(cfg.temperature)) cfg.temperature = 0.3;
+        cfg.temperature = Math.max(0, Math.min(0.5, cfg.temperature));
+
+        try {
+            cfg.maxTokens = Integer.parseInt(map.getOrDefault("ai_max_tokens",
+                    map.getOrDefault("gemini_max_tokens", "1200")));
+        } catch (Exception e) { cfg.maxTokens = 1200; }
+        cfg.maxTokens = Math.max(1200, Math.min(2400, cfg.maxTokens));
+
+        String enabledStr = map.getOrDefault("ai_chatbot_enabled", "true");
+        cfg.chatbotEnabled = !"false".equalsIgnoreCase(enabledStr);
+        return cfg;
+    }
+
+    public static String resolveThinkingLevel(String model, String configuredLevel, String defaultGemini3Level) {
+        if (!ai.provider.GeminiProvider.isGemini3Model(model)) {
+            return "";
+        }
+        String fallbackLevel = (defaultGemini3Level != null && !defaultGemini3Level.trim().isEmpty())
+                ? defaultGemini3Level.trim().toLowerCase(java.util.Locale.ROOT)
+                : DEFAULT_PRIMARY_THINKING_LEVEL;
+        String candidate = (configuredLevel != null && !configuredLevel.trim().isEmpty())
+                ? configuredLevel.trim().toLowerCase(java.util.Locale.ROOT)
+                : fallbackLevel;
+        String normalized = ai.provider.GeminiProvider.normalizeThinkingLevel(model, candidate);
+        return normalized != null ? normalized : fallbackLevel;
     }
 
     /**
@@ -69,31 +147,7 @@ public class AIService {
             // Reading configuration must not migrate/write production settings.
 
             Map<String, String> map = settingsDAO.getAllAsMap();
-            map.entrySet().removeIf(entry -> entry.getValue() == null);
-            ConfigCache cfg = new ConfigCache();
-            cfg.rawSettings = new ConcurrentHashMap<>(map);
-
-            cfg.activeProvider = map.getOrDefault("ai_active_provider", "gemini");
-            cfg.activeModel = map.getOrDefault("ai_active_model", map.getOrDefault("gemini_model", ""));
-            cfg.fallbackProvider = map.getOrDefault("ai_fallback_provider", "");
-            cfg.fallbackModel = map.getOrDefault("ai_fallback_model", "");
-            cfg.systemPrompt = ai.consultation.ConsultationPrompt.resolve(map);
-
-            try {
-                cfg.temperature = Double.parseDouble(map.getOrDefault("ai_temperature",
-                        map.getOrDefault("gemini_temperature", "0.3")));
-            } catch (Exception e) { cfg.temperature = 0.3; }
-            if (!Double.isFinite(cfg.temperature)) cfg.temperature = 0.3;
-            cfg.temperature = Math.max(0, Math.min(0.5, cfg.temperature));
-
-            try {
-                cfg.maxTokens = Integer.parseInt(map.getOrDefault("ai_max_tokens",
-                        map.getOrDefault("gemini_max_tokens", "1200")));
-            } catch (Exception e) { cfg.maxTokens = 1200; }
-            cfg.maxTokens = Math.max(1200, Math.min(2400, cfg.maxTokens));
-
-            String enabledStr = map.getOrDefault("ai_chatbot_enabled", "true");
-            cfg.chatbotEnabled = !"false".equalsIgnoreCase(enabledStr);
+            ConfigCache cfg = parseConfig(map);
 
             cachedConfig = cfg;
             cacheExpiresAt = now + CACHE_TTL_MS;
@@ -163,24 +217,58 @@ public class AIService {
     }
 
     public static ChatResponse askAI(String question, String sessionId) throws AIException {
+        if(rag.runtime.GeminiRuntimeConfig.requested(System.getenv())){
+            try{
+                rag.runtime.GeminiRuntime runtime=rag.runtime.GeminiRuntime.local();
+                ConfigCache local=getConfig();
+                if(!local.chatbotEnabled||!"gemini".equals(local.activeProvider)||!"gemini-3.8-flash".equals(local.activeModel)||!"medium".equals(local.thinkingLevel)||
+                    (runtime.config.backupEnabled&&(!local.fallbackEnabled||!"gemini".equals(local.fallbackProvider)||!"gemini-3.5-flash-lite".equals(local.fallbackModel)||!"low".equals(local.fallbackThinkingLevel))))throw new IllegalArgumentException();
+                return runtime.chat(question,ai.session.ChatSessionManager.getOrCreate(sessionId),cms.SiteContent.publicCatalog(),local.systemPrompt);
+            }catch(AIException e){throw e;}catch(Exception e){throw new AIException(AIException.ErrorType.INVALID_REQUEST,"Gemini local chưa được cấu hình/phê duyệt đầy đủ. Kiểm tra môi trường test và kế hoạch riêng.","System");}
+        }
         ConfigCache cfg = getConfig();
         if (!cfg.chatbotEnabled) throw new AIException(AIException.ErrorType.SERVER_ERROR,
             "Chatbot đang bảo trì. Anh/chị có thể gửi biểu mẫu tư vấn trên trang.", "System");
         ai.consultation.ProductCatalog catalog = cms.SiteContent.publicCatalog();
-        ai.consultation.ConsultationEngine.Target primary = target(cfg, cfg.activeProvider, cfg.activeModel);
-        ai.consultation.ConsultationEngine.Target fallback = target(cfg, cfg.fallbackProvider, cfg.fallbackModel);
-        if (primary != null && fallback != null && primary.provider.getId().equals(fallback.provider.getId()) && primary.model.equals(fallback.model)) fallback = null;
+        ai.consultation.ConsultationEngine.Target primary = buildPrimaryTarget(cfg);
+        ai.consultation.ConsultationEngine.Target fallback = buildFallbackTarget(cfg);
         ChatOptions options = new ChatOptions(cfg.temperature, cfg.maxTokens);
-        return new ai.consultation.ConsultationEngine().chat(question,
+        options.setThinkingLevel(cfg.thinkingLevel);
+        return new ai.consultation.ConsultationEngine(rag.KnowledgeRetrievalService.disabled()).chat(question,
             ai.session.ChatSessionManager.getOrCreate(sessionId), catalog, primary, fallback, options, cfg.systemPrompt);
     }
 
-    private static ai.consultation.ConsultationEngine.Target target(ConfigCache cfg, String providerId, String model) {
+    public static ai.consultation.ConsultationEngine.Target buildPrimaryTarget(ConfigCache cfg) {
+        if (cfg == null) return null;
+        return target(cfg, cfg.activeProvider, cfg.activeModel, cfg.thinkingLevel, cfg.maxTokens);
+    }
+
+    public static ai.consultation.ConsultationEngine.Target buildFallbackTarget(ConfigCache cfg) {
+        if (cfg == null || !cfg.fallbackEnabled) return null;
+        ai.consultation.ConsultationEngine.Target primary = buildPrimaryTarget(cfg);
+        ai.consultation.ConsultationEngine.Target fallback = target(
+                cfg, cfg.fallbackProvider, cfg.fallbackModel, cfg.fallbackThinkingLevel, cfg.fallbackMaxTokens);
+        if (fallback == null || !fallback.usable()) return null;
+        if (primary != null && ai.consultation.ConsultationEngine.isSameModelTarget(primary, fallback)) return null;
+        if (primary != null && ai.consultation.ConsultationEngine.isKeyRotationAttempt(primary, fallback)) return null;
+        return fallback;
+    }
+
+    private static ai.consultation.ConsultationEngine.Target target(
+            ConfigCache cfg, String providerId, String model, String thinkingLevel, int maxTokens) {
         LLMProvider provider = ProviderRegistry.get(providerId);
         if (provider == null || model == null || model.trim().isEmpty()) return null;
+        // Same provider always uses the single configured provider API key; automatic key/project rotation is forbidden.
         String key = cfg.rawSettings.get("ai_provider_" + provider.getId() + "_key");
         if ((key == null || key.isEmpty()) && "gemini".equals(provider.getId())) key = cfg.rawSettings.get("gemini_api_key");
-        return new ai.consultation.ConsultationEngine.Target(provider, CryptoUtil.decrypt(key), model.trim(), cfg.rawSettings.get("ai_provider_" + provider.getId() + "_base_url"));
+        String decrypted = (key != null && !key.isEmpty()) ? CryptoUtil.decrypt(key) : "";
+        return new ai.consultation.ConsultationEngine.Target(
+                provider,
+                decrypted,
+                model.trim(),
+                cfg.rawSettings.get("ai_provider_" + provider.getId() + "_base_url"),
+                thinkingLevel,
+                maxTokens);
     }
     public static String applyOutputGuardrails(String rawReply, String activeApiKey) {
         if (rawReply == null) return "";

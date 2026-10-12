@@ -94,7 +94,7 @@ public class MultiProviderTest {
     }
 
     private static void testCryptoAesGcm() {
-        String originalKey = "sk-proj-abc123xyz890secretkey987654321";
+        String originalKey = "sk-proj-FAKE_TEST_KEY_1234567890";
         String encrypted = CryptoUtil.encrypt(originalKey);
 
         if (!encrypted.startsWith("enc:gcm:")) {
@@ -114,7 +114,7 @@ public class MultiProviderTest {
     }
 
     private static void testKeyMaskingAndLogFilter() {
-        String testKey = "sk-1234567890abcdef123456";
+        String testKey = "sk-1_FAKE_TEST_KEY_123456";
         String masked = CryptoUtil.maskApiKey(testKey);
 
         if (!CryptoUtil.isMasked(masked)) {
@@ -125,9 +125,9 @@ public class MultiProviderTest {
         }
 
         // Test sanitize log
-        String logLine = "Connecting to https://api.openai.com with Bearer sk-1234567890abcdef123456 & api_key=AIzaSyAABBCCDD";
+        String logLine = "Connecting to https://api.openai.com with Bearer sk-1_FAKE_TEST_KEY_123456 & api_key=AIzaSyAABBCCDD";
         String sanitized = CryptoUtil.sanitizeForLog(logLine);
-        if (sanitized.contains("sk-1234567890abcdef123456") || sanitized.contains("AIzaSyAABBCCDD")) {
+        if (sanitized.contains("sk-1_FAKE_TEST_KEY_123456") || sanitized.contains("AIzaSyAABBCCDD")) {
             throw new AssertionError("Log còn chứa API Key: " + sanitized);
         }
     }
@@ -152,11 +152,16 @@ public class MultiProviderTest {
         if (!blockedMetadata) throw new AssertionError("Không chặn Cloud Metadata 169.254.169.254!");
 
         // 3. Phải cho phép URL hợp lệ
-        SSRFValidator.validateBaseUrl("https://api.openai.com/v1", false);
-        SSRFValidator.validateBaseUrl("https://api.deepseek.com", false);
+        // Documentation IP literals avoid external DNS dependency in an offline suite.
+        SSRFValidator.validateBaseUrl("https://203.0.113.10/v1", false);
+        SSRFValidator.validateBaseUrl("https://198.51.100.10", false);
 
-        // 4. Cho phép local khi bật cờ allowLocal
-        SSRFValidator.validateBaseUrl("http://localhost:11434/v1", true);
+        // Local access needs an exact server allowlist, not merely a caller boolean.
+        try { SSRFValidator.validateBaseUrl("http://localhost:11434/v1", true); throw new AssertionError("Unconfigured local URL accepted"); }
+        catch (IllegalArgumentException expected) {}
+        System.setProperty("AI_LOCAL_BASE_URL", "http://localhost:11434/v1");
+        try { SSRFValidator.validateBaseUrl("http://localhost:11434/v1", true); }
+        finally { System.clearProperty("AI_LOCAL_BASE_URL"); }
     }
 
     private static void testErrorNormalization() {
@@ -178,7 +183,7 @@ public class MultiProviderTest {
     }
 
     private static void testOutputGuardrails() {
-        String rawKey = "AIzaSyD-SecretKeyGoogleGemini987654";
+        String rawKey = "AIzaSy_FAKE_TEST_GEMINI_KEY_1234567890";
         String aiReplyWithKey = "Chào anh, API key của em là " + rawKey + ", anh có muốn mua gói Sky không?";
         String filtered = AIService.applyOutputGuardrails(aiReplyWithKey, rawKey);
 

@@ -11,8 +11,12 @@ public final class ConsultationReply {
     public String message, intent, action;
     public Integer recommendedPackageId;
     public final List<Integer> packageIds = new ArrayList<>();
+    public final List<Long> knowledgeChunkIds = new ArrayList<>();
 
     public static ConsultationReply parse(ChatResponse response, ProductCatalog catalog, String apiKey) throws Exception {
+        return parse(response, catalog, apiKey, null);
+    }
+    public static ConsultationReply parse(ChatResponse response, ProductCatalog catalog, String apiKey, rag.RagContextBuilder context) throws Exception {
         if (response == null || !Arrays.asList("stop", "STOP", "end_turn").contains(response.getFinishReason())) throw new IllegalArgumentException("Incomplete response");
         String raw = response.getContent();
         if (raw == null || raw.length() > 16000) throw new IllegalArgumentException("Invalid size");
@@ -39,17 +43,32 @@ public final class ConsultationReply {
                             reply.packageIds.add(id);
                         }
                         r.endArray(); break;
+                    case "knowledgeChunkIds":
+                        if (context == null || context.empty()) throw new IllegalArgumentException("Unexpected sources");
+                        r.beginArray();
+                        while (r.hasNext()) {
+                            if (r.peek() != JsonToken.NUMBER || reply.knowledgeChunkIds.size() >= 3) throw new IllegalArgumentException("Invalid sources");
+                            String value = r.nextString();
+                            if (!value.matches("[1-9][0-9]{0,17}")) throw new IllegalArgumentException("Invalid source ID");
+                            reply.knowledgeChunkIds.add(Long.parseLong(value));
+                        }
+                        r.endArray(); break;
                     default: throw new IllegalArgumentException("Unknown field");
                 }
             }
             r.endObject();
-            if (r.peek() != JsonToken.END_DOCUMENT || fields.size() != 5) throw new IllegalArgumentException("Invalid envelope");
+            if (r.peek() != JsonToken.END_DOCUMENT || fields.size() != (context == null || context.empty() ? 5 : 6)) throw new IllegalArgumentException("Invalid envelope");
         }
         if (!Arrays.asList("consultation", "comparison", "registration", "out_of_scope").contains(reply.intent) ||
             !Arrays.asList("none", "open_registration").contains(reply.action)) throw new IllegalArgumentException("Invalid enum");
         if ("open_registration".equals(reply.action) && (!"registration".equals(reply.intent) || reply.recommendedPackageId == null)) throw new IllegalArgumentException("Invalid action");
         if ("out_of_scope".equals(reply.intent) && (!reply.packageIds.isEmpty() || reply.recommendedPackageId != null || !"none".equals(reply.action))) throw new IllegalArgumentException("Invalid scope");
         validateMessage(reply.message, apiKey);
+        if (context != null && !context.empty()) {
+            context.validateIds(reply.knowledgeChunkIds);
+            if (!"consultation".equals(reply.intent) || !"none".equals(reply.action) || reply.recommendedPackageId != null || !reply.packageIds.isEmpty())
+                throw new IllegalArgumentException("Knowledge response cannot change business decisions");
+        }
         return reply;
     }
     private static String string(JsonReader r) throws Exception {

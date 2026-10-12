@@ -22,7 +22,7 @@ public class CryptoUtil {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     // Khóa mã hóa 256-bit được dẫn xuất từ biến môi trường
-    private static final SecretKey SECRET_KEY = initSecretKey();
+    private static SecretKey secretKey() { return initSecretKey(); }
 
     private static SecretKey initSecretKey() {
         try {
@@ -31,10 +31,12 @@ public class CryptoUtil {
                 envKey = System.getProperty("AI_ENCRYPTION_KEY");
             }
 
-            // Fallback an toàn có salt ứng dụng nếu môi trường chưa cấu hình biến
-            String rawSecret = (envKey != null && !envKey.trim().isEmpty())
-                    ? envKey.trim()
-                    : "FPT_TELECOM_SECURE_VAULT_KEY_v2026_@_GIA_LAI_TELECOM";
+            // Supply the SAME effective key used by existing ciphertexts.
+            // No generated/default key and no automatic re-encryption or rotation.
+            if (envKey == null || envKey.trim().isEmpty()) {
+                throw new IllegalStateException("AI_ENCRYPTION_KEY must be configured before encrypted settings are used");
+            }
+            String rawSecret = envKey.trim();
 
             // Băm SHA-256 để luôn tạo đúng 32 bytes (256 bits)
             MessageDigest sha = MessageDigest.getInstance("SHA-256");
@@ -58,7 +60,7 @@ public class CryptoUtil {
 
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             GCMParameterSpec spec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
-            cipher.init(Cipher.ENCRYPT_MODE, SECRET_KEY, spec);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey(), spec);
 
             byte[] cipherBytes = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
 
@@ -69,8 +71,7 @@ public class CryptoUtil {
 
             return "enc:gcm:" + Base64.getEncoder().encodeToString(combined);
         } catch (Exception e) {
-            System.err.println("⚠️ [CryptoUtil] Lỗi mã hóa: " + e.getMessage());
-            return plainText; // Fallback an toàn
+            throw new IllegalStateException("API key encryption failed; configuration was not saved");
         }
     }
 
@@ -99,12 +100,12 @@ public class CryptoUtil {
 
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             GCMParameterSpec spec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
-            cipher.init(Cipher.DECRYPT_MODE, SECRET_KEY, spec);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey(), spec);
 
             byte[] plainBytes = cipher.doFinal(cipherBytes);
             return new String(plainBytes, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            System.err.println("⚠️ [CryptoUtil] Lỗi giải mã: " + e.getMessage());
+            System.err.println("[CryptoUtil] Encrypted setting unavailable; check key configuration");
             return "";
         }
     }

@@ -38,7 +38,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapResultSet(rs);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return null;
     }
 
@@ -70,7 +70,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapResultSet(rs);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return null;
     }
 
@@ -87,7 +87,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapResultSet(rs);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return null;
     }
 
@@ -103,7 +103,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapResultSet(rs);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return null;
     }
 
@@ -119,7 +119,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapResultSet(rs);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return null;
     }
 
@@ -134,7 +134,7 @@ public class UserDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) list.add(mapResultSet(rs));
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return list;
     }
 
@@ -152,7 +152,7 @@ public class UserDAO {
             ps.setString(3, role);
             ps.setBoolean(4, u.isActive());
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); return false; }
     }
 
     public boolean changePassword(int userId, String newPassword) {
@@ -162,7 +162,7 @@ public class UserDAO {
             ps.setString(1, security.Passwords.hash(newPassword));
             ps.setInt(2, userId);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); return false; }
     }
 
     public boolean delete(int id) {
@@ -171,7 +171,7 @@ public class UserDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); return false; }
     }
 
     // =========================================================
@@ -194,7 +194,7 @@ public class UserDAO {
             ps.setString(5, fullName);
             ps.setInt(6, userId);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); return false; }
     }
 
     public boolean checkPassword(int userId, String currentPassword) {
@@ -246,7 +246,7 @@ public class UserDAO {
                     if (rs.next()) return rs.getInt(1);
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return -1;
     }
 
@@ -279,7 +279,7 @@ public class UserDAO {
                     if (rs.next()) return rs.getInt(1);
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return -1;
     }
 
@@ -317,7 +317,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) list.add(mapResultSet(rs));
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return list;
     }
 
@@ -341,7 +341,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getInt(1);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return 0;
     }
 
@@ -351,7 +351,7 @@ public class UserDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); return false; }
     }
 
     public boolean unlockAccount(int userId) {
@@ -360,7 +360,7 @@ public class UserDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); return false; }
     }
 
     public int countActive() {
@@ -369,7 +369,7 @@ public class UserDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) return rs.getInt(1);
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return 0;
     }
 
@@ -379,7 +379,7 @@ public class UserDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) return rs.getInt(1);
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return 0;
     }
 
@@ -389,7 +389,7 @@ public class UserDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) return rs.getInt(1);
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return 0;
     }
 
@@ -412,7 +412,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapResultSet(rs);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return null;
     }
 
@@ -423,7 +423,7 @@ public class UserDAO {
                  "DELETE FROM password_reset_token WHERE user_id = ?")) {
             ps.setInt(1, userId);
             ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
 
         // Thêm token mới
         String sql = "INSERT INTO password_reset_token "
@@ -435,7 +435,7 @@ public class UserDAO {
             ps.setString(2, token);
             ps.setTimestamp(3, expiresAt);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); return false; }
     }
 
     public UserDTO findByValidToken(String token) {
@@ -452,7 +452,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapResultSet(rs);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return null;
     }
 
@@ -472,7 +472,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapResultSet(rs);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return null;
     }
 
@@ -482,7 +482,7 @@ public class UserDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, token);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); return false; }
     }
 
     // =========================================================
@@ -500,7 +500,7 @@ public class UserDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapResultSet(rs);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return null;
     }
 
@@ -518,7 +518,7 @@ public class UserDAO {
             }
             ps.setInt(3, userId);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); return false; }
     }
 
     public int insertGoogleUser(UserDTO user) {
@@ -545,7 +545,7 @@ public class UserDAO {
                     if (rs.next()) return rs.getInt(1);
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return -1;
     }
 
@@ -564,7 +564,7 @@ public class UserDAO {
                         || (googleId != null && !googleId.isEmpty() && (password == null || password.isEmpty()));
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("UserDAO", e); }
         return false;
     }
 }

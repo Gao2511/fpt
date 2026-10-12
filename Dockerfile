@@ -11,6 +11,7 @@ RUN echo 'org.apache.catalina.startup.ContextConfig.jarsToSkip=*.jar' >> /usr/lo
 EXPOSE 8080
 
 ENV PORT=8080
+ENV RAG_ENABLED=false RAG_RUNTIME_MODE=OFFLINE_MOCK RAG_EMBEDDING_CALLS_APPROVED=false RAG_LOCAL_GEMINI_AUTHORIZED=false
 ENV CATALINA_OPTS="-Dserver.port=${PORT}"
 
 CMD ["catalina.sh", "run"]

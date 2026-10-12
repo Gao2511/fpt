@@ -44,7 +44,7 @@ public final class CustomerRequirements implements Serializable {
         else if (q.contains("game") || q.contains("gaming")) gaming = true;
         if (q.contains("sinh vien")) student = true;
         // A question about a benefit does not establish a purchase requirement.
-        boolean asking = q.contains("?") || q.matches("(?s).*\\b(?:khong|ko|hong|khum)\\s*[.!]*$");
+        boolean asking = q.contains("?") || q.matches("(?s).*\\b(?:khong|ko|hong|khum)\\s*[.!]*$") || q.contains("thi sao") || q.matches("(?s).*camera sao.*");
         if (q.matches("(?s).*(?:khong can|khong muon|bo|khong xem)\\s+camera.*")) { camera = false; cameraKnown = true; requirementsChanged = true; }
         else if (!asking && q.contains("camera")) { camera = true; cameraKnown = true; requirementsChanged = true; }
         if (q.matches("(?s).*(?:khong can|khong muon|bo|khong xem)\\s+(?:truyen hinh|tivi).*")) { television = false; televisionKnown = true; requirementsChanged = true; }

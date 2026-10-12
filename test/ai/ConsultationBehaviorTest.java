@@ -28,12 +28,14 @@ public class ConsultationBehaviorTest {
         public int calls;
         public final Queue<Object> outputs = new ArrayDeque<>();
         public List<ChatMessage> lastMessages;
+        public ChatOptions lastOptions;
+        public String lastModel;
         public CountDownLatch entered, release;
         public String getId(){return "mock";} public String getDisplayName(){return "Mock";} public String getDefaultBaseUrl(){return "";}
         public List<ModelInfo> listModels(String key,String url){return Collections.emptyList();}
         public List<ModelInfo> getPresetModels(){return Collections.emptyList();}
         public synchronized ChatResponse chat(List<ChatMessage> messages,String key,String model,String url,ChatOptions options) throws AIException {
-            calls++; lastMessages = new ArrayList<>(messages);
+            calls++; lastMessages = new ArrayList<>(messages); lastOptions = options; lastModel = model;
             if (entered != null) { entered.countDown(); try { release.await(5,TimeUnit.SECONDS); } catch (InterruptedException e) { Thread.currentThread().interrupt(); } }
             Object output = outputs.poll(); if (output instanceof AIException) throw (AIException)output;
             return output instanceof ChatResponse ? (ChatResponse)output : envelope("Em có thể hỗ trợ tư vấn Internet cho anh/chị. Anh/chị muốn tìm hiểu điều gì?");
@@ -182,6 +184,89 @@ public class ConsultationBehaviorTest {
             ChatResponse r = ask("Nhà anh 3 tầng dùng F1 được không?", new ChatSessionData("mesh-f2"), new MockProvider(), null);
             String c = r.getContent();
             check(c.contains("F2") && c.contains("700.000") && c.contains("20.000") && !c.contains("200.000") && !c.contains("tham khảo") && c.contains("Access Point"), "Must recommend F2 for 3 floors with +20.000d/thang: " + c);
+        });
+        test("primary gemini-3.8-flash and backup gemini-3.5-flash-lite have independent thinkingLevel and maxTokens",()->{
+            MockProvider p = new MockProvider(), b = new MockProvider();
+            p.outputs.add(new AIException(AIException.ErrorType.QUOTA_EXCEEDED, "429 quota", "Gemini"));
+            ChatResponse okBackup = raw("{\"message\":\"Em chào anh/chị. Em sẵn sàng hỗ trợ tư vấn Internet FPT.\",\"intent\":\"consultation\",\"recommendedPackageId\":null,\"packageIds\":[],\"action\":\"none\"}", "STOP");
+            okBackup.setModel("gemini-3.5-flash-lite");
+            okBackup.setPromptTokens(320); okBackup.setCompletionTokens(45); okBackup.setThoughtsTokens(18); okBackup.setTotalTokens(383);
+            b.outputs.add(okBackup);
+            ConsultationEngine.Target primary = new ConsultationEngine.Target(p, "same-test-key", "gemini-3.8-flash", "", "medium", 1600);
+            ConsultationEngine.Target backup = new ConsultationEngine.Target(b, "same-test-key", "gemini-3.5-flash-lite", "", "low", 1200);
+            ChatResponse r = new ConsultationEngine().chat("Bạn hỗ trợ được những gì vậy?", new ChatSessionData("indep-targets"), CATALOG, primary, backup, new ChatOptions(0.3, 1600));
+            check(p.calls == 1 && b.calls == 1, "Expected 1 call each to primary and backup");
+            check("gemini-3.8-flash".equals(p.lastModel) && "medium".equals(p.lastOptions.getThinkingLevel()) && p.lastOptions.getMaxTokens() == 1600, "Primary options mismatch");
+            check("gemini-3.5-flash-lite".equals(b.lastModel) && "low".equals(b.lastOptions.getThinkingLevel()) && b.lastOptions.getMaxTokens() == 1200, "Backup options mismatch");
+            check(r.isUsedFallbackModel() && "QUOTA_EXCEEDED".equals(r.getFallbackReason()) && r.getRequestAttempts() == 2 && r.getThoughtsTokens() == 18, "Failover telemetry mismatch");
+        });
+        test("ineligible errors (INVALID_KEY, MODEL_NOT_FOUND, INVALID_REQUEST) do not trigger backup failover",()->{
+            for (AIException.ErrorType ineligible : Arrays.asList(AIException.ErrorType.INVALID_KEY, AIException.ErrorType.MODEL_NOT_FOUND, AIException.ErrorType.INVALID_REQUEST)) {
+                MockProvider p = new MockProvider(), b = new MockProvider();
+                p.outputs.add(new AIException(ineligible, "Non-retryable error", "Gemini"));
+                ConsultationEngine.Target primary = new ConsultationEngine.Target(p, "same-test-key", "gemini-3.8-flash", "", "medium", 1600);
+                ConsultationEngine.Target backup = new ConsultationEngine.Target(b, "same-test-key", "gemini-3.5-flash-lite", "", "low", 1200);
+                ChatResponse r = new ConsultationEngine().chat("Bạn hỗ trợ được những gì vậy?", new ChatSessionData("ineligible-" + ineligible), CATALOG, primary, backup, new ChatOptions(0.3, 1200));
+                check(p.calls == 1 && b.calls == 0 && r.getRequestAttempts() == 1 && "safe-fallback".equals(r.getProvider()) && ineligible.name().equals(r.getFallbackReason()), "Ineligible error must not call backup: " + ineligible);
+            }
+        });
+        test("no retry loop or model bouncing when both primary and backup fail",()->{
+            MockProvider p = new MockProvider(), b = new MockProvider();
+            p.outputs.add(new AIException(AIException.ErrorType.HIGH_DEMAND, "503 primary overloaded", "Gemini"));
+            b.outputs.add(new AIException(AIException.ErrorType.QUOTA_EXCEEDED, "429 backup quota", "Gemini"));
+            ConsultationEngine.Target primary = new ConsultationEngine.Target(p, "same-test-key", "gemini-3.8-flash", "", "medium", 1600);
+            ConsultationEngine.Target backup = new ConsultationEngine.Target(b, "same-test-key", "gemini-3.5-flash-lite", "", "low", 1200);
+            ChatResponse r = new ConsultationEngine().chat("Bạn hỗ trợ được những gì vậy?", new ChatSessionData("both-fail"), CATALOG, primary, backup, new ChatOptions(0.3, 1200));
+            check(p.calls == 1 && b.calls == 1 && r.getRequestAttempts() == 2, "Must not retry backup or bounce back to primary");
+            check("safe-fallback".equals(r.getProvider()) && r.isUsedFallbackModel() && "HIGH_DEMAND->QUOTA_EXCEEDED".equals(r.getFallbackReason()) && r.getContent().contains("0932 079 469"), "Safe customer fallback mismatch");
+        });
+        test("cross-key rotation on same provider and self-fallback on same model are blocked",()->{
+            MockProvider p = new MockProvider(), b = new MockProvider();
+            p.outputs.add(new AIException(AIException.ErrorType.QUOTA_EXCEEDED, "429 quota", "Gemini"));
+            ConsultationEngine.Target primaryKey1 = new ConsultationEngine.Target(p, "key-project-alpha", "gemini-3.8-flash", "", "medium", 1600);
+            ConsultationEngine.Target backupKey2 = new ConsultationEngine.Target(b, "key-project-beta", "gemini-3.5-flash-lite", "", "low", 1200);
+            check(ConsultationEngine.isKeyRotationAttempt(primaryKey1, backupKey2) && !ConsultationEngine.isFallbackEligible(new AIException(AIException.ErrorType.QUOTA_EXCEEDED, "429", "Gemini"), primaryKey1, backupKey2), "Key rotation must be detected");
+            ChatResponse r = new ConsultationEngine().chat("Bạn hỗ trợ được những gì vậy?", new ChatSessionData("key-rot"), CATALOG, primaryKey1, backupKey2, new ChatOptions(0.3, 1200));
+            check(p.calls == 1 && b.calls == 0 && "KEY_ROTATION_BLOCKED".equals(r.getFallbackReason()), "Cross-key rotation on same provider must be blocked");
+
+            MockProvider sameP = new MockProvider();
+            sameP.outputs.add(new AIException(AIException.ErrorType.QUOTA_EXCEEDED, "429 quota", "Gemini"));
+            ConsultationEngine.Target same1 = new ConsultationEngine.Target(sameP, "same-key", "gemini-3.8-flash", "", "medium", 1600);
+            ConsultationEngine.Target same2 = new ConsultationEngine.Target(sameP, "same-key", "gemini-3.8-flash", "", "low", 1200);
+            check(ConsultationEngine.isSameModelTarget(same1, same2), "Same model on same provider must be detected");
+            ChatResponse r2 = new ConsultationEngine().chat("Bạn hỗ trợ được những gì vậy?", new ChatSessionData("same-model"), CATALOG, same1, same2, new ChatOptions(0.3, 1200));
+            check(sameP.calls == 1 && "safe-fallback".equals(r2.getProvider()), "Self-fallback on same model must be blocked");
+        });
+        test("admin config toggle ai_fallback_enabled controls backup target creation without breaking primary",()->{
+            Map<String, String> map = new HashMap<>();
+            map.put("ai_active_provider", "gemini");
+            map.put("ai_active_model", "gemini-3.8-flash");
+            map.put("ai_thinking_level", "medium");
+            map.put("ai_max_tokens", "1600");
+            map.put("ai_fallback_enabled", "false");
+            map.put("ai_fallback_provider", "gemini");
+            map.put("ai_fallback_model", "gemini-3.5-flash-lite");
+            map.put("ai_fallback_thinking_level", "low");
+            map.put("ai_fallback_max_tokens", "1200");
+            AIService.ConfigCache disabledCfg = AIService.parseConfig(map);
+            check(!disabledCfg.fallbackEnabled && AIService.buildFallbackTarget(disabledCfg) == null, "Fallback must be null when ai_fallback_enabled=false");
+            ConsultationEngine.Target primary = AIService.buildPrimaryTarget(disabledCfg);
+            check(primary != null && "gemini-3.8-flash".equals(primary.model) && "medium".equals(primary.thinkingLevel) && primary.maxTokens == 1600, "Primary target broken");
+
+            map.put("ai_fallback_enabled", "true");
+            AIService.ConfigCache enabledCfg = AIService.parseConfig(map);
+            ConsultationEngine.Target backup = AIService.buildFallbackTarget(enabledCfg);
+            check(enabledCfg.fallbackEnabled && backup != null && "gemini-3.5-flash-lite".equals(backup.model) && "low".equals(backup.thinkingLevel) && backup.maxTokens == 1200, "Backup target mismatch when enabled");
+        });
+        test("backup model strictly enforces ConsultationPolicy, ProductCatalog authority and RAG source validation",()->{
+            MockProvider p = new MockProvider(), b = new MockProvider();
+            p.outputs.add(new AIException(AIException.ErrorType.HIGH_DEMAND, "503 overloaded", "Gemini"));
+            // Backup tries to claim free installation (policy violation) -> must be rejected without retry loop on backup
+            b.outputs.add(envelope("Miễn phí lắp đặt hoàn toàn cho anh/chị."));
+            ConsultationEngine.Target primary = new ConsultationEngine.Target(p, "same-test-key", "gemini-3.8-flash", "", "medium", 1600);
+            ConsultationEngine.Target backup = new ConsultationEngine.Target(b, "same-test-key", "gemini-3.5-flash-lite", "", "low", 1200);
+            ChatResponse r = new ConsultationEngine().chat("Bạn hỗ trợ được những gì vậy?", new ChatSessionData("backup-policy"), CATALOG, primary, backup, new ChatOptions(0.3, 1200));
+            check(p.calls == 1 && b.calls == 1 && "safe-fallback".equals(r.getProvider()) && "HIGH_DEMAND->BACKUP_INVALID_OUTPUT".equals(r.getFallbackReason()), "Backup policy violation must be rejected after 1 attempt");
         });
         System.out.println("ConsultationBehaviorTest: " + passed + " passed");
     }

@@ -42,7 +42,7 @@ public class PackageDAO {
             ps.setInt(3, id);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            utils.SafeLog.error("PackageDAO", e);
             return false;
         }
     }
@@ -57,7 +57,7 @@ public class PackageDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) list.add(mapResultSet(rs));
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("PackageDAO", e); }
         return list;
     }
 
@@ -71,7 +71,7 @@ public class PackageDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) list.add(mapResultSet(rs));
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("PackageDAO", e); }
         return list;
     }
 
@@ -86,7 +86,7 @@ public class PackageDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapResultSet(rs);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("PackageDAO", e); }
         return null;
     }
 
@@ -101,7 +101,7 @@ public class PackageDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapResultSet(rs);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("PackageDAO", e); }
         return null;
     }
 
@@ -125,7 +125,7 @@ public class PackageDAO {
                 ps.setString(8, p.getBadgeType());
             }
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("PackageDAO", e); return false; }
     }
 
     // ===== UPDATE =====
@@ -150,7 +150,7 @@ public class PackageDAO {
             ps.setInt(9, p.getId());
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            utils.SafeLog.error("PackageDAO", e);
             return false;
         }
     }
@@ -162,7 +162,7 @@ public class PackageDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("PackageDAO", e); return false; }
     }
 
     // ===== MAP RESULTSET =====
@@ -213,7 +213,7 @@ public class PackageDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) list.add(mapResultSet(rs));
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("PackageDAO", e); }
         return list;
     }
 
@@ -234,7 +234,7 @@ public class PackageDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getInt(1);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("PackageDAO", e); }
         return 0;
     }
 
@@ -248,7 +248,7 @@ public class PackageDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getInt(1) > 0;
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("PackageDAO", e); }
         return false;
     }
 
@@ -259,7 +259,7 @@ public class PackageDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) return rs.getInt(1);
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("PackageDAO", e); }
         return 0;
     }
 }

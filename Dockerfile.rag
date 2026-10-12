@@ -1,0 +1,17 @@
+# Opt-in source build; existing Dockerfile/deployment pipeline is unchanged.
+FROM eclipse-temurin:17-jdk AS build
+RUN apt-get update && apt-get install -y --no-install-recommends ant curl && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY tools/dependencies.lock tools/dependencies.lock
+COPY tools/bootstrap-libs.sh tools/bootstrap-libs.sh
+RUN sh tools/bootstrap-libs.sh
+COPY src src
+COPY web web
+COPY build-portable.xml build-portable.xml
+RUN ant -f build-portable.xml war
+FROM tomcat:9-jre17-temurin
+RUN rm -rf /usr/local/tomcat/webapps/*
+COPY --from=build /app/.build/dist/fpt-sale-rag.war /usr/local/tomcat/webapps/ROOT.war
+ENV RAG_ENABLED=false RAG_EMBEDDING_MODEL_VERIFIED=false RAG_EMBEDDING_CALLS_APPROVED=false
+EXPOSE 8080
+CMD ["catalina.sh", "run"]

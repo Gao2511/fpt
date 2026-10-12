@@ -32,7 +32,7 @@ public class ApiKeyHistoryDAO {
             ps.setString(6, note);
 
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("ApiKeyHistoryDAO", e); return false; }
     }
 
     /** Lấy tất cả lịch sử (mới nhất trước) */
@@ -46,7 +46,7 @@ public class ApiKeyHistoryDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) list.add(mapResultSet(rs));
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("ApiKeyHistoryDAO", e); }
         return list;
     }
 
@@ -57,7 +57,7 @@ public class ApiKeyHistoryDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("ApiKeyHistoryDAO", e); return false; }
     }
 
     /** Xóa toàn bộ lịch sử */
@@ -66,7 +66,7 @@ public class ApiKeyHistoryDAO {
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             return ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); return 0; }
+        } catch (Exception e) { utils.SafeLog.error("ApiKeyHistoryDAO", e); return 0; }
     }
 
     /** Đếm tổng số */
@@ -76,7 +76,7 @@ public class ApiKeyHistoryDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) return rs.getInt(1);
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("ApiKeyHistoryDAO", e); }
         return 0;
     }
 

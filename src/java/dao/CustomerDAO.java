@@ -24,7 +24,7 @@ public class CustomerDAO {
                 c.setConsultantName(rs.getString("consultant_name"));
                 list.add(c);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("CustomerDAO", e); }
         return list;
     }
 
@@ -43,7 +43,7 @@ public class CustomerDAO {
                     return c;
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("CustomerDAO", e); }
         return null;
     }
 
@@ -78,7 +78,7 @@ public class CustomerDAO {
                     if (rs.next()) return rs.getInt(1);
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("CustomerDAO", e); }
         return -1;
     }
 
@@ -102,7 +102,7 @@ public class CustomerDAO {
 
             ps.setInt(8, c.getId());
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("CustomerDAO", e); return false; }
     }
 
     public boolean updateStatus(int id, String newStatus) {
@@ -112,7 +112,7 @@ public class CustomerDAO {
             ps.setString(1, newStatus);
             ps.setInt(2, id);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("CustomerDAO", e); return false; }
     }
 
     public boolean delete(int id) {
@@ -121,7 +121,7 @@ public class CustomerDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("CustomerDAO", e); return false; }
     }
 
     private CustomerDTO mapResultSet(ResultSet rs) throws SQLException {
@@ -188,7 +188,7 @@ public class CustomerDAO {
                     list.add(c);
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("CustomerDAO", e); }
         return list;
     }
 
@@ -221,7 +221,7 @@ public class CustomerDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getInt(1);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("CustomerDAO", e); }
         return 0;
     }
 
@@ -233,7 +233,7 @@ public class CustomerDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getInt(1);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("CustomerDAO", e); }
         return 0;
     }
 
@@ -243,7 +243,7 @@ public class CustomerDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) return rs.getInt(1);
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("CustomerDAO", e); }
         return 0;
     }
 
@@ -255,7 +255,7 @@ public class CustomerDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) list.add(rs.getString(1));
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("CustomerDAO", e); }
         return list;
     }
 
@@ -278,7 +278,7 @@ public class CustomerDAO {
                     list.add(c);
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("CustomerDAO", e); }
         return list;
     }
 
@@ -301,7 +301,7 @@ public class CustomerDAO {
                     list.add(c);
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("CustomerDAO", e); }
         return list;
     }
 }

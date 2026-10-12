@@ -1,0 +1,89 @@
+{
+  "planId": "phase23-20261011-v1",
+  "approved": false,
+  "model": "gemini-embedding-001",
+  "dimensions": 768,
+  "plannedHttpRequests": 10,
+  "maximumHttpRequestsIncludingRetries": 12,
+  "chatGenerationRequests": 0,
+  "target": {
+    "container": "fpt-rag-embedding-test-20261011-p23",
+    "database": "fpt_rag_test",
+    "host": "127.0.0.1",
+    "port": "random loopback port assigned after approval",
+    "environment": "development",
+    "image": "pgvector/pgvector:0.8.2-pg17@sha256:feb68f4f15446397d8cac7f4fe48fe4586de83160d1fc48b46283312d1a33966",
+    "mustBeNewAndEmpty": true
+  },
+  "documents": [
+    {
+      "id": "D1",
+      "title": "Vùng phủ WiFi trong nhà nhiều tầng",
+      "category": "guide",
+      "policyKey": "test.wifi.coverage",
+      "sourceAuthority": "admin_reviewed",
+      "source": "src/java/ai/consultation/ConsultationPolicy.java#known:multi-floor-guidance",
+      "review": "proposed_paraphrase_of_existing_project_content_requires_administrator_approval",
+      "content": "WiFi có thể yếu hoặc không phủ kín các phòng và tầng khi có vật cản hoặc tường dày. Việc tư vấn cho nhà nhiều tầng cần kiểm tra vị trí đặt thiết bị và vật cản thực tế."
+    },
+    {
+      "id": "D2",
+      "title": "WiFi 6 và WiFi 5: chia sẻ kết nối giữa nhiều thiết bị",
+      "category": "guide",
+      "policyKey": "test.wifi.standards",
+      "sourceAuthority": "admin_reviewed",
+      "source": "https://blogs.cisco.com/networking/wi-fis-market-expands-with-wi-fi-6e",
+      "review": "proposed_vietnamese_technical_summary_requires_administrator_approval_not_fpt_device_entitlement",
+      "content": "WiFi 6 (IEEE 802.11ax) bổ sung OFDMA so với WiFi 5 (IEEE 802.11ac), giúp phối hợp việc truyền dữ liệu giữa nhiều thiết bị hiệu quả hơn. Đây là khác biệt về chuẩn kết nối; không phải cam kết tốc độ hay vùng phủ của thiết bị FPT cụ thể."
+    },
+    {
+      "id": "D3",
+      "title": "Hướng dẫn kết nối khi chơi game",
+      "category": "guide",
+      "policyKey": "test.internet.gaming",
+      "sourceAuthority": "admin_reviewed",
+      "source": "src/java/ai/consultation/ConsultationPolicy.java",
+      "review": "exact_existing_project_text_requires_administrator_approval_for_live_test",
+      "content": "Với nhu cầu chơi game, anh/chị nên ưu tiên kết nối dây LAN; tốc độ gói không bảo đảm ping hay độ trễ thực tế."
+    }
+  ],
+  "questions": [
+    {
+      "id": "Q1",
+      "text": "Phí lắp đặt thông thường bao nhiêu?",
+      "expectedRelevantDocumentIds": [],
+      "expectedBehavior": "business-owned installation fee; no KB source proves a fee; negative retrieval control"
+    },
+    {
+      "id": "Q2",
+      "text": "Nhà nhiều tầng WiFi yếu thì sao?",
+      "expectedRelevantDocumentIds": ["D1"],
+      "expectedBehavior": "coverage guide or clarification about placement/obstacles; no Mesh fee or promised full coverage from KB"
+    },
+    {
+      "id": "Q3",
+      "text": "WiFi 6 khác WiFi 5 thế nào?",
+      "expectedRelevantDocumentIds": ["D2"],
+      "expectedBehavior": "general standard difference; no assertion of specific FPT modem capabilities beyond authoritative catalog"
+    },
+    {
+      "id": "Q4",
+      "text": "Shop ơi mạng nhà tui yếu quá.",
+      "expectedRelevantDocumentIds": ["D1"],
+      "expectedBehavior": "D1 is partial relevance only; clarify weak WiFi coverage versus Internet fault; do not assume gaming"
+    },
+    {
+      "id": "Q5",
+      "text": "Có camera với truyền hình không?",
+      "expectedRelevantDocumentIds": [],
+      "expectedBehavior": "package entitlement from authoritative business source; negative retrieval control"
+    },
+    {
+      "id": "Q6",
+      "text": "Thêm camera thì sao?",
+      "expectedRelevantDocumentIds": [],
+      "contextSetup": "Tôi chọn gói 220K.",
+      "expectedBehavior": "selected-package follow-up handled by existing business rules; no KB-derived entitlement or registration consent"
+    }
+  ]
+}

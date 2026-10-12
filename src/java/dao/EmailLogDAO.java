@@ -39,7 +39,7 @@ public class EmailLogDAO {
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            utils.SafeLog.error("EmailLogDAO", e);
             return false;
         }
     }
@@ -62,7 +62,7 @@ public class EmailLogDAO {
                 list.add(log);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            utils.SafeLog.error("EmailLogDAO", e);
         }
         return list;
     }
@@ -88,7 +88,7 @@ public class EmailLogDAO {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            utils.SafeLog.error("EmailLogDAO", e);
         }
         return list;
     }
@@ -168,7 +168,7 @@ public class EmailLogDAO {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            utils.SafeLog.error("EmailLogDAO", e);
         }
         return list;
     }
@@ -210,7 +210,7 @@ public class EmailLogDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getInt(1);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("EmailLogDAO", e); }
         return 0;
     }
 
@@ -223,7 +223,7 @@ public class EmailLogDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getInt(1);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("EmailLogDAO", e); }
         return 0;
     }
 
@@ -234,7 +234,7 @@ public class EmailLogDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) return rs.getInt(1);
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("EmailLogDAO", e); }
         return 0;
     }
 
@@ -245,7 +245,7 @@ public class EmailLogDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
-        } catch (Exception e) { e.printStackTrace(); return false; }
+        } catch (Exception e) { utils.SafeLog.error("EmailLogDAO", e); return false; }
     }
 
     /** Xóa toàn bộ log */
@@ -254,7 +254,7 @@ public class EmailLogDAO {
         try (Connection conn = DBUtils.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             return ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); return 0; }
+        } catch (Exception e) { utils.SafeLog.error("EmailLogDAO", e); return 0; }
     }
 
     /** Lấy log theo ID */
@@ -273,7 +273,7 @@ public class EmailLogDAO {
                     return log;
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) { utils.SafeLog.error("EmailLogDAO", e); }
         return null;
     }
 }

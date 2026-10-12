@@ -75,7 +75,7 @@
                     <c:if test="${not empty sessionScope.user && sessionScope.user.role == 'customer'}">
                         <div class="welcome-banner">
                             <span class="welcome-line-1">Chào mừng trở lại,</span>
-                            <span class="welcome-line-2">${sessionScope.user.fullName}!</span>
+                            <span class="welcome-line-2"><c:out value="${sessionScope.user.fullName}"/>!</span>
                         </div>
                     </c:if>
 
@@ -413,7 +413,7 @@
 
         <div class="container">
             <div class="features">
-                <c:if test="${cms['benefit1.visible']=='true'}"><div class="feature" style="order:${cms['benefit1.order']};">
+                <c:if test="${cms['benefit1.visible']=='true'}"><div class="feature" data-cms-order="${fn:escapeXml(cms['benefit1.order'])}">
                     <div class="icon">
                         <c:if test="${empty cms['benefit1.image']}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
@@ -425,7 +425,7 @@
                     <h4><c:out value="${cms['benefit1.title']}"/></h4>
                     <p><c:choose><c:when test="${not empty cms['benefit1.description']}"><c:out value="${cms['benefit1.description']}"/></c:when><c:otherwise>Kết nối không giới hạn, cho phép nhiều thiết bị cùng lúc mà không bị giật lag.</c:otherwise></c:choose></p>
                 </div>
-                </c:if><c:if test="${cms['benefit2.visible']=='true'}"><div class="feature" style="order:${cms['benefit2.order']};">
+                </c:if><c:if test="${cms['benefit2.visible']=='true'}"><div class="feature" data-cms-order="${fn:escapeXml(cms['benefit2.order'])}">
                     <div class="icon">
                         <c:if test="${empty cms['benefit2.image']}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
@@ -437,7 +437,7 @@
                     <h4><c:out value="${cms['benefit2.title']}"/></h4>
                     <p><c:choose><c:when test="${not empty cms['benefit2.description']}"><c:out value="${cms['benefit2.description']}"/></c:when><c:otherwise>Đường truyền siêu tốc, đáp ứng mọi nhu cầu giải trí, làm việc và học tập online.</c:otherwise></c:choose></p>
                 </div>
-                </c:if><c:if test="${cms['benefit3.visible']=='true'}"><div class="feature" style="order:${cms['benefit3.order']};">
+                </c:if><c:if test="${cms['benefit3.visible']=='true'}"><div class="feature" data-cms-order="${fn:escapeXml(cms['benefit3.order'])}">
                     <div class="icon">
                         <c:if test="${empty cms['benefit3.image']}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
@@ -446,7 +446,7 @@
                     <h4><c:out value="${cms['benefit3.title']}"/></h4>
                     <p><c:choose><c:when test="${not empty cms['benefit3.description']}"><c:out value="${cms['benefit3.description']}"/></c:when><c:otherwise>Kỹ thuật viên có mặt nhanh chóng, lắp đặt và kích hoạt dịch vụ trong ngày.</c:otherwise></c:choose></p>
                 </div>
-                </c:if><c:if test="${cms['benefit4.visible']=='true'}"><div class="feature" style="order:${cms['benefit4.order']};">
+                </c:if><c:if test="${cms['benefit4.visible']=='true'}"><div class="feature" data-cms-order="${fn:escapeXml(cms['benefit4.order'])}">
                     <div class="icon">
                         <c:if test="${empty cms['benefit4.image']}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
@@ -468,7 +468,7 @@
         <div class="container">
             <div class="devices">
 
-                <c:if test="${cms['device1.visible']=='true'}"><div class="device" style="order:${cms['device1.order']};">
+                <c:if test="${cms['device1.visible']=='true'}"><div class="device" data-cms-order="${fn:escapeXml(cms['device1.order'])}">
                     <div class="img-wrap">
                         <img src="${fn:startsWith(cms['device1.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['device1.image'])}"
                              alt="Modem WiFi 6">
@@ -479,7 +479,7 @@
                     </div>
                 </div></c:if>
 
-                <c:if test="${cms['device2.visible']=='true'}"><div class="device" style="order:${cms['device2.order']};">
+                <c:if test="${cms['device2.visible']=='true'}"><div class="device" data-cms-order="${fn:escapeXml(cms['device2.order'])}">
                     <div class="img-wrap">
                         <img src="${fn:startsWith(cms['device2.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['device2.image'])}"
                              alt="FPT Play Box">
@@ -490,7 +490,7 @@
                     </div>
                 </div></c:if>
 
-                <c:if test="${cms['device3.visible']=='true'}"><div class="device" style="order:${cms['device3.order']};">
+                <c:if test="${cms['device3.visible']=='true'}"><div class="device" data-cms-order="${fn:escapeXml(cms['device3.order'])}">
                     <div class="img-wrap">
                         <img src="${fn:startsWith(cms['device3.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['device3.image'])}"
                              alt="Camera AI">
@@ -501,7 +501,7 @@
                     </div>
                 </div></c:if>
 
-                <c:if test="${cms['device4.visible']=='true'}"><div class="device" style="order:${cms['device4.order']};">
+                <c:if test="${cms['device4.visible']=='true'}"><div class="device" data-cms-order="${fn:escapeXml(cms['device4.order'])}">
                     <div class="img-wrap">
                         <img src="${fn:startsWith(cms['device4.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['device4.image'])}"
                              alt="Box Ngoại Hạng Anh">
@@ -539,13 +539,13 @@
                             <label>Họ tên người cần lắp đặt <span style="color:#f37021;">*</span></label>
                             <input type="text" name="user_name" id="user_name"
                                    placeholder="Nguyễn Văn A" required
-                                   value="${not empty sessionScope.user ? sessionScope.user.displayName : ''}">
+                                   value="${fn:escapeXml(not empty sessionScope.user ? sessionScope.user.displayName : '')}">
                         </div>
                         <div>
                             <label>SĐT người cần lắp đặt <span style="color:#f37021;">*</span></label>
                             <input type="tel" name="user_phone" id="user_phone"
                                    placeholder="0912 345 678" required
-                                   value="${not empty sessionScope.user.phone ? sessionScope.user.phone : ''}">
+                                   value="${fn:escapeXml(not empty sessionScope.user.phone ? sessionScope.user.phone : '')}">
                         </div>
 
                         <!-- EMAIL KHÁCH HÀNG - KHÔNG BẮT BUỘC -->
@@ -553,7 +553,7 @@
                             <label>Email <span style="color:#9ca3af;font-weight:400;font-style:italic;">(không bắt buộc)</span></label>
                             <input type="email" name="user_email" id="user_email"
                                    placeholder="khachhang@gmail.com"
-                                   value="${not empty sessionScope.user.email ? sessionScope.user.email : ''}">
+                                   value="${fn:escapeXml(not empty sessionScope.user.email ? sessionScope.user.email : '')}">
                         </div>
 
                         <!-- ⭐ ĐỊA CHỈ: CASCADING DROPDOWN -->
@@ -693,6 +693,7 @@
         </footer>
 
         <!-- ============ SCRIPT CHUNG ============ -->
+        <script src="${pageContext.request.contextPath}/js/home-order.js"></script>
         <script>
             // ===== SCROLL REVEAL =====
             const revealElements = document.querySelectorAll(
@@ -743,11 +744,11 @@
                         border-radius: 50%;
                         background: rgba(255,255,255,0.5);
                         transform: translate(-50%, -50%);
-                        left: ${x}px;
-                        top: ${y}px;
                         pointer-events: none;
                         animation: rippleAnim 0.6s ease-out;
                     `;
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
                     this.style.position = 'relative';
                     this.style.overflow = 'hidden';
                     this.appendChild(ripple);

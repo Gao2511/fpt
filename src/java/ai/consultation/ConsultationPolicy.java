@@ -86,11 +86,18 @@ public final class ConsultationPolicy {
             for (ProductCatalog.Product p : catalog.all()) if (p.price > memory.previousBudget && fits(p, memory)) { extra.append(p.display()).append('\n'); count++; }
             if (count > 0) { memory.selectionAmbiguous = true; return reply(extra.toString().trim()); }
         }
-        if (q.matches("(?s).*co camera\\s*(?:khong|ko|hong|khum)[?! .]*")) {
+        ChatResponse cameraAddition=cameraAddition(question,memory,catalog);
+        if(cameraAddition!=null)return cameraAddition;
+        if (q.matches("(?s).*(?:co|combo|kem).*camera\\s*(?:khong|ko|hong|khum)[?! .]*")) {
             ProductCatalog.Product selected = memory.selectedPackageId == null ? null : catalog.byId(memory.selectedPackageId);
             if (selected != null) return reply((selected.camera ? "Gói đã chọn có camera. " : "Gói đã chọn chưa có camera. ") + selected.display());
             StringBuilder choices = new StringBuilder("Các gói có camera trong danh mục:\n");
             for (ProductCatalog.Product p : catalog.all()) if (p.camera) choices.append(p.display()).append('\n');
+            return reply(choices.toString().trim());
+        }
+        if (q.matches("(?s).*(?:internet kem truyen hinh|combo.*truyen hinh).*")) {
+            StringBuilder choices=new StringBuilder("Các gói Internet kèm truyền hình trong danh mục:\n");
+            for(ProductCatalog.Product p:catalog.all())if(p.tv180)choices.append(p.display()).append('\n');
             return reply(choices.toString().trim());
         }
 
@@ -100,6 +107,8 @@ public final class ConsultationPolicy {
             ProductCatalog.Product p = mentioned.get(0);
             return reply("Dạ gói " + p.label() + " có tốc độ công bố là " + p.speed + " Mbps" + (p.speed >= 1000 ? " (1 Gbps)" : "") + ", giá cước " + String.format(Locale.US, "%,d", p.price).replace(',', '.') + "đ/tháng.\n" + p.display());
         }
+        if (q.contains("cam ket") && (q.contains("toc do") || q.contains("24/7")))
+            return reply("Dạ em chưa có dữ liệu xác nhận cam kết tốc độ tuyệt đối hoặc liên tục trong mọi trường hợp. Tốc độ công bố của gói không phải bằng chứng cho cam kết này; anh/chị cần tư vấn viên kiểm tra điều kiện cụ thể.");
 
         // 2. Tư vấn Mesh WiFi theo số tầng
         if ((q.contains("3 tang") || q.contains("ba tang")) && (q.contains("f1") || q.contains("dung f1") || q.contains("duoc khong") || q.contains("on khong") || q.contains("co duoc khong"))) {
@@ -183,6 +192,20 @@ public final class ConsultationPolicy {
             if (fits(p, memory)) return p;
         }
         return null;
+    }
+    /** A benefit question is hypothetical; it does not mutate consent or the selected package. */
+    private static ChatResponse cameraAddition(String question,CustomerRequirements memory,ProductCatalog catalog) {
+        String q=rag.RetrievalQuery.normalize(question);
+        if(!q.matches("(?s).*(?:them camera|camera (?:thi )?sao|vay camera).*"))return null;
+        ProductCatalog.Product base=memory.selectedPackageId==null || memory.selectionAmbiguous ? null : catalog.byId(memory.selectedPackageId);
+        if(base==null && !memory.televisionKnown && memory.people==null && memory.floors==null && !q.contains("them camera"))return null;
+        if(base!=null && base.camera)return reply("Dạ gói đang chọn đã có camera:\n"+base.display());
+        StringBuilder text=new StringBuilder("Dạ nếu muốn thêm camera, anh/chị có thể xem các gói sau theo danh mục hiện tại:\n");int count=0;
+        if(memory.floors!=null)text.append("Em vẫn ghi nhận nhà ").append(memory.floors).append(" tầng.\n");
+        for(ProductCatalog.Product p:catalog.all())if(p.camera && (!memory.television || p.tv180) && (base==null || p.speed==base.speed)) {text.append(p.display()).append('\n');count++;}
+        if(count==0)return reply("Dạ danh mục hiện tại chưa có lựa chọn camera phù hợp với yêu cầu đã chia sẻ. Anh/chị muốn em so sánh các gói khác không?");
+        if(memory.budget!=null)text.append("Mình cần đối chiếu cước của từng gói với ngân sách đã chia sẻ trước khi chọn nhé.");
+        return reply(text.toString().trim());
     }
     private static boolean fits(ProductCatalog.Product p, CustomerRequirements m) {
         return (m.budget == null || p.price <= m.budget) && (!m.camera || p.camera) && (!m.television || p.tv180);

@@ -55,6 +55,14 @@ public class AIException extends Exception {
         return providerName;
     }
 
+    public boolean isRetryable() {
+        return errorType == ErrorType.QUOTA_EXCEEDED
+            || errorType == ErrorType.HIGH_DEMAND
+            || errorType == ErrorType.TIMEOUT
+            || errorType == ErrorType.NETWORK_ERROR
+            || errorType == ErrorType.SERVER_ERROR;
+    }
+
     /**
      * Chuyển mã HTTP và thông báo từ API hãng thành thông báo tiếng Việt dễ hiểu cho Admin
      */

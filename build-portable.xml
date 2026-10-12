@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ant + JDK17, independent of NetBeans private properties and machine paths. -->
+<project name="fpt-portable" default="war" basedir=".">
+    <property name="portable.dir" location=".build"/>
+    <property name="portable.web" location="${portable.dir}/web"/>
+    <property name="portable.war" location="${portable.dir}/dist/fpt-sale-rag.war"/>
+    <path id="compile.path"><fileset dir="lib/runtime" includes="*.jar"/><fileset dir="lib/compile-only" includes="*.jar"/></path>
+    <target name="compile">
+        <mkdir dir="${portable.web}/WEB-INF/classes"/>
+        <javac srcdir="src/java" destdir="${portable.web}/WEB-INF/classes" encoding="UTF-8" release="8" includeantruntime="false" excludes="controller/TestController.java">
+            <classpath refid="compile.path"/>
+        </javac>
+    </target>
+    <target name="war" depends="compile">
+        <copy todir="${portable.web}"><fileset dir="web" excludes="WEB-INF/classes/**,WEB-INF/lib/**,**/.env*,**/oauth.properties,**/*.log,**/*.sql,**/*.java"/></copy>
+        <copy todir="${portable.web}/WEB-INF/lib"><fileset dir="lib/runtime" includes="*.jar"/></copy>
+        <mkdir dir="${portable.dir}/dist"/>
+        <!-- Fixed ZIP modification timestamp permits artifact comparison on the same JDK/deps. -->
+        <war destfile="${portable.war}" webxml="web/WEB-INF/web.xml" modificationtime="2026-01-01T00:00:00Z">
+            <fileset dir="${portable.web}" excludes="WEB-INF/web.xml,**/oauth.properties,**/TestController*.class,**/.env*,**/*.log"/>
+        </war>
+    </target>
+    <target name="test" depends="compile">
+        <mkdir dir="${portable.dir}/test-classes"/>
+        <javac srcdir="test" destdir="${portable.dir}/test-classes" encoding="UTF-8" release="8" includeantruntime="false" excludes="cms/CmsBrowserServer.java,cms/HomeViewTest.java,rag/live/**">
+            <classpath><path refid="compile.path"/><pathelement location="${portable.web}/WEB-INF/classes"/></classpath>
+        </javac>
+        <path id="test.path"><path refid="compile.path"/><pathelement location="${portable.web}/WEB-INF/classes"/><pathelement location="${portable.dir}/test-classes"/></path>
+        <macrodef name="suite"><attribute name="name"/><sequential>
+            <java classname="@{name}" fork="true" failonerror="true">
+                <classpath refid="test.path"/><jvmarg value="-Dfile.encoding=UTF-8"/>
+                <jvmarg value="-DAI_ENCRYPTION_KEY=FAKE_OFFLINE_TEST_ENCRYPTION_KEY"/>
+                <!-- FakeDatabase consumes these; never allow implicit production configuration. -->
+                <env key="DB_HOST" value="127.0.0.1"/><env key="DB_PORT" value="1"/><env key="DB_NAME" value="offline_fixture"/>
+                <env key="DB_USER" value="FAKE_TEST_USER"/><env key="DB_PASSWORD" value="FAKE_TEST_PASSWORD"/>
+                <env key="AI_ENCRYPTION_KEY" value="FAKE_OFFLINE_TEST_ENCRYPTION_KEY"/><env key="RAG_ENABLED" value="false"/>
+            </java>
+        </sequential></macrodef>
+        <suite name="cms.CmsSecurityTest"/><suite name="cms.CmsBehaviorTest"/><suite name="cms.LocalDatabaseTest"/><suite name="cms.EditorLayoutTest"/>
+        <suite name="ai.ConsultationBehaviorTest"/><suite name="ai.AdaptiveConversationTest"/><suite name="ai.InstallationFeeTest"/>
+        <suite name="controller.ChatRegistrationTest"/><suite name="ai.provider.ProviderResponseTest"/>
+        <suite name="ai.MultiProviderTest"/>
+        <suite name="rag.RagBehaviorTest"/>
+        <suite name="rag.RagPhase2CorpusTest"/><suite name="rag.RagQualityTest"/>
+        <suite name="rag.RagAdminKbTest"/>
+    </target>
+</project>

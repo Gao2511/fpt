@@ -1,0 +1,350 @@
+{
+  "planId": "phase24-e2e-20261011-v1",
+  "approved": false,
+  "status": "READY FOR FINAL AUTHORIZATION — NOT EXECUTED",
+  "environment": "development",
+  "productionRagEnabled": false,
+  "embeddingModel": "gemini-embedding-001",
+  "dimensions": 768,
+  "embeddingKeyVariable": "RAG_EMBEDDING_API_KEY",
+  "chatKeyVariable": "RAG_CHAT_TEST_API_KEY",
+  "chatModel": "gemini-3.8-flash",
+  "chatModelRequirement": "Dedicated test configuration fixed to gemini-3.8-flash with thinkingLevel=medium; production chatbot model in settings remains unchanged",
+  "database": {
+    "host": "127.0.0.1",
+    "name": "fpt_rag_test",
+    "requireNewDedicatedContainer": true,
+    "productionAllowed": false,
+    "guardPlan": {
+      "loopbackOnly": true,
+      "credentials": "New test-only randomly generated credentials; never read .local/runtime.json or production settings",
+      "freshEmptyTablesRequired": true,
+      "expectedContainerLabel": "com.fpt.rag.test=true",
+      "verifyMappedPortAndContainerIdentity": true,
+      "verifyDatabaseAndUser": true,
+      "migrationIds": [
+        "002-rag-mvp.sql",
+        "003-rag-source-policy.sql"
+      ],
+      "rowNamespace": "Dedicated empty test DB; approved L1/L2 only, separate test business fixtures",
+      "connectionInjectionRequired": true,
+      "noDefaultFactoryOrProductionDbFallback": true,
+      "preserveOldResources": true,
+      "teardown": "Stop only the container created by this run; retain container/volume/rows/evidence"
+    }
+  },
+  "documents": [
+    {
+      "id": "L1",
+      "title": "Hướng dẫn kết nối mạng WiFi",
+      "content": "Anh/chị kiểm tra kết nối dây mạng an toàn trước khi liên hệ hỗ trợ.",
+      "sourceFile": "test/rag/RagQualityTest.java",
+      "scope": "Synthetic existing QA guidance, NOT a confirmed FPT policy",
+      "approvedForLive": true,
+      "approvedForIsolatedTestOnly": true,
+      "productionPublicationApproved": false,
+      "approvalNote": "Approved by Administrator in Phase 2.4.8 ONLY for isolated PostgreSQL testing (127.0.0.1 / fpt_rag_test); NOT approved for production publication",
+      "expectedChunks": 1
+    },
+    {
+      "id": "L2",
+      "title": "Hướng dẫn chơi game",
+      "content": "Với nhu cầu chơi game, anh/chị nên ưu tiên kết nối dây LAN; tốc độ gói không bảo đảm ping hay độ trễ thực tế.",
+      "sourceFile": "src/java/ai/consultation/ConsultationPolicy.java",
+      "scope": "Existing customer-facing guidance; no new business policy",
+      "approvedForLive": true,
+      "approvedForIsolatedTestOnly": true,
+      "productionPublicationApproved": false,
+      "approvalNote": "Approved by Administrator in Phase 2.4.8 ONLY for isolated PostgreSQL testing (127.0.0.1 / fpt_rag_test); NOT approved for production publication",
+      "expectedChunks": 1
+    }
+  ],
+  "questions": [
+    {
+      "id": "LQ1",
+      "text": "Mạng nhà mình chậm quá.",
+      "expectedSelectedDocuments": [
+        "L1"
+      ]
+    },
+    {
+      "id": "LQ2",
+      "text": "Shop ơi mạng nhà tui yếu quá.",
+      "expectedSelectedDocuments": [
+        "L1"
+      ]
+    },
+    {
+      "id": "LQ3",
+      "text": "Hướng dẫn chơi game Internet sao cho ổn?",
+      "expectedSelectedDocuments": [
+        "L2"
+      ],
+      "session": "gaming-follow-up"
+    },
+    {
+      "id": "LQ4",
+      "text": "Vậy cách đó có đảm bảo ping thấp không?",
+      "expectedSelectedDocuments": [
+        "L2"
+      ],
+      "session": "gaming-follow-up",
+      "usePreviousCustomerDomainOnly": true
+    },
+    {
+      "id": "LQ5",
+      "text": "WiFi 6 có tốt hơn WiFi 5 không?",
+      "expectedSelectedDocuments": [],
+      "expectedBehavior": "Disclose missing approved comparison; do not invent it"
+    },
+    {
+      "id": "LQ6",
+      "text": "Có cung cấp internet ở nước ngoài không?",
+      "expectedSelectedDocuments": [],
+      "expectedBehavior": "Disclose unconfirmed geographic coverage"
+    }
+  ],
+  "requestBudget": {
+    "documentEmbeddingPosts": 2,
+    "queryEmbeddingPosts": 6,
+    "chatGenerationPosts": 6,
+    "metadataGets": 0,
+    "countTokensRequests": 0,
+    "retries": 0,
+    "redirects": 0,
+    "maximumExternalRequests": 14
+  },
+  "estimatedTokens": {
+    "embeddingInput": "300-700 total; not measured",
+    "chatInput": "12000-24000 total including system, business data, context and bounded follow-up history; not measured",
+    "chatOutputMaximum": 7200,
+    "maxOutputTokensPerChat": 1200,
+    "thinkingTokens": "Bounded by maxOutputTokens=1200 (combined candidatesTokenCount + thoughtsTokenCount <= 1200 per request under thinkingLevel=medium; <= 7200 combined output+thinking tokens across 6 Chat POSTs)"
+  },
+  "cost": {
+    "currentProjectTierVerifiedForThisPlan": true,
+    "embeddingHistoricalPaidRateUsdPerMillionInputTokens": 0.15,
+    "historicalRateCurrentVerification": false,
+    "embeddingHistoricalEstimateUsd": "0.000045-0.000105, illustrative only",
+    "freeTierEstimateUsd": "0 only if both exact models are eligible and sufficient free quota is confirmed",
+    "chatPriceUsd": "Free Tier: $0.00 input / $0.00 output (including thinking tokens). Paid Tier (unapproved/forbidden): $0.75/1M input, $3.75/1M output (including thinking tokens) through Dec 31, 2026",
+    "administratorMustConfirmBothModelsPricesAndQuota": true,
+    "paidRequestsAllowed": false,
+    "maximumApprovedPaidCostUsd": 0,
+    "maximumEstimatedCostUsd": 0,
+    "maximumEstimateCondition": "Free Tier only, both exact models and sufficient quotas reconfirmed in the executing keys' projects. Missing confirmation or paid tier stops before any API; no paid fallback.",
+    "paidCostMaximumVerified": true,
+    "thinkingCostVerified": true
+  },
+  "acceptance": {
+    "expectedPositiveSourcesRequired": "4/4",
+    "unknownQuestionAbstentionsRequired": "2/2",
+    "requiredDimensions": 768,
+    "unsupportedClaimsMaximum": 0,
+    "metadataLeaksMaximum": 0,
+    "businessOverridesMaximum": 0,
+    "responseLanguage": "complete Vietnamese",
+    "followUpRequired": true,
+    "embeddingLatencyTargetMs": 5000,
+    "totalTurnLatencyTargetMs": 10000,
+    "precisionAtK": {
+      "k": 3,
+      "positiveAverageMinimum": 0.8,
+      "definition": "For each positive query: number of relevant expected source documents in deduplicated top min(3, returned document count) divided by that actual count. Empty result gives 0. Average over LQ1-LQ4. Do not divide by 3 when only one or two candidates exist."
+    },
+    "recallAtK": {
+      "k": 3,
+      "positiveCasesRequired": 4,
+      "definition": "Expected document must be present in top-3 unique eligible document candidates for every LQ1-LQ4"
+    },
+    "sourceSelection": "LQ1/LQ2 select L1 only; LQ3/LQ4 select L2 only; LQ5/LQ6 select no source.",
+    "grounding": "Customer technical answer must consist only of approved selected literal excerpts; no invented ping/coverage/standards/discount/price claims; model message is not proof of grounding.",
+    "authority": "L1/L2 require actual trusted test publication approval/current hash/version/valid dates/admin_reviewed metadata; synthetic source must never be labeled official FPT. Revalidate immediately before rendering.",
+    "authorityLiveScope": "Two-document live smoke test cannot demonstrate all conflicts/supersession scenarios; retain 41/41 and 24/24 offline regressions, report live scope honestly.",
+    "safety": "No secrets/metadata/PII/unsolicited registration; no business fact override; no production connection; no unexpected request; customer JSON excludes full structured object.",
+    "latencyTargetDefinition": "Embedding <=5s and complete turn <=10s measured excluding deliberate quota-spacing sleeps; target failures reported separately from semantic failures.",
+    "passingRule": "All six content/source cases and safety gates must pass; report latency and retrieval metric failures explicitly. Partial run stopped on failure is NOT PASS."
+  },
+  "executionPrerequisites": [
+    "Explicit separate approval of this plan and exact document contents",
+    "Administrator confirms current exact chat model, prices, free-tier eligibility and project-level quota",
+    "Dedicated test keys available to executing process, never copied from production",
+    "New empty test database with migrations 002/003",
+    "Review and mock-test a budget-enforcing transport/runner: existing adapter metadata GET and retries cannot be used unbounded",
+    "Persistent unique execution lock and CREATE_NEW sanitized evidence files, never touch Phase 2.3 files"
+  ],
+  "stopOn": [
+    "Any API/parse/vector/database/response validation failure",
+    "Any unexpected GET, redirect, retry or external request",
+    "Any wrong source, unsupported claim or internal metadata",
+    "Missing usage/billing confirmation before a paid request",
+    "Budget exhausted"
+  ],
+  "runnerImplemented": true,
+  "executionAuthorized": false,
+  "reviewDate": "2026-10-11",
+  "embeddingCompatibility": {
+    "model": "gemini-embedding-001",
+    "dimensions": 768,
+    "documentTaskType": "RETRIEVAL_DOCUMENT",
+    "queryTaskType": "RETRIEVAL_QUERY",
+    "documentTitleOnly": true,
+    "wireEndpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent",
+    "wireDimensionalityField": "outputDimensionality: integer 768 at root",
+    "normalization": "Finite, nonzero 768-vector; normalize document and query with existing VectorValues L2 normalizer",
+    "persistence": "Record model and vector_dimensions; DAO requires exact model/dimension/current revision, vector(768) rejects incompatible lengths",
+    "noMixedSpaces": "Never combine earlier mock vectors, default 3072 vectors or vectors from another model; new empty test DB",
+    "inputTokenLimit": 2048,
+    "tokenLimitEvidence": ".build/rag-auth-probes/20261011T073232469-324add1c9a8146dcbefac5dd6f2f0331.json",
+    "queryRewrite": "Use existing RetrievalQuery, Q4 customer-domain-only game expansion; freeze and hash document/query embedding payloads and approved chat template rules before execution. Record the dynamic chat body hash before each send; only derived context from approved documents may be included."
+  },
+  "quota": {
+    "verifiedForThisPlan": true,
+    "timeSensitiveReverificationRequiredBeforeExecution": true,
+    "previousEmbeddingSnapshot": {
+      "tier": "Free Tier",
+      "rpmLimit": 100,
+      "tpmLimit": 30000,
+      "rpdLimit": 1000,
+      "source": "Administrator Phase 2.3 & Phase 2.4.8 confirmation; re-verify immediately before live execution"
+    },
+    "embeddingRequestsRemainingRequired": 8,
+    "chatRequestsRemainingRequired": 6,
+    "schedule": "Serial; at least 65 seconds between sends to the same model, no concurrent requests or retry. Reserve project-level capacity; other consumers can exhaust it.",
+    "minimumRpmEachModel": 1,
+    "embeddingInputTokensPerRequestLimit": 2048,
+    "estimatedChatInputTokensPerRequestHigh": 4096,
+    "chatOutputCapPerRequest": 1200,
+    "chatThinkingQuota": "gemini-3.8-flash with thinkingLevel=medium; maxOutputTokens=1200 caps combined output + thinking tokens per request",
+    "administratorMustVerify": [
+      "Model gemini-3.8-flash available in the executing test Google Cloud project",
+      "Keys belong to approved test projects, no production key reuse",
+      "Free-tier eligibility and remaining RPM/TPM/RPD for BOTH models in those projects",
+      "Chat TPM accounts for relevant input/output/thinking consumption; 4096 input estimate is not a measured tokenizer guarantee",
+      "No automatic billing upgrade or paid fallback"
+    ]
+  },
+  "requestControl": {
+    "implemented": true,
+    "transport": "LiveSafety durable ledger + SinglePostWire one-shot TLS HTTP/1.1 POST; scoped CLI harness injects existing worker/retrieval/Engine. Runtime provider transports are never called.",
+    "operationLimits": {
+      "documentEmbedding": 2,
+      "queryEmbedding": 6,
+      "chat": 6,
+      "total": 14
+    },
+    "allowedMethodsAndEndpoints": "POST only, exact fixed embedding endpoint and exact approved Gemini generateContent model endpoint; reject all other methods/hosts/operations",
+    "attemptReservation": "Consume unique operation ordinal and global request slot atomically BEFORE network send, including failed/time-out requests; reject a reused ordinal",
+    "retries": "Internal adapter retries or engine repair/fallback must be blocked at transport boundary, not counted as new approved operations",
+    "metadata": "No outbound GET: prevalidated metadata evidence may be injected locally; do not invoke default metadata HTTP transport",
+    "redirects": "Disabled, 3xx ends the entire plan",
+    "abort": "First HTTP/vector/database/schema/source/grounding/security failure stops entire plan; if fewer than 14 sent, do not use remaining budget",
+    "existingPlanIdCannotResume": true,
+    "evidenceFailure": "Fail closed before sending if lock/counter/evidence storage cannot be secured",
+    "adapterAudit": {
+      "embedding": "GeminiEmbeddingService currently verifies metadata via GET on first call and may attempt up to 3 sends; its own HTTP transport disables redirects.",
+      "chat": "GeminiProvider disables its retries when responseSchema is set, but ConsultationEngine can repair/fallback. GeminiProvider.openConnection does not explicitly disable redirects.",
+      "requirement": "Every real outbound path needs the reviewed budget/operation guard plus redirects disabled. Current adapters are NOT sufficient to enforce the proposed plan."
+    }
+  },
+  "executionEvidence": {
+    "existingPhase23Files": "Read-only; never reset/overwrite/copy over old locks or results",
+    "lock": ".build/phase24-live/phase24-e2e-20261011-v1.request.lock",
+    "lockBehavior": "Atomic CreateNew after separate approval and all preflight gates; persist plan hash and approved budget (no key). Existing lock OR any orphan results forbid execution.",
+    "operationLedger": "Unique per-operation CREATE_NEW reservation/evidence; prevent double sends even after crash. No resume under this PlanId.",
+    "sanitizedSummary": "Unique CREATE_NEW result per operation plus final summary; reserve paths before send and finalize only files owned by this run. Evidence directory .build/phase24-live/<planId>.evidence; orchestration lock .build/phase24-orchestration/<planId>.lock. Frozen plan held read-only across preflight and execution.",
+    "include": [
+      "Plan/document/query hashes",
+      "Model/task/dimensions",
+      "HTTP status and sanitized error codes",
+      "Vector norm/dimension only",
+      "Retrieved and validated and selected source IDs",
+      "Customer-facing reply",
+      "Latency and token usage if returned, null if unavailable",
+      "Global and per-operation counters"
+    ],
+    "exclude": [
+      "API keys",
+      "Authorization/request headers",
+      "Entire vectors",
+      "Private customer data",
+      "Raw provider diagnostic bodies"
+    ],
+    "lockCreationDuringOfflineReview": false
+  },
+  "readiness": {
+    "executable": false,
+    "mechanismsOfflineVerified": true,
+    "mechanismTestResults": {
+      "safetyTestsPassed": 87,
+      "safetyTestsFailed": 0,
+      "entryTestsPassed": 4,
+      "isolationMockTestsPassed": 4,
+      "realDatabaseSafetyAssertionsPassed": 7,
+      "subjectSelectionTestsPassed": 22,
+      "mockLiveCasesPassed": 6,
+      "mockLiveRequests": 14,
+      "realProviderRequests": 0
+    },
+    "blockers": [
+      "Explicit final Administrator execution authorization required (approved=false, executionAuthorized=false, verifiedAtEpochMs=null, expiresAtEpochMs=null); re-verify time-sensitive quota immediately before execution"
+    ],
+    "knownQualityRisk": "Phase 2.4.9 READY FOR FINAL AUTHORIZATION — NOT EXECUTED: target chatModel=gemini-3.8-flash with thinkingConfig={thinkingLevel:medium}, backupModel=gemini-3.5-flash-lite disabled during the 14-request live run (enabledDuring14RequestLiveRun=false, extraBudgetRequests=0), L1/L2 approved for isolated PostgreSQL testing only, all LQ1-LQ6 PASS with 2+6+6=14 mock requests and thinking token usage verified. LQ4 raw ranked candidates L2 (1.0), L1 (0.5); query-aware context selects L2 only. Mean raw precision@3=0.875; positive recall=4/4; unknown abstention=2/2. See docs/rag-phase2.4.9-pre-execution-readiness.md."
+  },
+  "backupModelPolicy": {
+    "primaryModel": "gemini-3.8-flash",
+    "primaryThinkingConfig": {
+      "thinkingLevel": "medium"
+    },
+    "backupModel": "gemini-3.5-flash-lite",
+    "secondaryCompatibleBackupModel": "gemini-3.1-flash-lite",
+    "thinkingConfig": {
+      "thinkingLevel": "low"
+    },
+    "maxOutputTokens": 1200,
+    "freeTierPriceUsd": "Free of charge ($0.00 input / $0.00 output including thinking tokens)",
+    "eligibleErrors": [
+      "QUOTA_EXCEEDED",
+      "HIGH_DEMAND",
+      "SERVER_ERROR",
+      "TIMEOUT",
+      "NETWORK_ERROR"
+    ],
+    "ineligibleErrors": [
+      "INVALID_KEY",
+      "MODEL_NOT_FOUND",
+      "INVALID_REQUEST"
+    ],
+    "maxFailoverHopsPerTurn": 1,
+    "noKeyOrProjectRotation": true,
+    "enabledDuring14RequestLiveRun": false,
+    "extraBudgetRequests": 0,
+    "separatePlanApprovalRequiredForLiveFailover": true
+  },
+  "liveApproval": {
+    "verifiedAtEpochMs": null,
+    "expiresAtEpochMs": null,
+    "embeddingModel": "gemini-embedding-001",
+    "chatModel": "gemini-3.8-flash",
+    "dedicatedTestKeysConfirmed": true,
+    "metadataEvidenceReviewed": true,
+    "chatRestConfigurationReviewed": true,
+    "embeddingTier": "Free Tier",
+    "chatTier": "Free Tier",
+    "embeddingRpdRemaining": 8,
+    "chatRpdRemaining": 6,
+    "embeddingRpmRemaining": 1,
+    "chatRpmRemaining": 1,
+    "embeddingTpmRemaining": 2048,
+    "chatTpmRemaining": 17648,
+    "chatInputByteCap": 16384,
+    "chatInputTokenLimit": 1048576,
+    "chatOutputTokenLimit": 65536,
+    "chatMaxOutputTokens": 1200,
+    "thinkingConfig": {
+      "thinkingLevel": "medium"
+    },
+    "thinkingDisabledSupported": false,
+    "spacingMs": 65000
+  }
+}

@@ -123,7 +123,7 @@ public class GeminiProvider implements LLMProvider {
         }
 
         String base = (baseUrl != null && !baseUrl.trim().isEmpty()) ? baseUrl.trim() : DEFAULT_BASE_URL;
-        String endpoint = base + "/v1beta/models/" + model.trim() + ":generateContent?key=" + apiKey.trim();
+        String endpoint = base + "/v1beta/models/" + model.trim() + ":generateContent";
 
         long start = System.currentTimeMillis();
         HttpURLConnection conn = null;
@@ -134,10 +134,13 @@ public class GeminiProvider implements LLMProvider {
             conn = openConnection(endpoint, "POST", (options == null ? 15000 : options.remainingMillis(10000)), (options == null ? 30000 : options.remainingMillis(20000)));
             deadline = ProviderDeadline.watch(conn, options);
             conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            conn.setRequestProperty("x-goog-api-key",apiKey.trim());
             conn.setDoOutput(true);
-
+            byte[] payload=requestBody.toString().getBytes(StandardCharsets.UTF_8);
+            // Streaming request bodies cannot be buffered/replayed by HttpURLConnection on EOF.
+            conn.setFixedLengthStreamingMode(payload.length);
             try (OutputStream os = conn.getOutputStream()) {
-                os.write(requestBody.toString().getBytes(StandardCharsets.UTF_8));
+                os.write(payload);
             }
 
             int code = conn.getResponseCode();
@@ -177,6 +180,7 @@ public class GeminiProvider implements LLMProvider {
                 JsonObject usage = root.getAsJsonObject("usageMetadata");
                 if (usage.has("promptTokenCount")) response.setPromptTokens(usage.get("promptTokenCount").getAsInt());
                 if (usage.has("candidatesTokenCount")) response.setCompletionTokens(usage.get("candidatesTokenCount").getAsInt());
+                if (usage.has("thoughtsTokenCount")) response.setThoughtsTokens(usage.get("thoughtsTokenCount").getAsInt());
                 if (usage.has("totalTokenCount")) response.setTotalTokens(usage.get("totalTokenCount").getAsInt());
             }
 
@@ -269,7 +273,7 @@ public class GeminiProvider implements LLMProvider {
         return chat(testMsgs, apiKey, model, baseUrl, opt);
     }
 
-    private JsonObject buildRequestBody(List<ChatMessage> messages, ChatOptions options, String model) {
+    protected JsonObject buildRequestBody(List<ChatMessage> messages, ChatOptions options, String model) {
         JsonObject body = new JsonObject();
         JsonArray contents = new JsonArray();
         String systemInstructionText = null;
@@ -303,22 +307,63 @@ public class GeminiProvider implements LLMProvider {
         body.add("contents", contents);
 
         JsonObject genConfig = new JsonObject();
+        boolean gemini3 = isGemini3Model(model);
         if (options != null && options.getResponseSchema() != null && model != null &&
-            (model.startsWith("gemini-2.5-") || model.startsWith("gemini-3"))) {
+            (model.startsWith("gemini-2.5-") || gemini3)) {
             genConfig.addProperty("responseMimeType", "application/json");
             genConfig.add("responseJsonSchema", options.getResponseSchema());
         }
-        genConfig.addProperty("temperature", options != null ? options.getTemperature() : 0.7);
-        genConfig.addProperty("maxOutputTokens", options != null ? options.getMaxTokens() : 600);
-        if (options != null && options.getTopP() != null) {
-            genConfig.addProperty("topP", options.getTopP());
+        if (!gemini3) {
+            genConfig.addProperty("temperature", options != null ? options.getTemperature() : 0.7);
+            if (options != null && options.getTopP() != null) {
+                genConfig.addProperty("topP", options.getTopP());
+            }
+        } else if (options != null && options.getThinkingLevel() != null && !options.getThinkingLevel().trim().isEmpty()) {
+            String normalizedLevel = normalizeThinkingLevel(model, options.getThinkingLevel());
+            if (normalizedLevel != null) {
+                JsonObject thinking = new JsonObject();
+                thinking.addProperty("thinkingLevel", normalizedLevel);
+                genConfig.add("thinkingConfig", thinking);
+            }
         }
+        genConfig.addProperty("maxOutputTokens", options != null ? options.getMaxTokens() : 600);
         body.add("generationConfig", genConfig);
 
         return body;
     }
 
-    static String customerText(JsonArray parts) {
+    public static boolean isGemini3Model(String model) {
+        return model != null && model.trim().toLowerCase(java.util.Locale.ROOT).startsWith("gemini-3");
+    }
+
+    public static boolean isFlashLiteModel(String model) {
+        if (model == null) return false;
+        String m = model.trim().toLowerCase(java.util.Locale.ROOT);
+        return "gemini-3.5-flash-lite".equals(m) || "gemini-3.1-flash-lite".equals(m);
+    }
+
+    public static boolean isSupportedThinkingLevel(String model, String level) {
+        if (model == null || level == null) return false;
+        String m = model.trim().toLowerCase(java.util.Locale.ROOT);
+        String l = level.trim().toLowerCase(java.util.Locale.ROOT);
+        if (m.startsWith("gemini-3.8-flash")) {
+            return "low".equals(l) || "medium".equals(l) || "high".equals(l);
+        }
+        if (m.startsWith("gemini-3.5-flash-lite") || m.startsWith("gemini-3.1-flash-lite") || m.startsWith("gemini-3.6-flash")) {
+            return "minimal".equals(l) || "low".equals(l) || "medium".equals(l) || "high".equals(l);
+        }
+        if (m.startsWith("gemini-3")) {
+            return "low".equals(l) || "medium".equals(l) || "high".equals(l);
+        }
+        return false;
+    }
+
+    public static String normalizeThinkingLevel(String model, String level) {
+        if (!isSupportedThinkingLevel(model, level)) return null;
+        return level.trim().toLowerCase(java.util.Locale.ROOT);
+    }
+
+    protected static String customerText(JsonArray parts) {
         StringBuilder text = new StringBuilder();
         for (JsonElement element : parts) {
             JsonObject part = element.getAsJsonObject();
@@ -363,6 +408,7 @@ public class GeminiProvider implements LLMProvider {
     private HttpURLConnection openConnection(String urlStr, String method, int connectTimeout, int readTimeout) throws IOException {
         URL url = new URL(urlStr);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setInstanceFollowRedirects(false);
         conn.setRequestMethod(method);
         conn.setConnectTimeout(connectTimeout);
         conn.setReadTimeout(readTimeout);

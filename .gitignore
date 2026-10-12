@@ -24,3 +24,9 @@ sources.txt
 node_modules/
 **/node_modules/
 .local/
+.env
+.env.*
+!.env.example
+.build/
+lib/
+dist/*-rag*.war

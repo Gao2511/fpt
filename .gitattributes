@@ -1,0 +1,2 @@
+*.sh text eol=lf
+tools/dependencies.lock text eol=lf

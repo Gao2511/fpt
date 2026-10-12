@@ -1,0 +1,61 @@
+{
+  "purpose": "Offline validation and administrator review only; never auto-publish or index",
+  "documents": [
+    {
+      "id": "internet-gaming",
+      "category": "guide",
+      "title": "Hướng dẫn kết nối khi chơi game",
+      "content": "Với nhu cầu chơi game, anh/chị nên ưu tiên kết nối dây LAN; tốc độ gói không bảo đảm ping hay độ trễ thực tế.",
+      "source": "src/java/ai/consultation/ConsultationPolicy.java",
+      "review": "existing_project_content_test_only",
+      "expectedContentFilter": true,
+      "expectedRejectionReason": "ACCEPTED"
+    },
+    {
+      "id": "installation-standard",
+      "category": "policy",
+      "title": "Phí Internet thông thường / lần",
+      "content": "300000",
+      "source": "src/java/cms/SiteContent.java",
+      "review": "authoritative_business_only",
+      "expectedContentFilter": false,
+      "expectedRejectionReason": "INVALID_BUSINESS_CLAIM"
+    },
+    {
+      "id": "wifi6-guidance",
+      "category": "guide",
+      "title": "Hướng dẫn WiFi 6",
+      "content": "Modem WiFi 6 tốc độ cao, hỗ trợ nhiều thiết bị cùng lúc không giật lag.",
+      "source": "src/java/cms/SiteContent.java",
+      "review": "administrator_verification_required_marketing_claim",
+      "expectedContentFilter": false,
+      "expectedRejectionReason": "MISSING_APPROVAL"
+    },
+    {
+      "id": "camera-faq",
+      "category": "faq",
+      "title": "Camera FAQ",
+      "content": "Camera AI thông minh, giám sát an ninh 24/7, xem mọi lúc mọi nơi qua điện thoại.",
+      "source": "src/java/cms/SiteContent.java",
+      "review": "administrator_verification_required_not_a_support_policy",
+      "expectedContentFilter": false,
+      "expectedRejectionReason": "MISSING_APPROVAL"
+    },
+    {
+      "id": "mesh-guidance",
+      "category": "guide",
+      "title": "Mesh WiFi F1",
+      "content": "Lưu ý: Mesh WiFi F1 là lựa chọn mở rộng phủ sóng kết hợp cùng gói cước Internet FPT, không phải gói độc lập (Tổng cước = Giá gói Internet + 10.000đ/tháng).",
+      "source": "src/java/ai/consultation/ConsultationPolicy.java",
+      "review": "authoritative_business_only",
+      "expectedContentFilter": false,
+      "expectedRejectionReason": "INVALID_BUSINESS_CLAIM"
+    }
+  ],
+  "missingPolicies": [
+    "Thời gian hoặc lịch lắp đặt cam kết",
+    "Điều khoản tạm ngừng, hủy hợp đồng hoặc chuyển địa chỉ",
+    "Thời gian lưu trữ, quyền riêng tư và bảo hành camera",
+    "Các bước đổi mật khẩu WiFi theo thiết bị đang cung cấp"
+  ]
+}

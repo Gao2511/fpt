@@ -15,10 +15,12 @@ public class ProviderResponseTest {
     static int passed;
     static void check(boolean condition,String reason){if(!condition)throw new AssertionError(reason);}
     public static void main(String[]args)throws Exception{
-        String[] response={""},request={""};int[] status={200},delay={0};AtomicInteger calls=new AtomicInteger();
+        String[] response={""},request={""},authHeader={""},path={""};int[] status={200},delay={0};AtomicInteger calls=new AtomicInteger();
         HttpServer server=HttpServer.create(new InetSocketAddress("127.0.0.1",0),0);
         server.createContext("/",exchange->{
             calls.incrementAndGet();
+            authHeader[0]=exchange.getRequestHeaders().getFirst("x-goog-api-key");path[0]=exchange.getRequestURI().toString();
+            if(status[0]==302)exchange.getResponseHeaders().add("Location","/redirect-must-not-be-followed");
             java.io.ByteArrayOutputStream body=new java.io.ByteArrayOutputStream();byte[] buffer=new byte[4096];int n;
             while((n=exchange.getRequestBody().read(buffer))!=-1)body.write(buffer,0,n);
             request[0]=new String(body.toByteArray(),StandardCharsets.UTF_8);
@@ -41,6 +43,19 @@ public class ProviderResponseTest {
             JsonObject sent=JsonParser.parseString(request[0]).getAsJsonObject();
             check(sent.getAsJsonObject("generationConfig").has("responseJsonSchema") && sent.has("system_instruction"),"Missing native Gemini schema/system separation");
             passed++;System.out.println("PASS Gemini HTTP multipart, thought exclusion and schema payload");
+
+            for(String model:Arrays.asList("gemini-3.8-flash","gemini-3.5-flash-lite")){
+                options.setThinkingLevel(model.equals("gemini-3.8-flash")?"medium":"low");
+                new GeminiProvider().chat(messages,"fake-test-key",model,base,options);
+                sent=JsonParser.parseString(request[0]).getAsJsonObject();JsonObject gen=sent.getAsJsonObject("generationConfig");
+                check(gen.getAsJsonObject("thinkingConfig").get("thinkingLevel").getAsString().equals(options.getThinkingLevel())&&!gen.has("temperature")&&!gen.has("topP")&&gen.has("responseJsonSchema")&&gen.get("maxOutputTokens").getAsInt()==1200,"Phase4 REST configuration");
+                check("fake-test-key".equals(authHeader[0])&&!path[0].contains("key=")&&path[0].endsWith(model+":generateContent"),"header auth / exact model endpoint");
+            }
+            passed++;System.out.println("PASS Phase4 exact Gemini models / thinking / header auth REST payload");
+            int redirectBefore=calls.get();status[0]=302;boolean redirectRejected=false;
+            try{new GeminiProvider().chat(messages,"fake-test-key","gemini-3.8-flash",base,options);}catch(AIException expected){redirectRejected=true;}
+            check(redirectRejected&&calls.get()==redirectBefore+1,"Gemini redirected or retried");status[0]=200;
+            passed++;System.out.println("PASS Gemini redirects rejected without an extra HTTP request");
 
             response[0]="{\"choices\":[{\"message\":{\"content\":"+new Gson().toJson(envelope)+"},\"finish_reason\":\"stop\"}]}";
             OpenAICompatibleProvider openai=new OpenAICompatibleProvider("openai","Test OpenAI",base,false);
@@ -78,6 +93,25 @@ public class ProviderResponseTest {
             check(timedOut && System.currentTimeMillis()-began<1500,"Stalled response not bounded/classified as timeout");
             passed++;System.out.println("PASS stalled provider response times out within bounded deadline");
         } finally {System.clearProperty("AI_LOCAL_BASE_URL");server.stop(0);}
+        noReplayOnEof(false);noReplayOnEof(true);
         System.out.println("ProviderResponseTest: "+passed+" passed");
+    }
+    /** Server drops the response after reading a POST: the JDK must not replay its buffered body. */
+    private static void noReplayOnEof(boolean embedding)throws Exception{
+        try(java.net.ServerSocket listener=new java.net.ServerSocket(0,4,java.net.InetAddress.getByName("127.0.0.1"))){
+            listener.setSoTimeout(600);AtomicInteger posts=new AtomicInteger();java.util.concurrent.atomic.AtomicReference<Throwable> failure=new java.util.concurrent.atomic.AtomicReference<>();
+            Thread dropper=new Thread(()->{try{while(posts.get()<3){try(java.net.Socket socket=listener.accept()){
+                socket.setSoTimeout(2000);java.io.InputStream in=socket.getInputStream();java.io.ByteArrayOutputStream header=new java.io.ByteArrayOutputStream();int n;
+                while((n=in.read())>=0){header.write(n);byte[] bytes=header.toByteArray();int len=bytes.length;if(len>=4&&bytes[len-4]==13&&bytes[len-3]==10&&bytes[len-2]==13&&bytes[len-1]==10)break;if(len>8192)throw new java.io.IOException("Fixture header bound");}
+                String h=new String(header.toByteArray(),StandardCharsets.US_ASCII);java.util.regex.Matcher m=java.util.regex.Pattern.compile("(?im)^Content-Length: ([0-9]+)").matcher(h);if(!m.find())throw new AssertionError("Expected fixed-length POST");int size=Integer.parseInt(m.group(1));for(int i=0;i<size;i++)if(in.read()<0)throw new java.io.IOException("Fixture body truncated");posts.incrementAndGet();
+            }}}catch(java.net.SocketTimeoutException finished){}catch(Throwable t){failure.set(t);}},"offline-eof-fixture");dropper.setDaemon(true);dropper.start();
+            String base="http://127.0.0.1:"+listener.getLocalPort();boolean rejected=false;
+            try{
+                if(embedding)rag.GeminiEmbeddingService.httpTransport().request("POST",base+"/embedContent","fake-test-key",new JsonObject(),System.currentTimeMillis()+2000);
+                else{ChatOptions o=new ChatOptions(.3,1200);o.setDeadlineMillis(System.currentTimeMillis()+2000);new GeminiProvider().chat(Arrays.asList(ChatMessage.user("Chào bạn")),"fake-test-key","gemini-3.8-flash",base,o);}
+            }catch(java.io.IOException|AIException expected){rejected=true;}
+            dropper.join(3000);check(rejected&&failure.get()==null&&!dropper.isAlive()&&posts.get()==1,"Implicit HTTP POST replay on EOF");
+            passed++;System.out.println("PASS "+(embedding?"Embedding":"Chat")+" HTTP EOF cannot implicitly replay POST");
+        }
     }
 }

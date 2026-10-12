@@ -1,0 +1,13 @@
+.git
+.local
+.build
+.env
+.env.*
+!.env.example
+nbproject/private
+**/oauth.properties
+**/*.log
+build
+test
+test-e2e
+node_modules

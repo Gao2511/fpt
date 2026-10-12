@@ -13,16 +13,28 @@ public class ChatResponse implements Serializable {
     private String model;
     private int promptTokens;
     private int completionTokens;
+    private int thoughtsTokens;
     private int totalTokens;
     private String finishReason;
     private long latencyMs;
     private String action = "none";
     private Integer recommendedPackageId;
+    private boolean usedFallbackModel;
+    private String fallbackReason;
+    private int requestAttempts;
 
     public String getAction() { return action; }
     public void setAction(String action) { this.action = action; }
     public Integer getRecommendedPackageId() { return recommendedPackageId; }
     public void setRecommendedPackageId(Integer id) { recommendedPackageId = id; }
+    public int getThoughtsTokens() { return thoughtsTokens; }
+    public void setThoughtsTokens(int thoughtsTokens) { this.thoughtsTokens = thoughtsTokens; }
+    public boolean isUsedFallbackModel() { return usedFallbackModel; }
+    public void setUsedFallbackModel(boolean usedFallbackModel) { this.usedFallbackModel = usedFallbackModel; }
+    public String getFallbackReason() { return fallbackReason; }
+    public void setFallbackReason(String fallbackReason) { this.fallbackReason = fallbackReason; }
+    public int getRequestAttempts() { return requestAttempts; }
+    public void setRequestAttempts(int requestAttempts) { this.requestAttempts = requestAttempts; }
 
     public ChatResponse() {
     }
