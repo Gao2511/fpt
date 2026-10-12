@@ -229,39 +229,6 @@
                         </div>
                     </div>
 
-                    <!-- 5. MÔ HÌNH DỰ PHÒNG (FALLBACK MODEL) -->
-                    <div class="fallback-settings-card">
-                        <div class="fallback-title">
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                            Mô hình Dự Phòng Tự Động (Fallback Resilience)
-                        </div>
-                        <div class="fallback-desc">
-                            Khi model chính gặp sự cố (quá tải 503, hết quota 429, timeout), hệ thống tự động chuyển ngay sang model dự phòng này để chatbot khách không bị đứt đoạn.
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                            <div>
-                                <label class="form-label-dark" style="font-size: 11.5px; margin-bottom: 4px;">Hãng dự phòng:</label>
-                                <select name="ai_fallback_provider" id="fallbackProviderSelect" class="select-dark" style="padding: 8px 12px; font-size: 13px;">
-                                    <option value="" ${empty settingsMap['ai_fallback_provider'] ? 'selected' : ''}>-- Không dùng (Tắt) --</option>
-                                    <option value="gemini" ${settingsMap['ai_fallback_provider'] == 'gemini' ? 'selected' : ''}>Google Gemini</option>
-                                    <option value="openai" ${settingsMap['ai_fallback_provider'] == 'openai' ? 'selected' : ''}>OpenAI</option>
-                                    <option value="deepseek" ${settingsMap['ai_fallback_provider'] == 'deepseek' ? 'selected' : ''}>DeepSeek</option>
-                                    <option value="claude" ${settingsMap['ai_fallback_provider'] == 'claude' ? 'selected' : ''}>Claude</option>
-                                    <option value="groq" ${settingsMap['ai_fallback_provider'] == 'groq' ? 'selected' : ''}>Groq</option>
-                                    <option value="openrouter" ${settingsMap['ai_fallback_provider'] == 'openrouter' ? 'selected' : ''}>OpenRouter</option>
-                                    <option value="custom" ${settingsMap['ai_fallback_provider'] == 'custom' ? 'selected' : ''}>Custom</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="form-label-dark" style="font-size: 11.5px; margin-bottom: 4px;">Model dự phòng:</label>
-                                <input type="text" name="ai_fallback_model" id="fallbackModelInput"
-                                       class="input-dark" style="padding: 8px 12px; font-size: 13px;"
-                                       value="${fn:escapeXml(settingsMap['ai_fallback_model'])}"
-                                       placeholder="Đồng bộ và chọn model đang hoạt động">
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- 6. THAM SỐ SINH CHỮ (TEMPERATURE & MAX TOKENS) -->
                     <div class="params-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px;">
                         <div class="form-group-dark">
@@ -516,7 +483,12 @@
 
     // Dữ liệu presets được nạp sẵn
     const PRESETS = {
-        gemini: [],
+        gemini: [
+            { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash (Khuyên dùng: Siêu nhanh, chuẩn JSON Schema)' },
+            { id: 'gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash Lite (Tốc độ cao, tiết kiệm quota)' },
+            { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro (Suy luận chuyên sâu)' },
+            { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' }
+        ],
         openai: [
             { id: 'gpt-4o-mini', name: 'GPT-4o Mini (Khuyên dùng: Siêu thông minh, phản hồi cực nhanh, rẻ)' },
             { id: 'gpt-4o', name: 'GPT-4o (Flagship đa thể thức thông minh nhất của OpenAI)' },

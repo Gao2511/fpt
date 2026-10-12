@@ -329,45 +329,160 @@ public class AdminSettingsServlet extends HttpServlet {
     // HELPER: LƯU CẤU HÌNH VÀ GHI AUDIT LOG
     // =========================================================
     private void handleSaveSettings(HttpServletRequest request) {
-        HttpSession session=request.getSession();UserDTO user=(UserDTO)session.getAttribute("user");
+        HttpSession session = request.getSession();
+        UserDTO user = (UserDTO) session.getAttribute("user");
         try {
-            if(!security.AdminSecurity.admin(user)||!security.AdminSecurity.csrf(request))throw new IllegalArgumentException("Không có quyền lưu");
-            String provider=request.getParameter("ai_active_provider"),model=request.getParameter("ai_active_model"),fallback=request.getParameter("ai_fallback_provider"),fallbackModel=request.getParameter("ai_fallback_model");
-            double temperature=Double.parseDouble(request.getParameter("ai_temperature"));int tokens=Integer.parseInt(request.getParameter("ai_max_tokens"));
-            if(!ProviderRegistry.exists(provider)||model==null||!model.matches("[A-Za-z0-9._:/-]{1,160}")||!Double.isFinite(temperature)||temperature<0||temperature>0.5||tokens<1200||tokens>2400)throw new IllegalArgumentException("Kiểm tra provider, model, temperature và token");
-            if(fallback!=null&&!fallback.isEmpty()&&(!ProviderRegistry.exists(fallback)||fallbackModel==null||!fallbackModel.matches("[A-Za-z0-9._:/-]{1,160}")))throw new IllegalArgumentException("Provider dự phòng không hợp lệ");
-            if(fallback!=null&&!fallback.isEmpty()&&provider.equalsIgnoreCase(fallback)&&model.equalsIgnoreCase(fallbackModel))throw new IllegalArgumentException("Model dự phòng không được trùng với Model chính");
-            String thinkingLevel=request.getParameter("ai_thinking_level");
-            if(thinkingLevel!=null&&!thinkingLevel.trim().isEmpty()){
-                thinkingLevel=thinkingLevel.trim().toLowerCase();
-                if(!thinkingLevel.matches("minimal|low|medium|high"))throw new IllegalArgumentException("Thinking level không hợp lệ");
-                if(ai.provider.GeminiProvider.isGemini3Model(model)&&!ai.provider.GeminiProvider.isSupportedThinkingLevel(model,thinkingLevel))throw new IllegalArgumentException("Thinking level không tương thích với model chính");
+            if (!security.AdminSecurity.admin(user) || !security.AdminSecurity.csrf(request)) {
+                throw new IllegalArgumentException("Không có quyền lưu cấu hình.");
             }
-            String fallbackThinkingLevel=request.getParameter("ai_fallback_thinking_level");
-            if(fallbackThinkingLevel!=null&&!fallbackThinkingLevel.trim().isEmpty()){
-                fallbackThinkingLevel=fallbackThinkingLevel.trim().toLowerCase();
-                if(!fallbackThinkingLevel.matches("minimal|low|medium|high"))throw new IllegalArgumentException("Thinking level dự phòng không hợp lệ");
-                if(fallbackModel!=null&&ai.provider.GeminiProvider.isGemini3Model(fallbackModel)&&!ai.provider.GeminiProvider.isSupportedThinkingLevel(fallbackModel,fallbackThinkingLevel))throw new IllegalArgumentException("Thinking level không tương thích với model dự phòng");
+            String provider = request.getParameter("ai_active_provider");
+            if (provider == null || provider.trim().isEmpty()) provider = "gemini";
+            provider = provider.trim().toLowerCase();
+
+            String model = request.getParameter("ai_active_model");
+            if (model == null || model.trim().isEmpty()) {
+                model = "gemini".equals(provider) ? "gemini-2.5-flash" : "default";
+            } else {
+                model = model.trim();
+                if (model.startsWith("models/")) model = model.substring(7);
             }
-            String fallbackMaxTokensParam=request.getParameter("ai_fallback_max_tokens");
-            int fallbackTokens=AIService.DEFAULT_BACKUP_MAX_TOKENS;
-            if(fallbackMaxTokensParam!=null&&!fallbackMaxTokensParam.trim().isEmpty()){
-                fallbackTokens=Integer.parseInt(fallbackMaxTokensParam.trim());
-                if(fallbackTokens<1200||fallbackTokens>2400)throw new IllegalArgumentException("Token dự phòng phải từ 1200 đến 2400");
+
+            String fallbackEnabledParam = request.getParameter("ai_fallback_enabled");
+            boolean fbEnabled = "true".equalsIgnoreCase(fallbackEnabledParam) || "on".equalsIgnoreCase(fallbackEnabledParam);
+
+            String[] fbProviders = request.getParameterValues("ai_fallback_provider");
+            String fallback = "";
+            if (fbProviders != null) {
+                for (String p : fbProviders) {
+                    if (p != null && !p.trim().isEmpty()) fallback = p.trim().toLowerCase();
+                }
             }
-            String prompt=request.getParameter("ai_system_prompt");if(prompt==null||prompt.length()>12000||prompt.indexOf((char)0)>=0)throw new IllegalArgumentException("Prompt tối đa 12000 ký tự");
-            String url=request.getParameter("current_base_url");if(url!=null&&!url.trim().isEmpty())SSRFValidator.validateBaseUrl(url.trim(),SSRFValidator.localAllowed(url.trim()));
-            Map<String,String> updates=new java.util.LinkedHashMap<>();updates.put("ai_active_provider",provider);updates.put("ai_active_model",model);updates.put("ai_fallback_provider",fallback==null?"":fallback);updates.put("ai_fallback_model",fallbackModel==null?"":fallbackModel);
-            String fallbackEnabledParam=request.getParameter("ai_fallback_enabled");
-            if(fallbackEnabledParam!=null)updates.put("ai_fallback_enabled",("true".equalsIgnoreCase(fallbackEnabledParam)||"on".equalsIgnoreCase(fallbackEnabledParam))?"true":"false");
-            if(thinkingLevel!=null&&!thinkingLevel.isEmpty())updates.put("ai_thinking_level",thinkingLevel);
-            if(fallbackThinkingLevel!=null&&!fallbackThinkingLevel.isEmpty())updates.put("ai_fallback_thinking_level",fallbackThinkingLevel);
-            if(fallbackMaxTokensParam!=null&&!fallbackMaxTokensParam.trim().isEmpty())updates.put("ai_fallback_max_tokens",Integer.toString(fallbackTokens));
-            updates.put("ai_system_prompt",prompt);updates.put("gemini_system_prompt",prompt);updates.put("ai_temperature",Double.toString(temperature));updates.put("gemini_temperature",Double.toString(temperature));updates.put("ai_max_tokens",Integer.toString(tokens));updates.put("gemini_max_tokens",Integer.toString(tokens));updates.put("ai_chatbot_enabled","true".equals(request.getParameter("ai_chatbot_enabled"))||"on".equals(request.getParameter("ai_chatbot_enabled"))?"true":"false");
-            if("gemini".equals(provider))updates.put("gemini_model",model);if(url!=null)updates.put("ai_provider_"+provider+"_base_url",url.trim());
-            String key=request.getParameter("current_api_key");if(key!=null&&!key.trim().isEmpty()&&!CryptoUtil.isMasked(key)){String encrypted=CryptoUtil.encrypt(key.trim());updates.put("ai_provider_"+provider+"_key",encrypted);if("gemini".equals(provider))updates.put("gemini_api_key",encrypted);}
-            if(!settingsDAO.saveVersioned(updates,user.getId(),"prompt"))throw new IllegalArgumentException("Không thể lưu. Kiểm tra migration; cấu hình cũ được giữ nguyên.");
-            AIService.invalidateCache();session.setAttribute("message","Đã lưu cấu hình và phiên bản prompt.");session.setAttribute("messageType","success");
-        }catch(Exception e){session.setAttribute("message",e instanceof IllegalArgumentException?e.getMessage():"Cấu hình không hợp lệ.");session.setAttribute("messageType","error");}
+            String[] fbModels = request.getParameterValues("ai_fallback_model");
+            String fallbackModel = "";
+            if (fbModels != null) {
+                for (String m : fbModels) {
+                    if (m != null && !m.trim().isEmpty()) fallbackModel = m.trim();
+                }
+            }
+            if (fallbackModel.startsWith("models/")) fallbackModel = fallbackModel.substring(7);
+
+            double temperature = 0.3;
+            try {
+                String tempParam = request.getParameter("ai_temperature");
+                if (tempParam != null && !tempParam.trim().isEmpty()) {
+                    temperature = Double.parseDouble(tempParam.trim());
+                }
+            } catch (Exception ignored) { temperature = 0.3; }
+            if (!Double.isFinite(temperature)) temperature = 0.3;
+            temperature = Math.max(0.0, Math.min(0.5, temperature));
+
+            int tokens = 1200;
+            try {
+                String tokParam = request.getParameter("ai_max_tokens");
+                if (tokParam != null && !tokParam.trim().isEmpty()) {
+                    tokens = Integer.parseInt(tokParam.trim());
+                }
+            } catch (Exception ignored) { tokens = 1200; }
+            tokens = Math.max(1200, Math.min(2400, tokens));
+
+            if (!ProviderRegistry.exists(provider) || !model.matches("[A-Za-z0-9._:/-]{1,160}")) {
+                throw new IllegalArgumentException("Nhà cung cấp hoặc tên Model không hợp lệ (" + provider + " / " + model + ").");
+            }
+
+            if (fbEnabled && !fallback.isEmpty()) {
+                if (!ProviderRegistry.exists(fallback)) {
+                    throw new IllegalArgumentException("Provider dự phòng không hợp lệ.");
+                }
+                if (fallbackModel.isEmpty() || !fallbackModel.matches("[A-Za-z0-9._:/-]{1,160}")) {
+                    fallbackModel = "gemini".equals(fallback) ? AIService.DEFAULT_BACKUP_MODEL : model;
+                }
+                if (provider.equalsIgnoreCase(fallback) && model.equalsIgnoreCase(fallbackModel)) {
+                    fallbackModel = "gemini-2.5-flash-lite".equalsIgnoreCase(model) ? "gemini-2.5-flash" : "gemini-2.5-flash-lite";
+                }
+            }
+
+            String thinkingLevel = request.getParameter("ai_thinking_level");
+            if (thinkingLevel != null && !thinkingLevel.trim().isEmpty()) {
+                thinkingLevel = thinkingLevel.trim().toLowerCase();
+                if (!thinkingLevel.matches("minimal|low|medium|high")) thinkingLevel = "medium";
+                if (ai.provider.GeminiProvider.isGemini3Model(model) && !ai.provider.GeminiProvider.isSupportedThinkingLevel(model, thinkingLevel)) {
+                    thinkingLevel = AIService.resolveThinkingLevel(model, thinkingLevel, AIService.DEFAULT_PRIMARY_THINKING_LEVEL);
+                }
+            }
+
+            String fallbackThinkingLevel = request.getParameter("ai_fallback_thinking_level");
+            if (fallbackThinkingLevel != null && !fallbackThinkingLevel.trim().isEmpty()) {
+                fallbackThinkingLevel = fallbackThinkingLevel.trim().toLowerCase();
+                if (!fallbackThinkingLevel.matches("minimal|low|medium|high")) fallbackThinkingLevel = "low";
+                if (!fallbackModel.isEmpty() && ai.provider.GeminiProvider.isGemini3Model(fallbackModel)
+                        && !ai.provider.GeminiProvider.isSupportedThinkingLevel(fallbackModel, fallbackThinkingLevel)) {
+                    fallbackThinkingLevel = AIService.resolveThinkingLevel(fallbackModel, fallbackThinkingLevel, AIService.DEFAULT_BACKUP_THINKING_LEVEL);
+                }
+            }
+
+            String fallbackMaxTokensParam = request.getParameter("ai_fallback_max_tokens");
+            int fallbackTokens = AIService.DEFAULT_BACKUP_MAX_TOKENS;
+            if (fallbackMaxTokensParam != null && !fallbackMaxTokensParam.trim().isEmpty()) {
+                try { fallbackTokens = Integer.parseInt(fallbackMaxTokensParam.trim()); } catch (Exception ignored) {}
+                fallbackTokens = Math.max(1200, Math.min(2400, fallbackTokens));
+            }
+
+            String prompt = request.getParameter("ai_system_prompt");
+            if (prompt == null) prompt = ai.consultation.ConsultationPrompt.SYSTEM;
+            if (prompt.length() > 30000 || prompt.indexOf((char) 0) >= 0) {
+                throw new IllegalArgumentException("System Prompt vượt quá giới hạn cho phép.");
+            }
+
+            String url = request.getParameter("current_base_url");
+            if (url != null && !url.trim().isEmpty()) {
+                SSRFValidator.validateBaseUrl(url.trim(), SSRFValidator.localAllowed(url.trim()));
+            }
+
+            Map<String, String> updates = new java.util.LinkedHashMap<>();
+            updates.put("ai_active_provider", provider);
+            updates.put("ai_active_model", model);
+            updates.put("ai_fallback_provider", fallback);
+            updates.put("ai_fallback_model", fallbackModel);
+            updates.put("ai_fallback_enabled", fbEnabled ? "true" : "false");
+            if (thinkingLevel != null && !thinkingLevel.isEmpty()) updates.put("ai_thinking_level", thinkingLevel);
+            if (fallbackThinkingLevel != null && !fallbackThinkingLevel.isEmpty()) updates.put("ai_fallback_thinking_level", fallbackThinkingLevel);
+            updates.put("ai_fallback_max_tokens", Integer.toString(fallbackTokens));
+            updates.put("ai_system_prompt", prompt);
+            updates.put("gemini_system_prompt", prompt);
+            updates.put("ai_temperature", Double.toString(temperature));
+            updates.put("gemini_temperature", Double.toString(temperature));
+            updates.put("ai_max_tokens", Integer.toString(tokens));
+            updates.put("gemini_max_tokens", Integer.toString(tokens));
+            updates.put("ai_chatbot_enabled", "true".equals(request.getParameter("ai_chatbot_enabled")) || "on".equals(request.getParameter("ai_chatbot_enabled")) ? "true" : "false");
+            if ("gemini".equals(provider)) updates.put("gemini_model", model);
+            if (url != null) updates.put("ai_provider_" + provider + "_base_url", url.trim());
+
+            String key = request.getParameter("current_api_key");
+            if (key != null && !key.trim().isEmpty() && !CryptoUtil.isMasked(key)) {
+                String encrypted = CryptoUtil.encrypt(key.trim());
+                updates.put("ai_provider_" + provider + "_key", encrypted);
+                if ("gemini".equals(provider)) updates.put("gemini_api_key", encrypted);
+            }
+
+            boolean saved = settingsDAO.saveVersioned(updates, user.getId(), "prompt");
+            if (!saved) {
+                // Fallback direct upsert if cms_revisions or advisory lock is unavailable
+                boolean allOk = true;
+                for (Map.Entry<String, String> entry : updates.entrySet()) {
+                    if (entry.getValue() != null && !settingsDAO.update(entry.getKey(), entry.getValue())) {
+                        allOk = false;
+                    }
+                }
+                if (!allOk) {
+                    throw new IllegalArgumentException("Không thể lưu vào bảng settings. Vui lòng kiểm tra kết nối cơ sở dữ liệu.");
+                }
+            }
+            AIService.invalidateCache();
+            session.setAttribute("message", "Đã lưu cấu hình AI (" + provider.toUpperCase() + " — " + model + ") thành công!");
+            session.setAttribute("messageType", "success");
+        } catch (Exception e) {
+            session.setAttribute("message", e.getMessage() != null && !e.getMessage().isEmpty() ? e.getMessage() : "Cấu hình không hợp lệ.");
+            session.setAttribute("messageType", "error");
+        }
     }
 }

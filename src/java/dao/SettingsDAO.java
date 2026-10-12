@@ -32,10 +32,27 @@ public class SettingsDAO {
                     if(entry.getValue()==null){try(PreparedStatement delete=c.prepareStatement("DELETE FROM settings WHERE setting_key=?")){delete.setString(1,key);delete.executeUpdate();}}
                     else try(PreparedStatement p=c.prepareStatement(sql)){p.setString(1,key);p.setString(2,entry.getValue());if(p.executeUpdate()!=1)throw new SQLException("Publish failed");}
                 }
-                try(PreparedStatement p=c.prepareStatement("INSERT INTO cms_revisions(actor_id,change_type,before_data,after_data) VALUES(?,?,CAST(? AS jsonb),CAST(? AS jsonb))")){p.setInt(1,actor);p.setString(2,kind);p.setString(3,before.toString());p.setString(4,after.toString());p.executeUpdate();}
+                Savepoint sp = null;
+                try { sp = c.setSavepoint("before_cms_rev"); } catch (Exception ignored) {}
+                try(PreparedStatement p=c.prepareStatement("INSERT INTO cms_revisions(actor_id,change_type,before_data,after_data) VALUES(?,?,CAST(? AS jsonb),CAST(? AS jsonb))")){
+                    p.setInt(1,actor);p.setString(2,kind);p.setString(3,before.toString());p.setString(4,after.toString());p.executeUpdate();
+                } catch (SQLException revErr) {
+                    if (sp != null) {
+                        c.rollback(sp);
+                        try (Statement st = c.createStatement()) {
+                            st.execute("CREATE TABLE IF NOT EXISTS cms_revisions (id bigserial PRIMARY KEY, actor_id integer NOT NULL, change_type varchar(64) NOT NULL, before_data jsonb NOT NULL, after_data jsonb NOT NULL, created_at timestamptz NOT NULL DEFAULT NOW())");
+                            st.execute("CREATE INDEX IF NOT EXISTS cms_revisions_kind_id ON cms_revisions(change_type,id DESC)");
+                        }
+                        try(PreparedStatement p=c.prepareStatement("INSERT INTO cms_revisions(actor_id,change_type,before_data,after_data) VALUES(?,?,CAST(? AS jsonb),CAST(? AS jsonb))")){
+                            p.setInt(1,actor);p.setString(2,kind);p.setString(3,before.toString());p.setString(4,after.toString());p.executeUpdate();
+                        }
+                    } else {
+                        throw revErr;
+                    }
+                }
                 c.commit();return true;
-            }catch(Exception e){c.rollback();System.err.println("[CMS] Publish rolled back");return false;}
-        }catch(Exception e){System.err.println("[CMS] Storage unavailable");return false;}
+            }catch(Exception e){c.rollback();System.err.println("[CMS] Publish rolled back: " + e.getMessage());return false;}
+        }catch(Exception e){System.err.println("[CMS] Storage unavailable: " + e.getMessage());return false;}
     }
     public java.util.List<Map<String,String>> revisions(String kind){java.util.List<Map<String,String>> list=new java.util.ArrayList<>();try(Connection c=DBUtils.getConnection();PreparedStatement p=c.prepareStatement("SELECT id,actor_id,created_at FROM cms_revisions WHERE change_type=? ORDER BY id DESC LIMIT 20")){p.setString(1,kind);try(ResultSet r=p.executeQuery()){while(r.next()){Map<String,String> m=new java.util.HashMap<>();m.put("id",r.getString(1));m.put("actor",r.getString(2));m.put("time",r.getString(3));list.add(m);}}}catch(Exception e){System.err.println("[CMS] Revision list unavailable");}return list;}
     public boolean rollbackLatest(int revisionId,int actor,String kind){
