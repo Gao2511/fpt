@@ -2259,8 +2259,8 @@ public class AdminKnowledgeDAO {
         if (category == null || !VALID_CATEGORIES.contains(category.trim().toLowerCase(Locale.ROOT))) {
             throw new IllegalArgumentException("Danh mục tài liệu không hợp lệ (chỉ nhận faq, policy, guide).");
         }
-        if (content == null || content.trim().isEmpty() || content.length() > 60000) {
-            throw new IllegalArgumentException("Nội dung tài liệu bắt buộc (1..60.000 ký tự).");
+        if (content == null || content.trim().isEmpty() || content.length() > 300000) {
+            throw new IllegalArgumentException("Nội dung tài liệu bắt buộc (1..300.000 ký tự).");
         }
         if (source == null || source.trim().isEmpty() || source.trim().length() > 500) {
             throw new IllegalArgumentException("Nguồn tài liệu (source) bắt buộc (1..500 ký tự).");
