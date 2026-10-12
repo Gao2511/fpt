@@ -21,7 +21,7 @@ public final class DocumentSectionService {
     }
     private static final Pattern HEADING=Pattern.compile("(?im)^(?:#{1,6}\\s+.+|(?:PHẦN|MỤC|CHƯƠNG)\\s+[^\\r\\n]+|[0-9]{1,2}[.)]\\s+[^\\r\\n]+|[IVX]{1,6}[.)]\\s+[^\\r\\n]+)$");
     public List<Section> detect(String text){
-        if(text==null||text.trim().isEmpty()||text.length()>300000)throw new IllegalArgumentException("Văn bản trích xuất không hợp lệ.");
+        if(text==null||text.trim().isEmpty()||text.length()>60000)throw new IllegalArgumentException("Văn bản trích xuất không hợp lệ.");
         List<Integer> offsets=new ArrayList<>();offsets.add(0);Matcher m=HEADING.matcher(text);
         while(m.find())if(m.start()>0)offsets.add(m.start());
         if(offsets.size()>200)throw new IllegalArgumentException("Có quá nhiều mục; cần chia tệp trước khi nhập.");

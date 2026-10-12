@@ -75,7 +75,7 @@ public class KnowledgeDocumentDAO {
     private static void validate(KnowledgeDocumentDTO d,int actor) throws RagException {
         if(d==null || actor<=0 || d.id<0 || d.version<0 || (d.id>0 && d.version==0) ||
             d.title==null || d.title.trim().isEmpty() || d.title.length()>200 || !d.title.equals(d.title.trim()) ||
-            d.content==null || d.content.trim().isEmpty() || d.content.length()>300000 ||
+            d.content==null || d.content.trim().isEmpty() || d.content.length()>60000 ||
             d.source==null || d.source.trim().isEmpty() || d.source.length()>500 || !d.source.equals(d.source.trim()) ||
             !Arrays.asList("faq","policy","guide").contains(d.category) || !Arrays.asList("draft","published","archived").contains(d.status) ||
             d.policyKey==null || !(d.policyKey.isEmpty() || d.policyKey.matches("[a-z0-9][a-z0-9._-]{0,99}")) ||

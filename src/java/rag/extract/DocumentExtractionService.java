@@ -28,7 +28,7 @@ public final class DocumentExtractionService {
     private static final long MAX_UNCOMPRESSED_BYTES = 25L * 1024L * 1024L; // 25 MB
     private static final int MAX_ZIP_ENTRIES = 250;
     private static final int MAX_COMPRESSION_RATIO = 50;
-    private static final int MAX_EXTRACTED_CHARS = 300000;
+    private static final int MAX_EXTRACTED_CHARS = 60000;
 
     private static final Set<String> ALLOWED_EXTENSIONS = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList("pdf", "docx", "txt", "md")));
@@ -180,8 +180,8 @@ public final class DocumentExtractionService {
         if (extracted.length() > MAX_EXTRACTED_CHARS) {
             extracted = extracted.substring(0, MAX_EXTRACTED_CHARS).trim();
             warning = warning.isEmpty()
-                    ? "Nội dung đã được cắt giới hạn tối đa 300.000 ký tự."
-                    : warning + " Nội dung cắt giới hạn 300.000 ký tự.";
+                    ? "Nội dung đã được cắt giới hạn tối đa 60.000 ký tự."
+                    : warning + " Nội dung cắt giới hạn 60.000 ký tự.";
         }
 
         Files.write(target, bytes, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);

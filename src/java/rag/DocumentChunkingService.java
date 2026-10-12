@@ -34,7 +34,7 @@ public final class DocumentChunkingService {
     }
 
     public List<String> chunk(String content, int maxChunkSize, int overlap) throws RagException {
-        if(content==null || content.trim().isEmpty() || content.length()>300000) throw new RagException(RagException.Code.INVALID_DOCUMENT);
+        if(content==null || content.trim().isEmpty() || content.length()>60000) throw new RagException(RagException.Code.INVALID_DOCUMENT);
         if(maxChunkSize<MIN_CHUNK_SIZE || maxChunkSize>MAX_CHUNK_SIZE || overlap<0 || overlap>MAX_OVERLAP || overlap>=maxChunkSize/2)
             throw new RagException(RagException.Code.INVALID_DOCUMENT);
         String text=content.replace("\r\n","\n").replace('\r','\n').trim();
