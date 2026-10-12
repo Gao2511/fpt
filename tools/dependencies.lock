@@ -4,5 +4,4 @@ ae475120e9fcd99b4b00b38329bd61cdc5eb754eee03fe66c01f50e137724f99 lib/runtime/act
 45b515e7104944c09e45b9c7bb1ce5dff640486374852dd2b2e80cc3752dfa11 lib/runtime/javax.mail.jar https://repo.maven.apache.org/maven2/com/sun/mail/javax.mail/1.6.2/javax.mail-1.6.2.jar
 c6273119354a41522877e663582041012b22f8204fe72bba337ed84c7e649b0a lib/runtime/jstl-1.2.jar https://repo.maven.apache.org/maven2/javax/servlet/jstl/1.2/jstl-1.2.jar
 6e0e4cc2d8cae902084f8a2b18728b073a6fd9d1f87c9d8bff8f298c18185b93 lib/runtime/postgresql-42.7.13.jar https://repo.maven.apache.org/maven2/org/postgresql/postgresql/42.7.13/postgresql-42.7.13.jar
-e8c513e3d2ab17c39aec36167cc03d8bee9683f232b754b6a63c54c3eb25a8c4 lib/runtime/standard-1.0.6.jar https://repo.maven.apache.org/maven2/taglibs/standard/1.0.6/standard-1.0.6.jar
 83a03dd877d3674576f0da7b90755c8524af099ccf0607fc61aa971535ad7c60 lib/compile-only/javax.servlet-api-4.0.1.jar https://repo.maven.apache.org/maven2/javax/servlet/javax.servlet-api/4.0.1/javax.servlet-api-4.0.1.jar

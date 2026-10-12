@@ -4,7 +4,7 @@
     <property name="portable.dir" location=".build"/>
     <property name="portable.web" location="${portable.dir}/web"/>
     <property name="portable.war" location="${portable.dir}/dist/fpt-sale-rag.war"/>
-    <path id="compile.path"><fileset dir="lib/runtime" includes="*.jar"/><fileset dir="lib/compile-only" includes="*.jar"/></path>
+    <path id="compile.path"><fileset dir="lib/runtime" includes="*.jar" excludes="standard-*.jar"/><fileset dir="lib/compile-only" includes="*.jar"/></path>
     <target name="compile">
         <mkdir dir="${portable.web}/WEB-INF/classes"/>
         <javac srcdir="src/java" destdir="${portable.web}/WEB-INF/classes" encoding="UTF-8" release="8" includeantruntime="false" excludes="controller/TestController.java">
@@ -13,11 +13,13 @@
     </target>
     <target name="war" depends="compile">
         <copy todir="${portable.web}"><fileset dir="web" excludes="WEB-INF/classes/**,WEB-INF/lib/**,**/.env*,**/oauth.properties,**/*.log,**/*.sql,**/*.java"/></copy>
-        <copy todir="${portable.web}/WEB-INF/lib"><fileset dir="lib/runtime" includes="*.jar"/></copy>
+        <!-- JSTL 1.2 includes its implementation. Old Standard 1.0 jars duplicate Util/classes. -->
+        <delete><fileset dir="${portable.web}/WEB-INF/lib" includes="standard-*.jar" erroronmissingdir="false"/></delete>
+        <copy todir="${portable.web}/WEB-INF/lib"><fileset dir="lib/runtime" includes="*.jar" excludes="standard-*.jar"/></copy>
         <mkdir dir="${portable.dir}/dist"/>
         <!-- Fixed ZIP modification timestamp permits artifact comparison on the same JDK/deps. -->
         <war destfile="${portable.war}" webxml="web/WEB-INF/web.xml" modificationtime="2026-01-01T00:00:00Z">
-            <fileset dir="${portable.web}" excludes="WEB-INF/web.xml,**/oauth.properties,**/TestController*.class,**/.env*,**/*.log"/>
+            <fileset dir="${portable.web}" excludes="WEB-INF/web.xml,WEB-INF/lib/standard-*.jar,**/oauth.properties,**/TestController*.class,**/.env*,**/*.log"/>
         </war>
     </target>
     <target name="test" depends="compile">

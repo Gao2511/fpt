@@ -10,6 +10,10 @@
 <project name="fpt-sale" default="default" basedir=".">
     <description>Builds, tests, and runs the project fpt-sale.</description>
     <import file="nbproject/build-impl.xml"/>
+    <!-- Remove only obsolete generated build copies; keep original libraries/data untouched. -->
+    <target name="-pre-dist">
+        <delete><fileset dir="${build.web.dir}/WEB-INF/lib" includes="standard-*.jar" erroronmissingdir="false"/></delete>
+    </target>
     <!--
 
     There exist several targets which are by default empty and which can be 
