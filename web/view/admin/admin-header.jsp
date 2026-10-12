@@ -190,6 +190,16 @@
         <c:if test="${!demoMode}">
             <div class="sidebar-group sidebar-group-expandable ${isAiSectionActive ? 'is-open group-active' : ''}" id="sidebarGroupAi">
                 <div class="sidebar-group-label">AI &amp; Chatbot</div>
+                <a href="${pageContext.request.contextPath}/admin/settings#api-key"
+                   class="sidebar-link ${param.activeTab == 'settings' ? 'active' : ''}"
+                   id="adminAiSettingsLink"
+                   data-tooltip="Cấu hình AI &amp; API key"
+                   ${param.activeTab == 'settings' ? 'aria-current="page"' : ''}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="8" cy="15" r="5"/><path d="M11.5 11.5 21 2m-3 3 3 3m-6 0 3 3"/>
+                    </svg>
+                    <span class="sidebar-label">Cấu hình AI &amp; API key</span>
+                </a>
                 <button type="button"
                         class="sidebar-group-toggle ${isAiSectionActive ? 'group-active' : ''}"
                         id="sidebarAiToggleBtn"
@@ -302,7 +312,7 @@
                     <c:when test="${param.activeTab == 'business'}">Thông tin Kinh doanh &amp; Cài đặt chung</c:when>
                     <c:when test="${param.activeTab == 'users'}">Quản lý Tài khoản</c:when>
                     <c:when test="${param.activeTab == 'email-logs'}">Thông báo &amp; Lịch sử Email</c:when>
-                    <c:when test="${param.activeTab == 'settings'}">AI Model Settings</c:when>
+                    <c:when test="${param.activeTab == 'settings'}">Cấu hình AI &amp; API key</c:when>
                     <c:when test="${param.activeTab == 'knowledge-base'}">AI Knowledge Base &amp; RAG</c:when>
                     <c:otherwise>Bảng điều khiển</c:otherwise>
                 </c:choose>

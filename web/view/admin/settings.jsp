@@ -156,7 +156,7 @@
                     </div>
 
                     <!-- 3. API KEY THEO TỪNG HÃNG -->
-                    <div class="form-group-dark">
+                    <div class="form-group-dark" id="api-key" style="scroll-margin-top:100px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                             <label class="form-label-dark" for="providerApiKeyInput" style="margin-bottom: 0;">
                                 <svg viewBox="0 0 24 24">
