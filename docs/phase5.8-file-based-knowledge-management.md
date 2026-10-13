@@ -17,7 +17,9 @@ Ngày: 13/10/2026, Asia/Saigon. Baseline `c71e2f7`; làm trên `feature/rag-inte
 
 ## Dữ liệu tới Supabase/pgvector như thế nào
 
-Git file → source build / WEB-INF private catalog → authorized deployment sync → document FILE_MANAGED + immutable file revision → PENDING_QUEUE → durable publish job → approved budgeted Gemini worker → 768d normalized vectors → atomic activation in knowledge_chunks/documents.
+Git file → source build / WEB-INF private catalog → optional startup auto-sync with an audit actor → document FILE_MANAGED + immutable file revision → PENDING_QUEUE → durable publish job → approved budgeted Gemini worker → 768d normalized vectors → atomic activation in knowledge_chunks/documents.
+
+`KB_FILE_AUTO_SYNC=true` cùng `KB_FILE_SYNC_ACTOR_ID` dương bỏ bước bấm duyệt/đồng bộ trên Admin cho nguồn Git. `active: true` là quyết định xuất bản qua review repository. Chế độ mặc định vẫn tắt; các gate Gemini, quota, request budget và emergency disable không bị bỏ qua.
 
 Sync dùng database JDBC đã cấu hình của server nhưng **không tự migrate** và không tự cấp credentials. Thao tác sync không trực tiếp gửi embedding/Chat requests; worker riêng có thể gửi sau đó chỉ khi cấu hình authorization, key và quota đã hợp lệ.
 

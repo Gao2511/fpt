@@ -20,6 +20,8 @@ build.timestamp=${build.timestamp}
 build.pipeline=portable-ant-jdk17-release8
 </echo>
         <copy file="config/phase52-online-smoke-plan.json" tofile="${portable.web}/WEB-INF/classes/phase52-online-smoke-plan.json" failonerror="false" overwrite="true"/>
+        <java classname="ai.consultation.PromptFileValidator" fork="true" failonerror="true"><classpath><path refid="compile.path"/><pathelement location="${portable.web}/WEB-INF/classes"/></classpath><arg value="config/chatbot-system-prompt.md"/></java>
+        <copy file="config/chatbot-system-prompt.md" tofile="${portable.web}/WEB-INF/classes/chatbot-system-prompt.md" overwrite="true"/>
     </target>
     <target name="war" depends="compile">
         <java classname="rag.files.FileKnowledgeValidator" fork="true" failonerror="true"><classpath><path refid="compile.path"/><pathelement location="${portable.web}/WEB-INF/classes"/></classpath><arg value="knowledge"/></java>
@@ -40,7 +42,7 @@ build.pipeline=portable-ant-jdk17-release8
     </target>
     <target name="test" depends="compile">
         <mkdir dir="${portable.dir}/test-classes"/>
-        <javac srcdir="test" destdir="${portable.dir}/test-classes" encoding="UTF-8" release="8" includeantruntime="false" excludes="cms/CmsBrowserServer.java,cms/HomeViewTest.java,rag/live/**">
+        <javac srcdir="test" destdir="${portable.dir}/test-classes" encoding="UTF-8" release="8" includeantruntime="false" excludes="cms/CmsBrowserServer.java,cms/HomeViewTest.java,cms/KnowledgeViewServer.java,rag/live/**">
             <classpath><path refid="compile.path"/><pathelement location="${portable.web}/WEB-INF/classes"/></classpath>
         </javac>
         <path id="test.path"><path refid="compile.path"/><pathelement location="${portable.web}/WEB-INF/classes"/><pathelement location="${portable.dir}/test-classes"/></path>

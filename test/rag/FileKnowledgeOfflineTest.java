@@ -24,6 +24,7 @@ public final class FileKnowledgeOfflineTest {
         public void close(){}
     }
     public static void main(String[] args)throws Exception {
+        autoSyncConfiguration();
         KnowledgeFile sample=file(text("wifi",1,true,"Kiểm tra vị trí modem và các vật cản."));FileKnowledgeCatalog catalog=new FileKnowledgeCatalog(Arrays.asList(sample));
         Memory store=new Memory();Map<String,Integer> report=FileKnowledgeSync.sync(catalog,store,101);
         check(report.get("queued")==1&&store.imports==1,"active file imported and queued once");check(store.api==0&&store.ready.isEmpty(),"sync never calls embeddings or marks ready");
@@ -56,5 +57,15 @@ public final class FileKnowledgeOfflineTest {
         FileKnowledgeCatalog.install(updated);check(FileKnowledgeCatalog.allowedSource("upload:fixture")&&!FileKnowledgeCatalog.allowedSource("repo:forged/v1"),"Admin uploads preserved; undeployed repo ID denied");
         check(!KnowledgePublishWorker.authorized(Collections.emptyMap()),"file sync cannot enable Gemini worker or bypass approval gates");
         System.out.println("FILE-KB offline: "+pass+" PASS; Gemini requests=0; database writes=0");
+    }
+    private static void autoSyncConfiguration()throws Exception{
+        Map<String,String> disabled=new HashMap<>();
+        check(FileKnowledgeRuntime.autoSyncActor(disabled)==0,"repository auto-sync is opt-in");
+        disabled.put("KB_FILE_AUTO_SYNC","false");disabled.put("KB_FILE_SYNC_ACTOR_ID","7");
+        check(FileKnowledgeRuntime.autoSyncActor(disabled)==0,"disabled auto-sync ignores actor configuration");
+        Map<String,String> enabled=new HashMap<>();enabled.put("KB_FILE_AUTO_SYNC","true");enabled.put("KB_FILE_SYNC_ACTOR_ID","7");
+        check(FileKnowledgeRuntime.autoSyncActor(enabled)==7,"reviewed Git deployment uses configured audit actor without UI approval");
+        enabled.put("KB_FILE_SYNC_ACTOR_ID","0");
+        rejected(()->FileKnowledgeRuntime.autoSyncActor(enabled),"invalid auto-sync actor fails closed");
     }
 }

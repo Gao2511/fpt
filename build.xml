@@ -10,8 +10,14 @@
 <project name="fpt-sale" default="default" basedir=".">
     <description>Builds, tests, and runs the project fpt-sale.</description>
     <import file="nbproject/build-impl.xml"/>
+    <target name="-post-compile">
+        <java classname="ai.consultation.PromptFileValidator" fork="true" failonerror="true"><classpath><pathelement location="${build.classes.dir}"/><fileset dir="lib/runtime" includes="*.jar"/></classpath><arg value="config/chatbot-system-prompt.md"/></java>
+        <copy file="config/chatbot-system-prompt.md" tofile="${build.classes.dir}/chatbot-system-prompt.md" overwrite="true"/>
+    </target>
     <!-- Remove only obsolete generated build copies; keep original libraries/data untouched. -->
     <target name="-pre-dist">
+        <java classname="ai.consultation.PromptFileValidator" fork="true" failonerror="true"><classpath><pathelement location="${build.classes.dir}"/><fileset dir="lib/runtime" includes="*.jar"/></classpath><arg value="config/chatbot-system-prompt.md"/></java>
+        <copy file="config/chatbot-system-prompt.md" tofile="${build.classes.dir}/chatbot-system-prompt.md" overwrite="true"/>
         <java classname="rag.files.FileKnowledgeValidator" fork="true" failonerror="true"><classpath><pathelement location="${build.classes.dir}"/><fileset dir="lib/runtime" includes="*.jar"/></classpath><arg value="knowledge"/></java>
         <delete dir="${build.web.dir}/WEB-INF/knowledge"/>
         <copy todir="${build.web.dir}/WEB-INF/knowledge"><fileset dir="knowledge" includes="**/*.md,**/*.txt" followsymlinks="false"/></copy>

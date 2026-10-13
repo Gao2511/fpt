@@ -62,6 +62,12 @@ public class ConsultationBehaviorTest {
             settings.put("ai_system_prompt","");
             check("".equals(ConsultationPrompt.resolve(settings)),"Cleared prompt restored unexpectedly");
         });
+        test("repository prompt mode ignores database prompt and loads reviewed Markdown",()->{
+            Map<String,String> settings=new HashMap<>();settings.put("ai_system_prompt","Database prompt");
+            Map<String,String> environment=new HashMap<>();environment.put("AI_SYSTEM_PROMPT_SOURCE","file");
+            String prompt=ConsultationPrompt.resolve(settings,environment);
+            check(prompt.contains("# Vai trò")&&prompt.contains("Không dùng trí nhớ mô hình")&&!prompt.contains("Database prompt"),"Repository prompt was not loaded exactly from deployment resource");
+        });
         test("custom prompt controls common consultation through provider",()->{
             MockProvider p=new MockProvider();p.outputs.add(envelope("Tôi có thể tư vấn cho bạn. Bạn cần hỗ trợ thêm không?"));
             String custom="Xưng tôi, gọi khách là bạn.\nHỏi ngắn gọn.";

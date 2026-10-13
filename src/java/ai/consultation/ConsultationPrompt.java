@@ -2,6 +2,9 @@ package ai.consultation;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 /** One protocol shared by public chat and the admin preview. */
 public final class ConsultationPrompt {
@@ -19,10 +22,26 @@ public final class ConsultationPrompt {
         "Yêu cầu cần người thật thì hướng dẫn liên hệ; không nói đã gọi lại, gửi tin hay đăng ký thành công. " +
         "Yêu cầu đăng ký sẽ do máy chủ mở biểu mẫu và kiểm tra sự đồng ý riêng.";
 
-    public static String resolve(java.util.Map<String, String> settings) {
+    public static String resolve(Map<String, String> settings) {
+        return resolve(settings,System.getenv());
+    }
+    public static String resolve(Map<String,String> settings,Map<String,String> environment) {
+        if(environment!=null&&"file".equalsIgnoreCase(environment.get("AI_SYSTEM_PROMPT_SOURCE")))return repositoryPrompt();
         String value = settings.get("ai_system_prompt");
         if (value == null) value = settings.get("gemini_system_prompt");
         return value == null ? SYSTEM : value;
+    }
+    public static String repositoryPrompt() {
+        try(InputStream in=ConsultationPrompt.class.getResourceAsStream("/chatbot-system-prompt.md")){
+            if(in==null)throw new IllegalStateException("Thiếu System Prompt trong deployment");
+            ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buffer=new byte[4096];int n,total=0;
+            while((n=in.read(buffer))!=-1){total+=n;if(total>120000)throw new IllegalArgumentException("System Prompt vượt giới hạn byte");out.write(buffer,0,n);}
+            String prompt=new String(out.toByteArray(),StandardCharsets.UTF_8);validateRepositoryPrompt(prompt);return prompt;
+        }catch(IOException e){throw new IllegalStateException("Không đọc được System Prompt trong deployment",e);}
+    }
+    static void validateRepositoryPrompt(String prompt) {
+        if(prompt==null||prompt.trim().length()<200||prompt.length()>30000||prompt.indexOf('\0')>=0)throw new IllegalArgumentException("System Prompt không hợp lệ");
+        if(prompt.matches("(?s).*(?:AIza[0-9A-Za-z_-]{35}|-----BEGIN [A-Z ]*PRIVATE KEY-----|postgres(?:ql)?://[^\\s]+:[^\\s]+@|gh[pousr]_[0-9A-Za-z]{30,}).*"))throw new IllegalArgumentException("System Prompt chứa dạng credential");
     }
     public static String instructions(String prompt) {
         return (prompt == null ? SYSTEM : prompt) + "\n\nGiao thức ứng dụng (bắt buộc): Trả về JSON đúng schema, message tiếng Việt hoàn chỉnh, không nội dung nội bộ. " +
