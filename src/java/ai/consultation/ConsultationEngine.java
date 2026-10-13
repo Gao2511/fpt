@@ -94,6 +94,9 @@ public final class ConsultationEngine {
                 ChatResponse controlled = ConsultationPolicy.known(question, memory, catalog);
                 if (controlled != null) return commit(session, question, controlled);
             }
+            // Complete commercial solutions and their totals are server-owned for every prompt mode.
+            ChatResponse combined = ConsultationPolicy.combinedSolution(question, memory, catalog);
+            if (combined != null) return commit(session, question, combined);
             if(query!=null && query.clarify)return commit(session,question,ConsultationPolicy.reply("Anh/chị đang hỏi về gói Internet, camera hay phần hướng dẫn nào cụ thể ạ?"));
             if(query!=null && query.business && ConsultationPrompt.SYSTEM.equals(systemPrompt)) {
                 ChatResponse business=ConsultationPolicy.known(question,memory,catalog);

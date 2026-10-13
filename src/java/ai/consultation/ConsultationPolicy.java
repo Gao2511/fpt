@@ -16,25 +16,7 @@ public final class ConsultationPolicy {
             q.trim().matches("(?:oke?\\s+)?chot(?:\\s+luon|\\s+goi\\s+[0-9]+k?)?[.! ]*");
     }
     public static com.google.gson.JsonArray meshOptionsJson() {
-        com.google.gson.JsonArray arr = new com.google.gson.JsonArray();
-        com.google.gson.JsonObject f1 = new com.google.gson.JsonObject();
-        f1.addProperty("name", "Mesh WiFi F1");
-        f1.addProperty("floors", "Nhà 2 tầng");
-        f1.addProperty("devices", "1 Modem WiFi 6 + 1 Access Point");
-        f1.addProperty("installationFeeVnd", 500000);
-        f1.addProperty("monthlyAddonVnd", 10000);
-        f1.addProperty("note", "Lựa chọn mở rộng vùng phủ sóng, cộng thêm +10.000đ/tháng vào tiền cước Internet hàng tháng");
-        arr.add(f1);
-
-        com.google.gson.JsonObject f2 = new com.google.gson.JsonObject();
-        f2.addProperty("name", "Mesh WiFi F2");
-        f2.addProperty("floors", "Nhà 3 tầng");
-        f2.addProperty("devices", "1 Modem WiFi 6 + 2 Access Point");
-        f2.addProperty("installationFeeVnd", 700000);
-        f2.addProperty("monthlyAddonVnd", 20000);
-        f2.addProperty("note", "Lựa chọn mở rộng vùng phủ sóng, cộng thêm +20.000đ/tháng vào tiền cước Internet hàng tháng");
-        arr.add(f2);
-        return arr;
+        return meshOptionsJson(cms.SiteContent.defaults());
     }
 
     public static ChatResponse installationFee(String question, CustomerRequirements memory, ProductCatalog catalog) {
@@ -76,6 +58,8 @@ public final class ConsultationPolicy {
         if (ConversationSignals.social(question)) return reply(q.contains("dua") || q.contains("haha") ? "Dạ, em hiểu mình đang đùa thôi nhé! Khi cần hỏi về mạng, em vẫn ở đây ạ." : "Dạ, em vẫn ở đây khi mình cần hỗ trợ thêm nhé!");
         if (ConversationSignals.playful(question)) return reply("Haha, mạng không tặng kèm phép thuật hay kỹ năng pro player đâu ạ! Chơi game còn phụ thuộc ping, kết nối và máy chủ game; mình chơi trên PC hay điện thoại?");
         if (ConversationSignals.outside(question)) return reply("Dạ em hỗ trợ tư vấn dịch vụ FPT Telecom nên chưa thể làm yêu cầu này. Khi cần tìm hiểu gói Internet, em sẵn sàng hỗ trợ ạ.");
+        ChatResponse combined = combinedSolution(question, memory, catalog);
+        if (combined != null) return combined;
         if (ConversationSignals.ambiguous(question)) {
             ProductCatalog.Product selected = memory.selectedPackageId == null || memory.selectionAmbiguous ? null : catalog.byId(memory.selectedPackageId);
             return reply(selected == null ? "Anh/chị đang nói đến gói nào ạ?" : selected.display() + "\nAnh/chị muốn tìm hiểu thêm hay đăng ký gói này?");
@@ -109,37 +93,6 @@ public final class ConsultationPolicy {
         }
         if (q.contains("cam ket") && (q.contains("toc do") || q.contains("24/7")))
             return reply("Dạ em chưa có dữ liệu xác nhận cam kết tốc độ tuyệt đối hoặc liên tục trong mọi trường hợp. Tốc độ công bố của gói không phải bằng chứng cho cam kết này; anh/chị cần tư vấn viên kiểm tra điều kiện cụ thể.");
-
-        // 2. Tư vấn Mesh WiFi theo số tầng
-        if ((q.contains("3 tang") || q.contains("ba tang")) && (q.contains("f1") || q.contains("dung f1") || q.contains("duoc khong") || q.contains("on khong") || q.contains("co duoc khong"))) {
-            return reply("Dạ với nhà 3 tầng, gói Mesh WiFi F1 (gồm 1 Modem WiFi 6 + 1 Access Point) vốn được thiết kế tối ưu cho nhà 2 tầng, nên có thể sẽ bị sóng yếu hoặc không phủ kín các phòng/tầng nếu có vật cản hoặc tường dày.\n"
-                + "Để đảm bảo phủ sóng tốt và ổn định hơn cho nhà 3 tầng, em đề xuất anh/chị lựa chọn giải pháp Mesh WiFi F2:\n"
-                + "- Thiết bị: 1 Modem WiFi 6 + 2 Access Point.\n"
-                + "- Phí lắp đặt: 700.000 VNĐ.\n"
-                + "- Phí cộng thêm hàng tháng: +20.000đ/tháng (cộng thêm vào tiền cước gói Internet đã chọn).\n"
-                + "Lưu ý: Mesh WiFi F2 là giải pháp mở rộng phủ sóng kết hợp với gói Internet FPT, và không cam kết 100% phủ sóng mọi ngóc ngách nếu chưa kiểm tra vị trí đặt thiết bị và vật cản thực tế. Anh/chị cho em biết thêm diện tích mỗi tầng và nhu cầu sử dụng để em tư vấn gói cước Internet kết hợp tối ưu nhé!");
-        }
-        if (q.contains("2 tang") || q.contains("hai tang") || (q.contains("f1") && !q.contains("f2"))) {
-            return reply("Dạ với nhà 2 tầng, em đề xuất anh/chị lựa chọn giải pháp mở rộng vùng phủ sóng Mesh WiFi F1:\n"
-                + "- Phù hợp: Nhà 2 tầng, giúp loại bỏ góc chết WiFi giữa các tầng.\n"
-                + "- Thiết bị: 1 Modem WiFi 6 + 1 Access Point.\n"
-                + "- Phí lắp đặt: 500.000 VNĐ.\n"
-                + "- Phí cộng thêm hàng tháng: +10.000đ/tháng (cộng thêm vào tiền cước gói Internet).\n"
-                + "Lưu ý: Mesh WiFi F1 là lựa chọn mở rộng phủ sóng kết hợp cùng gói cước Internet FPT, không phải gói độc lập (Tổng cước = Giá gói Internet + 10.000đ/tháng). Anh/chị cho em biết thêm diện tích nhà, số người dùng và nhu cầu sử dụng Internet để em tư vấn gói cước nền phù hợp nhất nhé!");
-        }
-        if (q.contains("3 tang") || q.contains("ba tang") || q.contains("f2")) {
-            return reply("Dạ với nhà 3 tầng, em đề xuất anh/chị lựa chọn giải pháp Mesh WiFi F2 để đảm bảo phủ sóng đều các tầng:\n"
-                + "- Thiết bị: 1 Modem WiFi 6 + 2 Access Point.\n"
-                + "- Phí lắp đặt: 700.000 VNĐ.\n"
-                + "- Phí cộng thêm hàng tháng: +20.000đ/tháng (cộng thêm vào tiền cước gói Internet đã chọn).\n"
-                + "Lưu ý: Mesh WiFi F2 là giải pháp mở rộng phủ sóng kết hợp cùng gói cước Internet FPT. Anh/chị cho em biết thêm diện tích mỗi tầng, số lượng thiết bị và nhu cầu để em tư vấn gói Internet nền kết hợp phù hợp nhé!");
-        }
-        if (q.contains("mesh")) {
-            return reply("Dạ FPT hiện có 2 giải pháp mở rộng vùng phủ sóng Mesh WiFi cho nhà nhiều tầng (kết hợp cùng gói cước Internet FPT):\n"
-                + "1. Mesh WiFi F1 (Phù hợp nhà 2 tầng): 1 Modem WiFi 6 + 1 Access Point. Phí lắp đặt 500.000 VNĐ, phí cộng thêm +10.000đ/tháng.\n"
-                + "2. Mesh WiFi F2 (Phù hợp nhà 3 tầng): 1 Modem WiFi 6 + 2 Access Point. Phí lắp đặt 700.000 VNĐ, phí cộng thêm +20.000đ/tháng.\n"
-                + "Lưu ý: Phí hàng tháng của Mesh WiFi là phí cộng thêm vào tiền cước gói Internet hàng tháng. Anh/chị cho em biết số tầng và diện tích nhà để em tư vấn chi tiết nhé!");
-        }
 
         if ((q.contains("uu dai")||q.contains("khuyen mai")) && cms.SiteContent.promotionVisible(catalog.business)) {
             String ids=catalog.business.get("business.promotionPackageIds");
@@ -192,6 +145,133 @@ public final class ConsultationPolicy {
             if (fits(p, memory)) return p;
         }
         return null;
+    }
+
+    /** Returns one server-priced complete solution for coverage-related consultation. */
+    public static ChatResponse combinedSolution(String question, CustomerRequirements memory, ProductCatalog catalog) {
+        if (registrationRequested(question) || ConversationSignals.handoff(question)) return null;
+        String q = ProductCatalog.normalize(question);
+        if (q.contains("so sanh") || q.contains("tat ca") || q.contains("6 goi") || catalog.mentioned(question).size() > 1) return null;
+        boolean currentCoverageSignal = q.matches("(?s).*(?:[2-9]\\s*tang|hai tang|ba tang|bon tang|mesh|wifi yeu|song yeu|tang tren|nhieu phong|tuong day|tuong be tong|phong xa|goc chet).*" );
+        boolean coverageSignal = currentCoverageSignal
+            || memory.floors != null && memory.floors >= 2 && memory.requirementsChanged;
+        boolean internetOnly = memory.meshPreferenceKnown && !memory.meshWanted
+            && q.matches("(?s).*(?:chi (?:muon|can) goi internet|khong can mesh|khong dung mesh).*" );
+        if (!coverageSignal && !internetOnly) return null;
+        if (coverageSignal && memory.floors == null && memory.meshInterest == null
+                && (!memory.meshPreferenceKnown || memory.meshWanted))
+            return reply("Dạ em đã ghi nhận nhu cầu mở rộng vùng phủ WiFi. Anh/chị cho em biết nhà có bao nhiêu tầng để em ghép đúng gói Internet với phương án Mesh và tính tổng chính xác nhé?");
+
+        List<ProductCatalog.Product> mentioned = catalog.mentioned(question);
+        ProductCatalog.Product selected = mentioned.size() == 1 ? mentioned.get(0) : chooseForSolution(memory, catalog);
+        if (selected == null) return catalog.all().isEmpty() ? unavailable()
+            : reply("Dạ em chưa tìm được một gói vừa đáp ứng nhu cầu đã chia sẻ vừa nằm trong ngân sách hiện tại. Anh/chị có thể cho em biết mức ngân sách có thể điều chỉnh không ạ?");
+
+        RecommendedSolution.WifiCoverageOption coverage = null;
+        if (!memory.meshPreferenceKnown || memory.meshWanted) {
+            String option = memory.floors != null && memory.floors >= 3 ? "F2"
+                : memory.floors != null && memory.floors == 2 ? "F1"
+                : "F1".equals(memory.meshInterest) || "F2".equals(memory.meshInterest) ? memory.meshInterest : null;
+            if (option != null) coverage = meshOption(option, catalog.business);
+        }
+
+        List<String> optional = new ArrayList<>();
+        if (memory.camera) optional.add(memory.cameraCount == null ? "Camera" : memory.cameraCount + " camera");
+        if (memory.television) optional.add("Truyền hình");
+        List<String> sources = new ArrayList<>();
+        sources.add("packages:" + selected.id);
+        if (coverage != null) {
+            sources.add("cms:business.mesh" + coverage.id + "Monthly");
+            sources.add("cms:business.mesh" + coverage.id + "Fee");
+        }
+        Long internetFee = selected.standardInstallationFee > 0 ? selected.standardInstallationFee
+            : configuredMoney(catalog.business, "business.standardFee");
+        String reason = reason(memory, coverage);
+        RecommendedSolution solution = new RecommendedSolution(selected, coverage, optional, internetFee,
+            reason, memory.people == null && memory.devices == null ? "preliminary" : "requirements_based", sources);
+        memory.selectedPackageId = selected.id;
+        memory.selectionAmbiguous = false;
+        ChatResponse response = reply(renderSolution(solution, memory, coverageSignal));
+        response.setRecommendedPackageId(selected.id);
+        return response;
+    }
+
+    private static ProductCatalog.Product chooseForSolution(CustomerRequirements memory, ProductCatalog catalog) {
+        int minimumSpeed = 0;
+        if (memory.businessUse || memory.cameraCount != null && memory.cameraCount >= 4
+                || memory.people != null && memory.people >= 8 || memory.devices != null && memory.devices >= 12) minimumSpeed = 1000;
+        else if (memory.gaming || memory.streaming || memory.cameraCount != null && memory.cameraCount >= 2
+                || memory.people != null && memory.people >= 5 || memory.devices != null && memory.devices >= 8) minimumSpeed = 500;
+        ProductCatalog.Product current = memory.selectedPackageId == null ? null : catalog.byId(memory.selectedPackageId);
+        if (current != null && current.speed >= minimumSpeed && fits(current, memory)) return current;
+        for (ProductCatalog.Product product : catalog.all()) if (product.speed >= minimumSpeed && fits(product, memory)) return product;
+        return null;
+    }
+
+    private static RecommendedSolution.WifiCoverageOption meshOption(String id, Map<String,String> business) {
+        String prefix = "business.mesh" + id;
+        String equipment = business.get(prefix + "Equipment");
+        Long monthly = configuredMoney(business, prefix + "Monthly");
+        Long fee = configuredMoney(business, prefix + "Fee");
+        return new RecommendedSolution.WifiCoverageOption(id, equipment, monthly, fee);
+    }
+
+    private static Long configuredMoney(Map<String,String> values, String key) {
+        try {
+            String raw = values == null ? null : values.get(key);
+            if (raw == null || !raw.matches("[0-9]{1,9}")) return null;
+            long value = Long.parseLong(raw);
+            return value >= 0 && value <= 100000000 ? value : null;
+        } catch (RuntimeException invalid) { return null; }
+    }
+
+    private static String reason(CustomerRequirements memory, RecommendedSolution.WifiCoverageOption coverage) {
+        List<String> parts = new ArrayList<>();
+        if (memory.floors != null) parts.add("nhà " + memory.floors + " tầng");
+        if (memory.people != null) parts.add(memory.people + " người dùng");
+        if (memory.devices != null) parts.add(memory.devices + " thiết bị");
+        if (memory.streaming) parts.add("nhu cầu xem phim nhiều");
+        if (memory.gaming) parts.add("nhu cầu chơi game");
+        if (memory.cameraCount != null) parts.add(memory.cameraCount + " camera");
+        if (parts.isEmpty()) return coverage == null ? "yêu cầu chỉ dùng Internet" : "nhu cầu phủ sóng WiFi";
+        return String.join(", ", parts);
+    }
+
+    private static String renderSolution(RecommendedSolution solution, CustomerRequirements memory, boolean coverageSignal) {
+        StringBuilder out = new StringBuilder("Dạ với ").append(solution.reason).append(", em ưu tiên phương án ")
+            .append("Gói ").append(solution.internetPackage.label());
+        if (solution.wifiCoverageOption != null) out.append(" + ").append(solution.wifiCoverageOption.name);
+        out.append(".\n\n- Internet: ").append(RecommendedSolution.money(solution.monthlyInternetPrice)).append("/tháng — ")
+            .append(solution.internetPackage.speed).append("Mbps");
+        if (solution.wifiCoverageOption != null) {
+            out.append("\n- Phủ sóng: ").append(solution.wifiCoverageOption.name);
+            if (solution.wifiCoverageOption.equipment != null && !solution.wifiCoverageOption.equipment.trim().isEmpty())
+                out.append(" (").append(solution.wifiCoverageOption.equipment.trim()).append(")");
+            if (solution.monthlyAddonPrice != null) out.append(" — +").append(RecommendedSolution.money(solution.monthlyAddonPrice)).append("/tháng");
+            else out.append(" — giá hiện chưa có dữ liệu được xác nhận");
+        }
+        if (solution.totalMonthlyPrice != null) out.append("\n- Tổng hàng tháng: ").append(RecommendedSolution.money(solution.totalMonthlyPrice)).append("/tháng");
+        else out.append("\n- Tổng hàng tháng: chưa thể cộng chính xác vì giá Mesh chưa được xác nhận");
+        if (solution.internetInstallationFee != null) out.append("\n- Phí lắp Internet thông thường: ").append(RecommendedSolution.money(solution.internetInstallationFee)).append("/lần");
+        if (solution.wifiCoverageOption != null) {
+            if (solution.oneTimeDeviceFee != null) out.append("\n- Phí lắp Mesh: ").append(RecommendedSolution.money(solution.oneTimeDeviceFee)).append("/lần");
+            else out.append("\n- Phí lắp Mesh: chưa có dữ liệu được xác nhận");
+            if (solution.initialCost != null) out.append("\n- Tổng phí một lần: ").append(RecommendedSolution.money(solution.initialCost));
+        }
+        if (solution.internetInstallationFee != null || solution.oneTimeDeviceFee != null)
+            out.append("\nPhí một lần ở trên là mức thông thường; chính sách miễn giảm chỉ áp dụng khi được hệ thống xác nhận.");
+        out.append("\n\n").append("Phương án này cân bằng băng thông và vùng phủ; chất lượng thực tế còn phụ thuộc vị trí thiết bị, vật cản và số thiết bị dùng đồng thời.");
+        if (memory.gaming) out.append(" Với chơi game, nên ưu tiên kết nối dây LAN; tốc độ gói không bảo đảm ping hay độ trễ thực tế.");
+        if (memory.cameraCount != null && memory.cameraCount > 0) {
+            out.append(" Nhu cầu ").append(memory.cameraCount).append(" camera cần được kiểm tra thêm về vị trí và mức dùng đồng thời");
+            if (solution.internetPackage.camera) out.append("; gói này chỉ xác nhận kèm 1 Camera trong danh mục");
+            out.append(".");
+        }
+        if (coverageSignal && solution.wifiCoverageOption == null && (!memory.meshPreferenceKnown || memory.meshWanted))
+            out.append(" Anh/chị cho em biết số tầng để chọn phương án phủ sóng phù hợp nhé?");
+        else if (memory.people == null && memory.devices == null && !memory.meshPreferenceKnown)
+            out.append(" Anh/chị cho em biết số người hoặc số thiết bị thường dùng cùng lúc nhé?");
+        return out.toString();
     }
     /** A benefit question is hypothetical; it does not mutate consent or the selected package. */
     private static ChatResponse cameraAddition(String question,CustomerRequirements memory,ProductCatalog catalog) {
@@ -255,9 +335,20 @@ public final class ConsultationPolicy {
         contact+=phone.replaceFirst("([0-9]{4})([0-9]{3})([0-9]+)","$1 $2 $3");
         if(zalo!=null&&!zalo.isEmpty()&&!zalo.equals("https://zalo.me/"+phone))contact+=" hoặc Zalo "+zalo;
         replacements.put(CONTACT,contact);
-        for(int i=1;i<=2;i++){replacements.put((i==1?"500.000":"700.000")+" VNĐ",cms.SiteContent.amount(v,"business.meshF"+i+"Fee")+" VNĐ");replacements.put((i==1?"10.000":"20.000")+"đ/tháng",cms.SiteContent.amount(v,"business.meshF"+i+"Monthly")+"đ/tháng");replacements.put("1 Modem WiFi 6 + "+i+" Access Point",v.get("business.meshF"+i+"Equipment"));}
         StringBuilder pattern=new StringBuilder("(?<![0-9])(?:");for(String key:replacements.keySet()){if(pattern.charAt(pattern.length()-1)!=':')pattern.append('|');pattern.append(java.util.regex.Pattern.quote(key));}pattern.append(")(?![0-9])");
         java.util.regex.Matcher match=java.util.regex.Pattern.compile(pattern.toString()).matcher(message);StringBuffer out=new StringBuffer();while(match.find())match.appendReplacement(out,java.util.regex.Matcher.quoteReplacement(replacements.get(match.group())));match.appendTail(out);return out.toString();
     }
-    public static com.google.gson.JsonArray meshOptionsJson(Map<String,String> v){com.google.gson.JsonArray a=meshOptionsJson();for(int i=0;i<2;i++){com.google.gson.JsonObject o=a.get(i).getAsJsonObject();String k="business.meshF"+(i+1);o.addProperty("devices",v.get(k+"Equipment"));o.addProperty("installationFeeVnd",Long.parseLong(v.get(k+"Fee")));o.addProperty("monthlyAddonVnd",Long.parseLong(v.get(k+"Monthly")));o.addProperty("note",facts(o.get("note").getAsString(),v));}return a;}
+    public static com.google.gson.JsonArray meshOptionsJson(Map<String,String> v){
+        com.google.gson.JsonArray a=new com.google.gson.JsonArray();
+        for(int i=1;i<=2;i++){
+            String id="F"+i,k="business.mesh"+id;
+            com.google.gson.JsonObject o=new com.google.gson.JsonObject();
+            o.addProperty("name","Mesh WiFi "+id);o.addProperty("floors",i==1?"Nhà 2 tầng":"Nhà 3 tầng trở lên");
+            String equipment=v==null?null:v.get(k+"Equipment");if(equipment!=null)o.addProperty("devices",equipment);
+            Long fee=configuredMoney(v,k+"Fee"),monthly=configuredMoney(v,k+"Monthly");
+            if(fee!=null)o.addProperty("installationFeeVnd",fee);if(monthly!=null)o.addProperty("monthlyAddonVnd",monthly);
+            o.addProperty("priceAuthority","approved_cms_business_config");a.add(o);
+        }
+        return a;
+    }
 }
