@@ -17,7 +17,7 @@ public final class EditorLayout {
     public static List<Section> sections(boolean business){
         Map<String,Section> sections=new LinkedHashMap<>();
         if(business){
-            add(sections,"contact","Thông tin liên hệ","Hotline, địa chỉ và các kênh liên hệ trên website.");
+            add(sections,"contact","Thông tin liên hệ & tư vấn viên","Danh tính trợ lý, hotline, giờ hỗ trợ và các kênh đăng ký chính thức.");
             add(sections,"fees","Phí lắp đặt Internet","Khoản thu một lần, tách biệt với giá gói cước hàng tháng.");
             add(sections,"mesh","Dịch vụ Mesh WiFi","Nội dung khu vực Mesh WiFi và chi phí của từng cấu hình.");
             add(sections,"promotion","Thông tin ưu đãi","Nội dung, thời hạn và các gói được áp dụng ưu đãi.");

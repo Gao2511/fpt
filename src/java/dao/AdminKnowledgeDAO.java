@@ -1516,8 +1516,9 @@ public class AdminKnowledgeDAO {
         ManagedDocument d=findDocument(id);if(d==null||!"PUBLISHED".equals(d.workflowStatus)||d.approvedBy<=0||d.approvedAt==null||(d.effectiveAt!=null&&Instant.now().isBefore(d.effectiveAt))||(d.expiresAt!=null&&!Instant.now().isBefore(d.expiresAt)))throw new IllegalArgumentException("Only current approved published sources may be indexed");
         runtime.config.document(id,d.version,d.contentHash);
         GeminiEmbeddingService requestBuilder=new GeminiEmbeddingService(runtime.config.rag(),"unused-no-transport");
+        boolean trusted=KnowledgeContentPolicy.trustedOfficialRepository(d.source,d.sourceAuthority);
         for(String chunk:new DocumentChunkingService().chunk(d.content)){
-            if(KnowledgeContentPolicy.contentReason(d.title,chunk)!=KnowledgeContentPolicy.Reason.ACCEPTED)throw new IllegalArgumentException("Source content policy rejected before Gemini export");
+            if(KnowledgeContentPolicy.contentReason(d.title,chunk,trusted)!=KnowledgeContentPolicy.Reason.ACCEPTED)throw new IllegalArgumentException("Source content policy rejected before Gemini export");
             runtime.config.payload("DOCUMENT",requestBuilder.requestBody(d.title,chunk,"RETRIEVAL_DOCUMENT"));
         }
         try(Connection c=db.open()){c.setAutoCommit(false);try{

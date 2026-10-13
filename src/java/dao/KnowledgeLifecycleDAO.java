@@ -18,8 +18,9 @@ public final class KnowledgeLifecycleDAO {
     }
     public static List<String> safeChunks(ManagedDocument d) throws Exception {
         // Full-body preflight catches instructions split across boundaries. Do not promote upload rules.
-        if(KnowledgeContentPolicy.contentReason(d.title,d.content)!=KnowledgeContentPolicy.Reason.ACCEPTED)throw new IllegalArgumentException("Nội dung chứa chỉ dẫn hoặc thông tin kinh doanh không được phép nhập vào RAG.");
-        rag.importer.DocumentSectionService.validateEntry(d.title,d.content);
+        boolean trusted=KnowledgeContentPolicy.trustedOfficialRepository(d.source,d.sourceAuthority);
+        if(KnowledgeContentPolicy.contentReason(d.title,d.content,trusted)!=KnowledgeContentPolicy.Reason.ACCEPTED)throw new IllegalArgumentException("Nội dung chứa chỉ dẫn hoặc thông tin kinh doanh không được phép nhập vào RAG.");
+        rag.importer.DocumentSectionService.validateEntry(d.title,d.content,trusted);
         int safeSize=Math.min(d.chunkSize,(2048-d.title.getBytes(java.nio.charset.StandardCharsets.UTF_8).length-64)/4);
         if(safeSize<200)throw new RagException(RagException.Code.INVALID_DOCUMENT);
         return new DocumentChunkingService().chunk(d.content,safeSize,Math.min(d.chunkOverlap,safeSize/4));

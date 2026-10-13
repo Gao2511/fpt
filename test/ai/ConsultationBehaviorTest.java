@@ -14,7 +14,7 @@ public class ConsultationBehaviorTest {
     public static final ProductCatalog CATALOG = catalog();
     public static ProductCatalog catalog() {
         List<PackageDTO> rows = new ArrayList<>();
-        int[] prices = {195,205,220,230,239,249}, speeds = {300,300,500,500,1000,1000};
+        int[] prices = {195,205,220,230,239,249}, speeds = {300,300,300,300,1000,1000};
         for (int i=0; i<6; i++) {
             PackageDTO p = new PackageDTO(); p.setId(i+1); p.setName("Gói " + prices[i] + "K"); p.setPackageCode(prices[i] + "K");
             p.setPrice(prices[i]*1000L); p.setSpeedMbps(speeds[i]);
@@ -99,7 +99,7 @@ public class ConsultationBehaviorTest {
         });
         test("pair comparison shows actual difference",()->{
             ChatResponse r=ask("Gói 195K với 220K khác nhau thế nào?",new ChatSessionData("pair"),new MockProvider(),null);
-            check(r.getContent().contains("25.000đ/tháng") && r.getContent().contains("300Mbps và 500Mbps") && r.getContent().contains("TV 180 kênh"),r.getContent());
+            check(r.getContent().contains("25.000đ/tháng") && r.getContent().contains("300Mbps và 300Mbps") && r.getContent().contains("TV 180 kênh"),r.getContent());
         });
         test("household update retains budget and gaming",()->{
             ChatSessionData s=new ChatSessionData("update"); MockProvider p=new MockProvider();
@@ -170,8 +170,8 @@ public class ConsultationBehaviorTest {
             check(all.size() == 6, "Expected 6 packages");
             check(all.get(0).speed == 300 && all.get(0).price == 195000L, "195K speed must be 300");
             check(all.get(1).speed == 300 && all.get(1).price == 205000L, "205K speed must be 300");
-            check(all.get(2).speed == 500 && all.get(2).price == 220000L, "220K speed must be 500");
-            check(all.get(3).speed == 500 && all.get(3).price == 230000L, "230K speed must be 500");
+            check(all.get(2).speed == 300 && all.get(2).price == 220000L, "220K speed must be 300");
+            check(all.get(3).speed == 300 && all.get(3).price == 230000L, "230K speed must be 300");
             check(all.get(4).speed == 1000 && all.get(4).price == 239000L, "239K speed must be 1000");
             check(all.get(5).speed == 1000 && all.get(5).price == 249000L, "249K speed must be 1000");
         });
@@ -186,10 +186,10 @@ public class ConsultationBehaviorTest {
             check(c.contains("F1") && c.contains("500.000") && c.contains("10.000") && !c.contains("100.000") && !c.contains("tham khảo") && c.contains("Access Point"), "Must recommend F1 for 2 floors with +10.000d/thang: " + c);
             check(c.contains("cộng") || c.contains("mở rộng"), "Must clarify add-on fee nature: " + c);
         });
-        test("house 3 floors with F1 explains limitations and suggests Mesh WiFi F2",()->{
+        test("house 3 floors with F1 explains the verified tradeoff without a coverage guarantee",()->{
             ChatResponse r = ask("Nhà anh 3 tầng dùng F1 được không?", new ChatSessionData("mesh-f2"), new MockProvider(), null);
             String c = r.getContent();
-            check(c.contains("F2") && c.contains("700.000") && c.contains("20.000") && !c.contains("200.000") && !c.contains("tham khảo") && c.contains("Access Point"), "Must recommend F2 for 3 floors with +20.000d/thang: " + c);
+            check(c.contains("F1") && c.contains("500.000") && c.contains("10.000") && c.contains("không thể bảo đảm vùng phủ") && c.contains("Access Point"), "Must explain F1 tradeoff: " + c);
         });
         test("primary gemini-3.8-flash and backup gemini-3.5-flash-lite have independent thinkingLevel and maxTokens",()->{
             MockProvider p = new MockProvider(), b = new MockProvider();

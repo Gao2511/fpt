@@ -25,7 +25,8 @@ public final class KnowledgeIndexingService {
             }
             List<String> texts=new DocumentChunkingService().chunk(d.content);
             if("GEMINI".equals(embeddings.providerKind())){
-                for(String text:texts)if(KnowledgeContentPolicy.contentReason(d.title,text)!=KnowledgeContentPolicy.Reason.ACCEPTED)throw new RagException(RagException.Code.INVALID_DOCUMENT);
+                boolean trusted=KnowledgeContentPolicy.trustedOfficialRepository(d.source,d.sourceAuthority);
+                for(String text:texts)if(KnowledgeContentPolicy.contentReason(d.title,text,trusted)!=KnowledgeContentPolicy.Reason.ACCEPTED)throw new RagException(RagException.Code.INVALID_DOCUMENT);
                 try(Connection c=db.open();PreparedStatement p=c.prepareStatement("UPDATE public.knowledge_documents SET indexing_status='processing',embedding_error=NULL WHERE id=? AND version=? AND embedding_provider='GEMINI'")){p.setLong(1,d.id);p.setLong(2,d.version);if(p.executeUpdate()!=1)throw new RagException(RagException.Code.STALE_VERSION);}
             }
             List<float[]> vectors=new ArrayList<>();Map<String,float[]> dedup=new HashMap<>();

@@ -44,7 +44,7 @@ public class AdaptiveConversationTest {
         test("feature follow-up combines household devices and both amenities",()->{
             ChatSessionData s=new ChatSessionData("features");ask("Nhà 4 người dùng khoảng 5 thiết bị.",s,new MockProvider(),null);
             ChatResponse r=ask("Có truyền hình và camera.",s,new MockProvider(),null);
-            check(s.getRequirements().people==4 && s.getRequirements().devices==5 && r.getRecommendedPackageId()==4 && r.getContent().contains("230.000") && r.getContent().contains("500Mbps") && !r.getContent().contains("có cần thêm"),r.getContent());
+            check(s.getRequirements().people==4 && s.getRequirements().devices==5 && r.getRecommendedPackageId()==4 && r.getContent().contains("230.000") && r.getContent().contains("300Mbps") && !r.getContent().contains("có cần thêm"),r.getContent());
             r=ask("Không cần camera nữa.",s,new MockProvider(),null);
             check(!s.getRequirements().camera && s.getRequirements().television && r.getRecommendedPackageId()==3,r.getContent());
         });

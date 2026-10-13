@@ -24,14 +24,19 @@ public final class KnowledgeContentPolicy {
         if(c.expiresAt!=null && !now.isBefore(c.expiresAt))return Reason.EXPIRED;
         if(c.effectiveAt!=null && now.isBefore(c.effectiveAt))return Reason.NOT_EFFECTIVE;
         if(!Double.isFinite(c.score)||c.score<.28)return Reason.LOW_CONFIDENCE;
-        return contentReason(c.title,c.content);
+        return contentReason(c.title,c.content,trustedOfficialRepository(c.source,m.authority));
     }
     /** Pre-publication linter; does not grant approval or replace metadata/authority checks. */
     public static Reason contentReason(String title,String content) {
+        return contentReason(title,content,false);
+    }
+    /** Commercial facts are allowed only for versioned official files shipped by this repository. */
+    public static Reason contentReason(String title,String content,boolean trustedOfficialCommercial) {
         String text=title+"\n"+content;
         if(text.matches("(?s).*[<>{}`\\p{Cc}&&[^\\n\\t]].*"))return Reason.UNSAFE_CONTENT;
         String q=ProductCatalog.normalize(text);
         if(q.matches("(?s).*\\b(ignore|disregard|system|developer|assistant|instruction|prompt|api.?key|password|secret|token|bo qua chi dan|bo qua huong dan|bo qua quy tac|tiet lo|chi dan he thong|state tracking|tag constraint|suy luan noi bo|dang ky thanh cong|da gui yeu cau|da luu dang ky)\\b.*"))return Reason.UNSAFE_CONTENT;
+        if(trustedOfficialCommercial)return Reason.ACCEPTED;
         // Device names alone are not business claims. Prices, entitlements and specs stay DB-owned.
         String accented=java.text.Normalizer.normalize(text,java.text.Normalizer.Form.NFC).toLowerCase(java.util.Locale.ROOT);
         // Currency/quantities and rate-statement grammar, never accent-folded bare gia/cuoc/ngan.
@@ -44,5 +49,8 @@ public final class KnowledgeContentPolicy {
             q.matches("(?s).*(?:[0-9][0-9.,]*\\s*(?:mbps|gbps|kenh|camera|access point)|bao gom.*(?:modem|camera|wifi|truyen hinh)|khong giat lag|giam sat an ninh 24/7).*" ) ||
             text.matches("(?s).*(?:[0-9][0-9., ]*\\s*(?:đ|Đ|VNĐ|VND|vnd|k\\b)|(?:đ|VNĐ|VND)\\s*[0-9]|[0-9]\\s*%).*"))return Reason.INVALID_BUSINESS_CLAIM;
         return Reason.ACCEPTED;
+    }
+    public static boolean trustedOfficialRepository(String source,String authority) {
+        return source!=null && source.matches("repo:[a-z0-9][a-z0-9._-]{0,79}/v[1-9][0-9]*") && "official".equals(authority);
     }
 }

@@ -30,7 +30,7 @@ public final class CombinedSolutionRecommendationTest {
     }
     private static ProductCatalog catalog(boolean completeMeshPrice) {
         int[] prices = {195,205,220,230,239,249};
-        int[] speeds = {300,300,500,500,1000,1000};
+        int[] speeds = {300,300,300,300,1000,1000};
         List<PackageDTO> rows = new ArrayList<>();
         for (int i=0;i<prices.length;i++) {
             PackageDTO p = new PackageDTO();
@@ -73,8 +73,8 @@ public final class CombinedSolutionRecommendationTest {
         });
         test("case 3: two floors, five people and streaming gets one primary solution", () -> {
             ChatResponse r=ask("Nhà anh 2 tầng, 5 người, xem phim nhiều.",new ChatSessionData("phase59-c3"),CATALOG);
-            onePrimary(r); check(r.getRecommendedPackageId()==3 && r.getContent().contains("Mesh WiFi F1")
-                && r.getContent().contains("237.000đ/tháng"),r.getContent());
+            onePrimary(r); check(r.getRecommendedPackageId()==1 && r.getContent().contains("Mesh WiFi F1")
+                && r.getContent().contains("212.000đ/tháng"),r.getContent());
         });
         test("case 4: context evolves to Internet plus Mesh plus five-camera guidance", () -> {
             ChatSessionData s=new ChatSessionData("phase59-c4");
@@ -86,7 +86,7 @@ public final class CombinedSolutionRecommendationTest {
         test("case 5: gaming guidance avoids an absolute latency promise", () -> {
             ChatResponse r=ask("Anh chơi Valorant, nhà 3 tầng.",new ChatSessionData("phase59-c5"),CATALOG);
             onePrimary(r); String c=r.getContent();
-            check(r.getRecommendedPackageId()==3 && c.contains("249.000đ/tháng") && c.contains("LAN")
+            check(r.getRecommendedPackageId()==1 && c.contains("224.000đ/tháng") && c.contains("LAN")
                 && c.contains("không bảo đảm ping") && !c.contains("không lag"),c);
         });
         test("case 6: explicit Internet-only preference is respected", () -> {
@@ -98,7 +98,7 @@ public final class CombinedSolutionRecommendationTest {
             ChatResponse r=ask("Nhà anh 3 tầng.",new ChatSessionData("phase59-prices"),CATALOG);
             String c=r.getContent();
             check(c.contains("195.000đ/tháng") && c.contains("+29.000đ/tháng") && c.contains("224.000đ/tháng"),c);
-            check(c.contains("300.000đ/lần") && c.contains("830.000đ/lần") && c.contains("1.130.000đ"),c);
+            check(c.contains("830.000đ/lần") && c.contains("không cộng thêm 300.000đ") && !c.contains("1.130.000đ"),c);
             check(!c.contains("215.000đ/tháng") && !c.contains("700.000đ/lần"),"Hardcoded price leaked: "+c);
         });
         test("unknown Mesh price is not invented or aggregated", () -> {

@@ -21,8 +21,8 @@ public final class KnowledgeFile {
         if(version<1||title.length()>200||!Arrays.asList("guide","faq","policy").contains(category)||!Arrays.asList("admin_reviewed","official").contains(authority))throw new IllegalArgumentException("Metadata không hợp lệ");
         if(expires!=null&&effective!=null&&!expires.isAfter(effective))throw new IllegalArgumentException("Ngày hết hạn phải sau ngày hiệu lực");
         if(body.trim().isEmpty()||body.length()>KnowledgeLimits.extracted()||chunkSize<200||chunkSize>1200||overlap<0||overlap>400||overlap>=chunkSize/2)throw new IllegalArgumentException("Nội dung/chunk vượt giới hạn");
-        // Repository trust grants publication approval, never permission to override source policy.
-        rag.importer.DocumentSectionService.validateEntry(title,body);
+        // Only official repository files may carry commercial facts. Unsafe instructions remain blocked.
+        rag.importer.DocumentSectionService.validateEntry(title,body,"official".equals(authority));
     }
     public static KnowledgeFile parse(String raw,String path,String sha)throws RagException {
         String text=raw.startsWith("\uFEFF")?raw.substring(1):raw;text=text.replace("\r\n","\n");

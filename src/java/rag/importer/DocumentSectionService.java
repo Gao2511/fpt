@@ -45,14 +45,17 @@ public final class DocumentSectionService {
     }
     public static boolean singleTopic(String title){return RetrievalQuery.subjectTopics(title).size()==1;}
     public static void validateEntry(String title,String content)throws RagException{
-        if(KnowledgeContentPolicy.contentReason(title,content)!=KnowledgeContentPolicy.Reason.ACCEPTED)throw new IllegalArgumentException("Nội dung chưa đạt source policy; giữ hàng chờ duyệt.");
+        validateEntry(title,content,false);
+    }
+    public static void validateEntry(String title,String content,boolean trustedOfficialCommercial)throws RagException{
+        if(KnowledgeContentPolicy.contentReason(title,content,trustedOfficialCommercial)!=KnowledgeContentPolicy.Reason.ACCEPTED)throw new IllegalArgumentException("Nội dung chưa đạt source policy; giữ hàng chờ duyệt.");
         Kind suggested=classify(title,content);
         if(suggested==Kind.AI_BEHAVIOR||suggested==Kind.ADMIN_CONFIGURATION)throw new IllegalArgumentException("Quy tắc vận hành/cấu hình không được chuyển thành tri thức trả lời tự động.");
         if(!singleTopic(title))throw new IllegalArgumentException("Tiêu đề phải xác định đúng một chủ đề; hãy tách mục hoặc sửa tiêu đề trước khi tạo entry.");
         // Multi-domain body stays for manual splitting; never drop instructions to make a chunk pass.
         Set<String> domains=new HashSet<>(RetrievalQuery.subjectTopics(content));domains.remove("internet");
-        if(domains.size()>1)throw new IllegalArgumentException("Nội dung chứa nhiều chủ đề, cần tách riêng và duyệt lại.");
-        for(String part:new DocumentChunkingService().chunk(content))if(KnowledgeContentPolicy.contentReason(title,part)!=KnowledgeContentPolicy.Reason.ACCEPTED)
+        if(!trustedOfficialCommercial&&domains.size()>1)throw new IllegalArgumentException("Nội dung chứa nhiều chủ đề, cần tách riêng và duyệt lại.");
+        for(String part:new DocumentChunkingService().chunk(content))if(KnowledgeContentPolicy.contentReason(title,part,trustedOfficialCommercial)!=KnowledgeContentPolicy.Reason.ACCEPTED)
             throw new IllegalArgumentException("Nội dung chưa đạt source policy (giá cước hoặc chỉ dẫn không an toàn); giữ hàng chờ duyệt.");
     }
 }

@@ -86,14 +86,19 @@ public final class ConsultationEngine {
             CustomerRequirements memory = session.getRequirements();
             memory.update(question);
             rag.RetrievalQuery query = retrieval.enabled() ? rag.RetrievalQuery.plan(question,session.getHistory(),memory,catalog) : null;
-            ChatResponse installation = ConsultationPolicy.installationFee(question, memory, catalog);
-            if (installation != null) return commit(session, question, installation);
             // Consent, registration and human handoff remain server-owned, ahead of retrieval.
             if (ConsultationPolicy.registrationRequested(question) ||
                 (ConversationSignals.handoff(question) && (!(query==null ? ragQuestion(question) : query.retrieve) || explicitHandoff(question)))) {
                 ChatResponse controlled = ConsultationPolicy.known(question, memory, catalog);
                 if (controlled != null) return commit(session, question, controlled);
             }
+            ChatResponse guided = ConsultationPolicy.conversationFlow(question, memory, catalog);
+            if (guided != null) {
+                guided.setContent(ConsultationPolicy.facts(guided.getContent(),catalog.business));
+                return commit(session, question, guided);
+            }
+            ChatResponse installation = ConsultationPolicy.installationFee(question, memory, catalog);
+            if (installation != null) return commit(session, question, installation);
             // Complete commercial solutions and their totals are server-owned for every prompt mode.
             ChatResponse combined = ConsultationPolicy.combinedSolution(question, memory, catalog);
             if (combined != null) return commit(session, question, combined);
@@ -123,7 +128,7 @@ public final class ConsultationEngine {
             data.add("customerRequirements", memory.json());
             data.add("meshOptions", ConsultationPolicy.meshOptionsJson(catalog.business));
             com.google.gson.JsonObject businessData=new com.google.gson.JsonObject();
-            for(String key:java.util.Arrays.asList("business.phone","business.zalo","business.email","business.address","business.social","business.standardFee"))businessData.addProperty(key,catalog.business.get(key));
+            for(String key:java.util.Arrays.asList("business.assistantName","business.consultantName","business.phone","business.zalo","business.email","business.address","business.social","business.registrationUrl","business.chatbotHours","business.humanHours","business.standardFee","business.prepayPromotionConfirmed","business.prepayConfirmedDate","business.prepayInstallDiscount","business.prepay12BonusMonths"))businessData.addProperty(key,catalog.business.get(key));
             if(cms.SiteContent.promotionVisible(catalog.business))for(String key:java.util.Arrays.asList("business.promotionTitle","business.promotionDescription","business.promotionStart","business.promotionEnd","business.promotionPackageIds"))businessData.addProperty(key,catalog.business.get(key));
             data.add("business",businessData);
             if (!context.empty()) data.add("knowledgeContext", context.json());

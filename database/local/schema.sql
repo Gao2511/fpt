@@ -21,8 +21,8 @@ CREATE TABLE password_reset_token(id serial PRIMARY KEY, user_id integer REFEREN
 INSERT INTO packages(package_code,name,price,speed_mbps,description,long_description) VALUES
  ('195K','Gói 195K',195000,300,'Internet 300Mbps',E'WiFi 6 modem'),
  ('205K','Gói 205K',205000,300,'Internet 300Mbps và Camera',E'WiFi 6 modem\n1 Camera'),
- ('220K','Gói 220K',220000,500,'Internet 500Mbps và truyền hình',E'WiFi 6 modem\nTV 180 kênh\nNội dung Premier League'),
- ('230K','Gói 230K',230000,500,'Internet 500Mbps, Camera và truyền hình',E'WiFi 6 modem\n1 Camera\nTV 180 kênh\nNội dung Premier League'),
+ ('220K','Gói 220K',220000,300,'Internet 300Mbps và truyền hình',E'WiFi 6 modem\nTV 180 kênh\nNội dung Premier League'),
+ ('230K','Gói 230K',230000,300,'Internet 300Mbps, Camera và truyền hình',E'WiFi 6 modem\n1 Camera\nTV 180 kênh\nNội dung Premier League'),
  ('239K','Gói 239K',239000,1000,'Internet 1000Mbps và truyền hình',E'WiFi 6 modem\nTV 180 kênh\nNội dung Premier League'),
  ('249K','Gói 249K',249000,1000,'Internet 1000Mbps, Camera và truyền hình',E'WiFi 6 modem\n1 Camera\nTV 180 kênh\nNội dung Premier League');
 INSERT INTO settings(setting_key,setting_value) VALUES ('ai_chatbot_enabled','false');

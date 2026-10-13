@@ -5,7 +5,7 @@ $testClasses = Join-Path $env:TEMP ('fpt-chat-tests-' + [guid]::NewGuid().ToStri
 New-Item -ItemType Directory -Path $testClasses | Out-Null
 $servletJar = Join-Path $TomcatHome 'lib/servlet-api.jar'
 if (!(Test-Path -LiteralPath $servletJar)) { throw 'Specify -TomcatHome for your Tomcat 9 installation.' }
-$dependencies = (Join-Path $repoRoot 'build/web/WEB-INF/lib/*') + ';' + $servletJar
+$dependencies = (Join-Path $repoRoot 'build/web/WEB-INF/classes') + ';' + (Join-Path $repoRoot 'build/web/WEB-INF/lib/*') + ';' + $servletJar
 $sources = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot 'src/java'),(Join-Path $repoRoot 'test/ai'),(Join-Path $repoRoot 'test/controller') -Recurse -Filter '*.java' | ForEach-Object FullName)
 & javac -encoding UTF-8 --release 8 -cp $dependencies -d $testClasses $sources
 if ($LASTEXITCODE -ne 0) { throw 'Java compilation failed' }

@@ -33,9 +33,9 @@ public class InstallationFeeTest {
         r=ask("Phí lắp đặt có được miễn phí theo ưu đãi không?",s,new MockProvider(),null);
         check(r.getContent().contains("300.000") && r.getContent().contains("chưa có dữ liệu xác nhận miễn giảm"),r.getContent()); passed++;
         r=ask("Phí lắp Mesh F1 bao nhiêu?",s,new MockProvider(),null);
-        check(r.getContent().contains("500.000") && !r.getContent().contains("300.000"),r.getContent()); passed++;
+        check(r.getContent().contains("500.000") && r.getContent().contains("không cộng thêm 300.000đ"),r.getContent()); passed++;
         r=ask("Phí lắp Mesh F2 bao nhiêu?",s,new MockProvider(),null);
-        check(r.getContent().contains("700.000") && !r.getContent().contains("300.000"),r.getContent()); passed++;
+        check(r.getContent().contains("700.000") && r.getContent().contains("không cộng thêm 300.000đ"),r.getContent()); passed++;
         PackageDTO other = new PackageDTO(); other.setPrice(999000); other.setSpeedMbps(1000);
         check(other.getStandardInstallationFee()==0,"Other service inherits fee"); passed++;
         check(ConsultationPolicy.installationFee("Phí lắp camera bao nhiêu?",s.getRequirements(),CATALOG)==null,"Camera inherited Internet fee"); passed++;
