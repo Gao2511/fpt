@@ -8,9 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Knowledge Base &amp; RAG Management - FPT Sale Manager</title>
     <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/admin/admin.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/admin/admin-customer.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/admin/admin-kb.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/admin/admin.css?v=5.8">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/admin/admin-customer.css?v=5.8">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/admin/admin-kb.css?v=5.8">
 </head>
 <body>
 <jsp:include page="/view/admin/admin-header.jsp">

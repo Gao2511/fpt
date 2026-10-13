@@ -505,7 +505,52 @@
 /* Phase 5.7: four everyday destinations, existing admin theme and bounded previews. */
 .kb-primary-nav {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
 .kb-primary-nav a {text-align:center;white-space:normal;}
-.kb-advanced-links {display:flex;flex-wrap:wrap;gap:12px;padding:16px;}
+.kb-advanced-links {display:flex;flex-wrap:wrap;gap:10px;padding:12px 4px 4px;}
+.kb-advanced-links a {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 13px;
+    border-radius: 8px;
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #cbd5e1;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.18s ease;
+}
+.kb-advanced-links a:hover {
+    background: rgba(243, 112, 33, 0.18);
+    border-color: rgba(243, 112, 33, 0.45);
+    color: #ffffff;
+}
+.kb-metrics-grid > div:not(.kb-metric-card) {
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 13px;
+    color: #cbd5e1;
+}
+.kb-metrics-grid > div:not(.kb-metric-card) strong {
+    color: #f8fafc;
+    font-size: 15px;
+}
+.kb-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0 14px;
+}
+.kb-filter-row input:not([type="hidden"]) {
+    flex: 1 1 260px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(30, 41, 59, 0.9);
+    color: #f8fafc;
+    font-size: 13px;
+}
 .kb-snippet {white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto;}
 .kb-page progress {width:110px;accent-color:#f37021;}
 .kb-page input,.kb-page select {max-width:100%;}
