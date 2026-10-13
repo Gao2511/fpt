@@ -62,6 +62,8 @@ public class AdminKnowledgeBaseServlet extends HttpServlet {
         req.setAttribute("kbTextLimit",rag.KnowledgeLimits.text());req.setAttribute("kbExtractedLimit",rag.KnowledgeLimits.extracted());req.setAttribute("kbUploadLimit",rag.KnowledgeLimits.upload());
         req.setAttribute("kbWorkerAuthorized",rag.KnowledgePublishWorker.authorized(System.getenv()));
         req.setAttribute("ragRequestEvidence",rag.RagRequestEvidence.recent());
+        req.setAttribute("fileSyncRuntimeStatus",rag.files.FileKnowledgeRuntime.status());
+        if(Arrays.asList("documents","verify","advanced").contains(tab))try{req.setAttribute("fileSources",new dao.FileKnowledgeDAO().status());}catch(Exception unavailable){req.setAttribute("fileSyncNotice","Cần migration 009 và catalog deployment hợp lệ để xem nguồn FILE_MANAGED.");}
 
         AdminKnowledgeDAO store = dao();
         req.setAttribute("systemStatus", store.getSystemReadinessStatus());
@@ -210,6 +212,16 @@ public class AdminKnowledgeBaseServlet extends HttpServlet {
 
         AdminKnowledgeDAO store = dao();
         try {
+            Set<String> documentActions=new HashSet<>(Arrays.asList("simplePublish","publishDocument","publishUploadSections","restoreDocumentDraft","permanentDeleteDocument","prepareImport","updateDocument","submitReview","submitDocumentReview","approveDocument","rejectDocument","rollbackDocument","reindexDocument","requestGeminiIndex","unpublishDocument","archiveDocument"));
+            long fileTarget=documentActions.contains(action)?parseLong(req.getParameter("id"),parseLong(req.getParameter("docId"),0)):0;
+            ManagedDocument fileDoc=fileTarget>0?store.findDocument(fileTarget):null;
+            if(fileDoc!=null&&fileDoc.isFileManaged()&&!Arrays.asList("downloadOriginal","readOnlyRetrieval","runGeminiPreview","unpublishDocument","archiveDocument").contains(action))throw new IllegalArgumentException("FILE_MANAGED chỉ đọc trên Admin; sửa file trong Git.");
+            if(fileDoc!=null&&fileDoc.isFileManaged()&&Arrays.asList("unpublishDocument","archiveDocument").contains(action)){
+                new dao.FileKnowledgeDAO().emergencyDisable(fileDoc.id,actorId);session.setAttribute("kbMessage","Đã vô hiệu hóa khẩn cấp nguồn Git và mọi phiên bản; đồng bộ tiếp theo không tự bật lại.");resp.sendRedirect(req.getContextPath()+"/admin/knowledge-base?tab=documents&docId="+fileDoc.id);return;
+            }
+            if("syncRepositoryFiles".equals(action)){
+                rag.files.FileKnowledgeRuntime.sync(actorId);session.setAttribute("kbMessage","Đã yêu cầu đồng bộ các file thuộc deployment ở background. Chưa gọi Gemini; index theo worker/quota đã được cho phép.");resp.sendRedirect(req.getContextPath()+"/admin/knowledge-base?tab=documents");return;
+            }
             if("simplePublish".equals(action)||"publishDocument".equals(action)){
                 targetTab="documents";
                 long id=parseLong(req.getParameter("id"),0),version=parseLong(req.getParameter("version"),0);

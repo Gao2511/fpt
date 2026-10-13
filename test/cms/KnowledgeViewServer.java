@@ -21,7 +21,8 @@ public final class KnowledgeViewServer {
             }
             r.setAttribute("csrfToken","fixture-csrf");r.setAttribute("kbTab",r.getParameter("tab"));r.setAttribute("kbLifecycleAvailable",true);r.setAttribute("kbWorkerAuthorized",false);r.setAttribute("kbTextLimit",100000);r.setAttribute("kbExtractedLimit",500000);r.setAttribute("kbUploadLimit",10485760);
             boolean large="true".equals(r.getParameter("large"));String text="Kiểm tra vị trí modem và vật cản.";if(large)text=String.join("\n",Collections.nCopies(4000,text));
-            ManagedDocument doc=new ManagedDocument(1,1,"Hướng dẫn WiFi <script>danger</script>","guide",text,"fixture:reviewed","draft","DRAFT",large?"UPLOAD":"MANUAL","","",rag.VectorValues.hash("fixture"),"pending",null,"wifi.fixture","admin_reviewed",null,null,null,0,null,101,101,0,null,"",400,0,java.time.Instant.EPOCH,java.time.Instant.EPOCH);
+            boolean fileManaged="true".equals(r.getParameter("fileManaged"));
+            ManagedDocument doc=new ManagedDocument(1,1,"Hướng dẫn WiFi <script>danger</script>","guide",text,fileManaged?"repo:wifi/v1":"fixture:reviewed","draft","DRAFT",fileManaged?"FILE_MANAGED":(large?"UPLOAD":"MANUAL"),"","",rag.VectorValues.hash("fixture"),"pending",null,"wifi.fixture","admin_reviewed",null,null,null,0,null,101,101,0,null,"",400,0,java.time.Instant.EPOCH,java.time.Instant.EPOCH);
             r.setAttribute("documents",Collections.singletonList(doc));if("documents".equals(r.getParameter("tab")))r.setAttribute("selectedDoc",doc);
             r.setAttribute("metrics",new DashboardMetrics(1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,Collections.emptyList()));
             Map<String,Object> readiness=new HashMap<>();readiness.put("published",0);readiness.put("gemini",0);readiness.put("validChunks",0);readiness.put("failedPublishJobs",0);r.setAttribute("kbReadiness",readiness);

@@ -41,6 +41,16 @@ const assert=require('node:assert/strict');
   assert.equal(await page.locator('#providerApiKeyInput').inputValue(),'********');
   await page.screenshot({path:path.join(process.env.KB57_EVIDENCE,'api-key-settings.png'),fullPage:true});
   console.log('PASS KB57 browser visible API key navigation opens masked key form');
-  console.log('KB57 browser: 10/10 checks PASS; real API requests=0');
+  await page.goto(base+'/admin/knowledge-base?tab=documents&fileManaged=true');
+  assert.equal(await page.locator('textarea[name="content"]').isDisabled(),true);
+  assert.equal(await page.locator('form:has(input[name="action"][value="simplePublish"])').count(),0);
+  assert.equal(await page.locator('form:has(input[name="action"][value="rollbackDocument"])').count(),0);
+  assert.equal(await page.locator('form:has(input[name="action"][value="permanentDeleteDocument"])').count(),0);
+  assert.equal(await page.locator('form:has(input[name="action"][value="archiveDocument"])').count()>0,true);
+  const sync=page.locator('form:has(input[name="action"][value="syncRepositoryFiles"])');
+  assert.equal(await sync.locator('[name="csrf_token"]').count(),1);
+  await page.screenshot({path:path.join(process.env.KB57_EVIDENCE,'file-managed-read-only.png'),fullPage:true});
+  console.log('PASS FILE-KB browser file-managed read-only controls and authenticated sync form');
+  console.log('KB browser: 11/11 checks PASS; real API requests=0');
  }finally{if(browser)await browser.close();child.kill();}
 })().catch(e=>{console.error(e.message);process.exitCode=1;});

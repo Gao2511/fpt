@@ -523,6 +523,7 @@ public class AdminKnowledgeDAO {
             int chunkSize, int chunkOverlap, boolean preservePublishedState, String changeNote,
             int actorId, String actorUsername,long expectedVersion) throws Exception {
         ManagedDocument existing = findDocument(id);
+        if(existing!=null&&"FILE_MANAGED".equals(existing.sourceType))throw new IllegalArgumentException("Sửa nguồn FILE_MANAGED trong Git, không sửa nội dung trên Admin.");
         if (existing == null) {
             throw new IllegalArgumentException("Không tìm thấy tài liệu #" + id);
         }
@@ -2230,6 +2231,7 @@ public class AdminKnowledgeDAO {
             throw new IllegalArgumentException("Danh mục tài liệu không hợp lệ (chỉ nhận faq, policy, guide).");
         }
         int contentLimit="UPLOAD".equalsIgnoreCase(sourceType) ? KnowledgeLimits.extracted() : KnowledgeLimits.text();
+        if(!Arrays.asList("MANUAL","UPLOAD","FAQ").contains(sourceType==null?"MANUAL":sourceType.toUpperCase(Locale.ROOT))||source!=null&&source.startsWith("repo:"))throw new IllegalArgumentException("Nguồn repo: chỉ được tạo qua đồng bộ deployment.");
         if (content == null || content.trim().isEmpty() || content.length() > contentLimit) {
             throw new IllegalArgumentException("Nội dung tài liệu bắt buộc (1.."+contentLimit+" ký tự).");
         }

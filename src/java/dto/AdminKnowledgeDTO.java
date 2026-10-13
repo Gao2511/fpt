@@ -72,6 +72,8 @@ public final class AdminKnowledgeDTO {
     }
 
     public static final class ManagedDocument {
+        public boolean isFileManaged(){return "FILE_MANAGED".equals(sourceType);}
+        public String getManagementMode(){return isFileManaged()?"FILE_MANAGED":("UPLOAD".equals(sourceType)?"ADMIN_UPLOADED":"ADMIN_MANAGED");}
         public final long id;
         public final long version;
         public final String title;

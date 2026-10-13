@@ -28,6 +28,7 @@ public final class KnowledgeLifecycleDAO {
         actor(admin);
         try(Connection c=db.open()){c.setAutoCommit(false);try{
             ManagedDocument old=new AdminKnowledgeDAO(db).findDocument(oldId);
+            if(old!=null&&old.isFileManaged())throw new IllegalArgumentException("Thay thế nguồn Git bằng file/replaces trong repository.");
             if(old==null || oldId>=id || old.policyKey.isEmpty() || old.approvedBy<=0)throw new IllegalArgumentException("Bản thay thế cần tài liệu nguồn đã duyệt với Policy Key.");
             KnowledgeDocumentDTO d;
             try(PreparedStatement p=c.prepareStatement("SELECT * FROM public.knowledge_documents WHERE id=? AND version=? AND workflow_status='DRAFT' FOR UPDATE")){
@@ -54,6 +55,7 @@ public final class KnowledgeLifecycleDAO {
         actor(admin);
         try(Connection c=db.open()){c.setAutoCommit(false);try{
             ManagedDocument d=lock(c,id);
+            if(!FileKnowledgeDAO.permitted(c,id,d.source))throw new IllegalArgumentException("Nguồn file không còn active trong deployment hoặc đã bị vô hiệu hóa.");
             if(d.version!=version)throw new RagException(RagException.Code.STALE_VERSION);
             try(PreparedStatement p=c.prepareStatement("SELECT id FROM public.knowledge_publish_jobs WHERE document_id=? AND document_version=?")){
                 p.setLong(1,id);p.setLong(2,version);try(ResultSet r=p.executeQuery()){if(r.next()){c.commit();return r.getLong(1);}}
@@ -64,6 +66,7 @@ public final class KnowledgeLifecycleDAO {
             ManagedDocument old=null;
             if(d.supersedesDocumentId!=null){
                 old=lock(c,d.supersedesDocumentId);
+                if(old.isFileManaged()&&!d.isFileManaged())throw new IllegalArgumentException("Nguồn Admin không được thay thế FILE_MANAGED.");
                 if(old.id>=d.id || d.policyKey.isEmpty() || !d.policyKey.equals(old.policyKey) || ("official".equals(old.sourceAuthority)&&!"official".equals(d.sourceAuthority)))throw new IllegalArgumentException("Nguồn thay thế/authority không hợp lệ.");
             }
             long job;
@@ -89,7 +92,8 @@ public final class KnowledgeLifecycleDAO {
             try(Statement s=c.createStatement();ResultSet r=s.executeQuery("SELECT 1 FROM public.knowledge_embedding_requests WHERE state IN ('RESERVED','UNCERTAIN') LIMIT 1")){if(r.next()){c.commit();return false;}}
             try(PreparedStatement p=c.prepareStatement("SELECT j.id AS job_id,d.title,j.document_version,j.document_hash,d.* FROM public.knowledge_publish_jobs j JOIN public.knowledge_documents d ON d.id=j.document_id WHERE j.state IN ('PENDING_INDEX','WAITING_FOR_QUOTA','WAITING_EFFECTIVE') AND (j.state<>'WAITING_EFFECTIVE' OR d.effective_at<=CURRENT_TIMESTAMP) AND NOT EXISTS(SELECT 1 FROM public.knowledge_publish_chunks bad WHERE bad.job_id=j.id AND bad.state IN ('FAILED','UNCERTAIN')) ORDER BY j.id LIMIT 1 FOR UPDATE OF j,d SKIP LOCKED");ResultSet r=p.executeQuery()){
                 if(!r.next()){c.commit();return false;}jobId=r.getLong(1);title=r.getString(2);
-                if(r.getLong(3)!=r.getLong("version")||!r.getString(4).equals(r.getString("content_hash"))||!"APPROVED".equals(r.getString("workflow_status"))||expired(r)){
+                if(r.getString("source").startsWith("repo:")&&!rag.files.FileKnowledgeCatalog.ready()){c.commit();return false;}
+                if(r.getLong(3)!=r.getLong("version")||!r.getString(4).equals(r.getString("content_hash"))||!"APPROVED".equals(r.getString("workflow_status"))||expired(r)||!FileKnowledgeDAO.permitted(c,r.getLong("id"),r.getString("source"))){
                     state(c,jobId,"CANCELLED","STALE_VERSION");c.commit();return true;
                 }
             }
@@ -157,6 +161,7 @@ public final class KnowledgeLifecycleDAO {
             p.setLong(1,jobId);try(ResultSet r=p.executeQuery()){r.next();if(r.getInt(1)>0||r.getInt(2)==0)return;}
         }
         ManagedDocument d=lock(c,id);
+        if(!FileKnowledgeDAO.permitted(c,id,d.source)){state(c,jobId,"CANCELLED","STALE_VERSION");return;}
         if(d.version!=version||!d.contentHash.equals(hash)||!"APPROVED".equals(d.workflowStatus)||d.approvedBy<=0||d.approvedAt==null || (d.expiresAt!=null&&!Instant.now().isBefore(d.expiresAt))){state(c,jobId,"CANCELLED","STALE_VERSION");return;}
         if(d.effectiveAt!=null&&Instant.now().isBefore(d.effectiveAt)){state(c,jobId,"WAITING_EFFECTIVE",null);return;}
         if(oldId!=null){ManagedDocument old=lock(c,oldId);if(old.version!=oldVersion || !old.contentHash.equals(oldHash)){state(c,jobId,"INDEXING_FAILED","STALE_VERSION");return;}
@@ -212,6 +217,7 @@ public final class KnowledgeLifecycleDAO {
         List<String> paths=new ArrayList<>();
         try(Connection c=db.open()){c.setAutoCommit(false);try{
             ManagedDocument d=lock(c,id);if(d.version!=version || "PUBLISHED".equals(d.workflowStatus))throw new IllegalArgumentException("Gỡ xuất bản và xác nhận đúng phiên bản trước khi xóa.");
+            if("FILE_MANAGED".equals(d.sourceType))throw new IllegalArgumentException("Nguồn Git giữ lịch sử; chỉ cho phép vô hiệu hóa khẩn cấp trên Admin.");
             String[] refs={"SELECT 1 FROM public.knowledge_documents WHERE supersedes_document_id=?","SELECT 1 FROM public.knowledge_document_revisions WHERE supersedes_document_id=? AND document_id<>?","SELECT 1 FROM public.knowledge_faqs WHERE linked_document_id=?","SELECT 1 FROM public.knowledge_import_sections WHERE source_document_id=? OR document_id=?","SELECT 1 FROM public.knowledge_publish_jobs WHERE replacement_id=?"};
             for(String sql:refs)try(PreparedStatement p=c.prepareStatement(sql)){p.setLong(1,id);if(sql.contains("<>?")||sql.contains(" OR document_id=?"))p.setLong(2,id);try(ResultSet r=p.executeQuery()){if(r.next())throw new IllegalArgumentException("Tài liệu còn liên kết phiên bản/FAQ/import; hãy lưu trữ để bảo toàn nguồn.");}}
             try(PreparedStatement p=c.prepareStatement("SELECT 1 FROM public.knowledge_publish_chunks k JOIN public.knowledge_publish_jobs j ON j.id=k.job_id WHERE j.document_id=? AND k.state IN ('RESERVED','UNCERTAIN')")){p.setLong(1,id);try(ResultSet r=p.executeQuery()){if(r.next())throw new IllegalArgumentException("Request chưa xác định trạng thái; không được xóa evidence.");}}

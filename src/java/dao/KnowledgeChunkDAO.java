@@ -50,7 +50,10 @@ public class KnowledgeChunkDAO {
                 p.setString(i++,model);p.setInt(i++,dimensions);p.setString(i++,kind);p.setInt(i,Math.max(1,Math.min(limit,12)));
                 try(ResultSet r=p.executeQuery()){while(r.next())result.add(new KnowledgeChunkDTO(r.getLong("id"),r.getLong("document_id"),r.getLong("document_version"),r.getString("document_hash"),r.getString("title"),r.getString("content"),r.getString("source"),RagDatabase.instant(r,"effective_at"),RagDatabase.instant(r,"expires_at"),r.getDouble("score"),new KnowledgeChunkDTO.SourceMetadata(r.getString("status"),r.getString("category"),r.getInt("approved_by"),RagDatabase.instant(r,"approved_at"),r.getString("policy_key"),r.getString("source_authority"),false)));}
             }
-        }return result;
+        }
+        // Exclude removed deployment files even before DB reconciliation.
+        if(result.stream().anyMatch(chunk->chunk.source.startsWith("repo:")))try(Connection c=db.open()){Iterator<KnowledgeChunkDTO> i=result.iterator();while(i.hasNext()){KnowledgeChunkDTO chunk=i.next();if(!FileKnowledgeDAO.permitted(c,chunk.documentId,chunk.source))i.remove();}}
+        return result;
     }
     public boolean current(KnowledgeChunkDTO chunk) throws Exception {
         if(chunk.metadata==null)return false;
@@ -58,6 +61,7 @@ public class KnowledgeChunkDAO {
         String peers="EXISTS(SELECT 1 FROM public.knowledge_documents peer WHERE peer.id<>d.id AND ((d.policy_key<>'' AND peer.policy_key=d.policy_key) OR (d.policy_key='' AND peer.policy_key='' AND lower(peer.title)=lower(d.title))) AND peer.status='published' AND peer.approved_by>0 AND peer.approved_at<=CURRENT_TIMESTAMP AND (peer.effective_at IS NULL OR peer.effective_at<=CURRENT_TIMESTAMP) AND (peer.expires_at IS NULL OR peer.expires_at>CURRENT_TIMESTAMP) AND NOT EXISTS(SELECT 1 FROM superseded x WHERE x.id=peer.id AND x.policy_key=peer.policy_key AND (x.authority='official' OR peer.source_authority='admin_reviewed')) AND ((peer.source_authority='official' AND d.source_authority='admin_reviewed') OR (peer.source_authority=d.source_authority AND peer.content IS DISTINCT FROM d.content)))";
         String sql=LINEAGE+"SELECT "+peers+" AS conflict FROM public.knowledge_chunks k JOIN public.knowledge_documents d ON d.id=k.document_id WHERE "+ELIGIBLE+" AND k.embedding_provider='"+kind+"' AND d.embedding_provider=k.embedding_provider AND k.id=? AND d.id=? AND d.version=? AND d.content_hash=? AND k.content=? AND d.source=? AND d.title=? AND d.policy_key=? AND d.source_authority=? AND d.approved_by=? AND d.approved_at=?";
         try(Connection c=db.open();PreparedStatement p=c.prepareStatement(sql)) {
+            if(!FileKnowledgeDAO.permitted(c,chunk.documentId,chunk.source))return false;
             p.setLong(1,chunk.id);p.setLong(2,chunk.documentId);p.setLong(3,chunk.documentVersion);p.setString(4,chunk.documentHash);p.setString(5,chunk.content);
             p.setString(6,chunk.source);p.setString(7,chunk.title);p.setString(8,chunk.metadata.policyKey);p.setString(9,chunk.metadata.authority);p.setInt(10,chunk.metadata.approvedBy);p.setTimestamp(11,RagDatabase.timestamp(chunk.metadata.approvedAt));
             try(ResultSet r=p.executeQuery()){if(!r.next())return false;if(r.getBoolean("conflict")){System.err.println("[RAG source revalidation] issue=SOURCE_CONFLICT document="+chunk.documentId);return false;}return true;}

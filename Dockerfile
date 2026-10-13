@@ -8,6 +8,7 @@ RUN sed -i 's/\r$//' tools/bootstrap-libs.sh tools/dependencies.lock && sh tools
 COPY src src
 COPY web web
 COPY config config
+COPY knowledge knowledge
 COPY build-portable.xml build-portable.xml
 ARG RENDER_GIT_COMMIT=source-build
 ARG BUILD_VERSION=5.3.0-online-rag

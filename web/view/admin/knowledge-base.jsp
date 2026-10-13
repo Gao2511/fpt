@@ -413,7 +413,7 @@
             <!-- CREATE OR EDIT DOCUMENT FORM -->
             <div class="kb-panel">
                 <h3><c:out value="${not empty selectedDoc ? 'Chỉnh sửa & Quản lý Tài liệu #' : 'Tạo mới Tài liệu Tri thức (DRAFT)'}"/><c:if test="${not empty selectedDoc}"><c:out value="${selectedDoc.id}"/> (v<c:out value="${selectedDoc.version}"/>)</c:if></h3>
-                <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base">
+                <p>Nguồn: <c:out value="${selectedDoc.managementMode}"/></p><c:if test="${selectedDoc.fileManaged}"><p>Chỉ đọc — chỉnh nội dung trong knowledge/ rồi tăng version.</p></c:if><fieldset ${selectedDoc.fileManaged ? 'disabled' : ''} style="border:0;padding:0;margin:0;min-width:0"><form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base">
                     <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}">
                     <input type="hidden" name="tab" value="documents">
                     <input type="hidden" name="action" value="${not empty selectedDoc ? 'updateDocument' : 'createDocument'}">
@@ -507,7 +507,7 @@
                             <a class="kb-btn kb-btn-secondary" href="${pageContext.request.contextPath}/admin/knowledge-base?tab=documents">+ Tạo tài liệu mới</a>
                         </c:if>
                     </div>
-                </form>
+                </form></fieldset>
             </div>
 
             <!-- LIFECYCLE WORKFLOW, VERSION HISTORY & DIFF -->
@@ -536,7 +536,7 @@
                         <p style="font-size:12.5px;color:#94a3b8;">Content Hash: <code><c:out value="${selectedDoc.contentHash}"/></code></p>
 
                         <div class="kb-actions-inline" style="margin-bottom:16px;">
-                            <c:if test="${selectedDoc.workflowStatus == 'DRAFT' || selectedDoc.workflowStatus == 'REJECTED' || selectedDoc.workflowStatus == 'UNPUBLISHED'}">
+                            <c:if test="${!selectedDoc.fileManaged && (selectedDoc.workflowStatus == 'DRAFT' || selectedDoc.workflowStatus == 'REJECTED' || selectedDoc.workflowStatus == 'UNPUBLISHED')}">
                                 <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base">
                                     <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}">
                                     <input type="hidden" name="action" value="submitReview">
@@ -545,7 +545,7 @@
                                 </form>
                             </c:if>
 
-                            <c:if test="${selectedDoc.workflowStatus == 'PENDING_REVIEW'}">
+                            <c:if test="${!selectedDoc.fileManaged && (selectedDoc.workflowStatus == 'PENDING_REVIEW')}">
                                 <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base">
                                     <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}">
                                     <input type="hidden" name="action" value="approveDocument">
@@ -554,7 +554,7 @@
                                 </form>
                             </c:if>
 
-                            <c:if test="${selectedDoc.workflowStatus == 'APPROVED'}">
+                            <c:if test="${!selectedDoc.fileManaged && (selectedDoc.workflowStatus == 'APPROVED')}">
                                 <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base">
                                     <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}">
                                     <input type="hidden" name="action" value="publishDocument"><input type="hidden" name="version" value="${selectedDoc.version}">
@@ -564,7 +564,7 @@
                             </c:if>
 
                             <c:if test="${selectedDoc.workflowStatus == 'PUBLISHED'}">
-                                <c:if test="${selectedDoc.indexMode == 'MOCK INDEX'}">
+                                <c:if test="${!selectedDoc.fileManaged && (selectedDoc.indexMode == 'MOCK INDEX')}">
                                 <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base">
                                     <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}">
                                     <input type="hidden" name="action" value="reindexDocument">
@@ -572,7 +572,7 @@
                                     <button type="submit" class="kb-btn">Lập chỉ mục Offline ngay (Reindex)</button>
                                 </form>
                                 </c:if>
-                                <c:if test="${selectedDoc.indexMode == 'GEMINI INDEX'}"><a class="kb-btn" href="${pageContext.request.contextPath}/admin/knowledge-base?tab=indexing&amp;docId=${selectedDoc.id}">GEMINI INDEX: trạng thái / reindex có phê duyệt</a></c:if>
+                                <c:if test="${!selectedDoc.fileManaged && (selectedDoc.indexMode == 'GEMINI INDEX')}"><a class="kb-btn" href="${pageContext.request.contextPath}/admin/knowledge-base?tab=indexing&amp;docId=${selectedDoc.id}">GEMINI INDEX: trạng thái / reindex có phê duyệt</a></c:if>
                                 <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base">
                                     <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}">
                                     <input type="hidden" name="action" value="unpublishDocument">
@@ -591,7 +591,7 @@
                             </c:if>
                         </div>
 
-                        <c:if test="${selectedDoc.workflowStatus == 'PENDING_REVIEW' || selectedDoc.workflowStatus == 'APPROVED'}">
+                        <c:if test="${!selectedDoc.fileManaged && (selectedDoc.workflowStatus == 'PENDING_REVIEW' || selectedDoc.workflowStatus == 'APPROVED')}">
                             <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base" style="margin-bottom:16px;">
                                 <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}">
                                 <input type="hidden" name="action" value="rejectDocument">
@@ -624,13 +624,13 @@
                                             <td><c:out value="${rev.changeNote}"/></td>
                                             <td><small><c:out value="${rev.createdAt}"/></small></td>
                                             <td>
-                                                <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base">
+                                                <c:if test="${!selectedDoc.fileManaged}"><form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base">
                                                     <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}">
                                                     <input type="hidden" name="action" value="rollbackDocument">
                                                     <input type="hidden" name="id" value="${selectedDoc.id}">
                                                     <input type="hidden" name="targetVersion" value="${rev.versionNumber}">
                                                     <button type="submit" class="kb-btn kb-btn-secondary">Rollback -&gt; v+1</button>
-                                                </form>
+                                                </form></c:if>
                                             </td>
                                         </tr>
                                     </c:forEach>

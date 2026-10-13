@@ -22,6 +22,10 @@ build.pipeline=portable-ant-jdk17-release8
         <copy file="config/phase52-online-smoke-plan.json" tofile="${portable.web}/WEB-INF/classes/phase52-online-smoke-plan.json" failonerror="false" overwrite="true"/>
     </target>
     <target name="war" depends="compile">
+        <java classname="rag.files.FileKnowledgeValidator" fork="true" failonerror="true"><classpath><path refid="compile.path"/><pathelement location="${portable.web}/WEB-INF/classes"/></classpath><arg value="knowledge"/></java>
+        <!-- Private catalog exactly matches the deployment, including removed files. -->
+        <delete dir="${portable.web}/WEB-INF/knowledge"/>
+        <copy todir="${portable.web}/WEB-INF/knowledge"><fileset dir="knowledge" includes="**/*.md,**/*.txt" followsymlinks="false"/></copy>
         <copy todir="${portable.web}"><fileset dir="web" excludes="WEB-INF/classes/**,WEB-INF/lib/**,**/.env*,**/oauth.properties,**/*.log,**/*.sql,**/*.java"/></copy>
         <!-- JSTL 1.2 includes its implementation. Old Standard 1.0 jars duplicate Util/classes. -->
         <delete><fileset dir="${portable.web}/WEB-INF/lib" includes="standard-*.jar" erroronmissingdir="false"/></delete>

@@ -12,6 +12,9 @@
     <import file="nbproject/build-impl.xml"/>
     <!-- Remove only obsolete generated build copies; keep original libraries/data untouched. -->
     <target name="-pre-dist">
+        <java classname="rag.files.FileKnowledgeValidator" fork="true" failonerror="true"><classpath><pathelement location="${build.classes.dir}"/><fileset dir="lib/runtime" includes="*.jar"/></classpath><arg value="knowledge"/></java>
+        <delete dir="${build.web.dir}/WEB-INF/knowledge"/>
+        <copy todir="${build.web.dir}/WEB-INF/knowledge"><fileset dir="knowledge" includes="**/*.md,**/*.txt" followsymlinks="false"/></copy>
         <delete><fileset dir="${build.web.dir}/WEB-INF/lib" includes="standard-*.jar" erroronmissingdir="false"/></delete>
     </target>
     <!--

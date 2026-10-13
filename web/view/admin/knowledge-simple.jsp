@@ -1,6 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<jsp:include page="/view/admin/knowledge-files.jsp"/>
 <c:if test="${!kbLifecycleAvailable}"><div class="kb-alert kb-alert-error">Cần migration 008 để dùng xuất bản và thay thế an toàn. Các chức năng đọc và đường dẫn cũ vẫn được giữ.</div></c:if>
 <c:if test="${kbTab == 'upload'}">
  <section class="kb-panel"><h2>Tải lên &amp; Xuất bản</h2><p>Chọn tệp → kiểm tra nội dung → Xuất bản. Chỉ tài liệu đã lập chỉ mục Gemini thành công mới có thể được chatbot truy xuất khi gate RAG được bật.</p>
@@ -20,7 +21,7 @@
 <c:if test="${not empty selectedDoc && (kbTab == 'documents' || kbTab == 'imports')}">
  <section class="kb-panel"><h3>Xuất bản tài liệu #<c:out value="${selectedDoc.id}"/></h3>
   <p>Xuất bản là phê duyệt nội dung tri thức. Không thay đổi system prompt, giá cước hay cấu hình. Gemini chỉ chạy trong ngân sách và quota quản trị viên đã cho phép.</p>
-  <c:if test="${selectedDoc.workflowStatus != 'PUBLISHED' && selectedDoc.workflowStatus != 'ARCHIVED' && selectedDoc.workflowStatus != 'PROCESSING_FAILED'}">
+  <c:if test="${!selectedDoc.fileManaged && selectedDoc.workflowStatus != 'PUBLISHED' && selectedDoc.workflowStatus != 'ARCHIVED' && selectedDoc.workflowStatus != 'PROCESSING_FAILED'}">
    <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base">
     <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}"><input type="hidden" name="id" value="${selectedDoc.id}"><input type="hidden" name="version" value="${selectedDoc.version}">
     <input type="hidden" name="action" value="${kbTab == 'imports' && empty selectedDoc.supersedesDocumentId ? 'publishUploadSections' : 'simplePublish'}">
@@ -28,19 +29,20 @@
    </form>
   </c:if>
   <c:if test="${not empty selectedDoc.supersedesDocumentId}"><p>Thay thế #<c:out value="${selectedDoc.supersedesDocumentId}"/> sau khi index thành công. Nếu nội dung có nhiều chủ đề, cần tạo các bản thay thế đơn chủ đề riêng.</p></c:if>
-  <a class="kb-btn kb-btn-secondary" href="${pageContext.request.contextPath}/admin/knowledge-base?tab=upload&amp;replace=${selectedDoc.id}">Upload phiên bản thay thế</a>
+  <c:if test="${!selectedDoc.fileManaged}"><a class="kb-btn kb-btn-secondary" href="${pageContext.request.contextPath}/admin/knowledge-base?tab=upload&amp;replace=${selectedDoc.id}">Upload phiên bản thay thế</a></c:if>
+  <c:if test="${selectedDoc.fileManaged}"><p>FILE_MANAGED: sửa file và tăng version trong Git. Gỡ xuất bản/Lưu trữ là vô hiệu hóa khẩn cấp toàn bộ nguồn; sync không tự bật lại.</p></c:if>
   <div class="kb-actions-inline">
    <c:if test="${selectedDoc.workflowStatus == 'PUBLISHED'}"><form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base"><input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}"><input type="hidden" name="action" value="unpublishDocument"><input type="hidden" name="id" value="${selectedDoc.id}"><button class="kb-btn kb-btn-secondary" type="submit">Gỡ xuất bản</button></form></c:if>
    <c:if test="${selectedDoc.workflowStatus != 'ARCHIVED'}"><form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base"><input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}"><input type="hidden" name="action" value="archiveDocument"><input type="hidden" name="id" value="${selectedDoc.id}"><button class="kb-btn kb-btn-secondary" type="submit">Lưu trữ</button></form></c:if>
-   <c:if test="${selectedDoc.workflowStatus == 'ARCHIVED' || selectedDoc.workflowStatus == 'UNPUBLISHED'}"><form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base"><input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}"><input type="hidden" name="action" value="restoreDocumentDraft"><input type="hidden" name="id" value="${selectedDoc.id}"><input type="hidden" name="version" value="${selectedDoc.version}"><button class="kb-btn kb-btn-secondary" type="submit">Khôi phục thành bản nháp</button></form></c:if>
+   <c:if test="${!selectedDoc.fileManaged && (selectedDoc.workflowStatus == 'ARCHIVED' || selectedDoc.workflowStatus == 'UNPUBLISHED')}"><form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base"><input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}"><input type="hidden" name="action" value="restoreDocumentDraft"><input type="hidden" name="id" value="${selectedDoc.id}"><input type="hidden" name="version" value="${selectedDoc.version}"><button class="kb-btn kb-btn-secondary" type="submit">Khôi phục thành bản nháp</button></form></c:if>
   </div>
-  <details class="kb-advanced-details"><summary>Xóa vĩnh viễn (nâng cao)</summary>
+  <c:if test="${!selectedDoc.fileManaged}"><details class="kb-advanced-details"><summary>Xóa vĩnh viễn (nâng cao)</summary>
    <p>Ưu tiên Gỡ xuất bản / Lưu trữ. Xóa vĩnh viễn bị từ chối nếu còn liên kết hoặc request chưa xác định trạng thái.</p>
    <form method="post" action="${pageContext.request.contextPath}/admin/knowledge-base" data-kb-destructive>
     <input type="hidden" name="csrf_token" value="${fn:escapeXml(csrfToken)}"><input type="hidden" name="action" value="permanentDeleteDocument"><input type="hidden" name="id" value="${selectedDoc.id}"><input type="hidden" name="version" value="${selectedDoc.version}">
     <label>Nhập DELETE ${selectedDoc.id}<input name="confirmation" required autocomplete="off"></label><button class="kb-btn kb-btn-danger" type="submit">Xóa vĩnh viễn</button>
    </form>
-  </details>
+  </details></c:if>
  </section>
 </c:if>
 <c:if test="${kbTab == 'upload' || kbTab == 'documents' || kbTab == 'imports'}">
