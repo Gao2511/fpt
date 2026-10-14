@@ -99,6 +99,8 @@ public final class ConsultationEngine {
             }
             ChatResponse installation = ConsultationPolicy.installationFee(question, memory, catalog);
             if (installation != null) return commit(session, question, installation);
+            ChatResponse direct = ConsultationPolicy.direct(question, memory, catalog);
+            if (direct != null) return commit(session, question, direct);
             // Complete commercial solutions and their totals are server-owned for every prompt mode.
             ChatResponse combined = ConsultationPolicy.combinedSolution(question, memory, catalog);
             if (combined != null) return commit(session, question, combined);

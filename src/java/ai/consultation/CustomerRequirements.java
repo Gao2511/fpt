@@ -4,23 +4,25 @@ import com.google.gson.JsonObject;
 import java.io.Serializable;
 import java.util.regex.*;
 
-/** Only bounded facts from customer input; never stores instructions or contact PII. */
+/** Only bounded facts from customer input; never stores contact details, instructions or secrets. */
 public final class CustomerRequirements implements Serializable {
     private static final long serialVersionUID = 1L;
     public Long budget;
     public Integer people, devices, selectedPackageId, floors, cameraCount, requestedSpeedMbps, prepaymentMonths;
-    public String meshInterest, serviceArea;
+    public String meshInterest, serviceArea, customerName, coverageIssue, conversationStage = "BROWSING";
     public boolean gaming, streaming, businessUse, student, television, camera, football, smartTv;
     public boolean televisionKnown, cameraKnown, meshPreferenceKnown, meshWanted, registrationFormOpened;
     public boolean amenitiesAsked, locationAsked, consultationStarted, selectionAmbiguous;
+    public boolean prepaymentRejected, installationPriceObjected, monthlyPriceObjected, competitorCompared;
     public String style = "formal", stylePreference, address;
     public transient Long previousBudget;
     public transient boolean requirementsChanged;
     public void clear() {
         budget = null; people = null; devices = null; selectedPackageId = null; floors = null; cameraCount = null; requestedSpeedMbps = null; prepaymentMonths = null;
-        meshInterest = serviceArea = null;
+        meshInterest = serviceArea = customerName = coverageIssue = null; conversationStage = "BROWSING";
         gaming = streaming = businessUse = student = television = camera = football = smartTv = false;
         televisionKnown = cameraKnown = meshPreferenceKnown = meshWanted = registrationFormOpened = amenitiesAsked = locationAsked = consultationStarted = selectionAmbiguous = false;
+        prepaymentRejected = installationPriceObjected = monthlyPriceObjected = competitorCompared = false;
         style = "formal"; stylePreference = address = null;
         previousBudget = null; requirementsChanged = false;
     }
@@ -28,7 +30,12 @@ public final class CustomerRequirements implements Serializable {
         String q = ProductCatalog.normalize(text);
         previousBudget = budget;
         requirementsChanged = false;
-        if (q.matches("(?s).*(?:muon|can)\\s+(?:lap|dang ky)\\s+(?:mang|internet).*")) consultationStarted = true;
+        if (q.matches("(?s).*(?:muon|can)\\s+(?:lap|dang ky)\\s+(?:mang|internet).*")) { consultationStarted = true; conversationStage = "DISCOVERY"; }
+        Matcher explicitName = Pattern.compile("(?iu)(?:^|[.!?]\\s*)(?:(?:tôi|mình|em|anh|chị)\\s+tên là|tên (?:tôi|mình|em) là)\\s+([\\p{L}][\\p{L} .'-]{1,39})(?:[.!?,]|$)").matcher(text == null ? "" : text.trim());
+        if (explicitName.find()) {
+            String value = explicitName.group(1).trim().replaceAll("\\s+", " ");
+            if (!value.matches("(?iu).*(?:muốn|cần|đăng ký|lắp mạng|hỏi|ở tại).*")) customerName = value;
+        }
         String counts = q.replaceAll("\\bmot\\b", "1").replaceAll("\\bhai\\b", "2").replaceAll("\\bba\\b", "3")
             .replaceAll("\\bbon\\b", "4").replaceAll("\\bnam(?=\\s+(?:nguoi|dua|may|thiet bi))", "5");
         Matcher persons = Pattern.compile("(?<![0-9])(\\d{1,2})\\s*(?:nguoi|dua)\\b").matcher(counts);
@@ -54,7 +61,7 @@ public final class CustomerRequirements implements Serializable {
         if (speed.find()) { requestedSpeedMbps = Integer.parseInt(speed.group(1)); requirementsChanged = true; }
         Matcher prepay = Pattern.compile("(?:dong|tra)\\s*truoc\\s*(6|12|sau|muoi hai)\\s*thang").matcher(q);
         if (prepay.find()) { prepaymentMonths = prepay.group(1).matches("6|sau") ? 6 : 12; requirementsChanged = true; }
-        if (q.matches("(?s).*(?:khong muon|khong can|khong thich).*dong truoc.*")) prepaymentMonths = null;
+        if (q.matches("(?s).*(?:khong muon|khong can|khong thich).*?(?:dong|tra) truoc.*")) { prepaymentMonths = null; prepaymentRejected = true; }
         if (q.contains("khong choi game")) gaming = false;
         else if (q.contains("game") || q.contains("gaming") || q.contains("valorant") || q.contains("lien minh")) { gaming = true; requirementsChanged = true; }
         if (q.matches("(?s).*(?:xem phim|stream|netflix|youtube).*")) { streaming = true; requirementsChanged = true; }
@@ -70,6 +77,10 @@ public final class CustomerRequirements implements Serializable {
         else if (!asking && (q.contains("truyen hinh") || q.contains("tivi") || q.contains("smart tv") || q.contains("bong da"))) { television = true; televisionKnown = true; requirementsChanged = true; }
         if (q.contains("smart tv")) { smartTv = true; television = true; televisionKnown = true; requirementsChanged = true; }
         if (q.contains("bong da") || q.contains("ngoai hang anh") || q.contains("premier league")) { football = true; television = true; televisionKnown = true; requirementsChanged = true; }
+        if (q.matches("(?s).*(?:wifi yeu|song yeu|mat song|goc chet|tang tren.*yeu|phong xa.*yeu).*")) { coverageIssue = "WIFI_WEAK_COVERAGE"; requirementsChanged = true; }
+        if (q.matches("(?s).*(?:700\\s*k|700[.]?000|phi lap f2).*(?:cao|dat|mac).*")) { installationPriceObjected = true; }
+        if (q.matches("(?s).*(?:259\\s*k|259[.]?000|cuoc|hang thang).*(?:cao|dat|mac).*")) { monthlyPriceObjected = true; }
+        if (q.matches("(?s).*(?:viettel|vnpt|nha mang khac|ben khac).*")) competitorCompared = true;
         Matcher area = Pattern.compile("(?iu)(?:^|[,;.]\\s*)(?:(?:tại|ở)\\s+)?((?:xã|phường|thị trấn|huyện)\\s+[\\p{L}][\\p{L} .'-]{1,70})(?:[.!?]|$)").matcher(text == null ? "" : text.trim());
         if (area.find()) {
             String value = area.group(1).trim().replaceAll("[.!?]+$", "").trim().replaceAll("\\s+", " ");
@@ -87,6 +98,9 @@ public final class CustomerRequirements implements Serializable {
         o.addProperty("requestedSpeedMbps", requestedSpeedMbps);
         o.addProperty("prepaymentMonths", prepaymentMonths);
         o.addProperty("serviceArea", serviceArea);
+        o.addProperty("customerName", customerName);
+        o.addProperty("coverageIssue", coverageIssue);
+        o.addProperty("conversationStage", conversationStage);
         o.addProperty("meshInterest", meshInterest);
         o.addProperty("meshPreferenceKnown", meshPreferenceKnown);
         o.addProperty("meshWanted", meshWanted);
@@ -108,6 +122,10 @@ public final class CustomerRequirements implements Serializable {
         o.addProperty("amenitiesAlreadyAsked", amenitiesAsked);
         o.addProperty("locationAlreadyAsked", locationAsked);
         o.addProperty("consultationStarted", consultationStarted);
+        o.addProperty("prepaymentRejected", prepaymentRejected);
+        o.addProperty("installationPriceObjected", installationPriceObjected);
+        o.addProperty("monthlyPriceObjected", monthlyPriceObjected);
+        o.addProperty("competitorCompared", competitorCompared);
         return o;
     }
 }

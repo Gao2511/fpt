@@ -17,7 +17,7 @@ public final class ConversationSignals {
         return q.matches(".*(?:mang|lap|shop|goi).*(?:mat trang|pro player|cao thu|kiep sau|phep thuat).*");
     }
     public static boolean handoff(String input) {
-        return text(input).matches(".*(?:gap|muon|can|noi chuyen voi|lien he|goi cho).*(?:nguoi that|nhan vien|tu van vien|con nguoi).*|.*(?:so hotline|so dien thoai tu van|zalo|tai khoan|hoa don|cuoc no|khieu nai|hop dong).*" );
+        return text(input).matches(".*(?:gap|muon|can|noi chuyen voi|lien he|goi cho).*(?:phuc|nguoi that|nhan vien|tu van vien|con nguoi).*|.*(?:so hotline|so dien thoai tu van|zalo|tai khoan|hoa don|cuoc no|khieu nai|hop dong).*" );
     }
     public static boolean outside(String input) {
         // Only complete, high-confidence unrelated tasks. No substring ban on game/film/etc.

@@ -61,11 +61,13 @@ public final class ConsultationPolicy {
         List<ProductCatalog.Product> mentioned = catalog.mentioned(question);
         if (registrationRequested(question)) return registration(question, memory, catalog, mentioned);
         if (ConversationSignals.handoff(question)) return reply("Dạ chatbot hỗ trợ " + CHATBOT_HOURS + "; " + CONSULTANT_NAME + " tư vấn trực tiếp trong khung " + HUMAN_HOURS + " (giờ Việt Nam). Anh/chị có thể chủ động liên hệ qua " + CONTACT + ". Hệ thống chưa có cơ chế tự động chuyển thông tin hoặc yêu cầu gọi lại cho " + CONSULTANT_NAME + ".");
-        if (q.matches("(?s).*(?:co phai|la)\\s+(?:nguoi that|robot|ai).*")) return reply("Dạ em là " + ASSISTANT_NAME + ", hỗ trợ tư vấn trực tuyến " + CHATBOT_HOURS + ". Khi cần tư vấn trực tiếp, " + CONSULTANT_NAME + " hỗ trợ trong khung " + HUMAN_HOURS + " (giờ Việt Nam). Anh/chị đang muốn tìm hiểu gói cước hay cần hỗ trợ vấn đề mạng ạ?");
+        if (q.matches("(?s).*(?:co phai|la)\\s+(?:nguoi(?: that)?|robot|ai).*")) return reply("Dạ em là " + ASSISTANT_NAME + ", hỗ trợ tư vấn trực tuyến " + CHATBOT_HOURS + ". Khi cần tư vấn trực tiếp, " + CONSULTANT_NAME + " hỗ trợ trong khung " + HUMAN_HOURS + " (giờ Việt Nam).");
         if (ConversationSignals.greeting(question)) return reply(ConversationSignals.opening(memory) + "em là " + ASSISTANT_NAME + " đây ạ! " + ConversationSignals.address(memory) + " cần tìm gói mạng hay muốn hỏi thêm điều gì?");
         if (ConversationSignals.social(question)) return reply(q.contains("dua") || q.contains("haha") ? "Dạ, em hiểu mình đang đùa thôi nhé! Khi cần hỏi về mạng, em vẫn ở đây ạ." : "Dạ, em vẫn ở đây khi mình cần hỗ trợ thêm nhé!");
         if (ConversationSignals.playful(question)) return reply("Haha, mạng không tặng kèm phép thuật hay kỹ năng pro player đâu ạ! Chơi game còn phụ thuộc ping, kết nối và máy chủ game; mình chơi trên PC hay điện thoại?");
         if (ConversationSignals.outside(question)) return reply("Dạ em hỗ trợ tư vấn dịch vụ FPT Telecom nên chưa thể làm yêu cầu này. Khi cần tìm hiểu gói Internet, em sẵn sàng hỗ trợ ạ.");
+        ChatResponse direct = directAnswer(question, memory, catalog);
+        if (direct != null) return direct;
         ChatResponse combined = combinedSolution(question, memory, catalog);
         if (combined != null) return combined;
         if (ConversationSignals.ambiguous(question)) {
@@ -155,12 +157,64 @@ public final class ConsultationPolicy {
         return null;
     }
 
+    public static ChatResponse direct(String question, CustomerRequirements memory, ProductCatalog catalog) {
+        ChatResponse result = directAnswer(question, memory, catalog);
+        if (result != null) result.setContent(facts(result.getContent(), catalog.business));
+        return result;
+    }
+
+    /** Answers narrow factual questions before recommendation logic can add unrelated products. */
+    private static ChatResponse directAnswer(String question, CustomerRequirements memory, ProductCatalog catalog) {
+        String q = ProductCatalog.normalize(question);
+        ConversationIntent intent = ConversationIntent.classify(question, memory, catalog);
+        if (q.matches("(?s).*(?:khu vuc|tai|o) .*(?:lap duoc|co ha tang|co mang).*"))
+            return reply("Dạ em chưa có kết quả kiểm tra hạ tầng cho khu vực này nên chưa thể xác nhận lắp được. Việc khả dụng cần được kiểm tra theo địa chỉ cụ thể qua biểu mẫu hoặc " + CONTACT + ".");
+        if (q.matches("(?s).*\\bf2\\b.*(?:bat duoc|phu duoc|song|tang 3|tang ba|vung phu).*"))
+            return reply("Dạ F2 bổ sung 2 Access Point để cải thiện phủ sóng nhiều tầng. Khả năng bắt sóng ở tầng 3 còn phụ thuộc vị trí đặt thiết bị, vật cản và cấu trúc nhà nên em chưa thể bảo đảm khi chưa khảo sát.");
+        if ((intent == ConversationIntent.INSTALLATION_COST || intent == ConversationIntent.DIRECT_PRICE_QUESTION)
+                && q.matches("(?s).*\\bf2\\b.*(?:bao nhieu|gia|phi|cuoc|thang).*")) {
+            RecommendedSolution.WifiCoverageOption f2 = meshOption("F2", catalog.business);
+            String monthly = f2.monthlyAddonPrice == null ? "phụ thu tháng chưa được xác nhận" : "phụ thu " + RecommendedSolution.money(f2.monthlyAddonPrice) + "/tháng";
+            String install = f2.installationFeeTotal == null ? "phí lắp chưa được xác nhận" : "phí lắp " + RecommendedSolution.money(f2.installationFeeTotal) + "/lần";
+            return reply("Dạ Mesh F2 có " + monthly + " và " + install + ". Phí F2 là tổng phí lắp của phương án này, không cộng thêm phí Internet thông thường.");
+        }
+        if (q.matches("(?s).*(?:1000\\s*mbps|1\\s*gbps).*(?:bao nhieu|gia|cuoc|thang|thi sao).*")) {
+            ProductCatalog.Product selected = null;
+            for (ProductCatalog.Product p : catalog.all()) if (p.speed >= 1000 && (memory.camera ? p.camera : !p.camera)) { selected = p; break; }
+            if (selected == null) return null;
+            memory.selectedPackageId = selected.id; memory.selectionAmbiguous = false; memory.conversationStage = "RECOMMENDATION";
+            StringBuilder answer = new StringBuilder("Dạ Gói ").append(selected.label()).append(" có tốc độ ").append(selected.speed)
+                .append("Mbps, giá ").append(RecommendedSolution.money(selected.price)).append("/tháng.");
+            if ("F2".equals(memory.meshInterest)) {
+                RecommendedSolution.WifiCoverageOption f2 = meshOption("F2", catalog.business);
+                Long total = CommercialPriceValidator.monthlyTotal(selected.price, f2.monthlyAddonPrice);
+                if (total != null) answer.append(" Với Mesh F2 theo nhu cầu nhà nhiều tầng đã ghi nhận, tổng là ").append(RecommendedSolution.money(total)).append("/tháng.");
+            }
+            ChatResponse response = reply(answer.toString()); response.setRecommendedPackageId(selected.id); return response;
+        }
+        if (intent == ConversationIntent.CAMERA && q.matches("(?s).*(?:ben em|fpt|goi|internet)?.*(?:co camera|camera khong|camera nao).*")) {
+            StringBuilder answer = new StringBuilder("Dạ có ạ. Các gói đang có 1 camera là ");
+            List<String> labels = new ArrayList<>();
+            for (ProductCatalog.Product p : catalog.all()) if (p.camera) labels.add(p.label());
+            answer.append(String.join(", ", labels)).append("; nếu anh/chị không cần camera, em sẽ loại các gói này khỏi đề xuất.");
+            return reply(answer.toString());
+        }
+        if (intent == ConversationIntent.PRIVACY)
+            return reply("Dạ chatbot chỉ dùng thông tin cần thiết trong phiên tư vấn. Anh/chị không nên gửi mật khẩu, OTP, thông tin ngân hàng hoặc ảnh giấy tờ tùy thân qua chat.");
+        if (intent == ConversationIntent.COMPLAINT)
+            return reply("Dạ em rất tiếc về trải nghiệm này. Anh/chị mô tả giúp em tình trạng chính đang gặp; em chỉ xác nhận đã chuyển xử lý khi hệ thống thực sự ghi nhận.");
+        return null;
+    }
+
     /** Deterministic multi-turn discovery and objection handling before any model call. */
     public static ChatResponse conversationFlow(String question, CustomerRequirements memory, ProductCatalog catalog) {
-        String q = ProductCatalog.normalize(question);
         ChatResponse objection = objection(question, memory, catalog);
         if (objection != null) return objection;
         if (!memory.consultationStarted) return null;
+        ConversationIntent intent = ConversationIntent.classify(question, memory, catalog);
+        if (!(intent == ConversationIntent.INTERNET_RECOMMENDATION || intent == ConversationIntent.MESH_COVERAGE
+                || intent == ConversationIntent.TV_AND_FOOTBALL || intent == ConversationIntent.CAMERA
+                || intent == ConversationIntent.GENERAL)) return null;
         if (memory.floors == null) {
             return reply("Dạ em là " + ASSISTANT_NAME + ", em hỗ trợ mình chọn giải pháp phù hợp ạ. Nhà mình là nhà cấp 4 hay có mấy tầng vậy anh/chị?");
         }
@@ -177,10 +231,13 @@ public final class ConsultationPolicy {
 
     private static ChatResponse objection(String question, CustomerRequirements memory, ProductCatalog catalog) {
         String q = ProductCatalog.normalize(question);
-        if (q.matches("(?s).*(?:khong muon|khong can|khong thich).*dong truoc.*"))
-            return reply("Dạ em tôn trọng lựa chọn của anh/chị ạ. Mình có thể tiếp tục xem phương án theo cước và phí lắp thông thường; em sẽ không tự áp dụng hay tiếp tục thuyết phục mình dùng ưu đãi trả trước.");
-        if (q.matches("(?s).*(?:viettel|vnpt|ben khac|nha mang khac).*(?:re hon|chi|phi|gia|thiet bi).*") || q.matches("(?s).*(?:ben khac|nha mang khac) re hon.*"))
-            return reply("Dạ nếu phương án bên khác có chi phí ban đầu thấp hơn thì mình cân nhắc là hợp lý ạ. Để so sánh công bằng, mình nên đối chiếu cùng số điểm phát WiFi, phí hàng tháng, điều kiện lắp và phạm vi hỗ trợ. Với FPT em có thể giúp anh/chị so sánh F1 và F2 theo đúng cấu hình hiện có; em không khẳng định nhà mạng nào tốt hơn khi chưa có dữ liệu tương đương.");
+        if (q.matches("(?s).*(?:khong muon|khong can|khong thich).*?(?:dong|tra) truoc.*")) {
+            memory.prepaymentRejected = true;
+            memory.prepaymentMonths = null;
+            return reply("Dạ em tôn trọng lựa chọn của anh/chị. Em sẽ giữ phương án thanh toán thông thường, không tự áp dụng và không tiếp tục đề xuất trả trước.");
+        }
+        if (q.matches("(?s).*(?:viettel|vnpt|ben khac|nha mang khac).*(?:re hon|chi|phi|gia|thiet bi|[0-9]{3}\\s*k).*") || q.matches("(?s).*(?:ben khac|nha mang khac) re hon.*"))
+            return reply("Dạ, mức phí đó là thông tin anh/chị cung cấp về bên khác. Để so sánh công bằng cần đối chiếu cùng số điểm phát WiFi, tổng phí lắp và cước hàng tháng; em không khẳng định nhà mạng nào tốt hơn khi chưa có dữ liệu tương đương.");
         if (q.matches("(?s).*(?:de|cho) (?:anh|chi|toi|minh) suy nghi.*")) {
             ProductCatalog.Product selected = memory.selectedPackageId == null ? null : catalog.byId(memory.selectedPackageId);
             return reply(selected == null ? "Dạ vâng ạ, anh/chị cứ cân nhắc thoải mái. Khi cần em sẽ tiếp tục từ các nhu cầu mình đã chia sẻ."
@@ -195,7 +252,24 @@ public final class ConsultationPolicy {
             String id = memory.meshInterest == null ? (memory.floors != null && memory.floors >= 3 ? "F2" : "F1") : memory.meshInterest;
             RecommendedSolution.WifiCoverageOption mesh = meshOption(id, catalog.business);
             String amount = mesh.installationFeeTotal == null ? "mức phí chưa được cấu hình" : RecommendedSolution.money(mesh.installationFeeTotal);
-            return reply("Dạ em hiểu mình đang muốn tiết kiệm phí lắp ban đầu ạ. " + amount + " là tổng phí lắp của phương án Mesh " + id + ", thay cho phí Internet thông thường 300.000đ; hệ thống không cộng 300.000đ thêm lần nữa. Phương án này gồm " + (mesh.equipment == null ? "thiết bị theo cấu hình được duyệt" : mesh.equipment) + ". Nếu muốn giảm chi phí ban đầu, em có thể so sánh F1 hoặc Internet tiêu chuẩn, nhưng vùng phủ còn phụ thuộc cấu trúc nhà và vị trí lắp. Anh/chị muốn ưu tiên chi phí hay vùng phủ ạ?");
+            Long standardFee = configuredMoney(catalog.business,"business.standardFee");
+            String standard = standardFee == null ? "mức chưa được xác nhận" : RecommendedSolution.money(standardFee);
+            String promotion = !memory.prepaymentRejected && confirmedPrepayPromotion(catalog.business)
+                ? " Nếu chọn trả trước đủ điều kiện, mức giảm phí lắp đã xác nhận là " + RecommendedSolution.money(configuredMoney(catalog.business,"business.prepayInstallDiscount")) + "; em chỉ nêu lựa chọn này một lần."
+                : "";
+            return reply("Dạ, " + amount + " là tổng phí lắp Mesh " + id + ", đã gồm " + (mesh.equipment == null ? "thiết bị theo cấu hình được duyệt" : mesh.equipment) + " và thay cho phí Internet thông thường " + standard + "; không cộng " + standard + " thêm lần nữa." + promotion + " Phương án tiết kiệm hơn là F1 hoặc Internet tiêu chuẩn, đổi lại khả năng phủ nhiều tầng cần được kiểm tra theo mặt bằng.");
+        }
+        boolean monthlyConcern = q.matches("(?s).*(?:259\\s*k|259[.]?000|cuoc|hang thang|moi thang).*(?:cao|dat qua|mac|giam|re|tiet kiem).*" );
+        if (monthlyConcern) {
+            ProductCatalog.Product lower = null;
+            for (ProductCatalog.Product p : catalog.all()) if (p.price == 220000L) lower = p;
+            RecommendedSolution.WifiCoverageOption f2 = meshOption("F2", catalog.business);
+            if (lower != null && !memory.camera && f2.monthlyAddonPrice != null) {
+                long total = CommercialPriceValidator.monthlyTotal(lower.price, f2.monthlyAddonPrice);
+                memory.selectedPackageId = lower.id; memory.meshInterest = "F2"; memory.conversationStage = "RECOMMENDATION";
+                return reply("Dạ, nếu 259.000đ/tháng vượt ngân sách thì phương án thấp hơn là Gói " + lower.label() + " + Mesh F2 = " + RecommendedSolution.money(total) + "/tháng. Phương án này vẫn có truyền hình và không camera, nhưng tốc độ là 300Mbps thay vì 1000Mbps.");
+            }
+            return reply("Dạ, em hiểu mình đang cân nhắc cước hàng tháng. Em chưa thể hạ xuống phương án khác mà vẫn giữ đủ các quyền lợi đã chọn; anh/chị có thể cho em biết quyền lợi nào có thể điều chỉnh.");
         }
         if (q.matches("(?s).*(?:nha .*tang.*f1|f1.*(?:duoc khong|on khong|thay f2)).*")) {
             RecommendedSolution.WifiCoverageOption f1 = meshOption("F1", catalog.business);
@@ -252,6 +326,7 @@ public final class ConsultationPolicy {
             configuredInteger(catalog.business, "business.prepay12BonusMonths"), confirmedPrepayPromotion(catalog.business));
         memory.selectedPackageId = selected.id;
         memory.selectionAmbiguous = false;
+        memory.conversationStage = "RECOMMENDATION";
         ProductCatalog.Product alternative = null;
         if (selected.speed < 1000 && memory.television && memory.cameraKnown && !memory.camera) {
             for (ProductCatalog.Product candidate : catalog.all()) {
@@ -368,21 +443,16 @@ public final class ConsultationPolicy {
         else out.append("\n- Tổng hàng tháng: chưa thể cộng chính xác vì giá Mesh chưa được xác nhận");
         if (solution.internetPackage.camera) out.append("\n- Camera: gói nền gồm 1 Camera");
         else if (solution.wifiCoverageOption != null) out.append("\n- Camera: không gồm camera");
-        if (solution.installationFee != null) out.append("\n- Phí lắp trước ưu đãi trả trước: ").append(RecommendedSolution.money(solution.installationFee)).append("/lần");
+        if (solution.installationFee != null) out.append("\n- Phí lắp: ").append(RecommendedSolution.money(solution.installationFee)).append("/lần");
         else out.append("\n- Phí lắp: chưa có dữ liệu được xác nhận");
         if (solution.wifiCoverageOption != null && solution.installationFee != null)
             out.append(" (đã thay cho phí Internet thông thường, không cộng thêm ")
                 .append(solution.standardInternetInstallationFee == null ? "300.000đ" : RecommendedSolution.money(solution.standardInternetInstallationFee)).append(")");
-        if (solution.confirmedPromotion != null && solution.finalInstallationFee != null)
+        if (!memory.prepaymentRejected && solution.confirmedPromotion != null && solution.finalInstallationFee != null)
             out.append("\n- Ưu đãi đã chọn: ").append(solution.confirmedPromotion).append("; phí lắp còn ").append(RecommendedSolution.money(solution.finalInstallationFee)).append("/lần.");
-        else if (confirmedPrepayPromotion(business)) out.append("\nƯu đãi đã được xác nhận ngày ").append(promotionDateDisplay(business))
-            .append(": trả trước 6 tháng giảm ").append(RecommendedSolution.money(configuredMoney(business,"business.prepayInstallDiscount")))
-            .append(" phí lắp; trả trước 12 tháng giảm ").append(RecommendedSolution.money(configuredMoney(business,"business.prepayInstallDiscount")))
-            .append(" phí lắp và tặng ").append(configuredInteger(business,"business.prepay12BonusMonths")).append(" tháng dịch vụ. Chưa có ngày hết hiệu lực được xác nhận.");
-        else out.append("\nƯu đãi trả trước chưa có cấu hình xác nhận nên chưa được áp dụng vào tổng.");
         if (solution.internetPackage.premierLeague)
             out.append(" Nội dung Ngoại Hạng Anh áp dụng theo quyền phát sóng và điều kiện còn hiệu lực.");
-        out.append("\n\n").append("Phương án này cân bằng băng thông và vùng phủ; chất lượng thực tế còn phụ thuộc vị trí thiết bị, vật cản và số thiết bị dùng đồng thời.");
+        out.append("\n").append("Lý do: phương án này đáp ứng nhu cầu băng thông và vùng phủ đã chia sẻ; vùng phủ thực tế còn phụ thuộc vị trí thiết bị và vật cản.");
         if (memory.gaming) out.append(" Với chơi game, nên ưu tiên kết nối dây LAN; tốc độ gói không bảo đảm ping hay độ trễ thực tế.");
         if (memory.cameraCount != null && memory.cameraCount > 0) {
             out.append(" Nhu cầu ").append(memory.cameraCount).append(" camera cần được kiểm tra thêm về vị trí và mức dùng đồng thời");
@@ -393,6 +463,8 @@ public final class ConsultationPolicy {
             out.append(" Anh/chị cho em biết số tầng để chọn phương án phủ sóng phù hợp nhé?");
         else if (memory.people == null && memory.devices == null && !memory.meshPreferenceKnown)
             out.append(" Anh/chị cho em biết số người hoặc số thiết bị thường dùng cùng lúc nhé?");
+        else if (!memory.televisionKnown && !memory.cameraKnown)
+            out.append(" Anh/chị có cần truyền hình hoặc camera không ạ?");
         if (alternative != null && solution.wifiCoverageOption != null && solution.monthlyAddonPrice != null) {
             Long alternativeMonthly = CommercialPriceValidator.monthlyTotal(alternative.price, solution.monthlyAddonPrice);
             out.append("\n\nNếu ưu tiên 1000Mbps, phương án thay thế là Gói ").append(alternative.label()).append(" + ")
@@ -400,7 +472,6 @@ public final class ConsultationPolicy {
                 .append(alternativeMonthly == null ? "chưa đủ dữ liệu để cộng" : RecommendedSolution.money(alternativeMonthly) + "/tháng")
                 .append(", tổng phí lắp ").append(solution.installationFee == null ? "chưa được xác nhận" : RecommendedSolution.money(solution.installationFee)).append(".");
         }
-        out.append("\nAnh/chị nghiêng về phương án nào ạ?");
         return out.toString();
     }
     /** A benefit question is hypothetical; it does not mutate consent or the selected package. */
@@ -441,6 +512,7 @@ public final class ConsultationPolicy {
         if (p == null) return reply("Anh/chị muốn đăng ký gói nào? Em sẽ mở biểu mẫu để mình kiểm tra và tự gửi yêu cầu.");
         memory.selectedPackageId = p.id;
         memory.selectionAmbiguous = false;
+        memory.conversationStage = "REGISTRATION";
         RecommendedSolution.WifiCoverageOption mesh = memory.meshInterest == null ? null : meshOption(memory.meshInterest, catalog.business);
         Long monthly = CommercialPriceValidator.monthlyTotal(p.price, mesh == null ? null : mesh.monthlyAddonPrice);
         Long standard = p.standardInstallationFee > 0 ? p.standardInstallationFee : configuredMoney(catalog.business, "business.standardFee");
@@ -489,17 +561,32 @@ public final class ConsultationPolicy {
         if ("registration".equals(reply.intent)) throw new IllegalArgumentException("Unsolicited registration");
         if ("out_of_scope".equals(reply.intent) && (ConversationSignals.greeting(question) || ConversationSignals.social(question) || ConversationSignals.playful(question) || ConversationSignals.service(question, memory, catalog))) throw new IllegalArgumentException("Incorrect scope classification");
         String text = reply.message;
+        ConversationIntent intent = ConversationIntent.classify(question, memory, catalog);
         LinkedHashSet<Integer> ids = new LinkedHashSet<>(reply.packageIds);
-        if (reply.recommendedPackageId != null) ids.add(reply.recommendedPackageId);
-        if (ids.size() > 0 && memory.budget != null && reply.recommendedPackageId != null && catalog.byId(reply.recommendedPackageId).price > memory.budget)
+        Integer effectiveRecommendation = intent.allowsCatalogDetails() ? reply.recommendedPackageId : null;
+        if (effectiveRecommendation != null) ids.add(effectiveRecommendation);
+        List<ProductCatalog.Product> mentioned = catalog.mentioned(question);
+        if (intent == ConversationIntent.PACKAGE_COMPARISON && mentioned.size() >= 2
+                || intent == ConversationIntent.DIRECT_PRICE_QUESTION && mentioned.size() == 1) {
+            Set<Integer> requested = new HashSet<>();
+            for (ProductCatalog.Product product : mentioned) requested.add(product.id);
+            ids.retainAll(requested);
+            if (effectiveRecommendation != null && !requested.contains(effectiveRecommendation)) effectiveRecommendation = null;
+        }
+        if (ids.size() > 0 && memory.budget != null && effectiveRecommendation != null && catalog.byId(effectiveRecommendation).price > memory.budget)
             throw new IllegalArgumentException("Over budget");
-        if (reply.recommendedPackageId != null) {
-            ProductCatalog.Product selected = catalog.byId(reply.recommendedPackageId);
+        if (effectiveRecommendation != null) {
+            ProductCatalog.Product selected = catalog.byId(effectiveRecommendation);
             if (memory.camera && !selected.camera || memory.television && !selected.tv180) throw new IllegalArgumentException("Missing requested benefit");
         }
-        for (int id : ids) text += "\n" + catalog.byId(id).display();
-        ChatResponse r = reply(text); r.setRecommendedPackageId(reply.recommendedPackageId);
-        if (reply.recommendedPackageId != null) { memory.selectedPackageId = reply.recommendedPackageId; memory.selectionAmbiguous = false; }
+        int limit = intent == ConversationIntent.PACKAGE_COMPARISON ? 6
+            : intent == ConversationIntent.INTERNET_RECOMMENDATION ? 2
+            : intent == ConversationIntent.DIRECT_PRICE_QUESTION ? 1 : 0;
+        if (!intent.allowsCatalogDetails()) ids.clear();
+        int appended = 0;
+        for (int id : ids) if (appended++ < limit) text += "\n" + catalog.byId(id).display();
+        ChatResponse r = reply(text); r.setRecommendedPackageId(effectiveRecommendation);
+        if (effectiveRecommendation != null) { memory.selectedPackageId = effectiveRecommendation; memory.selectionAmbiguous = false; memory.conversationStage = "RECOMMENDATION"; }
         else if (ids.size() > 1) memory.selectionAmbiguous = true;
         return r;
     }
