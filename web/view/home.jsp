@@ -33,7 +33,7 @@
         <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
         <link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/home.css?v=images-fit-20261010-2">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/ai-chat.css?v=wide-20261015">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/ai-chat.css?v=clean-20261015-3">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/pkg-card.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/fonts.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/hero-stars.css">
@@ -906,7 +906,6 @@
 
         <!-- ============ AI CHAT WIDGET ============ -->
         <div class="ai-chat-button" id="aiChatBtn" onclick="toggleAIChat()" title="Tư vấn trực tuyến cùng AI" aria-label="Mở cửa sổ tư vấn AI">
-            <span class="ai-chat-button-label">Tư vấn AI ✨</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             </svg>
@@ -937,15 +936,6 @@
                     Xin chào anh/chị! Em là trợ lý AI thông minh của FPT Telecom.
                     Anh/chị đang quan tâm đến gói cước Internet, Truyền hình hay Camera an ninh ạ? Em sẵn sàng hỗ trợ ngay! 😊
                 </div>
-                <div class="ai-chat-suggestions" id="aiChatSuggestions">
-                    <div class="ai-suggestions-title">💡 Gợi ý câu hỏi nhanh:</div>
-                    <div class="ai-suggestions-list">
-                        <button type="button" class="ai-suggestion-chip" onclick="askAISuggestion('Gói cước Internet rẻ nhất là bao nhiêu?')">💰 Gói cước rẻ nhất</button>
-                        <button type="button" class="ai-suggestion-chip" onclick="askAISuggestion('Tư vấn gói cước WiFi 6 gia đình')">🏠 WiFi 6 Gia đình</button>
-                        <button type="button" class="ai-suggestion-chip" onclick="askAISuggestion('Combo Internet và Truyền hình FPT')">📺 Combo Net + TV</button>
-                        <button type="button" class="ai-suggestion-chip" onclick="askAISuggestion('Khuyến mãi lắp đặt mới nhất?')">🎁 Khuyến mãi lắp đặt</button>
-                    </div>
-                </div>
             </div>
 
             <div class="ai-chat-footer">
@@ -959,7 +949,6 @@
                     </svg>
                 </button>
             </div>
-            <div class="ai-chat-powered">⚡ Trợ lý AI FPT Telecom • Phản hồi tự động &amp; chính xác</div>
         </div>
 
         <script src="${pageContext.request.contextPath}/js/ai-chat.js"></script>

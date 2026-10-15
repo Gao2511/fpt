@@ -6,6 +6,6 @@
 <c:if test="${plan.standardInstallationFee > 0}">
     <fmt:formatNumber value="${plan.standardInstallationFee}" pattern="#,###" var="feeAmount"/>
     <p class="standard-installation-fee" style="font-size:13px;line-height:1.6;margin:10px 0;overflow-wrap:anywhere;">
-        Phí lắp đặt thông thường: <strong>${fn:replace(feeAmount, ',', '.')}đ/lần</strong>
+        Phí lắp đặt: <strong>${fn:replace(feeAmount, ',', '.')}đ/lần</strong>
     </p>
 </c:if>

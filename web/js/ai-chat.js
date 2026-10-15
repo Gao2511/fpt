@@ -30,18 +30,10 @@
             const win = root.document.getElementById('aiChatWindow');
             if (!win) return;
             const isOpen = win.classList.toggle('active');
-            const label = root.document.querySelector('.ai-chat-button-label');
-            if (label) label.style.display = isOpen ? 'none' : '';
             if (isOpen) {
                 const input = root.document.getElementById('aiChatInput');
                 if (input) root.setTimeout(() => input.focus(), 150);
             }
-        };
-        root.askAISuggestion = function (text) {
-            const input = root.document.getElementById('aiChatInput');
-            if (!input || pending) return;
-            input.value = text;
-            root.sendAIMessage();
         };
         root.sendAIMessage = async function () {
             const input = root.document.getElementById('aiChatInput');
@@ -50,8 +42,6 @@
             if (!message || pending) return;
             if (message.length > 2000) { appendReply(body, {reply: 'Vui lòng nhập câu hỏi tối đa 2000 ký tự.', action: 'none'}, contextPath); return; }
             pending = true; input.disabled = true;
-            const suggestions = root.document.getElementById('aiChatSuggestions');
-            if (suggestions) suggestions.style.display = 'none';
             const user = root.document.createElement('div'); user.className = 'ai-msg ai-msg-user'; user.textContent = message; body.appendChild(user);
             input.value = '';
             const loading = root.document.createElement('div');

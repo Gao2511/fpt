@@ -468,10 +468,8 @@ public final class ConsultationPolicy {
                 .append(solution.standardInternetInstallationFee == null ? "300.000đ" : RecommendedSolution.money(solution.standardInternetInstallationFee)).append(")");
         if (!memory.prepaymentRejected && solution.confirmedPromotion != null && solution.finalInstallationFee != null)
             out.append("\n- Ưu đãi đã chọn: ").append(solution.confirmedPromotion).append("; phí lắp còn ").append(RecommendedSolution.money(solution.finalInstallationFee)).append("/lần.");
-        if (solution.internetPackage.premierLeague)
-            out.append(" Nội dung Ngoại Hạng Anh áp dụng theo quyền phát sóng và điều kiện còn hiệu lực.");
         if (solution.wifiCoverageOption != null) out.append(" Vùng phủ thực tế còn phụ thuộc vị trí thiết bị và vật cản.");
-        if (memory.serviceArea != null) out.append("\n- Khu vực dự kiến: ").append(memory.serviceArea).append("; hạ tầng chưa được xác minh.");
+        if (memory.serviceArea != null) out.append("\n- Khu vực lắp đặt: ").append(memory.serviceArea);
         if (memory.gaming) out.append(" Với chơi game, nên ưu tiên kết nối dây LAN; tốc độ gói không bảo đảm ping hay độ trễ thực tế.");
         if (memory.cameraCount != null && memory.cameraCount > 0) {
             out.append(" Nhu cầu ").append(memory.cameraCount).append(" camera cần được kiểm tra thêm về vị trí và mức dùng đồng thời");
