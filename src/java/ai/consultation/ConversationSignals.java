@@ -45,7 +45,10 @@ public final class ConversationSignals {
         else if (playful(input) || q.matches(".*\\b(?:hong|khum|ko|on ap|ngon bo re|dua|shop|hi a|dua thoi)\\b.*")) memory.style = "casual";
         else if (q.matches("(?:gia .*|so sanh .*|dang ky .*|gui bang gia|co camera khong)[.!? ]*")) memory.style = "direct";
     }
-    public static String address(CustomerRequirements memory) { return memory.address == null ? "anh/chị" : memory.address; }
+    public static String address(CustomerRequirements memory) {
+        if (memory.address != null) return memory.address;
+        return memory.customerName == null ? "anh/chị" : "anh/chị " + memory.customerName;
+    }
     public static String opening(CustomerRequirements memory) {
         return "casual".equals(memory.style) ? "Dạ, mình xem thử nhé! " : "direct".equals(memory.style) ? "" : "Dạ, ";
     }

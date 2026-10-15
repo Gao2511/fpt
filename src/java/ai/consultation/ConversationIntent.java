@@ -19,6 +19,11 @@ public enum ConversationIntent {
     REGISTRATION,
     CUSTOMER_SUPPORT,
     COMPLAINT,
+    WIFI_TROUBLESHOOTING,
+    BUSINESS_CONSULTATION,
+    RENTAL_CONSULTATION,
+    SERVICE_RELOCATION,
+    SERVICE_CANCELLATION,
     PRIVACY,
     AI_IDENTITY,
     OUT_OF_SCOPE,
@@ -32,6 +37,11 @@ public enum ConversationIntent {
         if (q.matches("(?s).*(?:co phai|la)\\s+(?:nguoi(?: that)?|robot|ai).*")) return AI_IDENTITY;
         if (q.matches("(?s).*(?:bao mat|du lieu ca nhan|quyen rieng tu|xoa du lieu).*")) return PRIVACY;
         if (q.matches("(?s).*(?:khieu nai|that vong|qua te|buc minh|khong hai long).*")) return COMPLAINT;
+        if (q.matches("(?s).*(?:chuyen nha|chuyen dia chi|chuyen dia diem).*")) return SERVICE_RELOCATION;
+        if (q.matches("(?s).*(?:huy dich vu|ngung dich vu|tam ngung|cat mang).*")) return SERVICE_CANCELLATION;
+        if (q.matches("(?s).*(?:mat mang|khong vao mang|wifi yeu|song yeu|chap chon|bao hong).*")) return WIFI_TROUBLESHOOTING;
+        if (q.matches("(?s).*(?:kinh doanh|cua hang|quan ca phe|homestay|khach san|van phong|doanh nghiep).*")) return BUSINESS_CONSULTATION;
+        if (q.matches("(?s).*\\b(?:phong tro|o tro|nha thue|thue nha)\\b.*")) return RENTAL_CONSULTATION;
         if (ConversationSignals.handoff(input) || q.matches("(?s).*(?:mat mang|khong vao mang|bao hong|ho tro ky thuat).*")) return CUSTOMER_SUPPORT;
         if (q.matches("(?s).*(?:khong muon|khong can|khong thich).*?(?:dong|tra) truoc.*")) return PREPAYMENT_REJECTION;
         if (q.matches("(?s).*(?:viettel|vnpt|nha mang khac|ben khac).*(?:gia|phi|re|dat|so sanh|thiet bi|[0-9]{3}\\s*k).*")) return COMPETITOR_COMPARISON;
@@ -50,6 +60,7 @@ public enum ConversationIntent {
     }
 
     public boolean allowsCatalogDetails() {
-        return this == PACKAGE_COMPARISON || this == INTERNET_RECOMMENDATION || this == DIRECT_PRICE_QUESTION;
+        return this == PACKAGE_COMPARISON || this == INTERNET_RECOMMENDATION || this == DIRECT_PRICE_QUESTION
+            || this == TV_AND_FOOTBALL || this == CAMERA;
     }
 }

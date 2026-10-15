@@ -9,20 +9,20 @@ public final class CustomerRequirements implements Serializable {
     private static final long serialVersionUID = 1L;
     public Long budget;
     public Integer people, devices, selectedPackageId, floors, cameraCount, requestedSpeedMbps, prepaymentMonths;
-    public String meshInterest, serviceArea, customerName, coverageIssue, conversationStage = "BROWSING";
+    public String meshInterest, serviceArea, customerName, coverageIssue, dwellingType, cameraPlacement, conversationStage = "BROWSING";
     public boolean gaming, streaming, businessUse, student, television, camera, football, smartTv;
     public boolean televisionKnown, cameraKnown, meshPreferenceKnown, meshWanted, registrationFormOpened;
     public boolean amenitiesAsked, locationAsked, consultationStarted, selectionAmbiguous;
-    public boolean prepaymentRejected, installationPriceObjected, monthlyPriceObjected, competitorCompared;
+    public boolean prepaymentRejected, installationPriceObjected, monthlyPriceObjected, competitorCompared, rentalHome;
     public String style = "formal", stylePreference, address;
     public transient Long previousBudget;
     public transient boolean requirementsChanged;
     public void clear() {
         budget = null; people = null; devices = null; selectedPackageId = null; floors = null; cameraCount = null; requestedSpeedMbps = null; prepaymentMonths = null;
-        meshInterest = serviceArea = customerName = coverageIssue = null; conversationStage = "BROWSING";
+        meshInterest = serviceArea = customerName = coverageIssue = dwellingType = cameraPlacement = null; conversationStage = "BROWSING";
         gaming = streaming = businessUse = student = television = camera = football = smartTv = false;
         televisionKnown = cameraKnown = meshPreferenceKnown = meshWanted = registrationFormOpened = amenitiesAsked = locationAsked = consultationStarted = selectionAmbiguous = false;
-        prepaymentRejected = installationPriceObjected = monthlyPriceObjected = competitorCompared = false;
+        prepaymentRejected = installationPriceObjected = monthlyPriceObjected = competitorCompared = rentalHome = false;
         style = "formal"; stylePreference = address = null;
         previousBudget = null; requirementsChanged = false;
     }
@@ -45,7 +45,10 @@ public final class CustomerRequirements implements Serializable {
         if (deviceCount.find()) { int n = Integer.parseInt(deviceCount.group(1)); if (n > 0) { devices = n; requirementsChanged = true; } }
         Matcher floorM = Pattern.compile("(?<![0-9])(\\d{1,2})\\s*tang").matcher(counts);
         if (floorM.find()) { int fl = Integer.parseInt(floorM.group(1)); if (fl > 0) { floors = fl; requirementsChanged = true; } }
-        boolean declinesMesh = q.matches("(?s).*(?:khong can|khong muon|khong dung|bo)\\s+(?:dung )?(?:mesh|wifi mesh).*" )
+        Matcher groundFloors = Pattern.compile("(?<![0-9])(\\d{1,2})\\s*tret(?:\\s*[+,]?\\s*)(\\d{1,2})\\s*lau").matcher(counts);
+        if (groundFloors.find()) { int fl = Integer.parseInt(groundFloors.group(1)) + Integer.parseInt(groundFloors.group(2)); if (fl > 0) { floors = fl; dwellingType = "GROUND_AND_UPPER_FLOORS"; requirementsChanged = true; } }
+        if (q.matches("(?s).*nha\\s+cap\\s*4.*")) { floors = 1; dwellingType = "SINGLE_STOREY"; requirementsChanged = true; }
+        boolean declinesMesh = q.matches("(?s).*(?:khong|ko|k|hong|khum)\\s+(?:can|muon|dung)?\\s*(?:dung )?(?:mesh|wifi mesh).*" )
             || q.matches("(?s).*chi (?:muon|can) goi internet.*");
         if (declinesMesh) { meshPreferenceKnown = true; meshWanted = false; meshInterest = null; requirementsChanged = true; }
         else {
@@ -61,19 +64,22 @@ public final class CustomerRequirements implements Serializable {
         if (speed.find()) { requestedSpeedMbps = Integer.parseInt(speed.group(1)); requirementsChanged = true; }
         Matcher prepay = Pattern.compile("(?:dong|tra)\\s*truoc\\s*(6|12|sau|muoi hai)\\s*thang").matcher(q);
         if (prepay.find()) { prepaymentMonths = prepay.group(1).matches("6|sau") ? 6 : 12; requirementsChanged = true; }
-        if (q.matches("(?s).*(?:khong muon|khong can|khong thich).*?(?:dong|tra) truoc.*")) { prepaymentMonths = null; prepaymentRejected = true; }
+        if (q.matches("(?s).*(?:(?:khong|ko|k|hong|khum)\\s+(?:muon|can|thich)?).*?(?:dong|tra) truoc.*")) { prepaymentMonths = null; prepaymentRejected = true; }
         if (q.contains("khong choi game")) gaming = false;
         else if (q.contains("game") || q.contains("gaming") || q.contains("valorant") || q.contains("lien minh")) { gaming = true; requirementsChanged = true; }
         if (q.matches("(?s).*(?:xem phim|stream|netflix|youtube).*")) { streaming = true; requirementsChanged = true; }
         if (q.matches("(?s).*(?:kinh doanh|van phong|cua hang|shop (?:cua|nha)|doanh nghiep).*")) { businessUse = true; requirementsChanged = true; }
+        if (q.matches("(?s).*\\b(?:phong tro|o tro|nha thue|thue nha)\\b.*")) { rentalHome = true; requirementsChanged = true; }
         if (q.contains("sinh vien")) student = true;
         // A question about a benefit does not establish a purchase requirement.
         boolean asking = q.contains("?") || q.matches("(?s).*\\b(?:khong|ko|hong|khum)\\s*[.!]*$") || q.contains("thi sao") || q.matches("(?s).*camera sao.*");
-        if (q.matches("(?s).*(?:khong can|khong muon|bo|khong xem|khong lay|khong)\\s+camera.*")) { camera = false; cameraCount = null; cameraKnown = true; requirementsChanged = true; }
+        if (q.matches("(?s).*(?:(?:khong|ko|k|hong|khum)\\s+(?:can|muon|lay|xem)?|bo)\\s*camera.*")) { camera = false; cameraCount = null; cameraKnown = true; requirementsChanged = true; }
         else if (!asking && q.contains("camera")) { camera = true; cameraKnown = true; requirementsChanged = true; }
+        if (q.matches("(?s).*camera.*(?:trong nha|trong phong).*")) cameraPlacement = "INDOOR";
+        else if (q.matches("(?s).*camera.*(?:ngoai troi|ngoai nha).*")) cameraPlacement = "OUTDOOR";
         Matcher cameras = Pattern.compile("(?<![0-9])(\\d{1,2})\\s*camera\\b").matcher(counts);
         if (cameras.find()) { int n = Integer.parseInt(cameras.group(1)); if (n > 0) { cameraCount = n; camera = true; cameraKnown = true; requirementsChanged = true; } }
-        if (q.matches("(?s).*(?:khong can|khong muon|bo|khong xem)\\s+(?:truyen hinh|tivi|smart tv).*")) { television = false; televisionKnown = true; requirementsChanged = true; }
+        if (q.matches("(?s).*(?:(?:khong|ko|k|hong|khum)\\s+(?:can|muon|xem)?|bo)\\s*(?:truyen hinh|tivi|smart tv).*")) { television = false; televisionKnown = true; requirementsChanged = true; }
         else if (!asking && (q.contains("truyen hinh") || q.contains("tivi") || q.contains("smart tv") || q.contains("bong da"))) { television = true; televisionKnown = true; requirementsChanged = true; }
         if (q.contains("smart tv")) { smartTv = true; television = true; televisionKnown = true; requirementsChanged = true; }
         if (q.contains("bong da") || q.contains("ngoai hang anh") || q.contains("premier league")) { football = true; television = true; televisionKnown = true; requirementsChanged = true; }
@@ -100,6 +106,9 @@ public final class CustomerRequirements implements Serializable {
         o.addProperty("serviceArea", serviceArea);
         o.addProperty("customerName", customerName);
         o.addProperty("coverageIssue", coverageIssue);
+        o.addProperty("dwellingType", dwellingType);
+        o.addProperty("cameraPlacement", cameraPlacement);
+        o.addProperty("rentalHome", rentalHome);
         o.addProperty("conversationStage", conversationStage);
         o.addProperty("meshInterest", meshInterest);
         o.addProperty("meshPreferenceKnown", meshPreferenceKnown);
