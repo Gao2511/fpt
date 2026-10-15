@@ -33,7 +33,7 @@
         <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
         <link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/home.css?v=images-fit-20261010-2">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/ai-chat.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/ai-chat.css?v=wide-20261015">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/pkg-card.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/fonts.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/hero-stars.css">
@@ -905,7 +905,8 @@
         </script>
 
         <!-- ============ AI CHAT WIDGET ============ -->
-        <div class="ai-chat-button" id="aiChatBtn" onclick="toggleAIChat()">
+        <div class="ai-chat-button" id="aiChatBtn" onclick="toggleAIChat()" title="Tư vấn trực tuyến cùng AI" aria-label="Mở cửa sổ tư vấn AI">
+            <span class="ai-chat-button-label">Tư vấn AI ✨</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             </svg>
@@ -914,33 +915,51 @@
         <div class="ai-chat-window" id="aiChatWindow">
             <div class="ai-chat-header">
                 <div class="ai-chat-header-info">
-                    <div class="ai-chat-avatar">AI</div>
+                    <div class="ai-chat-avatar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/>
+                            <rect x="4" y="6" width="16" height="12" rx="3"/>
+                            <circle cx="9" cy="12" r="1.5" fill="currentColor"/>
+                            <circle cx="15" cy="12" r="1.5" fill="currentColor"/>
+                            <path d="M9 15h6"/>
+                        </svg>
+                    </div>
                     <div>
-                        <div class="ai-chat-title">Tư vấn viên AI</div>
-                        <div class="ai-chat-status">Đang hoạt động</div>
+                        <div class="ai-chat-title">Tư vấn viên AI FPT</div>
+                        <div class="ai-chat-status">Trực tuyến 24/7 • Sẵn sàng giải đáp</div>
                     </div>
                 </div>
-                <button class="ai-chat-close" onclick="toggleAIChat()">×</button>
+                <button class="ai-chat-close" onclick="toggleAIChat()" aria-label="Đóng cửa sổ tư vấn">×</button>
             </div>
 
             <div class="ai-chat-body" id="aiChatBody" data-contact="${fn:escapeXml(cms['business.phone'])}">
                 <div class="ai-msg ai-msg-bot">
-                    Xin chào anh/chị! Em là tư vấn viên AI của FPT Telecom.
-                    Anh/chị cần tư vấn gói cước nào ạ? 😊
+                    Xin chào anh/chị! Em là trợ lý AI thông minh của FPT Telecom.
+                    Anh/chị đang quan tâm đến gói cước Internet, Truyền hình hay Camera an ninh ạ? Em sẵn sàng hỗ trợ ngay! 😊
+                </div>
+                <div class="ai-chat-suggestions" id="aiChatSuggestions">
+                    <div class="ai-suggestions-title">💡 Gợi ý câu hỏi nhanh:</div>
+                    <div class="ai-suggestions-list">
+                        <button type="button" class="ai-suggestion-chip" onclick="askAISuggestion('Gói cước Internet rẻ nhất là bao nhiêu?')">💰 Gói cước rẻ nhất</button>
+                        <button type="button" class="ai-suggestion-chip" onclick="askAISuggestion('Tư vấn gói cước WiFi 6 gia đình')">🏠 WiFi 6 Gia đình</button>
+                        <button type="button" class="ai-suggestion-chip" onclick="askAISuggestion('Combo Internet và Truyền hình FPT')">📺 Combo Net + TV</button>
+                        <button type="button" class="ai-suggestion-chip" onclick="askAISuggestion('Khuyến mãi lắp đặt mới nhất?')">🎁 Khuyến mãi lắp đặt</button>
+                    </div>
                 </div>
             </div>
 
             <div class="ai-chat-footer">
-                <input type="text" id="aiChatInput" placeholder="Nhập câu hỏi..."
+                <input type="text" id="aiChatInput" placeholder="Nhập câu hỏi cần tư vấn..."
                        onkeypress="if (event.key === 'Enter')
                                    sendAIMessage()">
-                <button onclick="sendAIMessage()">
+                <button onclick="sendAIMessage()" title="Gửi câu hỏi" aria-label="Gửi câu hỏi">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="22" y1="2" x2="11" y2="13"/>
                     <polygon points="22 2 15 22 11 13 2 9 22 2"/>
                     </svg>
                 </button>
             </div>
+            <div class="ai-chat-powered">⚡ Trợ lý AI FPT Telecom • Phản hồi tự động &amp; chính xác</div>
         </div>
 
         <script src="${pageContext.request.contextPath}/js/ai-chat.js"></script>

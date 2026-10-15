@@ -17,8 +17,8 @@
         if (reply.registrationPath) {
             const link = body.ownerDocument.createElement('a');
             link.href = contextPath + reply.registrationPath;
-            link.textContent = 'Mở biểu mẫu đăng ký tư vấn';
-            link.style.display = 'block';
+            link.textContent = 'Mở biểu mẫu đăng ký tư vấn →';
+            link.style.display = 'inline-flex';
             bubble.appendChild(link);
         }
         body.appendChild(bubble);
@@ -26,7 +26,23 @@
     }
     function init(contextPath) {
         let pending = false;
-        root.toggleAIChat = function () { root.document.getElementById('aiChatWindow').classList.toggle('active'); };
+        root.toggleAIChat = function () {
+            const win = root.document.getElementById('aiChatWindow');
+            if (!win) return;
+            const isOpen = win.classList.toggle('active');
+            const label = root.document.querySelector('.ai-chat-button-label');
+            if (label) label.style.display = isOpen ? 'none' : '';
+            if (isOpen) {
+                const input = root.document.getElementById('aiChatInput');
+                if (input) root.setTimeout(() => input.focus(), 150);
+            }
+        };
+        root.askAISuggestion = function (text) {
+            const input = root.document.getElementById('aiChatInput');
+            if (!input || pending) return;
+            input.value = text;
+            root.sendAIMessage();
+        };
         root.sendAIMessage = async function () {
             const input = root.document.getElementById('aiChatInput');
             const body = root.document.getElementById('aiChatBody');
@@ -34,9 +50,14 @@
             if (!message || pending) return;
             if (message.length > 2000) { appendReply(body, {reply: 'Vui lòng nhập câu hỏi tối đa 2000 ký tự.', action: 'none'}, contextPath); return; }
             pending = true; input.disabled = true;
+            const suggestions = root.document.getElementById('aiChatSuggestions');
+            if (suggestions) suggestions.style.display = 'none';
             const user = root.document.createElement('div'); user.className = 'ai-msg ai-msg-user'; user.textContent = message; body.appendChild(user);
             input.value = '';
-            const loading = root.document.createElement('div'); loading.className = 'ai-msg-loading'; loading.textContent = 'Đang tư vấn…'; body.appendChild(loading);
+            const loading = root.document.createElement('div');
+            loading.className = 'ai-msg-loading';
+            loading.innerHTML = '<span></span><span></span><span></span> <span style="margin-left:4px;font-size:12.5px;color:#64748b">Đang tra cứu gói cước…</span>';
+            body.appendChild(loading);
             body.scrollTop = body.scrollHeight;
             const controller = new AbortController();
             const timer = root.setTimeout(() => controller.abort(), 55000);
@@ -47,7 +68,6 @@
                     body: new URLSearchParams({message: message}).toString()
                 });
                 const data = await response.json();
-                // Errors use the same validated display contract; status is not hidden.
                 appendReply(body, data, contextPath);
             } catch (error) {
                 const contact = body.dataset?.contact || '0932 079 469';
