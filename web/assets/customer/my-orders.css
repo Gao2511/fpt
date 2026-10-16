@@ -415,16 +415,24 @@ body {
 
 @media (max-width: 640px) {
     .orders-container {
-        padding: 100px 14px 40px;
+        padding: 92px 14px 40px;
+    }
+    .order-header {
+        flex-wrap: wrap;
+        gap: 10px;
     }
     .order-body {
         grid-template-columns: 1fr;
+    }
+    .order-row {
+        flex-wrap: wrap;
+        gap: 6px;
     }
     .orders-header h1 {
         font-size: 24px;
     }
     .order-card {
-        padding: 18px 20px;
+        padding: 18px 16px;
     }
     .order-label {
         min-width: 80px;
@@ -432,16 +440,26 @@ body {
     }
     .order-value {
         font-size: 13px;
+        word-break: break-word;
+    }
+    .empty-orders {
+        padding: 48px 18px 56px;
     }
     .empty-illustration {
-        width: 170px;
-        height: 170px;
+        width: 160px;
+        height: 160px;
     }
     .empty-orders h3 {
         font-size: 18px;
     }
     .empty-orders p {
         font-size: 13.5px;
+    }
+    .btn-cta {
+        width: 100%;
+        max-width: 280px;
+        justify-content: center;
+        box-sizing: border-box;
     }
 
     /* Phân trang mobile */

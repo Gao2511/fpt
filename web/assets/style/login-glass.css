@@ -823,15 +823,59 @@ body.login-body {
 /* ==========================================================================
    14. RESPONSIVE DESIGN (TABLET & MOBILE)
    ========================================================================== */
+@media (max-width: 640px) {
+    .back-home-wrap {
+        top: max(12px, env(safe-area-inset-top, 12px));
+        left: 14px;
+    }
+    .btn-back-glass {
+        padding: 8px 13px;
+        font-size: 12.5px;
+        min-height: 38px;
+        box-sizing: border-box;
+    }
+    .login-logo {
+        top: max(12px, env(safe-area-inset-top, 12px));
+        right: 14px;
+        left: auto;
+        transform: none;
+    }
+    .login-logo:hover {
+        transform: scale(1.03);
+    }
+    .login-logo-img {
+        height: 38px;
+    }
+    .login-main {
+        padding: 76px 16px 36px;
+        align-items: flex-start;
+    }
+    .login-wrap,
+    .login-wrap.register-wrap {
+        max-width: 100%;
+    }
+    .glass-input-wrap {
+        max-width: 100%;
+    }
+    .glass-input {
+        font-size: 16px;
+        min-height: 46px;
+        box-sizing: border-box;
+    }
+    .glass-btn-primary,
+    .glass-btn {
+        min-height: 46px;
+        box-sizing: border-box;
+    }
+}
+
 @media (max-width: 480px) {
-    .login-title { font-size: 32px; }
+    .login-title { font-size: clamp(28px, 8vw, 32px); }
     .login-sub { font-size: 13px; }
-    .glass-input-wrap { max-width: 100%; }
-    .login-socials { flex-direction: column; align-items: center; }
+    .login-socials { flex-direction: column; align-items: stretch; width: 100%; }
     .glass-btn { justify-content: center; width: 100%; }
     .login-logo h1 { font-size: 14px; }
-    .back-home-wrap { top: 12px; left: 12px; }
-    .login-main { padding-top: 75px; }
+    .login-modal { padding: 28px 22px; }
 }
 
 /* ==========================================================================

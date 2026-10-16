@@ -820,12 +820,20 @@
 
 @media (max-width: 640px) {
     .profile-container {
-        padding: 100px 14px 40px;
+        padding: 92px 14px 40px;
     }
     .avatar-card {
-        padding: 22px;
-        flex-direction: column;
-        text-align: center;
+        padding: 22px 18px !important;
+        flex-direction: column !important;
+        text-align: center !important;
+        gap: 18px !important;
+    }
+    .avatar-info {
+        min-width: 0 !important;
+        width: 100% !important;
+    }
+    .avatar-actions {
+        justify-content: center !important;
     }
     .avatar-preview {
         width: 100px;
@@ -841,7 +849,18 @@
         font-size: 40px;
     }
     .profile-card {
-        padding: 22px;
+        padding: 22px 16px;
+    }
+    .form-group label {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    .form-group label .optional-tag {
+        margin-left: 0;
+    }
+    .form-group input {
+        font-size: 16px;
+        min-height: 46px;
     }
     .quick-actions {
         grid-template-columns: 1fr;
@@ -851,6 +870,8 @@
     }
     .btn {
         width: 100%;
+        min-height: 46px;
         justify-content: center;
+        box-sizing: border-box;
     }
 }

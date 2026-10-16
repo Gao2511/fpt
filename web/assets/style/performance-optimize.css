@@ -135,6 +135,16 @@
         animation: none !important;
     }
 
+    /* ⭐ Hiển thị rõ chữ SVG tiêu đề chính khi tắt animation trên mobile */
+    .th-main {
+        opacity: 1 !important;
+    }
+
+    .th-draw {
+        stroke-dashoffset: 0 !important;
+        opacity: 0.28 !important;
+    }
+
     /* Giữ transition nhẹ nhàng cho tương tác mượt mà */
     button,
     a,
@@ -274,6 +284,15 @@
     body::after {
         animation: none !important;
     }
+
+    .th-main {
+        opacity: 1 !important;
+    }
+
+    .th-draw {
+        stroke-dashoffset: 0 !important;
+        opacity: 0.28 !important;
+    }
 }
 
 /* =========================================================
@@ -293,7 +312,7 @@
     .mobile-menu,
     .ai-chat-window {
         max-height: 90vh;
-        max-height: -webkit-fill-available;
+        max-height: 90dvh;
     }
     
     /* iOS — giảm animation để tiết kiệm pin */
@@ -310,45 +329,50 @@
 }
 
 /* =========================================================
-   5. TỐI ƯU CHO ANDROID — TẮT HIỆU ỨNG NẶNG
+   5. TỐI ƯU CHO ANDROID — TẮT HIỆU ỨNG NẶNG (CHỈ TRÊN MOBILE/TABLET)
    ========================================================= */
 
-/* Android dùng Chrome — detect qua -webkit- prefix */
-@supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
-    /* Android-specific */
-    html {
-        -webkit-tap-highlight-color: transparent;
-    }
-    
-    /* Android — tắt backdrop-filter triệt để */
-    .top-nav,
-    .user-avatar,
-    .mobile-menu,
-    .ai-chat-window,
-    .hero-dots,
-    .hero-nav {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        background: rgba(10, 31, 68, 0.95) !important;
-    }
-    
-    /* Android — fix scroll lag */
-    body {
-        overscroll-behavior-y: contain;
-    }
-    
-    /* Android — tắt transform 3D phức tạp */
-    .pkg-wrap,
-    .pkg {
-        transform: translateZ(0);
-        backface-visibility: hidden;
-    }
-    
-    /* Android — tắt animation pulse */
-    .ai-chat-button,
-    .contact-hero-icon,
-    .footer .hotline-box-footer .phone-icon {
-        animation: none !important;
+@media (max-width: 1024px) {
+    @supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+        /* Android-specific */
+        html {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Android — tắt backdrop-filter cho thanh điều hướng (giữ nguyên màu gốc cho ai-chat-window & hero-nav) */
+        .top-nav,
+        .mobile-menu {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            background: rgba(10, 31, 68, 0.96) !important;
+        }
+
+        .user-avatar,
+        .ai-chat-window,
+        .hero-dots,
+        .hero-nav {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+        
+        /* Android — fix scroll lag */
+        body {
+            overscroll-behavior-y: contain;
+        }
+        
+        /* Android — tắt transform 3D phức tạp */
+        .pkg-wrap,
+        .pkg {
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+        
+        /* Android — tắt animation pulse trên màn hình nhỏ */
+        .ai-chat-button,
+        .contact-hero-icon,
+        .footer .hotline-box-footer .phone-icon {
+            animation: none !important;
+        }
     }
 }
 

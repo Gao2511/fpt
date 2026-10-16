@@ -973,11 +973,14 @@ body.dark-mode .orders-page-info strong {
    ========================================================= */
 @media (max-width: 640px) {
     .theme-toggle-btn {
-        width: 44px;
-        height: 44px;
-        bottom: 74px;
+        width: 46px;
+        height: 46px;
+        bottom: max(20px, env(safe-area-inset-bottom, 20px));
         right: 16px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    body:has(.ai-chat-button) .theme-toggle-btn {
+        bottom: calc(max(16px, env(safe-area-inset-bottom, 16px)) + 62px);
     }
     .theme-toggle-btn .icon-sun,
     .theme-toggle-btn .icon-moon {
@@ -986,7 +989,8 @@ body.dark-mode .orders-page-info strong {
     }
 }
 
-body:has(.ai-chat-window.active) .theme-toggle-btn {
+body:has(.ai-chat-window.active) .theme-toggle-btn,
+body.ai-chat-open .theme-toggle-btn {
     opacity: 0;
     pointer-events: none;
     visibility: hidden;

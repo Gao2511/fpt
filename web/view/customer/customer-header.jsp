@@ -154,7 +154,7 @@
         </div>
 
         <!-- ⭐ NÚT HAMBURGER MENU (chỉ hiện trên mobile) -->
-        <button class="hamburger-btn" onclick="toggleMobileMenu(event)" aria-label="Menu">
+        <button class="hamburger-btn" type="button" onclick="toggleMobileMenu(event)" aria-label="Mở menu điều hướng" aria-expanded="false" aria-controls="mobileMenu">
             <span></span>
             <span></span>
             <span></span>
@@ -164,25 +164,47 @@
 
 <!-- ⭐ MOBILE MENU OVERLAY & DRAWER -->
 <div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
-<div class="mobile-menu" id="mobileMenu">
-    <c:if test="${cms['nav.home.visible']=='true'}"><a style="order:${cms['nav.home.order']};" href="${fn:startsWith(cms['nav.home.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.home.url'])}"><c:out value="${cms['nav.home.label']}"/></a></c:if>
-    <c:if test="${cms['nav.packages.visible']=='true'}"><a style="order:${cms['nav.packages.order']};" href="${fn:startsWith(cms['nav.packages.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.packages.url'])}"><c:out value="${cms['nav.packages.label']}"/></a></c:if>
-    <c:if test="${cms['nav.consultation.visible']=='true'}"><a style="order:${cms['nav.consultation.order']};" href="${fn:startsWith(cms['nav.consultation.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.consultation.url'])}"><c:out value="${cms['nav.consultation.label']}"/></a></c:if>
-    <c:if test="${cms['nav.contact.visible']=='true'}"><a style="order:${cms['nav.contact.order']};" href="${fn:startsWith(cms['nav.contact.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.contact.url'])}"><c:out value="${cms['nav.contact.label']}"/></a></c:if>
-    <c:choose>
-        <c:when test="${not empty sessionScope.user}">
-            <a href="${pageContext.request.contextPath}/profile" onclick="handleMobileNav(event, this)">Hồ sơ cá nhân</a>
-            <a href="${pageContext.request.contextPath}/my-orders" onclick="handleMobileNav(event, this)">Đơn của tôi</a>
-            <a href="${pageContext.request.contextPath}/logout" onclick="handleMobileNav(event, this)">Đăng xuất</a>
-        </c:when>
-        <c:otherwise>
-            <div class="mobile-menu-auth" style="margin-top: 10px; display: flex; gap: 8px;">
-                <a href="${pageContext.request.contextPath}/login" style="flex: 1; text-align: center; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25); border-radius: 8px; padding: 10px;">Đăng nhập</a>
-                <a href="${pageContext.request.contextPath}/register" style="flex: 1; text-align: center; background: linear-gradient(135deg, #f37021, #ff8c42); color: white; border-radius: 8px; padding: 10px;">Đăng ký</a>
-            </div>
-        </c:otherwise>
-    </c:choose>
-</div>
+<nav class="mobile-menu" id="mobileMenu" aria-label="Menu điều hướng di động">
+    <div class="mobile-menu-header">
+        <div class="mobile-menu-brand">
+            <img src="${pageContext.request.contextPath}/assets/img/logo-fpt.jpg" alt="FPT Telecom">
+            <span>FPT TELECOM</span>
+        </div>
+        <button type="button" class="mobile-menu-close" onclick="closeMobileMenu()" aria-label="Đóng menu">&times;</button>
+    </div>
+    <div class="mobile-menu-nav">
+        <c:if test="${cms['nav.home.visible']=='true'}"><a style="order:${cms['nav.home.order']};" href="${fn:startsWith(cms['nav.home.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.home.url'])}" onclick="handleMobileNav(event, this)"><c:out value="${cms['nav.home.label']}"/></a></c:if>
+        <c:if test="${cms['nav.packages.visible']=='true'}"><a style="order:${cms['nav.packages.order']};" href="${fn:startsWith(cms['nav.packages.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.packages.url'])}" onclick="handleMobileNav(event, this)"><c:out value="${cms['nav.packages.label']}"/></a></c:if>
+        <c:if test="${cms['nav.consultation.visible']=='true'}"><a style="order:${cms['nav.consultation.order']};" href="${fn:startsWith(cms['nav.consultation.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.consultation.url'])}" onclick="handleMobileNav(event, this)"><c:out value="${cms['nav.consultation.label']}"/></a></c:if>
+        <c:if test="${cms['nav.contact.visible']=='true'}"><a style="order:${cms['nav.contact.order']};" href="${fn:startsWith(cms['nav.contact.url'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['nav.contact.url'])}" onclick="handleMobileNav(event, this)"><c:out value="${cms['nav.contact.label']}"/></a></c:if>
+    </div>
+    <div class="mobile-menu-account">
+        <c:choose>
+            <c:when test="${not empty sessionScope.user}">
+                <a href="${pageContext.request.contextPath}/profile" onclick="handleMobileNav(event, this)">Hồ sơ cá nhân</a>
+                <a href="${pageContext.request.contextPath}/my-orders" onclick="handleMobileNav(event, this)">Đơn của tôi</a>
+                <a href="${pageContext.request.contextPath}/logout" class="mobile-menu-logout" onclick="handleMobileNav(event, this)">Đăng xuất</a>
+            </c:when>
+            <c:otherwise>
+                <div class="mobile-menu-auth">
+                    <a href="${pageContext.request.contextPath}/login" class="mobile-auth-login" onclick="handleMobileNav(event, this)">Đăng nhập</a>
+                    <a href="${pageContext.request.contextPath}/register" class="mobile-auth-register" onclick="handleMobileNav(event, this)">Đăng ký</a>
+                </div>
+            </c:otherwise>
+        </c:choose>
+    </div>
+    <a href="tel:0932079469" class="mobile-menu-hotline" onclick="closeMobileMenu()">
+        <span class="mobile-hotline-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+        </span>
+        <span class="mobile-hotline-text">
+            <small>Tổng đài tư vấn 24/7</small>
+            <strong>0932 079 469</strong>
+        </span>
+    </a>
+</nav>
 
 <!-- =========================================================
      SCRIPTS ĐIỀU KHIỂN HEADER (DROPDOWN & MOBILE MENU)
@@ -219,11 +241,35 @@
                     dropdown.classList.remove('show');
                 }
                 if (avatar) avatar.classList.remove('active');
+                if (typeof closeMobileMenu === 'function') {
+                    closeMobileMenu();
+                }
             }
         });
     }
 
     if (typeof toggleMobileMenu === 'undefined') {
+        function syncMobileActiveLinks() {
+            var menu = document.getElementById('mobileMenu');
+            if (!menu) return;
+            var path = window.location.pathname || '';
+            var hash = window.location.hash || '';
+            var links = menu.querySelectorAll('.mobile-menu-nav a, .mobile-menu-account > a');
+            links.forEach(function(a) {
+                var href = a.getAttribute('href') || '';
+                var isActive = false;
+                if (href.indexOf('#') !== -1) {
+                    var linkHash = href.substring(href.indexOf('#'));
+                    isActive = (hash === linkHash) && (path.endsWith('/home') || path.endsWith('/'));
+                } else if (href.endsWith('/home')) {
+                    isActive = (path.endsWith('/home') || path.endsWith('/')) && (!hash || hash === '#home');
+                } else if (href && path.indexOf(href) !== -1) {
+                    isActive = true;
+                }
+                a.classList.toggle('active', isActive);
+            });
+        }
+
         function toggleMobileMenu(event) {
             if (event) event.stopPropagation();
             var menu = document.getElementById('mobileMenu');
@@ -231,9 +277,13 @@
             var btn = document.querySelector('.hamburger-btn');
             if (menu) menu.classList.toggle('active');
             if (overlay) overlay.classList.toggle('active');
-            if (btn) btn.classList.toggle('active');
+            if (btn) {
+                var isOpen = btn.classList.toggle('active');
+                btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            }
 
             if (menu && menu.classList.contains('active')) {
+                syncMobileActiveLinks();
                 document.body.style.overflow = 'hidden';
             } else {
                 document.body.style.overflow = '';
@@ -246,7 +296,10 @@
             var btn = document.querySelector('.hamburger-btn');
             if (menu) menu.classList.remove('active');
             if (overlay) overlay.classList.remove('active');
-            if (btn) btn.classList.remove('active');
+            if (btn) {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-expanded', 'false');
+            }
             document.body.style.overflow = '';
         }
 
@@ -254,7 +307,7 @@
             var href = el.getAttribute('href') || '';
             closeMobileMenu();
 
-            // Nếu đang ở trang chủ và click vào anchor hash
+            // Nếu đang ở trang có chứa phần tử anchor hash thì cuộn mượt
             if (href.indexOf('#') !== -1) {
                 var hash = href.substring(href.indexOf('#'));
                 var target = document.querySelector(hash);
@@ -264,9 +317,19 @@
                         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         history.pushState(null, '', hash);
                         window.dispatchEvent(new HashChangeEvent('hashchange'));
+                        syncMobileActiveLinks();
                     }, 100);
                 }
             }
         }
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 900) {
+                closeMobileMenu();
+            }
+        });
+
+        window.addEventListener('hashchange', syncMobileActiveLinks);
+        document.addEventListener('DOMContentLoaded', syncMobileActiveLinks);
     }
 </script>

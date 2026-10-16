@@ -910,6 +910,7 @@ body.dark-mode .pkg-body {
     .mesh-grid {
         grid-template-columns: 1fr;
         gap: 18px;
+        padding: 0 12px;
     }
     .mesh-card-wrap .mesh-card__border::before {
         animation: none !important;
@@ -920,6 +921,48 @@ body.dark-mode .pkg-body {
         transform: none !important;
         background: linear-gradient(135deg, #f37021, #ffb26b) !important;
         opacity: 0.45 !important;
+    }
+    .mesh-card {
+        padding: 22px 18px 20px;
+    }
+    .mesh-card-header {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .mesh-monthly {
+        flex-wrap: wrap;
+    }
+    .btn-pkg,
+    .btn-mesh {
+        min-height: 46px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .pkg-body {
+        padding: 18px 16px 20px;
+    }
+    .pkg .price {
+        font-size: clamp(24px, 7.5vw, 30px);
+    }
+    .mesh-card {
+        padding: 18px 15px 18px;
+        gap: 13px;
+    }
+    .mesh-card-header h3 {
+        font-size: 1.2rem;
+    }
+    .mesh-price-box {
+        padding: 12px 14px;
+    }
+    .mesh-amount {
+        font-size: clamp(1.65rem, 6.8vw, 2.05rem);
+    }
+    .mesh-specs li {
+        font-size: 0.84rem;
     }
 }
 
