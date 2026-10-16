@@ -36,6 +36,7 @@
         <link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/home.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/customer/package-detail.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/fonts.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/performance-optimize.css">
         <!-- ⭐ Font Inter + Poppins cho trang package-detail -->
 <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -931,7 +931,7 @@ ul { list-style: none; }
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: fill;
+    object-fit: cover;
     object-position: center;
     opacity: 0;
     transition: opacity 1.2s ease-in-out;
@@ -2880,8 +2880,10 @@ footer {
     .hero-image { margin-right: 0; }
     .hero-slideshow {
         max-width: 100%;
-        height: clamp(200px, 56vw, 260px);
-        min-height: 200px;
+        aspect-ratio: 16 / 9;
+        height: auto;
+        min-height: 195px;
+        max-height: 250px;
         border-radius: 12px;
     }
     .hero-slide { border-radius: 12px; }
@@ -2925,7 +2927,15 @@ footer {
         gap: 16px;
     }
 
-    .device .img-wrap { height: auto; }
+    .device .img-wrap {
+        height: 180px;
+        aspect-ratio: auto;
+        padding: 12px;
+    }
+    .device .img-wrap img {
+        max-height: 156px;
+        object-fit: contain;
+    }
 
     /* ---- CONTACT FORM ---- */
     .contact-section { padding: 36px 0 56px 0; }

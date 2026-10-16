@@ -30,3 +30,8 @@ node_modules/
 .build/
 lib/
 dist/*-rag*.war
+test-e2e/screenshots/
+test-e2e/screenshots-mobile/
+test-e2e/test-customer-pages.cjs
+test-e2e/capture-admin-mobile.cjs
+test-e2e/inspect-mobile.cjs

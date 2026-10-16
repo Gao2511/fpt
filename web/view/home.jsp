@@ -32,6 +32,8 @@
 <meta property="og:image" content="${fn:startsWith(cms['seo.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['seo.image'])}">
         <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
         <link rel="shortcut icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/home.css?v=images-fit-20261010-2">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/ai-chat.css?v=clean-20261015-3">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/style/pkg-card.css">
@@ -164,20 +166,27 @@
                 <div class="hero-image">
                     <div class="hero-carousel">
                     <div class="hero-slideshow">
-                        <img src="${fn:startsWith(cms['hero.image1'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.image1'])}"
-                             alt="FPT Internet" class="hero-slide active">
-                        <img src="${fn:startsWith(cms['hero.image2'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.image2'])}"
-                             alt="Lắp đặt Internet WiFi 6 — kết nối cho gia đình" class="hero-slide">
-                        <img src="${fn:startsWith(cms['hero.image3'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.image3'])}"
-                             alt="FPT Telecom Gia Lai — mạng nhanh, giá tốt" class="hero-slide">
-                        <img src="${fn:startsWith(cms['hero.image4'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.image4'])}"
-                             alt="FPT Camera" class="hero-slide">
-                        <img src="${fn:startsWith(cms['hero.image5'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.image5'])}"
-                             alt="FPT Camera" class="hero-slide">
-                        <img src="${fn:startsWith(cms['hero.image6'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.image6'])}"
-                             alt="FPT Camera" class="hero-slide">
-                        <img src="${fn:startsWith(cms['hero.image7'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['hero.image7'])}"
-                             alt="FPT Camera" class="hero-slide">
+                        <img src="${not empty cms['hero.image1'] ? (fn:startsWith(cms['hero.image1'],'/') ? pageContext.request.contextPath.concat(cms['hero.image1']) : (fn:startsWith(cms['hero.image1'],'http') ? cms['hero.image1'] : pageContext.request.contextPath.concat('/').concat(cms['hero.image1']))) : pageContext.request.contextPath.concat('/assets/images/Hero1.png')}"
+                             alt="FPT Internet" class="hero-slide active"
+                             onerror="this.src='${pageContext.request.contextPath}/assets/images/Hero1.png'">
+                        <img src="${not empty cms['hero.image2'] ? (fn:startsWith(cms['hero.image2'],'/') ? pageContext.request.contextPath.concat(cms['hero.image2']) : (fn:startsWith(cms['hero.image2'],'http') ? cms['hero.image2'] : pageContext.request.contextPath.concat('/').concat(cms['hero.image2']))) : pageContext.request.contextPath.concat('/assets/images/Hero2.png')}"
+                             alt="Lắp đặt Internet WiFi 6 — kết nối cho gia đình" class="hero-slide"
+                             onerror="this.src='${pageContext.request.contextPath}/assets/images/Hero2.png'">
+                        <img src="${not empty cms['hero.image3'] ? (fn:startsWith(cms['hero.image3'],'/') ? pageContext.request.contextPath.concat(cms['hero.image3']) : (fn:startsWith(cms['hero.image3'],'http') ? cms['hero.image3'] : pageContext.request.contextPath.concat('/').concat(cms['hero.image3']))) : pageContext.request.contextPath.concat('/assets/images/Hero3.png')}"
+                             alt="FPT Telecom Gia Lai — mạng nhanh, giá tốt" class="hero-slide"
+                             onerror="this.src='${pageContext.request.contextPath}/assets/images/Hero3.png'">
+                        <img src="${not empty cms['hero.image4'] ? (fn:startsWith(cms['hero.image4'],'/') ? pageContext.request.contextPath.concat(cms['hero.image4']) : (fn:startsWith(cms['hero.image4'],'http') ? cms['hero.image4'] : pageContext.request.contextPath.concat('/').concat(cms['hero.image4']))) : pageContext.request.contextPath.concat('/assets/images/Hero4.png')}"
+                             alt="FPT Camera" class="hero-slide"
+                             onerror="this.src='${pageContext.request.contextPath}/assets/images/Hero4.png'">
+                        <img src="${not empty cms['hero.image5'] ? (fn:startsWith(cms['hero.image5'],'/') ? pageContext.request.contextPath.concat(cms['hero.image5']) : (fn:startsWith(cms['hero.image5'],'http') ? cms['hero.image5'] : pageContext.request.contextPath.concat('/').concat(cms['hero.image5']))) : pageContext.request.contextPath.concat('/assets/images/Hero5.png')}"
+                             alt="FPT Play Box" class="hero-slide"
+                             onerror="this.src='${pageContext.request.contextPath}/assets/images/Hero5.png'">
+                        <img src="${not empty cms['hero.image6'] ? (fn:startsWith(cms['hero.image6'],'/') ? pageContext.request.contextPath.concat(cms['hero.image6']) : (fn:startsWith(cms['hero.image6'],'http') ? cms['hero.image6'] : pageContext.request.contextPath.concat('/').concat(cms['hero.image6']))) : pageContext.request.contextPath.concat('/assets/images/Hero6.png')}"
+                             alt="Truyền hình FPT Play" class="hero-slide"
+                             onerror="this.src='${pageContext.request.contextPath}/assets/images/Hero6.png'">
+                        <img src="${not empty cms['hero.image7'] ? (fn:startsWith(cms['hero.image7'],'/') ? pageContext.request.contextPath.concat(cms['hero.image7']) : (fn:startsWith(cms['hero.image7'],'http') ? cms['hero.image7'] : pageContext.request.contextPath.concat('/').concat(cms['hero.image7']))) : pageContext.request.contextPath.concat('/assets/images/Hero7.png')}"
+                             alt="Combo Internet và Truyền hình" class="hero-slide"
+                             onerror="this.src='${pageContext.request.contextPath}/assets/images/Hero7.png'">
                     </div>
 
                     <div class="hero-carousel-controls">
@@ -470,8 +479,9 @@
 
                 <c:if test="${cms['device1.visible']=='true'}"><div class="device" data-cms-order="${fn:escapeXml(cms['device1.order'])}">
                     <div class="img-wrap">
-                        <img src="${fn:startsWith(cms['device1.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['device1.image'])}"
-                             alt="Modem WiFi 6">
+                        <img src="${not empty cms['device1.image'] ? (fn:startsWith(cms['device1.image'],'/') ? pageContext.request.contextPath.concat(cms['device1.image']) : (fn:startsWith(cms['device1.image'],'http') ? cms['device1.image'] : pageContext.request.contextPath.concat('/').concat(cms['device1.image']))) : pageContext.request.contextPath.concat('/assets/images/Wifi_6.png')}"
+                             alt="Modem WiFi 6"
+                             onerror="this.src='${pageContext.request.contextPath}/assets/images/Wifi_6.png'">
                     </div>
                     <div class="info">
                         <h4><c:out value="${cms['device1.title']}"/></h4>
@@ -481,8 +491,9 @@
 
                 <c:if test="${cms['device2.visible']=='true'}"><div class="device" data-cms-order="${fn:escapeXml(cms['device2.order'])}">
                     <div class="img-wrap">
-                        <img src="${fn:startsWith(cms['device2.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['device2.image'])}"
-                             alt="FPT Play Box">
+                        <img src="${not empty cms['device2.image'] ? (fn:startsWith(cms['device2.image'],'/') ? pageContext.request.contextPath.concat(cms['device2.image']) : (fn:startsWith(cms['device2.image'],'http') ? cms['device2.image'] : pageContext.request.contextPath.concat('/').concat(cms['device2.image']))) : pageContext.request.contextPath.concat('/assets/images/FPT-Play-Box.png')}"
+                             alt="FPT Play Box"
+                             onerror="this.src='${pageContext.request.contextPath}/assets/images/FPT-Play-Box.png'">
                     </div>
                     <div class="info">
                         <h4><c:out value="${cms['device2.title']}"/></h4>
@@ -492,8 +503,9 @@
 
                 <c:if test="${cms['device3.visible']=='true'}"><div class="device" data-cms-order="${fn:escapeXml(cms['device3.order'])}">
                     <div class="img-wrap">
-                        <img src="${fn:startsWith(cms['device3.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['device3.image'])}"
-                             alt="Camera AI">
+                        <img src="${not empty cms['device3.image'] ? (fn:startsWith(cms['device3.image'],'/') ? pageContext.request.contextPath.concat(cms['device3.image']) : (fn:startsWith(cms['device3.image'],'http') ? cms['device3.image'] : pageContext.request.contextPath.concat('/').concat(cms['device3.image']))) : pageContext.request.contextPath.concat('/assets/images/Camera-FPT-Play.png')}"
+                             alt="Camera AI"
+                             onerror="this.src='${pageContext.request.contextPath}/assets/images/Camera-FPT-Play.png'">
                     </div>
                     <div class="info">
                         <h4><c:out value="${cms['device3.title']}"/></h4>
@@ -503,8 +515,9 @@
 
                 <c:if test="${cms['device4.visible']=='true'}"><div class="device" data-cms-order="${fn:escapeXml(cms['device4.order'])}">
                     <div class="img-wrap">
-                        <img src="${fn:startsWith(cms['device4.image'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['device4.image'])}"
-                             alt="Box Ngoại Hạng Anh">
+                        <img src="${not empty cms['device4.image'] ? (fn:startsWith(cms['device4.image'],'/') ? pageContext.request.contextPath.concat(cms['device4.image']) : (fn:startsWith(cms['device4.image'],'http') ? cms['device4.image'] : pageContext.request.contextPath.concat('/').concat(cms['device4.image']))) : pageContext.request.contextPath.concat('/assets/images/Ngoai_Hang_Anh.png')}"
+                             alt="Box Ngoại Hạng Anh"
+                             onerror="this.src='${pageContext.request.contextPath}/assets/images/Ngoai_Hang_Anh.png'">
                     </div>
                     <div class="info">
                         <h4><c:out value="${cms['device4.title']}"/></h4>
@@ -600,8 +613,9 @@
                     <!-- Cột 1: Logo + Mô tả -->
                     <div>
                         <div class="brand-footer">
-                            <img src="${fn:startsWith(cms['header.logo'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['header.logo'])}"
+                            <img src="${not empty cms['header.logo'] ? (fn:startsWith(cms['header.logo'],'/') ? pageContext.request.contextPath.concat(cms['header.logo']) : (fn:startsWith(cms['header.logo'],'http') ? cms['header.logo'] : pageContext.request.contextPath.concat('/').concat(cms['header.logo']))) : pageContext.request.contextPath.concat('/assets/images/fpt-logo.jpg')}"
                                  alt="FPT Telecom"
+                                 onerror="this.src='${pageContext.request.contextPath}/assets/images/fpt-logo.jpg'"
                                  style="height: 55px; width: auto; object-fit: contain; margin-right: 12px;">
                             <div class="brand-text">
                                 <strong>FPT Telecom</strong>

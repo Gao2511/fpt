@@ -6,12 +6,14 @@
      CUSTOMER TOP NAVIGATION HEADER (DÙNG CHUNG CHO KHÁCH HÀNG)
      Tham số truyền vào: activeMenu ('home' | 'packages' | 'orders' | 'contact' | 'profile')
      ========================================================= -->
+<c:set var="headerLogoSrc" value="${empty cms['header.logo'] ? pageContext.request.contextPath.concat('/assets/images/fpt-logo.jpg') : (fn:startsWith(cms['header.logo'],'/') ? pageContext.request.contextPath.concat(cms['header.logo']) : (fn:startsWith(cms['header.logo'],'http') ? cms['header.logo'] : pageContext.request.contextPath.concat('/').concat(cms['header.logo'])))}"/>
 <header class="top-nav">
     <div class="container">
         <!-- LOGO FPT TELECOM -->
         <a href="${pageContext.request.contextPath}/home" class="logo" title="FPT Telecom">
-            <img src="${fn:startsWith(cms['header.logo'],'/') ? pageContext.request.contextPath : ''}${fn:escapeXml(cms['header.logo'])}"
+            <img src="${headerLogoSrc}"
                  alt="FPT Telecom"
+                 onerror="this.src='${pageContext.request.contextPath}/assets/images/fpt-logo.jpg'"
                  style="height: 50px; width: auto; object-fit: contain; display: block;">
         </a>
 
@@ -167,7 +169,9 @@
 <nav class="mobile-menu" id="mobileMenu" aria-label="Menu điều hướng di động">
     <div class="mobile-menu-header">
         <div class="mobile-menu-brand">
-            <img src="${pageContext.request.contextPath}/assets/img/logo-fpt.jpg" alt="FPT Telecom">
+            <img src="${headerLogoSrc}"
+                 alt="FPT Telecom"
+                 onerror="this.src='${pageContext.request.contextPath}/assets/images/fpt-logo.jpg'">
             <span>FPT TELECOM</span>
         </div>
         <button type="button" class="mobile-menu-close" onclick="closeMobileMenu()" aria-label="Đóng menu">&times;</button>
